@@ -447,6 +447,87 @@ details.more .controls>.group:nth-child(-n+2){display:none}
 .ftag{margin:2px 0 6px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
 .ftag.ex{color:var(--cng-ink)}
 .fuel .fv{margin:-2px 0 8px;font-weight:700;font-size:15px}
+
+/* ===== creative layer ===== */
+:root{--shadow:0 1px 2px rgba(60,40,120,.06),0 10px 30px -12px rgba(90,60,180,.22);--r:20px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px -14px rgba(0,0,0,.6)}}
+:root[data-theme="dark"]{--shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px -14px rgba(0,0,0,.6)}
+.panel,.kpi,.fuel,.feat,.tbl,ul.insights li.line{box-shadow:var(--shadow)}
+.panel{border-color:color-mix(in srgb,var(--line) 70%,transparent);background:color-mix(in srgb,var(--panel) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+/* hero */
+header{position:relative;overflow:hidden;padding:34px 30px 40px;border-radius:28px;border:0;box-shadow:var(--shadow);
+  background:linear-gradient(125deg,var(--accent-soft) 0%,var(--pink-soft) 38%,var(--yellow-soft) 68%,var(--cyan-soft) 100%)}
+header>*{position:relative;z-index:1}
+header::before,header::after{content:"";position:absolute;border-radius:50%;filter:blur(2px);z-index:0;pointer-events:none}
+header::before{width:260px;height:260px;right:-70px;top:-90px;background:radial-gradient(circle at 35% 35%,var(--pink),transparent 70%);opacity:.55;animation:float 9s ease-in-out infinite}
+header::after{width:200px;height:200px;left:-60px;bottom:-110px;background:radial-gradient(circle at 50% 50%,var(--cyan),transparent 70%);opacity:.6;animation:float 11s ease-in-out infinite reverse}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-14px,12px) scale(1.06)}}
+header .eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--panel);padding:5px 12px;border-radius:999px;box-shadow:var(--shadow)}
+header .eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--cng-ink);box-shadow:0 0 0 4px color-mix(in srgb,var(--cng) 60%,transparent);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--cng) 20%,transparent)}}
+h1{margin-top:14px;font-size:clamp(32px,5.4vw,54px);letter-spacing:-.025em}
+.herostats{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.herostats span{display:inline-flex;align-items:baseline;gap:6px;padding:7px 14px;border-radius:14px;background:color-mix(in srgb,var(--panel) 75%,transparent);font-size:13.5px;color:var(--muted);font-weight:600;border:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+.herostats b{font-family:var(--display);font-size:19px;font-weight:800;color:var(--ink)}
+.herostats span:nth-child(1) b{color:var(--accent-ink)}.herostats span:nth-child(2) b{color:var(--pink-ink)}.herostats span:nth-child(3) b{color:var(--cyan-ink)}.herostats span:nth-child(4) b{color:var(--cng-ink)}
+/* section heads with a coloured bar */
+.sechead{position:relative;padding-left:16px}
+.sechead::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:6px;border-radius:6px;background:linear-gradient(180deg,var(--accent),var(--pink),var(--yellow))}
+.sechead h2{font-size:clamp(24px,3.4vw,32px)}
+/* quick steps */
+.quick{border:0;background:linear-gradient(140deg,color-mix(in srgb,var(--panel) 92%,transparent),color-mix(in srgb,var(--accent-soft) 85%,transparent))}
+.sl .n{box-shadow:0 4px 12px -4px color-mix(in srgb,var(--pink-ink) 60%,transparent)}
+.chip{transition:transform .15s,box-shadow .15s,border-color .15s}
+.chip:hover{transform:translateY(-1px);box-shadow:0 6px 16px -8px rgba(90,60,180,.4)}
+.chip[aria-pressed="true"]{box-shadow:0 8px 18px -8px color-mix(in srgb,var(--accent-ink) 70%,transparent);border-color:transparent}
+/* verdict with payback ring */
+.verdict{grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:18px;border:0;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.verdict::after{content:"";position:absolute;right:-40px;bottom:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--cng) 50%,transparent),transparent 70%);pointer-events:none}
+.verdict.neg::after{background:radial-gradient(circle,color-mix(in srgb,var(--petrol) 55%,transparent),transparent 70%)}
+.vmain{display:grid;gap:10px;min-width:0;position:relative;z-index:1}
+.ring{--p:50;position:relative;z-index:1;width:124px;height:124px;border-radius:50%;display:grid;place-items:center;
+  background:conic-gradient(var(--cng-ink) calc(var(--p)*1%),color-mix(in srgb,var(--cng) 35%,transparent) 0);transition:background .4s}
+.ring.late{background:conic-gradient(var(--petrol-ink) 100%,transparent 0)}
+.ring>div{width:96px;height:96px;border-radius:50%;background:var(--panel);display:grid;place-content:center;text-align:center;line-height:1.15}
+.ring b{font-family:var(--display);font-size:22px;font-weight:800}
+.ring span{font-size:11px;color:var(--muted);font-weight:600;max-width:80px}
+@media (max-width:600px){.verdict{grid-template-columns:minmax(0,1fr) auto;gap:12px}.ring{width:92px;height:92px}.ring>div{width:72px;height:72px}.ring b{font-size:17px}.ring span{font-size:10px;max-width:64px}}
+/* KPI tiles */
+.kpi{border-top:0;border-radius:18px;position:relative;overflow:hidden;padding-top:18px}
+.kpi::before{content:"";position:absolute;left:14px;right:14px;top:0;height:4px;border-radius:0 0 4px 4px;background:var(--accent)}
+.kpi:nth-child(2)::before{background:var(--pink)}.kpi:nth-child(3)::before{background:var(--cng)}.kpi:nth-child(4)::before{background:var(--yellow)}
+.kpi .v{font-family:var(--display);font-weight:800;letter-spacing:-.01em}
+/* petrol vs cng duo with VS badge */
+.duo{position:relative}
+.duo::after{content:"VS";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:15px;color:var(--on-bright);background:linear-gradient(135deg,var(--petrol),var(--cng));box-shadow:0 0 0 5px var(--bg),var(--shadow);z-index:2}
+@media (max-width:620px){.duo::after{top:auto;bottom:auto;top:50%}}
+.fuel{border-radius:18px;padding:18px 20px}
+.fuel .fv{font-family:var(--display);font-size:19px!important;font-weight:800!important}
+/* rival lines */
+ul.insights li.line{transition:transform .15s,box-shadow .15s,background .15s}
+ul.insights li.line:hover{transform:translateX(3px)}
+.line .ov{box-shadow:0 4px 10px -6px rgba(0,0,0,.35)}
+/* feature cards */
+.feat{border-radius:18px;transition:transform .15s}
+.feat:hover{transform:translateY(-2px)}
+.feat ol{list-style:none;padding-left:0;counter-reset:f}
+.feat li{counter-increment:f;display:flex;gap:8px;align-items:flex-start}
+.feat li::before{content:counter(f);flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-family:var(--num);font-size:11px;font-weight:700;background:color-mix(in srgb,var(--accent) 45%,var(--panel));color:var(--ink);margin-top:1px}
+.feat.msil li::before{background:linear-gradient(135deg,var(--accent),var(--pink))}
+/* cost bars */
+.bar .track{height:18px;border-radius:999px}
+.bar .fill{border-radius:999px}
+/* footer */
+.foot{text-align:center;display:grid;gap:10px;justify-items:center;color:var(--muted);font-size:13.5px}
+.foot p{margin:0}
+.road{display:block;width:min(320px,80%);height:6px;border-radius:6px;background:repeating-linear-gradient(90deg,var(--accent) 0 22px,transparent 22px 36px),var(--soft);background-size:36px 100%,auto;animation:roll 1.6s linear infinite}
+@keyframes roll{to{background-position:36px 0,0 0}}
+/* gentle entrance */
+.wrap>*{animation:rise .5s ease-out both}
+.wrap>*:nth-child(2){animation-delay:.05s}.wrap>*:nth-child(3){animation-delay:.1s}.wrap>*:nth-child(4){animation-delay:.15s}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){header::before,header::after,header .eyebrow::before,.road,.wrap>*{animation:none}.chip,.feat,ul.insights li.line{transition:none}}
+@media (max-width:600px){header{padding:22px 18px 26px;border-radius:22px}h1{font-size:30px}.herostats{gap:6px}.herostats span{padding:5px 10px;font-size:12.5px}.herostats b{font-size:16px}.sechead{padding-left:13px}.sechead::before{width:5px}}
 </style>
 
 <div class="wrap">
@@ -455,6 +536,7 @@ details.more .controls>.group:nth-child(-n+2){display:none}
     <h1><span class="g">Arena</span> vs Competition Comparison</h1>
     <p class="lede">Pick a Maruti Suzuki Arena car and tell us how you drive. See how it compares with its rivals on price, running cost and features, and what <span style="color:var(--cng-ink);font-weight:700">CNG</span> saves over <span style="color:var(--petrol-ink);font-weight:700">petrol</span>.</p>
     <div class="sharebar"><a class="wa" id="waTop" href="https://wa.me/" target="_blank" rel="noopener">Share on WhatsApp</a><button type="button" class="copyl" id="copyTop">Copy link</button></div>
+    <div class="herostats" aria-label="What's inside"><span><b>22</b> cities</span><span><b>10</b> Arena cars</span><span><b>25+</b> rivals</span><span><b>Top 5</b> features</span></div>
     <div class="stamp">Fuel today in <b id="stCity">Hyderabad</b> · Petrol <b id="stP">₹116.15/L</b> · CNG <b id="stC">₹112/kg</b> · Oct 2026</div>
   </header>
 
@@ -577,7 +659,7 @@ details.more .controls>.group:nth-child(-n+2){display:none}
 
   <section class="stack" aria-labelledby="s1">
     <div class="sechead"><div class="eyebrow">Same car, two fuels</div><h2 id="s1">Petrol or CNG?</h2><p class="hint" id="s1Sub"></p></div>
-    <div class="verdict" id="verdict"><span class="tag" id="vTag">Go CNG</span><p id="vText"></p></div>
+    <div class="verdict" id="verdict"><div class="vmain"><span class="tag" id="vTag">Go CNG</span><p id="vText"></p></div><div class="ring" id="ring" aria-hidden="true"><div><b id="ringV"></b><span id="ringL">payback</span></div></div></div>
     <div class="kpis">
       <div class="kpi"><div class="l">Saving per month</div><div class="v" id="kMon"></div></div>
       <div class="kpi"><div class="l">Saving per year</div><div class="v" id="kYr"></div></div>
@@ -628,6 +710,7 @@ details.more .controls>.group:nth-child(-n+2){display:none}
     <p class="hint">Removing access blocks that person from using this page straight away. To remove them completely, also take them off the list in the page's Share menu.</p>
   </section>
   <p class="hint privacy">Opening this page records your name and the time of your visit for the dealership team.</p>
+  <footer class="foot"><span class="road" aria-hidden="true"></span><p>Made for <b>Maruti Suzuki Arena</b> · Southeast Zone · Prices refresh every morning</p></footer>
   <details class="notes">
     <summary>Data sources and assumptions</summary>
     <p>Ex-showroom prices are CarWale's Hyderabad or nearby Telangana city listings (Oct 2026) wherever available; Seltos from V3Cars (Oct 2026); Baleno from CarWale’s Sep 2026 variant list; Dzire Tour S from ZigWheels (Oct 2026); XL6 only Zeta was priced individually; Brezza, XL6, Grand i10 Nios, Amaze, Kushaq, Elevate and Dzire Tour S from ZigWheels (Jul–Oct 2026). Check against your current dealer price list before quoting a customer.</p>
@@ -1004,6 +1087,8 @@ function calc(){
   else{v.classList.add("neg");$("vTag").textContent="Stay petrol";
     $("vText").innerHTML=isFinite(be)?`At ${km} km a day, the CNG premium takes <b>${beTxt}</b> to pay back, longer than ${plural(yrs,"year")}. Petrol stays <b>${inr(-net)} cheaper</b>.`
       :`At these prices CNG doesn't cost less per km than petrol, so the premium never pays back.`}
+  {const r=$("ring"),pct=isFinite(be)?Math.min(100,be/months*100):100;r.style.setProperty("--p",pct.toFixed(1));r.classList.toggle("late",!(isFinite(be)&&be<=months));
+   $("ringV").textContent=!isFinite(be)?"—":be<12?be.toFixed(1)+" mo":(be/12).toFixed(1)+" yr";$("ringL").textContent=isFinite(be)?`payback of ${plural(yrs,"yr")}`:"no payback"}
   draw(prem,pMon,cMon,months,be);compare();
 }
 function draw(prem,pMon,cMon,months,be){
