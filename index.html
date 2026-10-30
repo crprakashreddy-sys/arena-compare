@@ -448,6 +448,50 @@ details.more .controls>.group:nth-child(-n+2){display:none}
 .ftag.ex{color:var(--cng-ink)}
 .fuel .fv{margin:-2px 0 8px;font-weight:700;font-size:15px}
 
+/* mobile sign-in gate + owner log */
+.gate{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;overflow:auto;
+  background:radial-gradient(600px 400px at 10% 0%,var(--pink-soft),transparent 70%),radial-gradient(600px 400px at 100% 100%,var(--cyan-soft),transparent 70%),var(--bg)}
+.gatebox{width:100%;max-width:420px;display:grid;gap:14px;background:var(--panel);border-radius:24px;padding:26px 22px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.gatebox h2{font-size:28px;font-weight:800}
+.gatebox h2 .g{background:linear-gradient(90deg,var(--accent-ink),var(--pink-ink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.gatebox input[type=text],.gatebox input[type=tel],.gatebox input[type=password]{font:inherit;font-size:17px;color:var(--ink);background:var(--soft);border:2px solid var(--line);border-radius:12px;padding:12px 14px;width:100%}
+.gatebox input:focus-visible{outline:none;border-color:var(--accent-ink)}
+.mob{display:flex;align-items:stretch}
+.mob span{display:grid;place-items:center;padding:0 12px;font-weight:700;background:var(--accent-soft);border:2px solid var(--line);border-right:0;border-radius:12px 0 0 12px}
+.mob input{border-radius:0 12px 12px 0!important;letter-spacing:.06em;font-family:var(--num)!important}
+.gerr{margin:0;min-height:1.2em;color:var(--bad);font-weight:600;font-size:14px}
+.gbtn{font:inherit;font-size:17px;font-weight:800;color:var(--on-bright);border:0;border-radius:14px;padding:14px;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--pink));box-shadow:0 10px 22px -10px color-mix(in srgb,var(--accent-ink) 70%,transparent)}
+.gbtn:disabled{opacity:.6;cursor:wait}
+.gbtn:focus-visible{outline:3px solid var(--accent-ink);outline-offset:2px}
+.gfine{font-size:12.5px}
+body.gated{overflow:hidden}
+body.gated .wrap{filter:blur(6px);pointer-events:none;user-select:none}
+#ownPanel .acctools select{width:auto;flex:0 1 180px;font-size:14px;padding:8px 10px;border-radius:999px}
+#ownTbl td{font-family:var(--body);white-space:normal}
+#ownTbl td.n{font-family:var(--num);white-space:nowrap}
+#ownTbl tr.who{cursor:pointer}
+#ownTbl tr.who:hover td{background:var(--soft)}
+#ownTbl tr.det td{background:var(--soft);font-size:13.5px;color:var(--muted)}
+#ownTbl tr.isBlocked td{opacity:.6}
+#ownTbl a{color:var(--accent-ink);font-weight:700;text-decoration:none}
+#ownTbl .vlist{display:grid;gap:3px;margin:0;padding:0;list-style:none}
+@media (max-width:600px){#ownPanel .acctools select{flex:1 1 45%}}
+@media (max-width:600px){
+  #ownPanel table{min-width:0}
+  #ownTbl,#ownTbl tbody{display:block}
+  #ownTbl tr:first-child:has(th){display:none}
+  #ownTbl tr.who{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+  #ownTbl tr.who td{border:0;padding:0;text-align:left;background:none!important;font-size:13.5px}
+  #ownTbl tr.who td:nth-child(1){font-size:15px}
+  #ownTbl tr.who td:not(:nth-child(7)){grid-column:1}
+  #ownTbl tr.who td:nth-child(7){grid-column:2;grid-row:1/span 4;align-self:center}
+  #ownTbl tr.who td:nth-child(3)::before{content:"Visits: "}
+  #ownTbl tr.who td:nth-child(4)::before{content:"Last seen: "}
+  #ownTbl tr.who td:nth-child(6)::before{content:"Time on page: "}
+  #ownTbl tr.who td.n::before{font-family:var(--body);color:var(--muted)}
+  #ownTbl tr.det{display:block}#ownTbl tr.det td{display:block;border:0;padding:10px 14px}
+}
+
 /* ===== creative layer ===== */
 :root{--shadow:0 1px 2px rgba(60,40,120,.06),0 10px 30px -12px rgba(90,60,180,.22);--r:20px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px -14px rgba(0,0,0,.6)}}
@@ -709,6 +753,18 @@ ul.insights li.line:hover{transform:translateX(3px)}
     <p class="hint">Removing access blocks that person from using this page straight away. To remove them completely, also take them off the list in the page's Share menu.</p>
   </section>
   <p class="hint privacy">Opening this page records your name and the time of your visit for the dealership team.</p>
+  <section class="panel access" id="ownPanel" hidden aria-labelledby="ownH">
+    <div class="sechead"><div class="eyebrow">Only you can see this</div><h2 id="ownH">Who's using this page</h2></div>
+    <p class="accsum" id="ownSum"></p>
+    <div class="acctools">
+      <div class="chips" id="ownTabs"></div>
+      <select id="ownCity" aria-label="Filter by city"></select>
+      <input type="search" id="ownQ" placeholder="Search name or mobile" aria-label="Search visitors">
+    </div>
+    <p class="empty" id="ownErr" hidden></p>
+    <div class="tbl"><table id="ownTbl"></table></div>
+    <div class="acctools"><button type="button" class="chip sm" id="ownMore" hidden></button><span></span><span><button type="button" class="act" id="ownRefresh">Refresh</button><button type="button" class="act" id="ownOut">Close owner view</button></span></div>
+  </section>
   <footer class="foot"><span class="road" aria-hidden="true"></span><p>Made for <b>Maruti Suzuki Arena</b> · Southeast Zone · Prices refresh every morning</p></footer>
   <details class="notes">
     <summary>Data sources and assumptions</summary>
@@ -716,6 +772,20 @@ ul.insights li.line:hover{transform:translateX(3px)}
     <p>Mileage is the manufacturer's claimed (ARAI) figure for every car, petrol and CNG, so the comparison is like for like. Where CarWale did not list a figure, the maker's published claim is used.</p>
     <p>Fuel prices are set per city (Oct 2026: Goodreturns, V3Cars, Business Today, BankBazaar, RozKaBhav). Where a city's CNG price wasn't published, the state average is used and marked. Ex-showroom prices are the same across Telangana, Andhra Pradesh, Odisha and Chhattisgarh (checked on CarWale); on-road prices differ by state road tax. The blended CNG cost assumes the rest of the driving runs on petrol. Prices refresh automatically each morning.</p>
   </details>
+</div>
+
+<div class="gate" id="gate" hidden role="dialog" aria-modal="true" aria-labelledby="gateH">
+  <form class="gatebox" id="gateForm" novalidate>
+    <div class="eyebrow">Maruti Suzuki Arena · Southeast Zone</div>
+    <h2 id="gateH"><span class="g">Arena</span> vs Competition</h2>
+    <p class="hint" id="gateSub">Enter your name and mobile number to open the comparison.</p>
+    <div class="field" id="gName"><label for="gN">Your name</label><input type="text" id="gN" autocomplete="name" maxlength="60" required></div>
+    <div class="field" id="gMob"><label for="gM">Mobile number</label><div class="mob"><span>+91</span><input type="tel" id="gM" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="10-digit number" required></div></div>
+    <div class="field" id="gPinF" hidden><label for="gP">Owner PIN</label><input type="password" id="gP" inputmode="numeric" autocomplete="off" maxlength="12"></div>
+    <p class="gerr" id="gErr" role="alert"></p>
+    <button type="submit" class="gbtn" id="gBtn">Open the comparison</button>
+    <p class="hint gfine" id="gFine">Your name, number and visit time are recorded for the dealership team. You'll only be asked once on this phone.</p>
+  </form>
 </div>
 
 <script>
@@ -1356,6 +1426,103 @@ loadModel();calc();
     db.collection("visits").onSnapshot(snap=>{visits=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(b.last).localeCompare(String(a.last)));render()},()=>{});
     db.collection("blocked").onSnapshot(snap=>{blocked=new Set(snap.docs.map(d=>d.id));render()},()=>{});
   }catch(e){}
+})();
+
+// ---- mobile-number sign-in + visitor log (public link only) ----
+const LOG_URL="__LOG_URL__";
+(function(){
+  const host=location.hostname,test=/[?&]gatetest/.test(location.search);
+  if(!/^https:\/\/script\.google\.com\//.test(LOG_URL)||!(host.endsWith("github.io")||test))return;
+  const K="arenaVisitor",ownerMode=/owner/i.test(location.hash);
+  const api=q=>fetch(LOG_URL+"?"+new URLSearchParams(q)).then(r=>r.json());
+  const gate=$("gate"),form=$("gateForm"),err=$("gErr"),btn=$("gBtn");
+  let me=null;try{me=JSON.parse(localStorage.getItem(K)||"null")}catch(e){}
+  const vid=Date.now().toString(36)+Math.random().toString(36).slice(2,8),t0=Date.now();
+  const cityName=()=>{try{return CITIES[+$("city").value].n}catch(e){return""}};
+  const carName=()=>{try{return CMP&&CMP.ms?`${CMP.ms.n} ${CMP.ms.v}`:MODELS[sel.value].n}catch(e){return""}};
+  const blockedScreen=()=>{document.body.classList.remove("gated");gate.hidden=true;
+    document.querySelector(".wrap").innerHTML='<section class="panel blockedMsg"><h2>Access removed</h2><p class="lede">Your access to this page has been removed. Please contact the Maruti Suzuki Arena team if you think this is a mistake.</p></section>'};
+  const showGate=()=>{gate.hidden=false;document.body.classList.add("gated");setTimeout(()=>$(ownerMode?"gP":"gN").focus(),50)};
+  const hideGate=()=>{gate.hidden=true;document.body.classList.remove("gated")};
+  let logged=false;
+  const logVisit=()=>api({a:"log",v:vid,n:me.n,m:me.m,c:cityName(),car:carName(),d:navigator.userAgent.slice(0,110)})
+    .then(r=>{if(r&&r.blocked){try{localStorage.removeItem(K)}catch(e){}blockedScreen();return"blocked"}logged=true;return"ok"});
+  const sendUpd=()=>{if(!logged)return;try{fetch(LOG_URL+"?"+new URLSearchParams({a:"upd",v:vid,c:cityName(),car:carName(),s:Math.round((Date.now()-t0)/1000)}),{keepalive:true}).catch(()=>{})}catch(e){}};
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")sendUpd()});
+  window.addEventListener("pagehide",sendUpd);
+  setTimeout(sendUpd,60000);
+
+  if(ownerMode){
+    $("gName").hidden=true;$("gMob").hidden=true;$("gPinF").hidden=false;$("gateSub").textContent="Owner view. Enter your PIN to see who is using this page.";
+    $("gFine").textContent="Wrong link? Remove #owner from the address to open the normal page.";btn.textContent="Open owner view";
+    let pin="";try{pin=sessionStorage.getItem("arenaPin")||""}catch(e){}
+    if(pin)startOwner(pin,true);else showGate();
+  }else if(me&&me.m){logVisit().catch(()=>{})}
+  else showGate();
+
+  form.addEventListener("submit",async e=>{e.preventDefault();err.textContent="";
+    if(ownerMode){const pin=$("gP").value.trim();if(!pin){err.textContent="Enter your PIN.";return}startOwner(pin,false);return}
+    const n=$("gN").value.trim().replace(/\s+/g," "),m=$("gM").value.replace(/\D/g,"");
+    if(n.length<2){err.textContent="Please enter your name.";$("gN").focus();return}
+    if(!/^[6-9]\d{9}$/.test(m)){err.textContent="Please enter a valid 10-digit mobile number.";$("gM").focus();return}
+    me={n,m};btn.disabled=true;btn.textContent="Opening…";
+    try{const r=await logVisit();if(r==="blocked")return}catch(x){}
+    try{localStorage.setItem(K,JSON.stringify(me))}catch(x){}
+    btn.disabled=false;btn.textContent="Open the comparison";hideGate()});
+  $("gM").addEventListener("input",e=>{e.target.value=e.target.value.replace(/\D/g,"").slice(0,10)});
+
+  // ---- owner view ----
+  let V=[],B=new Set(),PIN="",tab="all",city="",q="",limit=50,open=null;
+  async function startOwner(pin,silent){btn.disabled=true;btn.textContent="Checking…";
+    try{const r=await api({a:"list",pin});
+      if(!r||!r.ok){btn.disabled=false;btn.textContent="Open owner view";try{sessionStorage.removeItem("arenaPin")}catch(e){}
+        err.textContent=(r&&r.error)||"Could not open owner view.";if(silent)showGate();return}
+      PIN=pin;try{sessionStorage.setItem("arenaPin",pin)}catch(e){}
+      V=r.visits||[];B=new Set(r.blocked||[]);hideGate();$("ownPanel").hidden=false;render();
+      setTimeout(()=>$("ownPanel").scrollIntoView({behavior:"smooth",block:"start"}),100);
+    }catch(x){btn.disabled=false;btn.textContent="Open owner view";err.textContent="No connection. Try again.";if(silent)showGate()}}
+  async function refresh(){try{const r=await api({a:"list",pin:PIN});if(r&&r.ok){V=r.visits||[];B=new Set(r.blocked||[]);render()}else{$("ownErr").hidden=false;$("ownErr").textContent=(r&&r.error)||"Could not refresh."}}catch(e){$("ownErr").hidden=false;$("ownErr").textContent="No connection. Try again."}}
+  const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const fmt=t=>t?new Date(t).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"}):"—";
+  const dur=s=>!s?"—":s<60?s+" sec":Math.round(s/60)+" min";
+  const startOfToday=()=>{const d=new Date();d.setHours(0,0,0,0);return d.getTime()};
+  function render(){
+    $("ownErr").hidden=true;
+    const from=tab==="today"?startOfToday():tab==="week"?Date.now()-7*864e5:0;
+    const vis=V.filter(v=>new Date(v.t).getTime()>=from&&(!city||v.c===city));
+    const people=new Map();
+    vis.forEach(v=>{let p=people.get(v.m);if(!p){p={m:v.m,n:v.n,list:[],cities:new Set(),cars:new Set(),secs:0};people.set(v.m,p)}
+      p.list.push(v);if(v.c)p.cities.add(v.c);if(v.car)p.cars.add(v.car);p.secs+=v.s||0;if(v.n)p.n=v.n});
+    let arr=[...people.values()].map(p=>{p.list.sort((a,b)=>String(b.t).localeCompare(String(a.t)));p.last=p.list[0].t;return p}).sort((a,b)=>String(b.last).localeCompare(String(a.last)));
+    const ql=q.trim().toLowerCase();if(ql)arr=arr.filter(p=>p.n.toLowerCase().includes(ql)||p.m.includes(ql.replace(/\D/g,"")||"#"));
+    const today=V.filter(v=>new Date(v.t).getTime()>=startOfToday());
+    $("ownSum").textContent=`${V.length.toLocaleString("en-IN")} visits · ${new Set(V.map(v=>v.m)).size} people · ${today.length} visits today · ${B.size} removed`;
+    const tabs=[["all","All time"],["today","Today"],["week","Last 7 days"]];
+    $("ownTabs").innerHTML=tabs.map(([k,l])=>`<button type="button" class="chip sm" data-t="${k}" aria-pressed="${tab===k}">${l}</button>`).join("");
+    const cities=[...new Set(V.map(v=>v.c).filter(Boolean))].sort();
+    $("ownCity").innerHTML=`<option value="">All cities</option>`+cities.map(c=>`<option${c===city?" selected":""}>${esc(c)}</option>`).join("");
+    if(!arr.length){$("ownTbl").innerHTML=`<tr><td>No visits ${ql?"match your search":"in this period"} yet.</td></tr>`;$("ownMore").hidden=true;return}
+    let h=`<tr><th>Name</th><th>Mobile</th><th>Visits</th><th>Last seen</th><th>City · car</th><th>Time on page</th><th></th></tr>`;
+    arr.slice(0,limit).forEach(p=>{const bl=B.has(p.m);
+      h+=`<tr class="who${bl?" isBlocked":""}" data-m="${p.m}"><td><b>${esc(p.n)}</b>${bl?' <small class="bad">removed</small>':""}</td><td class="n"><a href="tel:+91${p.m}">${p.m}</a></td><td class="n">${p.list.length}</td><td class="n">${fmt(p.last)}</td><td>${esc([...p.cities].slice(0,2).join(", "))}${p.cars.size?"<br><small>"+esc([...p.cars].slice(0,2).join(", "))+"</small>":""}</td><td class="n">${dur(p.secs)}</td><td>${bl?`<button type="button" class="act restore" data-u="${p.m}">Restore</button>`:`<button type="button" class="act" data-b="${p.m}" data-n="${esc(p.n)}">Remove access</button>`}</td></tr>`;
+      if(open===p.m)h+=`<tr class="det"><td colspan="7"><ul class="vlist">${p.list.slice(0,15).map(v=>`<li>${fmt(v.t)} · ${esc(v.c||"—")} · ${esc(v.car||"—")} · ${dur(v.s)}</li>`).join("")}</ul></td></tr>`});
+    $("ownTbl").innerHTML=h;
+    $("ownMore").hidden=arr.length<=limit;$("ownMore").textContent=`Show ${Math.min(50,arr.length-limit)} more of ${arr.length-limit}`;
+  }
+  $("ownTabs").addEventListener("click",e=>{const b=e.target.closest("[data-t]");if(b){tab=b.dataset.t;limit=50;render()}});
+  $("ownCity").addEventListener("change",e=>{city=e.target.value;limit=50;render()});
+  $("ownQ").addEventListener("input",e=>{q=e.target.value;limit=50;render()});
+  $("ownMore").addEventListener("click",()=>{limit+=50;render()});
+  $("ownRefresh").addEventListener("click",refresh);
+  $("ownOut").addEventListener("click",()=>{try{sessionStorage.removeItem("arenaPin")}catch(e){}location.href=location.pathname});
+  $("ownTbl").addEventListener("click",async e=>{
+    const b=e.target.closest("[data-b],[data-u]");
+    if(b){e.stopPropagation();const m=b.dataset.b||b.dataset.u,on=!!b.dataset.b;
+      if(on&&b.dataset.c!=="1"){b.dataset.c="1";b.textContent="Tap again to confirm";b.classList.add("danger");return}
+      b.disabled=true;b.textContent=on?"Removing…":"Restoring…";
+      try{const r=await api({a:on?"block":"unblock",pin:PIN,m,n:b.dataset.n||""});if(r&&r.ok){on?B.add(m):B.delete(m)}}catch(x){}
+      render();return}
+    const tr=e.target.closest("tr.who");if(tr){open=open===tr.dataset.m?null:tr.dataset.m;render()}});
 })();
 </script>
 
