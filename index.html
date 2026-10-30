@@ -497,6 +497,26 @@ body.gated .wrap{filter:blur(6px);pointer-events:none;user-select:none}
 
 .viewtabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
 @media (max-width:600px){.viewtabs .chip{flex:1 1 0;text-align:center}}
+.objpick{margin:8px 0 10px}
+.objs{display:grid;gap:8px}
+details.obj{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--cng);border-radius:14px;padding:10px 14px;box-shadow:var(--shadow)}
+details.obj.no{border-left-color:var(--petrol)}
+details.obj summary{cursor:pointer;font-weight:700;font-size:15.5px;list-style:none}
+details.obj summary::-webkit-details-marker{display:none}
+details.obj summary::after{content:"＋";float:right;color:var(--accent-ink)}
+details.obj[open] summary::after{content:"－"}
+details.obj[open] summary{margin-bottom:10px}
+.otbl{width:100%;min-width:0!important;table-layout:fixed;border-collapse:collapse;font-size:14px;margin-bottom:10px}
+.otbl td,.otbl th{white-space:normal!important;font-family:var(--body)!important;overflow-wrap:anywhere;min-width:0!important}
+details.obj{min-width:0;overflow:hidden}
+.otbl th,.otbl td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.otbl th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--soft)}
+.otbl th.dm{background:var(--accent-soft)}
+.otbl td:first-child{color:var(--muted);font-weight:600;width:32%}
+.osay{margin:8px 0 10px;padding:10px 12px;border-radius:10px;background:var(--cng-soft);font-size:15px;line-height:1.5}
+details.obj.no .osay{background:var(--petrol-soft)}
+.oshare{margin-left:0}
+@media (max-width:600px){.otbl{font-size:13px}.otbl th,.otbl td{padding:7px 8px}}
 /* ===== creative layer ===== */
 :root{--shadow:0 1px 2px rgba(60,40,120,.06),0 10px 30px -12px rgba(90,60,180,.22);--r:20px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px -14px rgba(0,0,0,.6)}}
@@ -675,9 +695,11 @@ ul.insights li.line:hover{transform:translateX(3px)}
       <div class="viewtabs" role="tablist" aria-label="Choose what to compare">
         <button type="button" class="chip vt" role="tab" id="vtCost" data-v="cost" aria-pressed="true" aria-selected="true" aria-controls="paneCost">Total cost of ownership</button>
         <button type="button" class="chip vt" role="tab" id="vtFeat" data-v="feat" aria-pressed="false" aria-selected="false" aria-controls="paneFeat">Top 5 features</button>
+        <button type="button" class="chip vt" role="tab" id="vtObj" data-v="obj" aria-pressed="false" aria-selected="false" aria-controls="paneObj">Customer objections</button>
       </div>
       <div id="paneCost" role="tabpanel" aria-labelledby="vtCost"><div class="bars" id="bars"></div></div>
       <div id="paneFeat" role="tabpanel" aria-labelledby="vtFeat" hidden><div class="feats" id="feats"></div></div>
+      <div id="paneObj" role="tabpanel" aria-labelledby="vtObj" hidden><p class="hint">Pick the rival the customer is considering, then tap what they say.</p><div class="chips objpick" id="objPick"></div><div class="objs" id="objList"></div></div>
       <p class="hint">Rivals open on their variant nearest in price; change it in the table. Total = ex-showroom price + fuel for the period. Registration, insurance, service and resale are not included. Some features are on higher variants only.</p>
     </div>
   </section>
@@ -776,6 +798,7 @@ ul.insights li.line:hover{transform:translateX(3px)}
     <summary>Data sources and assumptions</summary>
     <p>Ex-showroom prices are CarWale's Hyderabad or nearby Telangana city listings (Oct 2026) wherever available; Seltos from V3Cars (Oct 2026); Baleno from CarWale’s Sep 2026 variant list; Dzire Tour S from ZigWheels (Oct 2026); XL6 only Zeta was priced individually; Brezza, XL6, Grand i10 Nios, Amaze, Kushaq, Elevate and Dzire Tour S from ZigWheels (Jul–Oct 2026). Check against your current dealer price list before quoting a customer.</p>
     <p>Rivals added on 30 Oct 2026 (ex-showroom, mostly Delhi list prices, Sep–Oct 2026): Tigor, Altroz, i20, Magnite and Taisor from V3Cars; Glanza facelift from V3Cars (Oct 2026); Rumion and Citroen C3 from CarDekho; Syros MY26 from CarDekho; Kylaq from Gaadify (Apr 2026); Kiger from Carlelo; Triber from Autocar India; Carens Clavis from CarOnPhone; XUV 3XO CNG from Carlelo (Oct 2026); Bayon from Times Drive and GaadiKey (Oct 2026). Mileage claims from CarWale, Autocar India, Rushlane, CarTrade, V3Cars and CarDekho. Altroz CNG claims differ by source (26.2–27.8 km/kg), so 26.9 is used; Altroz petrol automatics use the published 19.33 km/L claim; Taisor CNG uses the Fronx CNG claim (same engine). Added later: Renault Kwid (Autocar India, Jul 2026; ARAI 21.7/22.5 km/L), Renault Duster 1.3 turbo (CarDekho prices; Renault claims 17.75/18.45 km/L; the 1.0 turbo has no published claim yet); Duster strong hybrid (Times Drive, 17 Oct 2026; ARAI 29 km/L, Emotion priced ₹19.48 L per the official table) and Nissan Tekton (Autocar India, Jul 2026). Tata Curvv and Tata Sierra are not included because no claimed petrol mileage is published for the versions on sale.</p>
+    <p>Customer objections: crash ratings are only those under current protocols — Bharat NCAP, or Global NCAP from 2022 onwards (Autocar India lists, Oct 2026); older tests are shown as "not tested under current norms". Standard airbags from Maruti/Rushlane (May 2025), Business Today (Jul 2025), 91wheels, Spinny, Gaadify and Times Drive. Warranty from Spinny (Sep 2026). Maruti service network: 6,000+ touchpoints in 3,000+ cities (Maruti Suzuki press release, Jul 2026). Rival service-network counts aren't published, so they're not shown.</p>
     <p>Mileage is the manufacturer's claimed (ARAI) figure for every car, petrol and CNG, so the comparison is like for like. Where CarWale did not list a figure, the maker's published claim is used.</p>
     <p>Fuel prices are set per city (Oct 2026: Goodreturns, V3Cars, Business Today, BankBazaar, RozKaBhav). Where a city's CNG price wasn't published, the state average is used and marked. Ex-showroom prices are the same across Telangana, Andhra Pradesh, Odisha and Chhattisgarh (checked on CarWale); on-road prices differ by state road tax. The blended CNG cost assumes the rest of the driving runs on petrol. Prices refresh automatically each morning.</p>
   </details>
@@ -1353,6 +1376,119 @@ $("waCmp").addEventListener("click",async e=>{
   }catch(x){if(x&&x.name==="AbortError")return;window.open(waLink(text),"_blank","noopener")}
 });
 
+
+// ---- customer objection handler ----
+// Crash ratings: only tests under current protocols (Bharat NCAP, or Global NCAP from 2022). Sources: Autocar India lists (Oct 2026).
+const SAFETY={
+ "Brezza":[5,"Bharat NCAP","2026"],"Dzire":[5,"Bharat NCAP","2025"],"Victoris":[5,"Bharat NCAP","2025"],"Baleno":[4,"Bharat NCAP","2025"],
+ "Celerio":[3,"Global NCAP","2025"],"Alto K10":[2,"Global NCAP","2023"],"Wagon R":[1,"Global NCAP","2023"],"S-Presso":[1,"Global NCAP","2022"],
+ "Tekton":[5,"Bharat NCAP","2026"],"Duster":[5,"Bharat NCAP","2026"],"Venue":[5,"Bharat NCAP","2026"],"Seltos":[5,"Bharat NCAP","2026"],"Punch":[5,"Bharat NCAP","2026"],
+ "Amaze":[5,"Bharat NCAP","2025"],"Altroz":[5,"Bharat NCAP","2025"],"Syros":[5,"Bharat NCAP","2025"],"Kylaq":[5,"Bharat NCAP","2025"],
+ "XUV 3XO":[5,"Bharat NCAP","2024"],"Nexon":[5,"Bharat NCAP","2024"],"Magnite":[5,"Global NCAP","2025"],"Taigun":[5,"Global NCAP","2022"],"Kushaq":[5,"Global NCAP","2022"]};
+// Standard airbags (sources: Spinny Victoris safety, Rushlane May 2025, 91wheels Mar 2025, Business Today Jul 2025, Gaadify Hyundai, Spinny Tata, Times Drive 2026, V3Cars trim guides)
+const AIRBAGS={"Alto K10":"6","S-Presso":"6","Celerio":"6","Wagon R":"6","Eeco":"6","Swift":"6","Dzire":"6","Brezza":"6","Ertiga":"6","Baleno":"6","Victoris":"6",
+ "Exter":"6","Aura":"6","Grand i10 Nios":"6","i20":"6","Venue":"6","Creta":"6","Bayon":"6","Tiago":"2","Tigor":"2","Punch":"6","Altroz":"6","Nexon":"6",
+ "XUV 3XO":"6","Glanza":"6","Magnite":"6","Kwid":"2 (6 on Climber)"};
+// Standard warranty (Spinny, Sep 2026; Times Drive for Duster)
+const WARRANTY={"Maruti":"3 yrs / 1 lakh km","Hyundai":"3 yrs / 1 lakh km to unlimited km (by model)","Kia":"3 yrs / unlimited km","Skoda":"Up to 5 yrs / 1.25 lakh km"};
+const warrantyOf=b=>{const k=Object.keys(WARRANTY).find(k=>b.indexOf(k)===0);return k?WARRANTY[k]:"—"};
+const isMaruti=b=>/^Maruti/.test(b);
+const stars=s=>s?`${"★".repeat(s[0])}${"☆".repeat(5-s[0])} (${s[1]} ${s[2]})`:"Not tested under current norms";
+
+function objectionsFor(ms,x,C){
+  const L=[],M=ms.n,R=x.n,yrs=plural(C.yrs,"year");
+  const gap=(ms.x-x.x)*1e5,fs=x.fuelYr-ms.fuelYr,d=x.tot-ms.tot,pct=Math.round((ms.c/x.c-1)*100);
+  // 1. safety
+  const sm=SAFETY[M],sr=SAFETY[R],am=AIRBAGS[M],ar=AIRBAGS[R],st=n=>`${n} star${n===1?"":"s"}`;
+  const abN=v=>parseInt(v||"0",10);
+  if(sm||sr||am||ar){
+    let say,good;
+    if(sm&&sr){
+      if(sm[0]>sr[0]){say=`The ${M} actually scores higher in the crash test: ${st(sm[0])} vs ${st(sr[0])} for the ${R}.`;good=true}
+      else if(sm[0]===sr[0]){say=`Both cars score ${st(sm[0])} in the crash test, so the ${M} is just as safe on that measure.`;good=true}
+      else{say=`Yes, the ${R} scored higher in the crash test (${st(sr[0])} vs ${st(sm[0])}).${am?` Every ${M} now comes with ${am} airbags as standard.`:""}`;good=false}
+    }else if(sm&&!sr){
+      if(sm[0]>=4){say=`The ${M} is crash-tested at ${st(sm[0])} (${sm[1]} ${sm[2]}). The ${R} hasn't been tested under the current norms.`;good=true}
+      else{say=`The ${M} was rated ${st(sm[0])} by ${sm[1]} in ${sm[2]}.${am?` Every ${M} now comes with ${am} airbags as standard${ar?`, against ${ar} on the ${R}`:""}.`:""} The ${R} hasn't been tested under the current norms.`;good=!!(am&&ar&&abN(am)>abN(ar))}
+    }else if(!sm&&sr){
+      say=`The ${R} has a ${sr[0]}-star rating (${sr[1]} ${sr[2]}); the ${M} hasn't been tested under the current norms.${am?` Every ${M} comes with ${am} airbags as standard${ar?`, the same as${abN(ar)<abN(am)?" more than":""} the ${R}'s ${ar}`.replace("same as more than","more than"):""}.`:""}`;good=false
+    }else{
+      say=am?`Neither car has a current crash-test rating. Every ${M} comes with ${am} airbags as standard${ar?`; the ${R} gets ${ar}`:""}.`:`Neither car has a current crash-test rating.`;good=!!(am&&(!ar||abN(am)>=abN(ar)))
+    }
+    L.push({q:`"The ${R} is safer"`,rows:[["Crash test",stars(sm),stars(sr)],["Standard airbags",am||"—",ar||"—"]],say,good});
+  }
+  // 2. price
+  if(gap>0){
+    const say=d>=0?`The ${R} is ${inr(gap)} cheaper to buy, but the ${M} saves ${inr(Math.max(fs,0))} a year on fuel${fs>0?`, so it recovers the difference in about ${(gap/fs).toFixed(1)} years`:""}. Over ${yrs}, the ${M} works out ${inr(d)} cheaper in total.`
+      :`The ${R} is ${inr(gap)} cheaper to buy and still ${inr(-d)} cheaper overall at ${C.km} km a day. Focus on service network, features and resale.`;
+    L.push({q:`"The ${R} is cheaper"`,rows:[["Ex-showroom",lakh(ms.x),lakh(x.x)],["Fuel per year",inr(ms.fuelYr),inr(x.fuelYr)],[`Total, ${yrs}`,inr(ms.tot),inr(x.tot)]],say,good:d>=0});
+  }
+  // 3. mileage (only when rival claims more)
+  if(pct<0){
+    L.push({q:`"The ${R} gives better mileage"`,rows:[[`Claimed (${C.unit})`,ms.c.toFixed(2),x.c.toFixed(2)],["Fuel per year",inr(ms.fuelYr),inr(x.fuelYr)],[`Total, ${yrs}`,inr(ms.tot),inr(x.tot)]],
+      say:d>=0?`True, the ${R} claims ${-pct}% better mileage, which is ${inr(-fs)} a year. But the ${M} costs ${inr(gap<0?-gap:0)} less to buy, so it's still ${inr(d)} cheaper over ${yrs}.`
+        :`True, the ${R} claims ${-pct}% better mileage, about ${inr(-fs)} a year on fuel.`,good:d>=0});
+  }
+  // 4. features
+  const fm=featFor(M,ms.v),fx=featFor(R,x.v);
+  L.push({q:`"The ${R} has more features"`,feat:[fm,fx],
+    say:gap<0?`For ${inr(-gap)} less, the ${M} ${ms.v} gives you: ${fm.list.slice(0,3).join(", ")}.`:gap>0?`The ${M} ${ms.v} costs ${inr(gap)} more and gives you: ${fm.list.slice(0,3).join(", ")}.`:`At the same price, the ${M} ${ms.v} gives you: ${fm.list.slice(0,3).join(", ")}.`,good:true});
+  // 5. service and warranty
+  L.push({q:`"What about service and warranty?"`,rows:[["Standard warranty",warrantyOf(ms.b),warrantyOf(x.b)],["Service network","6,000+ points in 3,000+ cities","—"]],
+    say:`Maruti has over 6,000 service points in 3,000+ cities, so service is always close by, even in smaller towns.${!isMaruti(x.b)&&warrantyOf(x.b)!=="—"?` Note: the ${R}'s standard warranty is ${warrantyOf(x.b)}, against ${warrantyOf(ms.b)} for the ${M}.`:""}`,good:true});
+  return L;
+}
+function objHTML(ms,x,C){
+  const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+  return objectionsFor(ms,x,C).map((o,k)=>`<details class="obj ${o.good?"ok":"no"}"><summary>💬 ${esc(o.q)}</summary>
+    ${o.rows?`<table class="otbl"><tr><th></th><th class="dm">${esc(ms.n)}</th><th>${esc(x.n)}</th></tr>${o.rows.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join("")}</table>`:""}
+    ${o.feat?`<div class="dfeat"><div class="m"><b>${esc(ms.n)} ${esc(ms.v)}</b><ol>${o.feat[0].list.map(t=>`<li>${esc(t)}</li>`).join("")}</ol></div><div><b>${esc(x.n)} ${esc(x.v)}</b><ol>${o.feat[1].list.map(t=>`<li>${esc(t)}</li>`).join("")}</ol></div></div>`:""}
+    <p class="osay"><b>🗣 What to say:</b> ${esc(o.say)}</p>
+    <button type="button" class="act oshare" data-k="${k}" data-r="${esc(x.n)}">Share this answer as an image</button></details>`).join("");
+}
+function objImage(ms,x,o){
+  const S=2,W=1080,P=44,rows=o.rows||[],fl=o.feat?Math.max(o.feat[0].list.length,o.feat[1].list.length):0;
+  const ctx0=document.createElement("canvas").getContext("2d");
+  const body='"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif',disp='"Bricolage Grotesque",Georgia,serif';
+  ctx0.font=`600 30px ${body}`;const wrap=(g,t,w)=>{const ws=t.split(" "),out=[];let line="";ws.forEach(wd=>{const tt=line?line+" "+wd:wd;if(g.measureText(tt).width>w&&line){out.push(line);line=wd}else line=tt});if(line)out.push(line);return out};
+  const sayLines=wrap(ctx0,o.say,W-2*P-60);
+  const H=290+(rows.length?60+rows.length*70+10:0)+(fl?90+fl*46:0)+60+sayLines.length*42+40;
+  const cv=document.createElement("canvas");cv.width=W*S;cv.height=H*S;const g=cv.getContext("2d");g.scale(S,S);
+  g.fillStyle="#f7f4fd";g.fillRect(0,0,W,H);
+  let hg=g.createLinearGradient(0,0,W,220);hg.addColorStop(0,"#d9cffd");hg.addColorStop(.5,"#ffd6e6");hg.addColorStop(1,"#cdeff7");rr(g,P/2,P/2,W-P,236,30);g.fillStyle=hg;g.fill();
+  g.fillStyle="#9b2f5e";g.font=`800 22px ${body}`;g.fillText("MARUTI SUZUKI ARENA  ·  SOUTHEAST ZONE",P+16,P+38);
+  g.fillStyle="#241f3a";g.font=`800 46px ${disp}`;g.fillText(`${ms.n} ${ms.v}`,P+16,P+98);
+  g.fillStyle="#4b3aa8";g.font=`700 28px ${body}`;g.fillText(`vs ${x.n} ${x.v}`,P+16,P+140);
+  g.fillStyle="#241f3a";g.font=`700 30px ${body}`;g.fillText(o.q.replace(/^"|"$/g,"“").replace(/“$/,"”"),P+16,P+186);
+  let y=290;
+  if(rows.length){const c1=P+20,c2=P+400,c3=P+700;g.fillStyle="#6a6485";g.font=`800 20px ${body}`;g.fillText(ms.n.toUpperCase(),c2,y+30);g.fillText(x.n.toUpperCase(),c3,y+30);y+=50;
+    rows.forEach(r=>{rr(g,P/2,y,W-P,60,16);g.fillStyle="#ffffff";g.fill();g.fillStyle="#6a6485";g.font=`600 24px ${body}`;g.fillText(r[0],c1,y+39);
+      g.fillStyle="#241f3a";g.font=`700 24px ${body}`;[[r[1],c2],[r[2],c3]].forEach(([t,xx])=>{let f=24;while(g.measureText(t).width>280&&f>15){f--;g.font=`700 ${f}px ${body}`}g.fillText(t,xx,y+39);g.font=`700 24px ${body}`});y+=70});y+=10}
+  if(fl){const cw=(W-P-20)/2;[[o.feat[0],ms,P/2],[o.feat[1],x,P/2+cw+20]].forEach(([F,car,xx],i)=>{rr(g,xx,y,cw,70+fl*46,20);g.fillStyle=i?"#ffffff":"#efe9ff";g.fill();
+      g.fillStyle="#241f3a";g.font=`800 26px ${body}`;g.fillText(`${car.n} ${car.v}`.slice(0,30),xx+20,y+42);g.font=`500 22px ${body}`;F.list.forEach((t,k)=>{g.fillText(`${k+1}. ${t}`.slice(0,40),xx+20,y+84+k*46)})});y+=90+fl*46}
+  rr(g,P/2,y,W-P,60+sayLines.length*42,22);g.fillStyle=o.good?"#dff6ea":"#fff0e5";g.fill();
+  g.fillStyle=o.good?"#1f7a55":"#b5541a";g.font=`800 24px ${body}`;g.fillText("WHAT TO KNOW",P+16,y+40);
+  g.fillStyle="#241f3a";g.font=`600 30px ${body}`;sayLines.forEach((l,k)=>g.fillText(l,P+16,y+82+k*42));
+  return cv;
+}
+async function shareObj(btn){
+  const C=CMP;if(!C)return;const x=C.rows.find(r=>r.n===btn.dataset.r);if(!x)return;const o=objectionsFor(C.rows[0],x,C)[+btn.dataset.k];if(!o)return;
+  const cv=objImage(C.rows[0],x,o);
+  try{const blob=await new Promise(r=>cv.toBlob(r,"image/png"));const file=new File([blob],"maruti-answer.png",{type:"image/png"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file]});return}
+    if(location.hostname.endsWith("github.io")){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="maruti-answer.png";document.body.appendChild(a);a.click();a.remove();btn.textContent="Image saved";return}
+    window.open(waLink(`${o.q}\n${C.rows[0].n} ${C.rows[0].v} vs ${x.n} ${x.v}\n\n${o.say}`),"_blank","noopener");
+  }catch(e){}
+}
+document.addEventListener("click",e=>{const b=e.target.closest(".oshare");if(b){e.preventDefault();shareObj(b)}});
+let objRival=null;
+function renderObj(){
+  const C=CMP;if(!C||!$("objPick"))return;const rv=C.rows.slice(1);if(!rv.length){$("objPick").innerHTML="";$("objList").innerHTML="";return}
+  if(!rv.some(r=>r.n===objRival))objRival=rv[0].n;
+  $("objPick").innerHTML=rv.map(r=>`<button type="button" class="chip sm" data-o="${r.n}" aria-pressed="${r.n===objRival}">${r.n}</button>`).join("");
+  const x=rv.find(r=>r.n===objRival);$("objList").innerHTML=objHTML(C.rows[0],x,C);
+}
+
 // ---- detailed analysis popup ----
 let CMP=null,dlgFrom=null;
 function openDetail(i){
@@ -1387,6 +1523,8 @@ function openDetail(i){
     <p class="hint">At ${C.km} km a day, ${C.isP?"petrol ₹"+C.fp+"/L":"CNG ₹"+C.fp+"/kg"}. Green marks the better figure. Registration, insurance, service and resale not included.</p>
     <h4 class="dsub">Top 5 features of these versions</h4>
     <div class="dfeat"><div class="m"><b>${ms.n} ${ms.v}</b><p class="ftag ${fm.exact?"ex":""}">${fm.label}</p><ol>${f(fm)}</ol></div><div><b>${x.n} ${x.v}</b><p class="ftag ${fx.exact?"ex":""}">${fx.label}</p><ol>${f(fx)}</ol></div></div>
+    <h4 class="dsub">Customer objections</h4>
+    <div class="objs">${objHTML(ms,x,C)}</div>
     <div class="sharebar"><a class="wa" href="${waLink(wa)}" target="_blank" rel="noopener">Share this on WhatsApp</a></div>`;
   $("dlgVar").addEventListener("change",e=>{rivalPick[C.pk+x.n]=+e.target.value;compare();const ni=CMP.rows.findIndex(r=>r.n===x.n);if(ni>0)openDetail(ni)});
   if($("dlg").hidden){dlgFrom=document.activeElement;$("dlg").hidden=false;document.body.style.overflow="hidden";$("dlg").querySelector(".dlg").focus()}
@@ -1445,6 +1583,7 @@ function compare(){
     return `<li class="line" data-i="${ii+1}" tabindex="0" role="button" aria-label="Detailed analysis: ${ms.n} ${ms.v} vs ${x.n} ${x.v}"><span class="who">vs <b>${x.n}</b> <small>${x.v}</small></span><span class="m">${tick(price[0])}${price[1]} price</span><span class="m">${tick(mil[0])}${mil[1]} mileage</span><span class="m">${tick(fuel[0])}${fuel[1].replace("Saves ","saves ")} fuel/yr</span>${ov}<span class="more">Details ›</span></li>`}).join("");
   CMP={rows,ms,yrs,km,isP,unit,per,pk,POOL,fp,rw};
   updateShare(ms,rows,yrs,km,isP);
+  try{renderObj()}catch(e){}
   const max=Math.max(...rows.map(r=>r.tot));
   $("bars").innerHTML=rows.slice().sort((a,b)=>a.tot-b.tot).map(x=>`<div class="bar ${x.msil?"msil":""}"><span class="nm" title="${x.n} ${x.v}">${x.n} ${x.v}</span><div class="track"><div class="fill" style="width:${(x.tot/max*100).toFixed(1)}%"></div></div><span class="val">${inr(x.tot)}</span></div>`).join("");
   $("feats").innerHTML=rows.map(x=>{const F=featFor(x.n,x.v);return `<div class="feat ${x.msil?"msil":""}"><span class="brand">${x.b}</span><h4>${x.n} <small>${x.v}</small></h4><p class="ftag ${F.exact?"ex":""}">${F.label}</p><ol>${F.list.map(f=>`<li>${f}</li>`).join("")}</ol></div>`}).join("");
@@ -1726,14 +1865,16 @@ const LOG_URL="https://script.google.com/macros/s/AKfycbzvTIZH5hYpOR_ZF6KvFKb8DS
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")setTimeout(check,500)});
 })();
 
+// ---- objection rival picker ----
+document.addEventListener("click",e=>{const b=e.target.closest("#objPick [data-o]");if(b){objRival=b.dataset.o;renderObj()}});
 // ---- total cost / top 5 features switch ----
 (function(){
   const tabs=[...document.querySelectorAll(".viewtabs .vt")];
   const show=v=>{tabs.forEach(t=>{const on=t.dataset.v===v;t.setAttribute("aria-pressed",on);t.setAttribute("aria-selected",on)});
-    $("paneCost").hidden=v!=="cost";$("paneFeat").hidden=v!=="feat";try{localStorage.setItem("arenaView",v)}catch(e){}};
+    $("paneCost").hidden=v!=="cost";$("paneFeat").hidden=v!=="feat";$("paneObj").hidden=v!=="obj";try{localStorage.setItem("arenaView",v)}catch(e){}};
   tabs.forEach(t=>t.addEventListener("click",()=>show(t.dataset.v)));
   let v="cost";try{v=localStorage.getItem("arenaView")||"cost"}catch(e){}
-  show(v==="feat"?"feat":"cost");
+  show(["feat","obj"].includes(v)?v:"cost");
 })();
 </script>
 
