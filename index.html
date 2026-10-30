@@ -464,6 +464,9 @@ details.more .controls>.group:nth-child(-n+2){display:none}
 .gbtn:disabled{opacity:.6;cursor:wait}
 .gbtn:focus-visible{outline:3px solid var(--accent-ink);outline-offset:2px}
 .gfine{font-size:12.5px}
+.glink{font:inherit;font-size:13.5px;font-weight:700;color:var(--accent-ink);background:none;border:0;padding:4px 0;cursor:pointer;justify-self:start;text-decoration:underline;text-underline-offset:3px}
+.ownfab{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:50;font:inherit;font-size:14px;font-weight:800;color:var(--on-bright);border:0;border-radius:999px;padding:11px 16px;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--pink));box-shadow:var(--shadow)}
+body.gated .ownfab{display:none}
 body.gated{overflow:hidden}
 body.gated .wrap{filter:blur(6px);pointer-events:none;user-select:none}
 #ownPanel .acctools select{width:auto;flex:0 1 180px;font-size:14px;padding:8px 10px;border-radius:999px}
@@ -767,7 +770,7 @@ ul.insights li.line:hover{transform:translateX(3px)}
     </div>
     <p class="empty" id="ownErr" hidden></p>
     <div class="tbl"><table id="ownTbl"></table></div>
-    <div class="acctools"><button type="button" class="chip sm" id="ownMore" hidden></button><span></span><span><button type="button" class="act" id="ownRefresh">Refresh</button><button type="button" class="act" id="ownOut">Close owner view</button></span></div>
+    <div class="acctools"><button type="button" class="chip sm" id="ownMore" hidden></button><span></span><span><button type="button" class="act" id="ownRefresh">Refresh</button><button type="button" class="act" id="ownOut">Hide list</button><button type="button" class="act" id="ownSignOut">Sign out as owner</button></span></div>
   </section>
   <footer class="foot"><span class="road" aria-hidden="true"></span><p>Made for <b>Maruti Suzuki Arena</b> · Southeast Zone · Prices refresh every morning</p></footer>
   <details class="notes">
@@ -789,9 +792,11 @@ ul.insights li.line:hover{transform:translateX(3px)}
     <div class="field" id="gPinF" hidden><label for="gP">Owner PIN</label><input type="password" id="gP" inputmode="numeric" autocomplete="off" maxlength="12"></div>
     <p class="gerr" id="gErr" role="alert"></p>
     <button type="submit" class="gbtn" id="gBtn">Open the comparison</button>
+    <button type="button" class="glink" id="gSwitch">Page owner? Open with your PIN</button>
     <p class="hint gfine" id="gFine">Your name, number and visit time are recorded for the dealership team. You'll only be asked once on this phone.</p>
   </form>
 </div>
+<button type="button" class="ownfab" id="ownFab" hidden>👥 Visitors</button>
 
 <script>
 // Ex-showroom ₹ lakh. v = CNG variant, x = CNG price, pv/px = matching petrol variant & price, c = claimed km/kg, p = petrol claimed km/L
@@ -1519,7 +1524,9 @@ const LOG_URL="https://script.google.com/macros/s/AKfycbzvTIZH5hYpOR_ZF6KvFKb8DS
 (function(){
   const host=location.hostname,test=/[?&]gatetest/.test(location.search);
   if(!/^https:\/\/script\.google\.com\//.test(LOG_URL)||!(host.endsWith("github.io")||test))return;
-  const K="arenaVisitor",ownerMode=/owner/i.test(location.hash);
+  const K="arenaVisitor",OD="arenaOwnerDevice",OP="arenaOwnerPin";let ownerMode=/owner/i.test(location.hash);
+  const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}},lsSet=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}};
+  const ownerDevice=lsGet(OD)==="1";
   const api=q=>fetch(LOG_URL+"?"+new URLSearchParams(q)).then(r=>r.json());
   const gate=$("gate"),form=$("gateForm"),err=$("gErr"),btn=$("gBtn");
   let me=null;try{me=JSON.parse(localStorage.getItem(K)||"null")}catch(e){}
@@ -1529,6 +1536,16 @@ const LOG_URL="https://script.google.com/macros/s/AKfycbzvTIZH5hYpOR_ZF6KvFKb8DS
   const blockedScreen=()=>{document.body.classList.remove("gated");gate.hidden=true;
     document.querySelector(".wrap").innerHTML='<section class="panel blockedMsg"><h2>Access removed</h2><p class="lede">Your access to this page has been removed. Please contact the Maruti Suzuki Arena team if you think this is a mistake.</p></section>'};
   const showGate=()=>{gate.hidden=false;document.body.classList.add("gated");setTimeout(()=>$(ownerMode?"gP":"gN").focus(),50)};
+  function setMode(owner){ownerMode=owner;err.textContent="";
+    $("gName").hidden=owner;$("gMob").hidden=owner;$("gPinF").hidden=!owner;
+    $("gateSub").textContent=owner?"Owner view. Enter your PIN to see who is using this page.":"Enter your name and mobile number to open the comparison.";
+    $("gFine").textContent=owner?"This phone will be remembered as the owner's, so you won't be asked to sign in again.":"Your name, number and visit time are recorded for the dealership team. You'll only be asked once on this phone.";
+    $("gSwitch").textContent=owner?"Not the owner? Sign in with name and mobile":"Page owner? Open with your PIN";
+    btn.textContent=owner?"Open owner view":"Open the comparison";btn.disabled=false;
+    setTimeout(()=>$(owner?"gP":"gN").focus(),30)}
+  $("gSwitch").addEventListener("click",()=>setMode(!ownerMode));
+  function openOwner(){const pin=lsGet(OP)||"";if(pin){startOwner(pin,true)}else{setMode(true);showGate()}}
+  $("ownFab").addEventListener("click",()=>{if(!$("ownPanel").hidden){$("ownPanel").scrollIntoView({behavior:"smooth",block:"start"});return}openOwner()});
   const hideGate=()=>{gate.hidden=true;document.body.classList.remove("gated")};
   let logged=false;
   const logVisit=()=>api({a:"log",v:vid,n:me.n,m:me.m,city:cityName(),car:carName(),d:navigator.userAgent.slice(0,110)})
@@ -1538,12 +1555,9 @@ const LOG_URL="https://script.google.com/macros/s/AKfycbzvTIZH5hYpOR_ZF6KvFKb8DS
   window.addEventListener("pagehide",sendUpd);
   setTimeout(sendUpd,60000);
 
-  if(ownerMode){
-    $("gName").hidden=true;$("gMob").hidden=true;$("gPinF").hidden=false;$("gateSub").textContent="Owner view. Enter your PIN to see who is using this page.";
-    $("gFine").textContent="Wrong link? Remove #owner from the address to open the normal page.";btn.textContent="Open owner view";
-    let pin="";try{pin=sessionStorage.getItem("arenaPin")||""}catch(e){}
-    if(pin)startOwner(pin,true);else showGate();
-  }else if(me&&me.m){logVisit().catch(()=>{})}
+  if(ownerMode){setMode(true);openOwner()}
+  else if(ownerDevice){$("ownFab").hidden=false}
+  else if(me&&me.m){logVisit().catch(()=>{})}
   else showGate();
 
   form.addEventListener("submit",async e=>{e.preventDefault();err.textContent="";
@@ -1561,12 +1575,12 @@ const LOG_URL="https://script.google.com/macros/s/AKfycbzvTIZH5hYpOR_ZF6KvFKb8DS
   let V=[],B=new Set(),PIN="",tab="all",city="",q="",limit=50,open=null;
   async function startOwner(pin,silent){btn.disabled=true;btn.textContent="Checking…";
     try{const r=await api({a:"list",pin});
-      if(!r||!r.ok){btn.disabled=false;btn.textContent="Open owner view";try{sessionStorage.removeItem("arenaPin")}catch(e){}
-        err.textContent=(r&&r.error)||"Could not open owner view.";if(silent)showGate();return}
-      PIN=pin;try{sessionStorage.setItem("arenaPin",pin)}catch(e){}
+      if(!r||!r.ok){btn.disabled=false;btn.textContent="Open owner view";lsSet(OP,null);
+        err.textContent=(r&&r.error)||"Could not open owner view.";if(silent){setMode(true);showGate();err.textContent=(r&&r.error)||""}return}
+      PIN=pin;lsSet(OP,pin);lsSet(OD,"1");$("ownFab").hidden=false;
       V=r.visits||[];B=new Set(r.blocked||[]);hideGate();$("ownPanel").hidden=false;render();
       setTimeout(()=>$("ownPanel").scrollIntoView({behavior:"smooth",block:"start"}),100);
-    }catch(x){btn.disabled=false;btn.textContent="Open owner view";err.textContent="No connection. Try again.";if(silent)showGate()}}
+    }catch(x){btn.disabled=false;btn.textContent="Open owner view";err.textContent="No connection. Try again.";if(silent){setMode(true);showGate();err.textContent="No connection. Try again."}}}
   async function refresh(){try{const r=await api({a:"list",pin:PIN});if(r&&r.ok){V=r.visits||[];B=new Set(r.blocked||[]);render()}else{$("ownErr").hidden=false;$("ownErr").textContent=(r&&r.error)||"Could not refresh."}}catch(e){$("ownErr").hidden=false;$("ownErr").textContent="No connection. Try again."}}
   const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const fmt=t=>t?new Date(t).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"}):"—";
@@ -1601,7 +1615,8 @@ const LOG_URL="https://script.google.com/macros/s/AKfycbzvTIZH5hYpOR_ZF6KvFKb8DS
   $("ownQ").addEventListener("input",e=>{q=e.target.value;limit=50;render()});
   $("ownMore").addEventListener("click",()=>{limit+=50;render()});
   $("ownRefresh").addEventListener("click",refresh);
-  $("ownOut").addEventListener("click",()=>{try{sessionStorage.removeItem("arenaPin")}catch(e){}location.href=location.pathname});
+  $("ownOut").addEventListener("click",()=>{$("ownPanel").hidden=true;window.scrollTo({top:0,behavior:"smooth"})});
+  $("ownSignOut").addEventListener("click",()=>{lsSet(OP,null);lsSet(OD,null);location.href=location.pathname});
   $("ownTbl").addEventListener("click",async e=>{
     const b=e.target.closest("[data-b],[data-u]");
     if(b){e.stopPropagation();const m=b.dataset.b||b.dataset.u,on=!!b.dataset.b;
