@@ -492,6 +492,8 @@ body.gated .wrap{filter:blur(6px);pointer-events:none;user-select:none}
   #ownTbl tr.det{display:block}#ownTbl tr.det td{display:block;border:0;padding:10px 14px}
 }
 
+.viewtabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+@media (max-width:600px){.viewtabs .chip{flex:1 1 0;text-align:center}}
 /* ===== creative layer ===== */
 :root{--shadow:0 1px 2px rgba(60,40,120,.06),0 10px 30px -12px rgba(90,60,180,.22);--r:20px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px -14px rgba(0,0,0,.6)}}
@@ -668,10 +670,12 @@ ul.insights li.line:hover{transform:translateX(3px)}
             <ul class="insights" id="cmpHead"></ul>
       <div class="sharebar"><a class="wa" id="waCmp" href="https://wa.me/" target="_blank" rel="noopener">Share this comparison on WhatsApp</a><span class="copied" id="copyMsg" role="status"></span></div>
       <details class="full"><summary>See full numbers and change rival versions</summary><div class="tbl"><table id="cmpTbl"></table></div></details>
-      <h3 class="subhead">Total cost of ownership</h3>
-      <div class="bars" id="bars"></div>
-      <h3 class="subhead">Top 5 features</h3>
-      <div class="feats" id="feats"></div>
+      <div class="viewtabs" role="tablist" aria-label="Choose what to compare">
+        <button type="button" class="chip vt" role="tab" id="vtCost" data-v="cost" aria-pressed="true" aria-selected="true" aria-controls="paneCost">Total cost of ownership</button>
+        <button type="button" class="chip vt" role="tab" id="vtFeat" data-v="feat" aria-pressed="false" aria-selected="false" aria-controls="paneFeat">Top 5 features</button>
+      </div>
+      <div id="paneCost" role="tabpanel" aria-labelledby="vtCost"><div class="bars" id="bars"></div></div>
+      <div id="paneFeat" role="tabpanel" aria-labelledby="vtFeat" hidden><div class="feats" id="feats"></div></div>
       <p class="hint">Rivals open on their variant nearest in price; change it in the table. Total = ex-showroom price + fuel for the period. Registration, insurance, service and resale are not included. Some features are on higher variants only.</p>
     </div>
   </section>
@@ -1630,6 +1634,16 @@ const LOG_URL="https://script.google.com/macros/s/AKfycbzvTIZH5hYpOR_ZF6KvFKb8DS
   }
   setTimeout(check,1500);
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")setTimeout(check,500)});
+})();
+
+// ---- total cost / top 5 features switch ----
+(function(){
+  const tabs=[...document.querySelectorAll(".viewtabs .vt")];
+  const show=v=>{tabs.forEach(t=>{const on=t.dataset.v===v;t.setAttribute("aria-pressed",on);t.setAttribute("aria-selected",on)});
+    $("paneCost").hidden=v!=="cost";$("paneFeat").hidden=v!=="feat";try{localStorage.setItem("arenaView",v)}catch(e){}};
+  tabs.forEach(t=>t.addEventListener("click",()=>show(t.dataset.v)));
+  let v="cost";try{v=localStorage.getItem("arenaView")||"cost"}catch(e){}
+  show(v==="feat"?"feat":"cost");
 })();
 </script>
 
