@@ -373,6 +373,55 @@ html,body{max-width:100%;overflow-x:hidden}
 .tune .advgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:0}
 .tune input[type=number]{background:var(--panel)}
 @media (max-width:600px){.tune .advgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.tune .advgrid .field:nth-child(n+3){grid-column:1/-1}.tunehead h3{font-size:17px}}
+
+/* rival picking panel */
+.rivalpick{display:grid;gap:12px;border-top:4px solid var(--cyan)}
+.rivalpick h3{font-family:var(--display);font-size:18px;font-weight:600}
+.rivalpick .field:has(#cfuel),.rivalpick #pvarField{display:none!important}
+.moretune .advgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:12px}
+/* clickable rival lines */
+ul.insights li.line{cursor:pointer;transition:background .15s,transform .15s}
+ul.insights li.line:hover{background:var(--soft)!important}
+ul.insights li.line:active{transform:scale(.99)}
+ul.insights li.line:focus-visible{outline:3px solid var(--accent-ink);outline-offset:2px}
+.line .more{font-size:12.5px;font-weight:700;color:var(--accent-ink);white-space:nowrap}
+/* popup */
+.dlgback{position:fixed;inset:0;z-index:60;background:rgba(24,16,48,.48);display:flex;align-items:center;justify-content:center;padding:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.dlg{background:var(--panel);color:var(--ink);border-radius:20px;width:100%;max-width:680px;max-height:88vh;overflow:auto;padding:20px 20px max(20px,env(safe-area-inset-bottom,0px));box-shadow:0 20px 60px rgba(20,10,50,.35);outline:none}
+.dlgtop{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;position:sticky;top:-20px;background:var(--panel);padding:8px 0;z-index:1}
+.dlgtop h3{font-family:var(--display);font-size:22px;font-weight:800;background:linear-gradient(90deg,var(--accent-ink),var(--pink-ink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.dlgx{font:inherit;font-size:18px;width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:var(--soft);color:var(--ink);cursor:pointer;flex:none}
+.dlgx:focus-visible{outline:3px solid var(--accent-ink);outline-offset:2px}
+.dpick{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-bottom:12px}
+.dpick .dlab{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.dpick select{width:auto;flex:1 1 220px;font-size:14.5px;padding:8px 10px}
+.dverdict{padding:12px 14px;border-radius:12px;font-size:15px;line-height:1.5;margin-bottom:14px}
+.dverdict.ok{background:var(--cng-soft)}.dverdict.no{background:var(--petrol-soft)}
+.dtwrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+.dtbl{width:100%;min-width:0;border-collapse:collapse;font-size:14.5px}
+.dtbl th,.dtbl td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:normal}
+.dtbl tr:last-child td{border-bottom:0;font-weight:800}
+.dtbl th:first-child,.dtbl td:first-child{text-align:left;color:var(--muted);font-family:var(--body);font-weight:600}
+.dtbl th{background:var(--soft);font-family:var(--display);font-size:15px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--ink)}
+.dtbl th small{display:block;font-family:var(--body);font-size:11.5px;font-weight:500;color:var(--muted)}
+.dtbl th.dm{background:var(--accent-soft)}
+.dtbl td{font-family:var(--num);font-variant-numeric:tabular-nums}
+.dtbl td.win{background:var(--cng-soft);color:var(--cng-ink);font-weight:700}
+.dsub{font-family:var(--body);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:16px 0 8px}
+.dfeat{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dfeat>div{border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0}
+.dfeat>div.m{border:2px solid var(--accent);background:var(--accent-soft)}
+.dfeat ol{margin:6px 0 0;padding-left:18px;font-size:14px;display:grid;gap:4px}
+@media (max-width:600px){
+  .dlgback{align-items:flex-end;padding:0}
+  .dlg{max-width:none;border-radius:20px 20px 0 0;max-height:92vh;padding:16px 16px max(18px,env(safe-area-inset-bottom,0px))}
+  .dlgtop{top:-16px}
+  .dlgtop h3{font-size:19px}
+  .dtbl{font-size:13.5px}.dtbl th,.dtbl td{padding:8px 9px}
+  .dfeat{grid-template-columns:minmax(0,1fr)}
+  .line .more{margin-left:auto}
+}
+@media (prefers-reduced-motion:reduce){ul.insights li.line{transition:none}}
 </style>
 
 <div class="wrap">
@@ -395,7 +444,7 @@ html,body{max-width:100%;overflow-x:hidden}
   </section>
 
   <details class="more panel">
-    <summary>More options <span>fuel prices, CNG premium and how rivals are picked</span></summary>
+    <summary>More options <span>fuel prices, CNG premium, mileage and upkeep</span></summary>
     <div class="moregrid">
     <div class="controls">
       <div class="group">
@@ -436,26 +485,9 @@ html,body{max-width:100%;overflow-x:hidden}
       </div>
     </div>
     
-      <div class="morecmp">
-        <h3 class="subhead">How rivals are picked</h3>
-        <div class="modes">
-      <div class="modes">
-        <div class="field"><label for="cfuel">Compare</label>
-          <select id="cfuel"><option value="cng" selected>CNG vs CNG</option><option value="petrol">Petrol vs Petrol</option></select></div>
-        <div class="field" id="pvarField" hidden><label for="pvar">Maruti petrol variant</label><select id="pvar"></select></div>
-        <div class="field"><label for="bmode">Choose rivals by</label>
-          <select id="bmode"><option value="price" selected>Similar price (any brand)</option><option value="seg">Segment rivals</option></select></div>
-        <div class="field" id="bandField"><label for="band">Price range <output id="bandO"></output></label>
-          <input type="range" id="band" min="25000" max="150000" step="5000" value="75000"></div>
-      </div>
-        </div>
-      </div>
-    </div>
-  </details>
-
-  <section class="panel tune" aria-labelledby="tuneH">
-    <div class="tunehead"><h3 id="tuneH">Fine-tune mileage and upkeep</h3><p class="hint">Adjust these to match real driving. Results below update as you change them.</p></div>
-    <div class="advgrid">
+      <div class="moretune">
+        <h3 class="subhead">Mileage and upkeep</h3>
+        <div class="advgrid">
         <div class="field"><label for="pm">Petrol km/L (claimed)</label><input type="number" id="pm" step="0.01" min="1"></div>
         <div class="field"><label for="cm">CNG km/kg (claimed)</label><input type="number" id="cm" step="0.01" min="1"></div>
         <div class="field">
@@ -474,6 +506,21 @@ html,body{max-width:100%;overflow-x:hidden}
           <p class="hint">Cylinder testing, kit checks and similar.</p>
         </div>
       </div>
+      </div>
+    </div>
+  </details>
+
+<section class="panel rivalpick" aria-labelledby="rpH">
+    <h3 id="rpH">How rivals are picked</h3>
+    <div class="modes">
+        <div class="field"><label for="cfuel">Compare</label>
+          <select id="cfuel"><option value="cng" selected>CNG vs CNG</option><option value="petrol">Petrol vs Petrol</option></select></div>
+        <div class="field" id="pvarField" hidden><label for="pvar">Maruti petrol variant</label><select id="pvar"></select></div>
+        <div class="field"><label for="bmode">Choose rivals by</label>
+          <select id="bmode"><option value="price" selected>Similar price (any brand)</option><option value="seg">Segment rivals</option></select></div>
+        <div class="field" id="bandField"><label for="band">Price range <output id="bandO"></output></label>
+          <input type="range" id="band" min="25000" max="150000" step="5000" value="75000"></div>
+    </div>
   </section>
 
   <section class="stack" aria-labelledby="s2">
@@ -523,6 +570,12 @@ html,body{max-width:100%;overflow-x:hidden}
 
 
 
+  <div class="dlgback" id="dlg" hidden>
+    <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dlgH" tabindex="-1">
+      <div class="dlgtop"><h3 id="dlgH"></h3><button type="button" class="dlgx" id="dlgX" aria-label="Close">✕</button></div>
+      <div id="dlgBody"></div>
+    </div>
+  </div>
   <section class="panel access" id="accessPanel" hidden aria-labelledby="accH">
     <div class="sechead"><div class="eyebrow">Only you can see this</div><h2 id="accH">Who's using this page</h2></div>
     <p class="accsum" id="accSum"></p>
@@ -752,6 +805,51 @@ function updateShare(ms,rows,yrs,km,isP){
   t+=`\nSee the full price, mileage and features comparison 👉 ${SHARE_URL}`;
   $("waCmp").href=waLink(t);
 }
+
+// ---- detailed analysis popup ----
+let CMP=null,dlgFrom=null;
+function openDetail(i){
+  const C=CMP;if(!C)return;const ms=C.rows[0],x=C.rows[i];if(!x)return;
+  const yr=C.yrs,unit=C.unit;
+  const fy=r=>r.fuelYr,mo=r=>r.fuelYr/12,per=r=>r.fuelYr*yr,rwm=r=>r.c*C.rw;
+  const win=(a,b,lower)=>a===b?["",""]:((lower?a<b:a>b)?["win",""]:["","win"]);
+  const rowsT=[
+    ["Ex-showroom price",lakh(ms.x),lakh(x.x),win(ms.x,x.x,true)],
+    [`Claimed mileage (${unit})`,ms.c.toFixed(2),x.c.toFixed(2),win(ms.c,x.c,false)],
+    [`Real-world mileage (${unit}, ${Math.round(C.rw*100)}%)`,rwm(ms).toFixed(1),rwm(x).toFixed(1),win(ms.c,x.c,false)],
+    ["Fuel cost per km",inr2(ms.cpk),inr2(x.cpk),win(ms.cpk,x.cpk,true)],
+    ["Fuel per month",inr(mo(ms)),inr(mo(x)),win(fy(ms),fy(x),true)],
+    ["Fuel per year",inr(fy(ms)),inr(fy(x)),win(fy(ms),fy(x),true)],
+    [`Fuel over ${plural(yr,"year")}`,inr(per(ms)),inr(per(x)),win(fy(ms),fy(x),true)],
+    [`Total cost, ${plural(yr,"year")}`,inr(ms.tot),inr(x.tot),win(ms.tot,x.tot,true)]];
+  const d=x.tot-ms.tot,gap=(ms.x-x.x)*1e5,runSave=x.fuelYr-ms.fuelYr;
+  let verdict=d>=0?`<b>${ms.n} ${ms.v}</b> works out <b>${inr(d)} cheaper</b> than the ${x.n} ${x.v} over ${plural(yr,"year")}.`
+    :`The <b>${x.n} ${x.v}</b> works out <b>${inr(-d)} cheaper</b> than the ${ms.n} ${ms.v} over ${plural(yr,"year")}.`;
+  if(gap>0&&runSave>0)verdict+=` The ${ms.n}'s ${inr(gap)} higher price is recovered by fuel savings in <b>${(gap/runSave).toFixed(1)} years</b>.`;
+  else if(gap<0&&runSave>=0)verdict+=` It costs ${inr(-gap)} less to buy and less to run.`;
+  else if(gap<0&&runSave<0)verdict+=` It costs ${inr(-gap)} less to buy, though the ${x.n} is ${inr(-runSave)} a year cheaper to fuel.`;
+  const opts=C.POOL[x.n].vars.map((v,k)=>`<option value="${k}"${k===x.idx?" selected":""}>${v[0]} · ${lakh(v[1])}</option>`).join("");
+  const f=n=>(FEAT[n]||["Feature list not loaded yet"]).map(t=>`<li>${t}</li>`).join("");
+  const wa=`🚗 ${ms.n} ${ms.v} vs ${x.n} ${x.v} (${C.isP?"petrol":"CNG"})\n${C.km} km a day · ${plural(yr,"year")}\n\nPrice: ${lakh(ms.x)} vs ${lakh(x.x)}\nMileage: ${ms.c.toFixed(2)} vs ${x.c.toFixed(2)} ${unit}\nFuel per year: ${inr(fy(ms))} vs ${inr(fy(x))}\nTotal over ${plural(yr,"year")}: ${inr(ms.tot)} vs ${inr(x.tot)}\n${d>=0?`✅ ${ms.n} saves ${inr(d)}`:`➖ ${x.n} saves ${inr(-d)}`}\n\nFull comparison 👉 ${SHARE_URL}`;
+  $("dlgH").textContent=`${ms.n} vs ${x.n}`;
+  $("dlgBody").innerHTML=`
+    <div class="dpick"><span class="dlab">${x.b} version</span><select id="dlgVar" aria-label="${x.n} version">${opts}</select></div>
+    <div class="dverdict ${d>=0?"ok":"no"}">${verdict}</div>
+    <div class="dtwrap"><table class="dtbl"><tr><th></th><th class="dm">${ms.n}<small>${ms.v}</small></th><th>${x.n}<small>${x.v}</small></th></tr>
+      ${rowsT.map(r=>`<tr><td>${r[0]}</td><td class="${r[3][0]}">${r[1]}</td><td class="${r[3][1]}">${r[2]}</td></tr>`).join("")}</table></div>
+    <p class="hint">At ${C.km} km a day, ${C.isP?"petrol ₹"+C.fp+"/L":"CNG ₹"+C.fp+"/kg"}. Green marks the better figure. Registration, insurance, service and resale not included.</p>
+    <h4 class="dsub">Top 5 features</h4>
+    <div class="dfeat"><div class="m"><b>${ms.n}</b><ol>${f(ms.n)}</ol></div><div><b>${x.n}</b><ol>${f(x.n)}</ol></div></div>
+    <div class="sharebar"><a class="wa" href="${waLink(wa)}" target="_blank" rel="noopener">Share this on WhatsApp</a></div>`;
+  $("dlgVar").addEventListener("change",e=>{rivalPick[C.pk+x.n]=+e.target.value;compare();const ni=CMP.rows.findIndex(r=>r.n===x.n);if(ni>0)openDetail(ni)});
+  if($("dlg").hidden){dlgFrom=document.activeElement;$("dlg").hidden=false;document.body.style.overflow="hidden";$("dlg").querySelector(".dlg").focus()}
+}
+function closeDetail(){if($("dlg").hidden)return;$("dlg").hidden=true;document.body.style.overflow="";if(dlgFrom&&dlgFrom.focus)try{dlgFrom.focus()}catch(e){}}
+$("cmpHead").addEventListener("click",e=>{const li=e.target.closest("li.line[data-i]");if(li)openDetail(+li.dataset.i)});
+$("cmpHead").addEventListener("keydown",e=>{const li=e.target.closest("li.line[data-i]");if(li&&(e.key==="Enter"||e.key===" ")){e.preventDefault();openDetail(+li.dataset.i)}});
+$("dlgX").addEventListener("click",closeDetail);
+$("dlg").addEventListener("click",e=>{if(e.target===$("dlg"))closeDetail()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDetail()});
 function nearest(vars,price){let bi=0,bd=1e9;vars.forEach((v,i)=>{const d=Math.abs(v[1]-price);if(d<bd){bd=d;bi=i}});return bi}
 function compare(){
   queueMicrotask(()=>{try{renderQuick()}catch(e){}});
@@ -786,14 +884,15 @@ function compare(){
   $("cmpTbl").querySelectorAll("select.rv").forEach(s=>s.addEventListener("change",e=>{rivalPick[pk+e.target.dataset.r]=+e.target.value;compare()}));
   const msName=`${ms.n} ${ms.v}`;
   const tick=ok=>ok?'<span class="ic ok" aria-label="Maruti better">✓</span>':'<span class="ic no" aria-label="Rival better">✗</span>';
-  $("cmpHead").innerHTML=rows.slice(1).map(x=>{
+  $("cmpHead").innerHTML=rows.slice(1).map((x,ii)=>{
     const gap=(ms.x-x.x)*1e5,pct=Math.round((ms.c/x.c-1)*100),fuelSave=x.fuelYr-ms.fuelYr,d=x.tot-ms.tot;
     const price=gap<=0?[true,gap===0?"Same price":`${inr(-gap)} lower`]:[false,`${inr(gap)} higher`];
     const mil=pct>=0?[true,pct===0?"About the same":`${pct}% better`]:[false,`${-pct}% lower`];
     const fuel=fuelSave>=0?[true,`Saves ${inr(fuelSave)}`]:[false,`${inr(-fuelSave)} more`];
     const all=d>=0?`<div class="vsall ok">Maruti saves <b>${inr(d)}</b> over ${plural(yrs,"year")}</div>`:`<div class="vsall no">${x.n} is <b>${inr(-d)}</b> cheaper over ${plural(yrs,"year")}</div>`;
     const ov=d>=0?`<span class="ov ok">${ms.n} saves <b>${inr(d)}</b></span>`:`<span class="ov no">${x.n} saves <b>${inr(-d)}</b></span>`;
-    return `<li class="line"><span class="who">vs <b>${x.n}</b> <small>${x.v}</small></span><span class="m">${tick(price[0])}${price[1]} price</span><span class="m">${tick(mil[0])}${mil[1]} mileage</span><span class="m">${tick(fuel[0])}${fuel[1].replace("Saves ","saves ")} fuel/yr</span>${ov}</li>`}).join("");
+    return `<li class="line" data-i="${ii+1}" tabindex="0" role="button" aria-label="Detailed analysis: ${ms.n} ${ms.v} vs ${x.n} ${x.v}"><span class="who">vs <b>${x.n}</b> <small>${x.v}</small></span><span class="m">${tick(price[0])}${price[1]} price</span><span class="m">${tick(mil[0])}${mil[1]} mileage</span><span class="m">${tick(fuel[0])}${fuel[1].replace("Saves ","saves ")} fuel/yr</span>${ov}<span class="more">Details ›</span></li>`}).join("");
+  CMP={rows,ms,yrs,km,isP,unit,per,pk,POOL,fp,rw};
   updateShare(ms,rows,yrs,km,isP);
   const max=Math.max(...rows.map(r=>r.tot));
   $("bars").innerHTML=rows.slice().sort((a,b)=>a.tot-b.tot).map(x=>`<div class="bar ${x.msil?"msil":""}"><span class="nm" title="${x.n} ${x.v}">${x.n} ${x.v}</span><div class="track"><div class="fill" style="width:${(x.tot/max*100).toFixed(1)}%"></div></div><span class="val">${inr(x.tot)}</span></div>`).join("");
