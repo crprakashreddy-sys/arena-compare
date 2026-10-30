@@ -446,6 +446,7 @@ details.more .controls>.group:nth-child(-n+2){display:none}
 .feat h4 small{display:block;font-family:var(--body);font-size:12.5px;font-weight:600;color:var(--muted);margin-top:2px}
 .ftag{margin:2px 0 6px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
 .ftag.ex{color:var(--cng-ink)}
+.fuel .fv{margin:-2px 0 8px;font-weight:700;font-size:15px}
 </style>
 
 <div class="wrap">
@@ -575,7 +576,7 @@ details.more .controls>.group:nth-child(-n+2){display:none}
   </details>
 
   <section class="stack" aria-labelledby="s1">
-    <div class="sechead"><div class="eyebrow">Same car, two fuels</div><h2 id="s1">Petrol or CNG?</h2></div>
+    <div class="sechead"><div class="eyebrow">Same car, two fuels</div><h2 id="s1">Petrol or CNG?</h2><p class="hint" id="s1Sub"></p></div>
     <div class="verdict" id="verdict"><span class="tag" id="vTag">Go CNG</span><p id="vText"></p></div>
     <div class="kpis">
       <div class="kpi"><div class="l">Saving per month</div><div class="v" id="kMon"></div></div>
@@ -584,13 +585,15 @@ details.more .controls>.group:nth-child(-n+2){display:none}
       <div class="kpi"><div class="l">Net gain over period</div><div class="v" id="kNet"></div></div>
     </div>
     <div class="duo">
-      <div class="fuel pet"><h3>Petrol</h3>
+      <div class="fuel pet"><h3>Petrol</h3><p class="fv" id="pName"></p>
+        <div class="row"><span>Ex-showroom</span><span id="pEx"></span></div>
         <div class="row"><span>Real-world mileage</span><span id="pEff"></span></div>
         <div class="row"><span>Cost per km</span><span id="pCpk"></span></div>
         <div class="row"><span>Fuel per month</span><span id="pMon"></span></div>
         <div class="row"><span>Fuel over the period</span><span id="pTot"></span></div>
       </div>
-      <div class="fuel cng"><h3>CNG</h3>
+      <div class="fuel cng"><h3>CNG</h3><p class="fv" id="cName"></p>
+        <div class="row"><span>Ex-showroom</span><span id="cEx"></span></div>
         <div class="row"><span>Real-world mileage</span><span id="cEff"></span></div>
         <div class="row"><span>Cost per km (blended)</span><span id="cCpk"></span></div>
         <div class="row"><span>Fuel + upkeep per month</span><span id="cMon"></span></div>
@@ -993,6 +996,9 @@ function calc(){
   const beTxt=!isFinite(be)?"Never":be<12?be.toFixed(1)+" months":(be/12).toFixed(1)+" years";
   $("kBE").textContent=beTxt;
   const m=MODELS[sel.value],vv=curVar(),name=vv?`${m.n} ${vv.v}`:`${m.n} CNG`,v=$("verdict");
+  if(vv){$("pName").textContent=`${m.n} ${vv.pv}`;$("cName").textContent=`${m.n} ${vv.v}`;$("pEx").textContent=lakh(vv.px);$("cEx").textContent=lakh(vv.x);
+    $("s1Sub").textContent=`Same version, two fuels: ${m.n} ${vv.pv} petrol vs ${m.n} ${vv.v}. The CNG one costs ${inr(prem)} more to buy.`}
+  else{$("pName").textContent=`${m.n} petrol`;$("cName").textContent=`${m.n} CNG`;$("pEx").textContent="—";$("cEx").textContent="—";$("s1Sub").textContent=`${m.n} petrol vs CNG, using a typical CNG price gap of ${inr(prem)}.`}
   if(net>0){v.classList.remove("neg");$("vTag").textContent="Go CNG";
     $("vText").innerHTML=`The <b>${name}</b> pays back its ${inr(prem)} premium in <b>${beTxt}</b> and leaves you <b>${inr(net)} better off</b> over ${plural(yrs,"year")}.`}
   else{v.classList.add("neg");$("vTag").textContent="Stay petrol";
