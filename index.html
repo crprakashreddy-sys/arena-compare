@@ -1445,9 +1445,9 @@ const LOG_URL="https://script.google.com/macros/s/AKfycbzvTIZH5hYpOR_ZF6KvFKb8DS
   const showGate=()=>{gate.hidden=false;document.body.classList.add("gated");setTimeout(()=>$(ownerMode?"gP":"gN").focus(),50)};
   const hideGate=()=>{gate.hidden=true;document.body.classList.remove("gated")};
   let logged=false;
-  const logVisit=()=>api({a:"log",v:vid,n:me.n,m:me.m,c:cityName(),car:carName(),d:navigator.userAgent.slice(0,110)})
+  const logVisit=()=>api({a:"log",v:vid,n:me.n,m:me.m,city:cityName(),car:carName(),d:navigator.userAgent.slice(0,110)})
     .then(r=>{if(r&&r.blocked){try{localStorage.removeItem(K)}catch(e){}blockedScreen();return"blocked"}logged=true;return"ok"});
-  const sendUpd=()=>{if(!logged)return;try{fetch(LOG_URL+"?"+new URLSearchParams({a:"upd",v:vid,c:cityName(),car:carName(),s:Math.round((Date.now()-t0)/1000)}),{keepalive:true}).catch(()=>{})}catch(e){}};
+  const sendUpd=()=>{if(!logged)return;try{fetch(LOG_URL+"?"+new URLSearchParams({a:"upd",v:vid,city:cityName(),car:carName(),s:Math.round((Date.now()-t0)/1000)}),{keepalive:true}).catch(()=>{})}catch(e){}};
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")sendUpd()});
   window.addEventListener("pagehide",sendUpd);
   setTimeout(sendUpd,60000);
