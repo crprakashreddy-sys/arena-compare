@@ -1535,6 +1535,30 @@ const LOG_URL="https://script.google.com/macros/s/AKfycbzvTIZH5hYpOR_ZF6KvFKb8DS
       render();return}
     const tr=e.target.closest("tr.who");if(tr){open=open===tr.dataset.m?null:tr.dataset.m;render()}});
 })();
+
+// ---- auto-refresh when a newer version is published (public link / home-screen app) ----
+(function(){
+  if(!location.hostname.endsWith("github.io"))return;
+  const mine=(document.querySelector("script")||{}).textContent||"";
+  let busy=false;
+  async function check(){
+    if(busy||document.visibilityState!=="visible")return;busy=true;
+    try{
+      const r=await fetch(location.pathname+"?nc="+Date.now(),{cache:"no-store"});
+      if(!r.ok)return;
+      const html=await r.text(),a=html.indexOf("<"+"script>"),b=html.indexOf("<"+"/script>",a);
+      if(a<0||b<0)return;
+      const fresh=html.slice(a+8,b);
+      if(fresh.trim()&&fresh.trim()!==mine.trim()){
+        const key="arenaReloaded:"+fresh.length;
+        let done=false;try{done=sessionStorage.getItem(key)==="1";sessionStorage.setItem(key,"1")}catch(e){}
+        if(!done)location.reload();
+      }
+    }catch(e){}finally{busy=false}
+  }
+  setTimeout(check,1500);
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")setTimeout(check,500)});
+})();
 </script>
 
 </body>
