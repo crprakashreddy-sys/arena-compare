@@ -659,7 +659,7 @@ ul.insights li.line:hover{transform:translateX(3px)}
           <select id="cfuel"><option value="cng" selected>CNG vs CNG</option><option value="petrol">Petrol vs Petrol</option></select></div>
         <div class="field" id="pvarField" hidden><label for="pvar">Maruti petrol variant</label><select id="pvar"></select></div>
         <div class="field"><label for="bmode">Choose rivals by</label>
-          <select id="bmode"><option value="price" selected>Similar price (any brand)</option><option value="seg">Segment rivals</option></select></div>
+          <select id="bmode"><option value="seg" selected>Segment rivals</option><option value="price">Segment rivals + any car at a similar price</option></select></div>
         <div class="field" id="bandField"><label for="band">Price range <output id="bandO"></output></label>
           <input type="range" id="band" min="25000" max="150000" step="5000" value="75000"></div>
     </div>
@@ -1403,11 +1403,14 @@ function compare(){
       const pv=pl[+$("pvar").value||0];mv={v:pv[0],x:pv[1],c:pv[2]}}}
   else{const cv=curVar();if(cv)mv={v:cv.v,x:cv.x,c:cv.c||m.c}}
   let rivals=null;
-  if(mv){if(mode==="price"){rivals=Object.keys(POOL).filter(rn=>rn!==m.n&&POOL[rn].vars.some(v=>Math.abs(v[1]-mv.x)*1e5<=band));if(!rivals.length)rivals=null}else rivals=(MAP[m.n]||[]).filter(rn=>rn!==m.n&&POOL[rn]);if(!rivals.length)rivals=null}
+  if(mv){const seg=(MAP[m.n]||[]).filter(rn=>rn!==m.n&&POOL[rn]);
+    if(mode==="price"){const near=Object.keys(POOL).filter(rn=>rn!==m.n&&POOL[rn].vars.some(v=>Math.abs(v[1]-mv.x)*1e5<=band));rivals=[...new Set([...seg,...near])]}
+    else rivals=seg;
+    if(!rivals.length)rivals=null}
   if(!rivals||!mv){$("cmpNone").hidden=false;$("cmpRes").hidden=true;
     $("cmpNone").textContent=!mv?`${m.n} has no ${isP?"petrol":"CNG"} variant prices loaded${isP?"":" — try Petrol vs Petrol"}.`
       :mode==="price"?`No rival ${isP?"petrol":"CNG"} variant is priced within ± ${inr(band)} of the ${m.n} ${mv.v}. Widen the price range or switch to segment rivals.`
-      :`No direct ${isP?"petrol":"CNG"} rival is mapped for the ${m.n}. Try "Similar price".`;return}
+      :`No direct ${isP?"petrol":"CNG"} rival is mapped for the ${m.n}. Under "Choose rivals by", pick "Segment rivals + any car at a similar price".`;return}
   $("cmpNone").hidden=true;$("cmpRes").hidden=false;
   const km=+$("km").value,yrs=+$("yrs").value,rw=+$("rw").value/100,kmYr=km*365;
   const cost=(price,c)=>{const cpk=fp/(c*rw),fuelYr=cpk*kmYr;return{cpk,fuelYr,tot:price*1e5+fuelYr*yrs}};
