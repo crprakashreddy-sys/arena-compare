@@ -584,7 +584,6 @@ ul.insights li.line:hover{transform:translateX(3px)}
     <div class="eyebrow">Maruti Suzuki Arena · Southeast Zone</div>
     <h1><span class="g">Arena</span> vs Competition Comparison</h1>
     <p class="lede">Pick a Maruti Suzuki Arena car and tell us how you drive. See how it compares with its rivals on price, running cost and features, and what <span style="color:var(--cng-ink);font-weight:700">CNG</span> saves over <span style="color:var(--petrol-ink);font-weight:700">petrol</span>.</p>
-    <div class="sharebar"><a class="wa" id="waTop" href="https://wa.me/" target="_blank" rel="noopener">Share on WhatsApp</a><button type="button" class="copyl" id="copyTop">Copy link</button></div>
     <div class="stamp">Fuel today in <b id="stCity">Hyderabad</b> · Petrol <b id="stP">₹116.15/L</b> · CNG <b id="stC">₹112/kg</b> · Oct 2026</div>
   </header>
 
@@ -1268,13 +1267,11 @@ function draw(prem,pMon,cMon,months,be){
 // ---- WhatsApp sharing ----
 const SHARE_URL="https://tinyurl.com/Arena-vs-Competition";
 const waLink=t=>"https://wa.me/?text="+encodeURIComponent(t);
-$("waTop").href=waLink("🚗 Arena vs Competition – Price Check & Comparison\nCompare Maruti Suzuki Arena cars with rivals in Hyderabad: prices, mileage, running cost, petrol vs CNG and top features.\n👉 "+SHARE_URL);
 function copyLink(msgEl){
   const done=()=>{if(msgEl){msgEl.textContent="Link copied";setTimeout(()=>msgEl.textContent="",2500)}};
   try{navigator.clipboard.writeText(SHARE_URL).then(done,()=>fallback())}catch(e){fallback()}
   function fallback(){const t=document.createElement("textarea");t.value=SHARE_URL;t.setAttribute("readonly","");t.style.position="fixed";t.style.opacity="0";document.body.appendChild(t);t.select();try{document.execCommand("copy");done()}catch(e){}t.remove()}
 }
-$("copyTop").addEventListener("click",()=>{copyLink(null);$("copyTop").textContent="Link copied";setTimeout(()=>$("copyTop").textContent="Copy link",2500)});
 function updateShare(ms,rows,yrs,km,isP){
   let t=`🚗 ${ms.n} ${ms.v} vs competition (${isP?"petrol":"CNG"})\n${km} km a day · ${plural(yrs,"year")}\n\n`;
   rows.slice(1).forEach(x=>{const d=x.tot-ms.tot;t+=d>=0?`✅ vs ${x.n} ${x.v}: ${ms.n} saves ${inr(d)}\n`:`➖ vs ${x.n} ${x.v}: ${x.n} saves ${inr(-d)}\n`});
