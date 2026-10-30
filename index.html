@@ -670,7 +670,7 @@ ul.insights li.line:hover{transform:translateX(3px)}
     <p class="empty" id="cmpNone" hidden></p>
     <div class="stack" id="cmpRes">
             <ul class="insights" id="cmpHead"></ul>
-      <div class="sharebar"><a class="wa" id="waCmp" href="https://wa.me/" target="_blank" rel="noopener">Share this comparison on WhatsApp</a><span class="copied" id="copyMsg" role="status"></span></div>
+      <div class="sharebar"><a class="wa" id="waCmp" href="https://wa.me/" target="_blank" rel="noopener">Share this comparison as an image</a><span class="copied" id="copyMsg" role="status"></span></div>
       <details class="full"><summary>See full numbers and change rival versions</summary><div class="tbl"><table id="cmpTbl"></table></div></details>
       <div class="viewtabs" role="tablist" aria-label="Choose what to compare">
         <button type="button" class="chip vt" role="tab" id="vtCost" data-v="cost" aria-pressed="true" aria-selected="true" aria-controls="paneCost">Total cost of ownership</button>
@@ -1278,6 +1278,60 @@ function updateShare(ms,rows,yrs,km,isP){
   t+=`\nSee the full price, mileage and features comparison 👉 ${SHARE_URL}`;
   $("waCmp").href=waLink(t);
 }
+
+
+// ---- share the comparison as an image ----
+function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+function cmpImage(){
+  const C=CMP;if(!C)return null;const ms=C.rows[0],rivals=C.rows.slice(1);
+  const W=1080,P=56,RH=168,H=360+rivals.length*(RH+20)+190;
+  const cv=document.createElement("canvas");cv.width=W;cv.height=H;const g=cv.getContext("2d");
+  const disp='"Bricolage Grotesque",Georgia,serif',body='"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
+  let cityN="";try{cityN=CITIES[+$("city").value].n}catch(e){}
+  // background
+  let bg=g.createLinearGradient(0,0,W,H);bg.addColorStop(0,"#f1ecff");bg.addColorStop(.45,"#ffeef5");bg.addColorStop(1,"#e8f7fb");g.fillStyle=bg;g.fillRect(0,0,W,H);
+  // header
+  g.fillStyle="#b23a6d";g.font=`800 26px ${body}`;g.fillText("MARUTI SUZUKI ARENA · SOUTHEAST ZONE",P,P+30);
+  g.fillStyle="#2b2542";g.font=`800 58px ${disp}`;g.fillText(`${ms.n} ${ms.v}`,P,P+108);
+  g.fillStyle="#5b48c2";g.font=`700 36px ${body}`;g.fillText(`vs competition · ${C.isP?"Petrol":"CNG"}`,P,P+158);
+  g.fillStyle="#6a6485";g.font=`500 28px ${body}`;
+  g.fillText(`${C.km} km a day · ${plural(C.yrs,"year")}${cityN?" · "+cityN:""} · ex-showroom ${lakh(ms.x)}`,P,P+206);
+  g.fillText(`Saving = ex-showroom price + fuel over ${plural(C.yrs,"year")}`,P,P+246);
+  // rows
+  let y=330;
+  rivals.forEach(x=>{
+    const d=x.tot-ms.tot,win=d>=0,gap=(ms.x-x.x)*1e5,pct=Math.round((ms.c/x.c-1)*100),fs=x.fuelYr-ms.fuelYr;
+    g.save();g.shadowColor="rgba(90,60,180,.18)";g.shadowBlur=24;g.shadowOffsetY=8;rr(g,P,y,W-2*P,RH,26);g.fillStyle="#ffffff";g.fill();g.restore();
+    rr(g,P,y,12,RH,6);g.fillStyle=win?"#7fd3ae":"#ffb489";g.fill();
+    g.fillStyle="#6a6485";g.font=`600 26px ${body}`;g.fillText("vs",P+40,y+52);
+    g.fillStyle="#2b2542";g.font=`800 36px ${disp}`;g.fillText(x.n,P+82,y+54);
+    const nw=g.measureText(x.n).width;g.fillStyle="#6a6485";g.font=`500 26px ${body}`;g.fillText(x.v,P+82+nw+14,y+54);
+    g.font=`600 26px ${body}`;
+    const bits=[[gap<=0,gap===0?"Same price":gap<0?`${inr(-gap)} lower price`:`${inr(gap)} higher price`],[pct>=0,pct===0?"Same mileage":pct>0?`${pct}% better mileage`:`${-pct}% lower mileage`],[fs>=0,fs>=0?`saves ${inr(fs)} fuel/yr`:`${inr(-fs)} more fuel/yr`]];
+    const tw=bits.reduce((t,[ok,b])=>t+g.measureText((ok?"✓ ":"✗ ")+b).width+30,0);if(tw>W-2*P-60)g.font=`600 ${Math.floor(26*(W-2*P-60)/tw)}px ${body}`;
+    let bx=P+40;bits.forEach(([ok,t])=>{g.fillStyle=ok?"#25795a":"#a95518";g.fillText((ok?"✓ ":"✗ ")+t,bx,y+100);bx+=g.measureText((ok?"✓ ":"✗ ")+t).width+30});
+    const pill=win?`${ms.n} saves ${inr(d)}`:`${x.n} saves ${inr(-d)}`;
+    g.font=`800 28px ${body}`;const pw=g.measureText(pill).width+40;rr(g,P+40,y+118,pw,40,20);g.fillStyle=win?"#a3e6c8":"#ffc9a3";g.fill();
+    g.fillStyle="#2b2542";g.fillText(pill,P+60,y+148);
+    y+=RH+20;
+  });
+  // footer
+  g.fillStyle="#2b2542";g.font=`800 32px ${body}`;g.fillText("Full price, mileage & features comparison:",P,y+50);
+  g.fillStyle="#5b48c2";g.font=`800 36px ${body}`;g.fillText(SHARE_URL.replace(/^https?:\/\//,""),P,y+100);
+  g.fillStyle="#6a6485";g.font=`500 22px ${body}`;g.fillText("Claimed mileage for every car. Registration, insurance and service not included.",P,y+140);
+  return cv;
+}
+$("waCmp").addEventListener("click",async e=>{
+  const cv=cmpImage();if(!cv)return;e.preventDefault();
+  const text=decodeURIComponent((($("waCmp").href.split("text=")[1])||"").replace(/\+/g," "));
+  try{
+    const blob=await new Promise(r=>cv.toBlob(r,"image/png"));
+    const file=new File([blob],"arena-vs-competition.png",{type:"image/png"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text:`See the full comparison 👉 ${SHARE_URL}`});return}
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="arena-vs-competition.png";document.body.appendChild(a);a.click();a.remove();
+    $("copyMsg").textContent="Image saved. Attach it in WhatsApp.";setTimeout(()=>$("copyMsg").textContent="",5000);
+  }catch(x){if(x&&x.name==="AbortError")return;window.open(waLink(text),"_blank","noopener")}
+});
 
 // ---- detailed analysis popup ----
 let CMP=null,dlgFrom=null;
