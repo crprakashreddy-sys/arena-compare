@@ -329,6 +329,16 @@ ul.insights li.line{display:flex!important;flex-wrap:wrap;align-items:center;gap
   .acctools input[type=search]{flex:1 1 100%}
   .privacy,details.notes{font-size:12.5px}
 }
+
+/* keep every block inside the screen width */
+html,body{max-width:100%;overflow-x:hidden}
+.wrap{grid-template-columns:minmax(0,1fr)}
+.wrap>*,.stack>*,.quick>*,.step,.steprow>*,.chips,.group,.moregrid>*,.exact,.duo>*,.kpis>*,ul.insights>li{min-width:0}
+.quick{grid-template-columns:minmax(0,1fr)}
+.step{grid-template-columns:minmax(0,1fr)}
+#qModel,#qVar{max-width:100%}
+.exact input[type=range]{min-width:0;width:100%}
+.exact .num{flex:none}
 </style>
 
 <div class="wrap">
