@@ -422,6 +422,12 @@ ul.insights li.line:focus-visible{outline:3px solid var(--accent-ink);outline-of
   .line .more{margin-left:auto}
 }
 @media (prefers-reduced-motion:reduce){ul.insights li.line{transition:none}}
+
+.cngset{display:grid;gap:14px;border-top:4px solid var(--cng)}
+.cngset .tunehead h3{font-family:var(--display);font-size:19px;font-weight:600}
+.cnggrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.cngset input[type=number]{background:var(--panel)}
+@media (max-width:600px){.cnggrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.cnggrid .field:nth-child(n+3){grid-column:1/-1}.cngset .tunehead h3{font-size:17px}}
 </style>
 
 <div class="wrap">
@@ -444,7 +450,7 @@ ul.insights li.line:focus-visible{outline:3px solid var(--accent-ink);outline-of
   </section>
 
   <details class="more panel">
-    <summary>More options <span>fuel prices, CNG premium, mileage and upkeep</span></summary>
+    <summary>More options <span>petrol price, petrol mileage and real-world factor</span></summary>
     <div class="moregrid">
     <div class="controls">
       <div class="group">
@@ -473,15 +479,8 @@ ul.insights li.line:focus-visible{outline:3px solid var(--accent-ink);outline-of
       </div>
       <div class="group">
         <h3>Prices</h3>
-        <div class="pair">
-          <div class="field"><label for="pp">Petrol ₹/L</label><input type="number" id="pp" value="116.15" step="0.01" min="1"></div>
-          <div class="field"><label for="cp">CNG ₹/kg</label><input type="number" id="cp" value="103" step="0.5" min="1"></div>
-        </div>
-        <div class="field">
-          <label for="prem">CNG premium (₹)</label>
-          <input type="number" id="prem" value="95000" step="1000" min="0">
-          <p class="hint" id="premHint"></p>
-        </div>
+        <div class="field"><label for="pp">Petrol ₹/L</label><input type="number" id="pp" value="116.15" step="0.01" min="1"></div>
+        
       </div>
     </div>
     
@@ -489,22 +488,14 @@ ul.insights li.line:focus-visible{outline:3px solid var(--accent-ink);outline-of
         <h3 class="subhead">Mileage and upkeep</h3>
         <div class="advgrid">
         <div class="field"><label for="pm">Petrol km/L (claimed)</label><input type="number" id="pm" step="0.01" min="1"></div>
-        <div class="field"><label for="cm">CNG km/kg (claimed)</label><input type="number" id="cm" step="0.01" min="1"></div>
+        
         <div class="field">
           <label for="rw">Real-world vs claimed <output id="rwO"></output></label>
           <input type="range" id="rw" min="60" max="100" step="5" value="80">
           <p class="hint">City driving usually gets 75–85% of the claimed figure.</p>
         </div>
-        <div class="field">
-          <label for="share">Driven on CNG <output id="shareO"></output></label>
-          <input type="range" id="share" min="50" max="100" step="5" value="90">
-          <p class="hint">Lower it if CNG stations are scarce on your routes.</p>
-        </div>
-        <div class="field">
-          <label for="mx">Extra CNG upkeep ₹/year</label>
-          <input type="number" id="mx" value="2500" step="500" min="0">
-          <p class="hint">Cylinder testing, kit checks and similar.</p>
-        </div>
+        
+        
       </div>
       </div>
     </div>
@@ -535,6 +526,29 @@ ul.insights li.line:focus-visible{outline:3px solid var(--accent-ink);outline-of
       <h3 class="subhead">Top 5 features</h3>
       <div class="feats" id="feats"></div>
       <p class="hint">Rivals open on their variant nearest in price; change it in the table. Total = ex-showroom price + fuel for the period. Registration, insurance, service and resale are not included. Some features are on higher variants only.</p>
+    </div>
+  </section>
+
+  <section class="panel cngset" aria-labelledby="cngH">
+    <div class="tunehead"><h3 id="cngH">CNG settings</h3><p class="hint">These shape the petrol vs CNG result below. Change them to match your city and driving.</p></div>
+    <div class="cnggrid">
+      <div class="field"><label for="cp">CNG ₹/kg</label><input type="number" id="cp" value="103" step="0.5" min="1"></div>
+      <div class="field"><label for="cm">CNG km/kg (claimed)</label><input type="number" id="cm" step="0.01" min="1"></div>
+      <div class="field">
+          <label for="prem">CNG premium (₹)</label>
+          <input type="number" id="prem" value="95000" step="1000" min="0">
+          <p class="hint" id="premHint"></p>
+        </div>
+      <div class="field">
+          <label for="share">Driven on CNG <output id="shareO"></output></label>
+          <input type="range" id="share" min="50" max="100" step="5" value="90">
+          <p class="hint">Lower it if CNG stations are scarce on your routes.</p>
+        </div>
+      <div class="field">
+          <label for="mx">Extra CNG upkeep ₹/year</label>
+          <input type="number" id="mx" value="2500" step="500" min="0">
+          <p class="hint">Cylinder testing, kit checks and similar.</p>
+        </div>
     </div>
   </section>
 
