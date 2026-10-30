@@ -529,7 +529,7 @@ html,body{max-width:100%;overflow-x:hidden}
   <p class="hint privacy">Opening this page records your name and the time of your visit for the dealership team.</p>
   <details class="notes">
     <summary>Data sources and assumptions</summary>
-    <p>Ex-showroom prices are CarWale's Hyderabad or nearby Telangana city listings (Oct 2026) wherever available; Seltos from V3Cars (Oct 2026); Baleno from CarWale’s Sep 2026 variant list; XL6 only Zeta was priced individually; some CNG lists from V3Cars, Team-BHP and Carlelo (Jan–Oct 2026); Nexon CNG figures are estimates. Check against your current dealer price list before quoting a customer.</p>
+    <p>Ex-showroom prices are CarWale's Hyderabad or nearby Telangana city listings (Oct 2026) wherever available; Seltos from V3Cars (Oct 2026); Baleno from CarWale’s Sep 2026 variant list; Dzire Tour S from ZigWheels (Oct 2026); XL6 only Zeta was priced individually; some CNG lists from V3Cars, Team-BHP and Carlelo (Jan–Oct 2026); Nexon CNG figures are estimates. Check against your current dealer price list before quoting a customer.</p>
     <p>Mileage is the manufacturer's claimed (ARAI) figure for every car, petrol and CNG, so the comparison is like for like. Where CarWale did not list a figure, the maker's published claim is used.</p>
     <p>Hyderabad CNG has been quoted between ₹97 and ₹109/kg this year; ₹103 reflects the July 2026 revision. The blended CNG cost assumes the rest of the driving runs on petrol. Prices refresh automatically each morning.</p>
   </details>
@@ -546,7 +546,8 @@ const MODELS=[
   {n:"Dzire",ch:"Arena",p:24.79,c:33.73,vars:[
     {v:"VXi CNG",x:8.031,pv:"VXi",px:7.17},
     {v:"ZXi CNG",x:9.037,pv:"ZXi",px:8.18},
-    {v:"VXi CNG AMT",x:8.531,pv:"VXi AMT",px:7.62,c:36.47,p:25.71}]},
+    {v:"VXi CNG AMT",x:8.531,pv:"VXi AMT",px:7.62,c:36.47,p:25.71},
+    {v:"Tour S CNG",x:7.25,pv:"Tour S",px:6.29,c:34.3,p:26.06}]},
   {n:"Wagon R",ch:"Arena",p:24.35,c:34.05,vars:[
     {v:"LXi CNG",x:5.939,pv:"LXi",px:4.989},
     {v:"VXi CNG",x:6.469,pv:"VXi",px:5.519}]},
@@ -587,9 +588,9 @@ const RIVALS={
 // Petrol: Hyderabad/Telangana ex-showroom ₹ lakh (CarWale, Oct 2026). [variant, price, claimed km/L]
 const PETROL={
   "Swift":[["LXi",5.84,24.80],["VXi",6.68,24.80],["VXi (O)",6.94,24.80],["VXi AMT",7.13,25.75],["VXi (O) AMT",7.39,25.75],["ZXi",7.62,24.80],["ZXi AMT",8.07,25.75],["ZXi Plus",8.29,24.80],["ZXi Plus AMT",8.74,25.75]],
-  "Dzire":[["LXi",6.31,24.79],["VXi",7.27,24.79],["VXi AMT",7.72,25.71],["ZXi",8.28,24.79],["ZXi AMT",8.73,25.71],["ZXi Plus",8.96,24.79],["ZXi Plus AMT",9.41,25.71]],
+  "Dzire":[["Tour S",6.29,26.06],["LXi",6.31,24.79],["VXi",7.27,24.79],["VXi AMT",7.72,25.71],["ZXi",8.28,24.79],["ZXi AMT",8.73,25.71],["ZXi Plus",8.96,24.79],["ZXi Plus AMT",9.41,25.71]],
   "Wagon R":[["LXi 1.0",4.99,24.35],["VXi 1.0",5.55,24.35],["VXi 1.0 AMT",5.99,25.19],["ZXi 1.2",5.98,23.56],["ZXi Plus 1.2",6.41,23.56],["ZXi 1.2 AMT",6.43,24.43],["ZXi Plus 1.2 AMT",6.86,24.43]],
-  "Victoris":[["LXi",10.50,21.18],["VXi",11.85,21.18],["VXi AT",13.41,20.45],["ZXi",13.62,21.18],["ZXi (O)",13.69,21.18],["ZXi AT",15.18,20.45],["ZXi Plus",15.39,21.18],["ZXi Plus (O)",15.48,21.18],["VXi Strong Hybrid",16.43,28.65],["ZXi Plus AT",17.34,20.45],["ZXi Strong Hybrid",17.85,28.65]],
+  "Victoris":[["LXi",10.50,21.18],["VXi",11.85,21.18],["VXi AT",13.41,20.45],["ZXi",13.62,21.18],["ZXi (O)",13.69,21.18],["ZXi AT",15.18,20.45],["ZXi (O) AT",15.25,20.45],["ZXi Plus",15.39,21.18],["ZXi Plus (O)",15.48,21.18],["VXi Strong Hybrid",16.43,28.65],["ZXi Plus AT",17.34,20.45],["ZXi Plus (O) AT",17.43,20.45],["ZXi Strong Hybrid",17.85,28.65],["ZXi (O) Strong Hybrid",18.44,28.65],["ZXi Plus AWD AT",18.69,20.45],["ZXi Plus (O) AWD AT",19.27,20.45],["ZXi Plus Strong Hybrid",19.52,28.65],["ZXi Plus (O) Strong Hybrid",19.99,28.65],["Aurum Edition Strong Hybrid",20.22,28.65]],
   "Ertiga":[["LXi",8.90,20.51],["VXi",9.95,20.51],["ZXi",11.02,20.51],["VXi AT",11.30,20.3],["ZXi Plus",11.79,20.51],["ZXi AT",12.37,20.3],["ZXi Plus AT",13.14,20.3]],
   "Alto K10":[["STD (O)",3.70,24.39],["LXi (O)",4.00,24.39],["VXi (O)",4.52,24.39],["VXi (O) AMT",4.97,24.9],["VXi Plus (O)",5.00,24.39],["VXi Plus (O) AMT",5.45,24.9]],
   "S-Presso":[["STD (O)",3.50,24.44],["LXi (O)",3.82,24.44],["VXi (O)",4.32,24.44],["VXi (O) AMT",4.77,25.3],["VXi Plus (O)",4.82,24.44],["VXi Plus (O) AMT",5.27,25.3]],
