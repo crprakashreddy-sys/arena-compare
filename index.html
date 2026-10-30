@@ -1328,6 +1328,7 @@ $("waCmp").addEventListener("click",async e=>{
     const blob=await new Promise(r=>cv.toBlob(r,"image/png"));
     const file=new File([blob],"arena-vs-competition.png",{type:"image/png"});
     if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text:`See the full comparison 👉 ${SHARE_URL}`});return}
+    if(!location.hostname.endsWith("github.io")){window.open(waLink(text),"_blank","noopener");return}
     const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="arena-vs-competition.png";document.body.appendChild(a);a.click();a.remove();
     $("copyMsg").textContent="Image saved. Attach it in WhatsApp.";setTimeout(()=>$("copyMsg").textContent="",5000);
   }catch(x){if(x&&x.name==="AbortError")return;window.open(waLink(text),"_blank","noopener")}
