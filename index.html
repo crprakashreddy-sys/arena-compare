@@ -424,6 +424,16 @@ ul.insights li.line:focus-visible{outline:3px solid var(--accent-ink);outline-of
 @media (prefers-reduced-motion:reduce){ul.insights li.line{transition:none}}
 
 .cngset{display:grid;gap:14px;border-top:4px solid var(--cng)}
+details.cngset{display:block}
+details.cngset>summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
+details.cngset>summary::-webkit-details-marker{display:none}
+.cs-t{font-weight:700;color:var(--cng-ink)}
+.cs-v{font-size:13.5px;color:var(--muted);flex:1 1 220px;min-width:0}
+.cs-c{font-size:13px;font-weight:700;color:var(--accent-ink);white-space:nowrap}
+details.cngset[open] .cs-c{visibility:hidden}
+details.cngset[open]>summary{margin-bottom:12px}
+details.cngset .hint{margin:0 0 12px}
+details.more .controls>.group:nth-child(-n+2){display:none}
 .cngset .tunehead h3{font-family:var(--display);font-size:19px;font-weight:600}
 .cnggrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
 .cngset input[type=number]{background:var(--panel)}
@@ -540,8 +550,9 @@ ul.insights li.line:focus-visible{outline:3px solid var(--accent-ink);outline-of
     </div>
   </section>
 
-  <section class="panel cngset" aria-labelledby="cngH">
-    <div class="tunehead"><h3 id="cngH">CNG settings</h3><p class="hint">These shape the petrol vs CNG result below. Change them to match your city and driving.</p></div>
+  <details class="panel cngset">
+    <summary><span class="cs-t">CNG figures used</span><span class="cs-v" id="cngSum"></span><span class="cs-c">Change</span></summary>
+    <p class="hint">Filled in from your city and version. Change only if your numbers differ.</p>
     <div class="cnggrid">
       <div class="field"><label for="cp">CNG ₹/kg</label><input type="number" id="cp" value="112" step="0.5" min="1"></div>
       <div class="field"><label for="cm">CNG km/kg (claimed)</label><input type="number" id="cm" step="0.01" min="1"></div>
@@ -561,7 +572,7 @@ ul.insights li.line:focus-visible{outline:3px solid var(--accent-ink);outline-of
           <p class="hint">Cylinder testing, kit checks and similar.</p>
         </div>
     </div>
-  </section>
+  </details>
 
   <section class="stack" aria-labelledby="s1">
     <div class="sechead"><div class="eyebrow">Same car, two fuels</div><h2 id="s1">Petrol or CNG?</h2></div>
@@ -794,7 +805,140 @@ const VFEAT={
   "Adventure":["360° camera","Blind-view monitor","Automatic climate control","Push-button start","Auto headlamps"],
   "Adventure (S)":["Sunroof","360° camera","Blind-view monitor","Automatic climate control","Auto headlamps"],
   "Accomplished":["10.25-inch touchscreen","Cooled glovebox","Hill-descent control","Keyless entry","360° camera"],
-  "Accomplished Plus (S)":["Sunroof","Wireless charger","7-inch colour digital cluster","Rear armrest","LED cornering fog lamps"]}
+  "Accomplished Plus (S)":["Sunroof","Wireless charger","7-inch colour digital cluster","Rear armrest","LED cornering fog lamps"]},
+ "Dzire":{
+  "LXi":["6 airbags","ABS, EBD and ESP","Hill-hold assist","Keyless entry","Power windows"],
+  "VXi":["7-inch touchscreen","Wireless Android Auto / CarPlay","Electric-folding mirrors","Rear AC vents","4 speakers"],
+  "ZXi":["Rear camera","Tyre pressure monitor","Push-button start","Automatic AC","15-inch alloys"],
+  "ZXi Plus":["9-inch touchscreen","360° camera","Cruise control","Arkamys-tuned sound","Dual-tone alloys"]},
+ "Celerio":{
+  "LXi":["Side and curtain airbags","ESC stability control","Manual AC","Power steering","Front power windows"],
+  "VXi":["All power windows","Power mirrors","Speed-sensing door lock","60:40 split rear seat","Parcel tray"],
+  "ZXi":["Rear defogger","Remote central locking","Bluetooth music","Steering-mounted controls","Tilt steering"],
+  "ZXi Plus":["7-inch touchscreen","Android Auto / CarPlay","Push-button start","Height-adjustable driver seat","Alloy wheels"]},
+ "S-Presso":{
+  "STD (O)":["ESC stability control","Seat-belt pretensioners","Idle start-stop","Sliding front seats","Digital cluster"],
+  "LXi (O)":["AC with heater","Power steering","ESC stability control","Idle start-stop","Digital cluster"],
+  "VXi (O)":["Remote central locking","Front power windows","Bluetooth music","Auto door lock","Info display"],
+  "VXi Plus (O)":["7-inch touchscreen","Android Auto / CarPlay","Steering-mounted controls","Power mirrors","Remote central locking"]},
+ "Ertiga":{
+  "LXi":["Side and curtain airbags","ESC with hill hold","Manual AC","All power windows","3-point belts for all 7"],
+  "VXi":["Remote central locking","Bluetooth music","Power-folding mirrors","Steering-mounted controls","2nd and 3rd-row AC vents"],
+  "ZXi":["7-inch touchscreen","Android Auto / CarPlay","Push-button start","Automatic AC","Height-adjustable driver seat"],
+  "ZXi Plus":["Rear camera","Wireless Android Auto / CarPlay","Cruise control","Tyre pressure monitor","Auto headlamps"]},
+ "Baleno":{
+  "Sigma":["ESC with hill hold","4 airbags","60:40 split rear seat","Manual AC","Keyless entry"],
+  "Delta":["7-inch touchscreen","Wireless Android Auto / CarPlay","Tyre pressure monitor","Power-folding mirrors","Front armrest"],
+  "Zeta":["Rear camera","9-inch touchscreen","LED projector headlamps","Push-button start","Height-adjustable driver seat"],
+  "Alpha":["360° camera","Head-up display","Cruise control","Ventilated front seats","Auto-dimming inside mirror"],
+  "Alpha (O)":["Adaptive cruise control","Forward collision warning","Lane departure warning","Lane keep assist","Auto high beam"]},
+ "Fronx":{
+  "Sigma":["ESC with hill hold","Automatic AC","Projector headlamps","Remote central locking","6 airbags"],
+  "Delta":["7-inch touchscreen","Wireless Android Auto / CarPlay","Steering-mounted controls","Power-folding mirrors","Parcel tray"],
+  "Delta Plus":["LED headlamps","Auto headlamps","LED DRLs","Alloy wheels","Wireless Android Auto / CarPlay"],
+  "Zeta":["Rear camera","Push-button start","Height-adjustable driver seat","Wireless charger","Curtain airbags"],
+  "Alpha":["360° camera","Head-up display","9-inch touchscreen","Cruise control","UV-cut glass"]},
+ "Exter":{
+  "HX 2":["6 airbags","ESC with hill hold","Rear parking sensors","ISOFIX child-seat mounts","Manual AC"],
+  "HX 3":["8-inch touchscreen","Wireless Android Auto / CarPlay","Rear camera","Day/night inside mirror","Steering-mounted controls"],
+  "HX 4":["Tyre pressure monitor","LED DRLs","Electric mirrors","All power windows","Rear AC vents"],
+  "HX 6":["Automatic AC","Dashcam","Rear defogger","Projector headlamps","Cruise control (petrol)"],
+  "HX 8":["Auto headlamps","Wireless charger","Cooled glovebox","15-inch dual-tone alloys","Rear wiper"],
+  "HX 10":["Navigation with OTA updates","Connected car tech","Wireless charger","Auto headlamps","Metal pedals"]},
+ "Aura":{
+  "E":["4 airbags","Front power windows","Manual AC","LED tail lamps","14-inch wheels"],
+  "S":["Music system","Steering-mounted controls","Power mirrors","Rear power windows","Tyre pressure monitor"],
+  "SX":["8-inch touchscreen","Android Auto / CarPlay","Rear camera","ESC with hill hold","Cruise control (petrol)"],
+  "SX (O)":["Curtain airbags","Wireless charger","Automatic AC","Auto headlamps","Projector headlamps"],
+  "SX Plus":["Automatic AC","8-inch touchscreen","Rear camera","ESC with hill hold","Steering-mounted controls"]},
+ "Grand i10 Nios":{
+  "Era":["Side and curtain airbags","Remote central locking","Front power windows","Manual AC","Auto door lock"],
+  "Magna":["Music system","Tyre pressure monitor","Steering-mounted controls","Power mirrors","Rear AC vents"],
+  "Sportz":["8-inch touchscreen","Android Auto / CarPlay","Rear camera","Automatic AC","Rear defogger"],
+  "Asta":["Push-button start","Wireless charger","Cooled glovebox","Rear wiper","ISOFIX child-seat mounts"]},
+ "Nexon":{
+  "Smart":["LED headlamps","ESC with hill hold","6 airbags","Manual AC","Front power windows"],
+  "Smart Plus":["7-inch touchscreen","Android Auto / CarPlay","Remote central locking","Rear power windows","Power-folding mirrors"],
+  "Smart Plus (S)":["Sunroof","Auto headlamps","7-inch touchscreen","Android Auto / CarPlay","Remote central locking"],
+  "Pure Plus":["LED projector headlamps","Electronic AC controls","Rear AC vents","Android Auto / CarPlay","Rear power windows"],
+  "Pure Plus (S)":["Sunroof","Auto headlamps","Auto wipers","Rear AC vents","LED projector headlamps"],
+  "Pure Plus (PS)":["Panoramic sunroof","Auto headlamps","Auto wipers","Rear AC vents","LED projector headlamps"],
+  "Creative":["Push-button start","Automatic AC","Rear camera","Tyre pressure monitor","Height-adjustable driver seat"],
+  "Creative Plus (S)":["360° camera","Blind-spot monitor","10.25-inch touchscreen","Cruise control","Sunroof"]},
+ "Amaze":{
+  "V":["6 airbags","ESC and traction control","8-inch touchscreen, wireless phone link","LED projector headlamps","Remote central locking"],
+  "VX":["Rear camera","Push-button start","Automatic AC with rear vents","Rear defogger","Auto headlamps and wipers"],
+  "ZX":["ADAS safety suite","Adaptive cruise control","Auto emergency braking","Lane keep assist","Auto high beam"]},
+ "Venue":{
+  "HX 2":["6 airbags","ESC with ABS and EBD","LED projector headlamps","10.25-inch touchscreen, wireless phone link","All power windows"],
+  "HX 4":["Rear camera","Tyre pressure monitor","Rear defogger","Electric-folding mirrors","Dual-tone seats"],
+  "HX 5":["Sunroof","Push-button start","Auto-folding mirrors","Rear camera","Tyre pressure monitor"],
+  "HX 6":["Automatic AC","Quad-beam LED headlamps","Wireless charger","Anti-pinch driver window","60:40 split rear seat"],
+  "HX 6T":["Connected car tech","Over-the-air updates","Voice-controlled sunroof","Automatic AC","Wireless charger"],
+  "HX 8":["Ventilated front seats","Drive modes","Traction modes","Electronic parking brake with auto hold","Rear disc brakes"],
+  "HX 10":["Level 2 ADAS","Dual 12.3-inch curved screens","Bose 8-speaker sound","Auto-dimming inside mirror","Front and side parking sensors"]},
+ "Sonet":{
+  "HTE":["6 airbags","Front power windows","Power mirrors","USB-C charging","Speed-sensing door lock"],
+  "HTK":["8-inch touchscreen","Wireless Android Auto / CarPlay","Rear camera","Front parking sensors","Rear power windows"],
+  "HTK Plus":["Push-button start","Automatic AC","Power-folding mirrors","LED fog lamps","Sunroof (turbo)"],
+  "HTX":["Sunroof","Cruise control","60:40 split rear seat","Ventilated seats (automatic)","Paddle shifters (automatic)"],
+  "HTX Plus":["10.25-inch touchscreen","Bose sound system","Ventilated front seats","Sunroof","Cruise control"],
+  "GTX Plus":["360° camera","Forward collision avoidance","Lane keep assist","Blind-spot view monitor","Power driver seat"]},
+ "XUV 3XO":{
+  "MX1":["Curtain airbags","ESC stability control","Projector headlamps","All power windows","16-inch wheels"],
+  "MX2 Pro":["10.25-inch touchscreen","Single-pane sunroof","Steering-mounted controls","Remote central locking","Follow-me-home headlamps"],
+  "MX3":["Wireless Android Auto","Cruise control","Wireless charger","10.25-inch touchscreen","Steering-mounted controls"],
+  "AX5":["Dual-zone automatic AC","Push-button start","Rear camera","10.25-inch digital cluster","Tyre pressure monitor"],
+  "AX7":["Panoramic sunroof","Harman Kardon sound","Leather upholstery","17-inch alloys","Front parking sensors"]},
+ "Creta":{
+  "E":["Side and curtain airbags","ESC stability control","Remote central locking","Front and rear armrests","Manual AC"],
+  "EX":["8-inch touchscreen","Wireless Android Auto / CarPlay","Power mirrors","Steering-mounted controls","Voice commands"],
+  "S":["Rear camera","Cruise control","Rear defogger","Rear wiper","Parcel tray"],
+  "S (O)":["Panoramic sunroof","Dual-zone automatic AC","Push-button start","17-inch alloys","Rear camera"],
+  "SX":["10.25-inch touchscreen","Wireless charger","Remote engine start","Over-the-air updates","Panoramic sunroof"],
+  "SX Tech":["ADAS lane keep assist","Forward collision avoidance","Blind-spot warning","Bose sound system","Adaptive cruise (CVT)"],
+  "SX (O)":["360° camera","Ventilated front seats","Powered driver seat","Front parking sensors","Auto-dimming inside mirror"]},
+ "Seltos":{
+  "HTE":["10.25-inch touchscreen","Wireless Android Auto / CarPlay","LED headlamps","Cruise control","ESC stability control"],
+  "HTE (O)":["60:40 split rear seat","LED light bar at rear","Leatherette and fabric seats","Auto hold (automatic)","Traction modes (automatic)"],
+  "HTK":["Push-button start","Rear defogger","Rear wiper","Tilt and telescopic steering","17-inch wheels (auto/turbo)"],
+  "HTK (O)":["Panoramic sunroof","Wireless charger","Powered driver seat","Front parking sensors","Ventilated seats (automatic)"],
+  "HTX":["12.3-inch touchscreen","Bose sound system","Dual-zone automatic AC","Connected car with OTA updates","Panoramic sunroof"],
+  "HTX (A)":["360° camera","Adaptive cruise with stop-and-go","Forward collision avoidance","Blind-spot alert","Front and side parking sensors"],
+  "GTX":["LED projector headlamps","18-inch alloys","Memory seat and mirrors","12.3-inch touchscreen","Bose sound system"],
+  "GTX (A)":["360° camera","Adaptive cruise control","Blind-spot alert","Rear cross-traffic alert","12.3-inch digital cluster"]},
+ "Hyryder":{
+  "E":["Push-button start","Hill-start assist","Automatic AC","LED DRLs","Rear disc brakes"],
+  "S":["7-inch touchscreen","Android Auto / CarPlay","Cruise control","Rear camera","Connected car tech"],
+  "G":["9-inch touchscreen","LED projector headlamps","Curtain airbags","Auto headlamps","Rear defogger"],
+  "V":["360° camera","Panoramic sunroof","Leather seats","Leather steering wheel","9-inch touchscreen"]},
+ "Taigun":{
+  "Comfortline":["7-inch touchscreen","Android Auto / CarPlay","LED headlamps and tail lamps","Electronic differential lock","Tyre pressure warning"],
+  "Highline":["10-inch touchscreen","Wireless Android Auto / CarPlay","Rear camera","Rear defogger","16-inch alloys"],
+  "Topline":["Electric sunroof","Ventilated front seats","LED projector headlamps","Push-button start","8-inch digital cluster"]},
+ "Kushaq":{
+  "Classic Plus":["6 airbags","Full LED lights","7-inch touchscreen with phone link","Automatic AC with rear vents","16-inch alloys"],
+  "Signature":["10.1-inch touchscreen, wireless phone link","Rear camera","Wireless charger","Keyless entry","17-inch alloys"],
+  "Sportline":["Blacked-out alloys","Gloss-black styling","Black interior","Aluminium pedals","Rear camera"],
+  "Prestige":["Panoramic sunroof","Ventilated powered front seats","Rear massage seats","10.25-inch digital cluster","8-speaker sound with subwoofer"],
+  "Monte Carlo":["Dual-tone paint","Dual-tone alloys","Red accents inside and out","Black leatherette seats","Panoramic sunroof"]},
+ "Elevate":{
+  "SV":["6 airbags","ESC and traction control","Hill-start assist","Rear parking sensors","Automatic AC"],
+  "V":["8-inch touchscreen, wireless phone link","Connected car tech","Multi-angle rear camera","4 speakers","Rear USB-C ports"],
+  "VX":["Electric sunroof","17-inch dual-tone alloys","Wireless charger","Ambient lighting","LED lighting signature"],
+  "ZX":["ADAS safety suite","10.25-inch touchscreen","Ventilated front seats","Leather upholstery","Auto-dimming inside mirror"],
+  "ZX Plus":["360° camera","Front parking sensors","Powered driver seat","Ventilated rear seats","ADAS safety suite"]},
+ "XL6":{
+  "Zeta":["Captain seats in 2nd row","7-inch touchscreen","Android Auto / CarPlay","Cruise control","Push-button start"],
+  "Alpha":["360° camera","Leather seats","Auto headlamps","Leather steering wheel","IR-cut windscreen"],
+  "Alpha Plus":["Ventilated front seats","Tyre pressure monitor","360° camera","Leather seats","Rear spoiler"]},
+ "Grand Vitara":{
+  "Sigma":["ESC stability control","Push-button start","Automatic AC","Projector headlamps","6 airbags"],
+  "Delta":["Rear camera","7-inch touchscreen","Cruise control","Paddle shifters (automatic)","Rear USB charger"],
+  "Zeta":["LED projector headlamps","9-inch touchscreen","Curtain airbags","17-inch alloys","Rear wiper"],
+  "Zeta Plus":["Head-up display","Panoramic sunroof","Wireless charger","Colour digital cluster","Ambient lighting"],
+  "Alpha":["360° camera","Panoramic sunroof","Leather seats","Leather steering wheel","9-inch touchscreen"],
+  "Alpha Plus":["Ventilated front seats","Tyre pressure monitor","360° camera","Head-up display","Better speakers"]},
 };
 function featFor(model,variant){
   const T=VFEAT[model];
@@ -837,6 +981,7 @@ function calc(){
   $("shareO").textContent=Math.round(share*100)+"%";$("rwO").textContent=Math.round(rw*100)+"%";
   $("kmHint").textContent=`About ${(km*30).toLocaleString("en-IN")} km a month, ${(km*365).toLocaleString("en-IN")} km a year.`;
   $("stP").textContent=`₹${pp}/L`;$("stC").textContent=`₹${cp}/kg`;
+  $("cngSum").textContent=`₹${cp}/kg · ${+$("cm").value} km/kg · ₹${prem.toLocaleString("en-IN")} extra · ${Math.round(share*100)}% on CNG`;
   const pCpk=pp/pm,cCpk=share*(cp/cm)+(1-share)*pCpk,mKm=km*365/12;
   const pMon=pCpk*mKm,cMon=cCpk*mKm+mx/12,save=pMon-cMon,months=yrs*12;
   const pTot=pMon*months,cTot=prem+cMon*months,net=pTot-cTot,be=save>0?prem/save:Infinity;
