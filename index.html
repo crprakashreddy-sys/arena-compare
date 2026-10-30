@@ -432,6 +432,10 @@ ul.insights li.line:focus-visible{outline:3px solid var(--accent-ink);outline-of
 .citystep select{font-size:16px;font-weight:600;max-width:420px;background:var(--panel);border:2px solid var(--accent);border-radius:12px;padding:10px 12px}
 .sl .n.pin{background:none;font-size:18px;width:auto}
 @media (max-width:600px){.citystep select{max-width:none}}
+
+.feat h4 small{display:block;font-family:var(--body);font-size:12.5px;font-weight:600;color:var(--muted);margin-top:2px}
+.ftag{margin:2px 0 6px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.ftag.ex{color:var(--cng-ink)}
 </style>
 
 <div class="wrap">
@@ -744,6 +748,61 @@ const FEAT={
  "Elevate":["Level 2 ADAS (top variants)","Single-pane sunroof (higher variants)","10.25-inch touchscreen (higher variants)","CVT automatic option","1.5 i-VTEC petrol"],
  "XUV 3XO":["5-star Bharat NCAP","6 airbags standard","Level 2 ADAS","Panoramic sunroof","Dual 10.25-inch screens"]
 };
+
+// Top 5 features by trim (summarised from Gaadify and V3Cars variant guides, 2026). A version uses its trim's list.
+const VFEAT={
+ "Swift":{
+  "LXi":["6 airbags","ESP stability control","ABS with EBD","Rear parking sensors","Keyless entry with central locking"],
+  "VXi":["7-inch touchscreen","Wireless Android Auto / CarPlay","Power-adjustable mirrors","6 airbags and ESP","Rear parking sensors"],
+  "VXi (O)":["Push-button start with smart key","Suzuki Connect car tech","Power-folding mirrors","Wireless Android Auto / CarPlay","6 airbags and ESP"],
+  "ZXi":["LED projector headlamps with LED DRLs","Automatic headlamps","Automatic climate control","Wireless charger","6 airbags and ESP"],
+  "ZXi Plus":["9-inch touchscreen","Cruise control","Rear parking camera","Arkamys-tuned sound","LED projector headlamps"]},
+ "Brezza":{
+  "LXi":["Side and curtain airbags","ESP with hill-start assist","Remote central locking","Projector headlamps","Power windows and mirrors"],
+  "VXi":["7-inch touchscreen","Wireless Android Auto / CarPlay","Steering-mounted controls","Height-adjustable driver seat","ESP with hill-start assist"],
+  "ZXi":["Electric sunroof","Push-button start with smart key","LED projector headlamps","Wireless Android Auto / CarPlay","ESP with hill-start assist"],
+  "ZXi Plus":["360° camera","10.1-inch touchscreen","Head-up display","Ventilated front seats","Electric sunroof"]},
+ "Alto K10":{
+  "STD (O)":["Side and curtain airbags","ESP stability control","Three-point belts for all five","Rear child locks","No AC or power steering in this trim"],
+  "LXi (O)":["Manual AC with heater","Power steering","ESP stability control","Side and curtain airbags","Rear child locks"],
+  "VXi (O)":["Front power windows","Bluetooth music system with USB","Central locking","Speed-sensing auto door lock","Manual AC and power steering"],
+  "VXi Plus (O)":["7-inch touchscreen","Android Auto / CarPlay (wired)","Steering-mounted controls","Remote central locking","Rear parcel tray"]},
+ "Wagon R":{
+  "LXi":["ESP stability control","Side and curtain airbags","Manual AC with heater","Front power windows","Central locking"],
+  "VXi":["Bluetooth music system","Remote central locking","Power mirrors","60:40 split rear seat","ESP, side and curtain airbags"],
+  "ZXi":["1.2-litre engine option","AMT automatic option","Steering-mounted controls","Bluetooth music system","Remote central locking"],
+  "ZXi Plus":["7-inch touchscreen","Android Auto / CarPlay (wired)","Alloy wheels","Front fog lamps","Rear defogger"]},
+ "Victoris":{
+  "LXi":["7-inch touchscreen, wireless Android Auto / CarPlay","ESC with traction control","Push-button start with smart key","Projector headlamps","60:40 split rear seat"],
+  "VXi":["Rear camera","Tyre pressure monitoring","Cruise control","Electronic parking brake with auto hold (AT)","Wireless Android Auto / CarPlay"],
+  "ZXi":["Gesture-controlled power tailgate","LED projector headlamps","Cooled wireless charger","10.25-inch digital cluster","Rear camera and cruise control"],
+  "ZXi (O)":["Panoramic sunroof","Gesture-controlled power tailgate","LED projector headlamps","Cooled wireless charger","10.25-inch digital cluster"],
+  "ZXi Plus":["360° camera","ADAS with adaptive cruise (petrol AT)","10.1-inch touchscreen with Dolby Atmos","Ventilated front seats","8-way power driver seat"],
+  "ZXi Plus (O)":["Panoramic sunroof","360° camera","ADAS (petrol AT)","10.1-inch touchscreen with Dolby Atmos","Ventilated front seats"]},
+ "Tiago":{
+  "Smart":["Side and curtain airbags","ISOFIX child-seat mounts","Manual AC","Tilt steering","Digital instrument cluster"],
+  "Pure":["Bluetooth music system","Power windows","Remote central locking","Power mirrors","Height-adjustable driver seat"],
+  "Pure Plus":["8-inch touchscreen","Wireless Android Auto / CarPlay","Rear camera","ESP with hill-start assist","Power windows and mirrors"],
+  "Pure Plus A":["Automatic climate control","Push-button start with smart key","Auto headlamps","Front armrest with storage","8-inch touchscreen, wireless phone mirroring"],
+  "Creative":["10.25-inch touchscreen","Lane-watch camera","LED headlamps","Auto-folding mirrors","Automatic climate control"],
+  "Creative Plus":["Wireless charger","LED fog lamps","Dual-tone black roof","Connected-car telematics","10.25-inch touchscreen"]},
+ "Punch":{
+  "Smart":["ESP with hill-start assist","Curtain airbags","Tyre pressure sensors","Manual AC","5-star Bharat NCAP"],
+  "Pure":["Rear AC vents","Steering-mounted controls","Power mirrors","Front armrest","ESP and curtain airbags"],
+  "Pure Plus":["8-inch touchscreen","Wireless Android Auto / CarPlay","Rear camera","Cruise control (not with CNG AMT)","Height-adjustable driver seat"],
+  "Pure Plus (S)":["Sunroof","Auto headlamps","Rain-sensing wipers","8-inch touchscreen, wireless phone mirroring","Rear camera"],
+  "Adventure":["360° camera","Blind-view monitor","Automatic climate control","Push-button start","Auto headlamps"],
+  "Adventure (S)":["Sunroof","360° camera","Blind-view monitor","Automatic climate control","Auto headlamps"],
+  "Accomplished":["10.25-inch touchscreen","Cooled glovebox","Hill-descent control","Keyless entry","360° camera"],
+  "Accomplished Plus (S)":["Sunroof","Wireless charger","7-inch colour digital cluster","Rear armrest","LED cornering fog lamps"]}
+};
+function featFor(model,variant){
+  const T=VFEAT[model];
+  if(T&&variant){const v=variant.toLowerCase();let best=null;
+    Object.keys(T).forEach(k=>{const kl=k.toLowerCase();if((v===kl||v.startsWith(kl+" "))&&(!best||k.length>best.length))best=k});
+    if(best)return{list:T[best],label:`${best} features`,exact:true}}
+  return{list:FEAT[model]||["Feature list not loaded yet"],label:"Model highlights",exact:false};
+}
 const PMATCH={"Victoris":["Grand Vitara","Creta","Seltos","Hyryder","Taigun","Kushaq","Elevate"],"Alto K10":["Tiago"],"S-Presso":["Tiago"],"Celerio":["Tiago","Grand i10 Nios"],"Swift":["Baleno","Fronx","Tiago","Grand i10 Nios","Punch","Exter"],"Dzire":["Aura","Amaze"],"Wagon R":["Tiago","Grand i10 Nios"],"Brezza":["Fronx","Nexon","Venue","Sonet","XUV 3XO"],"Ertiga":["XL6"]};
 const MATCH={"Ertiga":["XL6"],"Eeco":["Tiago"],"Victoris":["Grand Vitara","Hyryder"],"Alto K10":["Tiago"],"S-Presso":["Tiago"],"Celerio":["Tiago"],"Swift":["Baleno","Fronx","Tiago","Grand i10 Nios","Exter","Punch"],"Dzire":["Aura"],"Wagon R":["Tiago","Grand i10 Nios"],"Brezza":["Fronx","Nexon"]};
 
@@ -850,7 +909,7 @@ function openDetail(i){
   else if(gap<0&&runSave>=0)verdict+=` It costs ${inr(-gap)} less to buy and less to run.`;
   else if(gap<0&&runSave<0)verdict+=` It costs ${inr(-gap)} less to buy, though the ${x.n} is ${inr(-runSave)} a year cheaper to fuel.`;
   const opts=C.POOL[x.n].vars.map((v,k)=>`<option value="${k}"${k===x.idx?" selected":""}>${v[0]} · ${lakh(v[1])}</option>`).join("");
-  const f=n=>(FEAT[n]||["Feature list not loaded yet"]).map(t=>`<li>${t}</li>`).join("");
+  const fm=featFor(ms.n,ms.v),fx=featFor(x.n,x.v),f=F=>F.list.map(t=>`<li>${t}</li>`).join("");
   const wa=`🚗 ${ms.n} ${ms.v} vs ${x.n} ${x.v} (${C.isP?"petrol":"CNG"})\n${C.km} km a day · ${plural(yr,"year")}\n\nPrice: ${lakh(ms.x)} vs ${lakh(x.x)}\nMileage: ${ms.c.toFixed(2)} vs ${x.c.toFixed(2)} ${unit}\nFuel per year: ${inr(fy(ms))} vs ${inr(fy(x))}\nTotal over ${plural(yr,"year")}: ${inr(ms.tot)} vs ${inr(x.tot)}\n${d>=0?`✅ ${ms.n} saves ${inr(d)}`:`➖ ${x.n} saves ${inr(-d)}`}\n\nFull comparison 👉 ${SHARE_URL}`;
   $("dlgH").textContent=`${ms.n} vs ${x.n}`;
   $("dlgBody").innerHTML=`
@@ -859,8 +918,8 @@ function openDetail(i){
     <div class="dtwrap"><table class="dtbl"><tr><th></th><th class="dm">${ms.n}<small>${ms.v}</small></th><th>${x.n}<small>${x.v}</small></th></tr>
       ${rowsT.map(r=>`<tr><td>${r[0]}</td><td class="${r[3][0]}">${r[1]}</td><td class="${r[3][1]}">${r[2]}</td></tr>`).join("")}</table></div>
     <p class="hint">At ${C.km} km a day, ${C.isP?"petrol ₹"+C.fp+"/L":"CNG ₹"+C.fp+"/kg"}. Green marks the better figure. Registration, insurance, service and resale not included.</p>
-    <h4 class="dsub">Top 5 features</h4>
-    <div class="dfeat"><div class="m"><b>${ms.n}</b><ol>${f(ms.n)}</ol></div><div><b>${x.n}</b><ol>${f(x.n)}</ol></div></div>
+    <h4 class="dsub">Top 5 features of these versions</h4>
+    <div class="dfeat"><div class="m"><b>${ms.n} ${ms.v}</b><p class="ftag ${fm.exact?"ex":""}">${fm.label}</p><ol>${f(fm)}</ol></div><div><b>${x.n} ${x.v}</b><p class="ftag ${fx.exact?"ex":""}">${fx.label}</p><ol>${f(fx)}</ol></div></div>
     <div class="sharebar"><a class="wa" href="${waLink(wa)}" target="_blank" rel="noopener">Share this on WhatsApp</a></div>`;
   $("dlgVar").addEventListener("change",e=>{rivalPick[C.pk+x.n]=+e.target.value;compare();const ni=CMP.rows.findIndex(r=>r.n===x.n);if(ni>0)openDetail(ni)});
   if($("dlg").hidden){dlgFrom=document.activeElement;$("dlg").hidden=false;document.body.style.overflow="hidden";$("dlg").querySelector(".dlg").focus()}
@@ -917,7 +976,7 @@ function compare(){
   updateShare(ms,rows,yrs,km,isP);
   const max=Math.max(...rows.map(r=>r.tot));
   $("bars").innerHTML=rows.slice().sort((a,b)=>a.tot-b.tot).map(x=>`<div class="bar ${x.msil?"msil":""}"><span class="nm" title="${x.n} ${x.v}">${x.n} ${x.v}</span><div class="track"><div class="fill" style="width:${(x.tot/max*100).toFixed(1)}%"></div></div><span class="val">${inr(x.tot)}</span></div>`).join("");
-  $("feats").innerHTML=rows.map(x=>`<div class="feat ${x.msil?"msil":""}"><span class="brand">${x.b}</span><h4>${x.n}</h4><ol>${(FEAT[x.n]||["Feature list not loaded yet"]).map(f=>`<li>${f}</li>`).join("")}</ol></div>`).join("");
+  $("feats").innerHTML=rows.map(x=>{const F=featFor(x.n,x.v);return `<div class="feat ${x.msil?"msil":""}"><span class="brand">${x.b}</span><h4>${x.n} <small>${x.v}</small></h4><p class="ftag ${F.exact?"ex":""}">${F.label}</p><ol>${F.list.map(f=>`<li>${f}</li>`).join("")}</ol></div>`}).join("");
 }
 
 
