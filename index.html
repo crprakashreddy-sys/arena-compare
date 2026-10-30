@@ -280,17 +280,55 @@ ul.insights li.line{display:flex!important;flex-wrap:wrap;align-items:center;gap
 #accTbl td:last-child{text-align:right}
 .blockedMsg{text-align:center;padding:40px 22px}
 
-.lead{display:grid;gap:12px;background:linear-gradient(135deg,var(--cng-soft),var(--accent-soft) 60%,var(--pink-soft))}
-.leadgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-.lead input[type=text],.lead input[type=tel]{font:inherit;font-size:16px;color:var(--ink);background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;width:100%}
-.lead input:focus-visible{outline:2px solid var(--accent-ink);outline-offset:1px}
-.consent{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;margin:14px 0 4px}
-.consent input{width:20px;height:20px;margin-top:2px;accent-color:var(--accent-ink);flex:none}
-.leadrow{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:10px}
-.leadbtn{background:linear-gradient(135deg,var(--accent),var(--pink));border-color:var(--accent-ink);font-weight:700;padding:11px 22px}
-.leadbtn:disabled{opacity:.6}
-.leadmsg{font-size:14.5px;font-weight:600}
-.leadmsg.ok{color:var(--cng-ink)}.leadmsg.err{color:var(--bad)}
+
+/* phone layout */
+@media (max-width:600px){
+  body{font-size:15px}
+  .wrap{padding-block:14px 36px;gap:18px}
+  header{padding:18px 16px;border-radius:18px}
+  h1{font-size:27px}
+  h2{font-size:21px}
+  .lede{font-size:15px;margin-top:8px}
+  .stamp{font-size:12px;flex-wrap:wrap;margin-top:10px;padding:4px 10px}
+  .panel{padding:16px;border-radius:14px}
+  .quick{gap:14px}
+  .sl{font-size:16.5px;gap:8px}
+  .sl .n{width:24px;height:24px;font-size:12.5px}
+  #qModel,#qVar{flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  #qModel::-webkit-scrollbar,#qVar::-webkit-scrollbar{display:none}
+  #qModel .chip,#qVar .chip{flex:none;scroll-snap-align:start}
+  .chip{font-size:14px;padding:8px 14px;min-height:40px}
+  .chips#qFuel .chip{flex:1;text-align:center}
+  .steprow{gap:14px}
+  .exact{gap:10px}
+  .exact .num input{width:80px;font-size:16px;padding:7px}
+  details.more summary{font-size:17px}
+  details.more summary span{font-size:13px}
+  .group{padding:12px}
+  .verdict{padding:16px;gap:8px}
+  .verdict p{font-size:16px}
+  .kpis{gap:8px}
+  .kpi{padding:10px 12px}
+  .kpi .l{font-size:12px}
+  .kpi .v{font-size:18px}
+  .fuel{padding:12px 14px}
+  .row{font-size:14px;padding:7px 8px}
+  .stack{gap:12px}
+  ul.insights li.line{padding:8px 10px!important;gap:3px 10px;font-size:13.5px}
+  .line .who{flex-basis:100%}
+  .line .m{font-size:13px}
+  .line .ov{margin-left:0;font-size:13px}
+  .bar{font-size:13.5px;gap:6px 10px}
+  .feats{grid-template-columns:minmax(0,1fr);gap:10px}
+  .feat{padding:12px 14px}
+  .feat h4{font-size:17px;margin-bottom:6px}
+  .feat ol{font-size:14px;gap:4px}
+  th,td{padding:9px 10px}
+  table{font-size:13.5px}
+  .access table{min-width:420px}
+  .acctools input[type=search]{flex:1 1 100%}
+  .privacy,details.notes{font-size:12.5px}
+}
 </style>
 
 <div class="wrap">
@@ -437,20 +475,6 @@ ul.insights li.line{display:flex!important;flex-wrap:wrap;align-items:center;gap
 
 
 
-  <section class="panel lead" id="leadPanel" hidden aria-labelledby="leadH">
-    <div class="sechead"><div class="eyebrow">Interested?</div><h2 id="leadH">Get the best price on this car</h2></div>
-    <p class="hint">Leave your number and our team will call you with today's on-road price and offers.</p>
-    <form id="leadForm" novalidate>
-      <div class="leadgrid">
-        <div class="field"><label for="lName">Your name</label><input type="text" id="lName" autocomplete="name" required maxlength="60"></div>
-        <div class="field"><label for="lPhone">Mobile number</label><input type="tel" id="lPhone" autocomplete="tel" inputmode="numeric" placeholder="10-digit mobile" required maxlength="14"></div>
-        <div class="field"><label for="lCar">Car you're interested in</label><input type="text" id="lCar" maxlength="80"></div>
-        <div class="field"><label for="lArea">Area in Hyderabad (optional)</label><input type="text" id="lArea" autocomplete="address-level2" maxlength="60"></div>
-      </div>
-      <label class="consent"><input type="checkbox" id="lOk" required> I agree to be contacted by phone or WhatsApp about this car.</label>
-      <div class="leadrow"><button type="submit" class="chip leadbtn" id="lSend">Call me back</button><span class="leadmsg" id="lMsg" role="status"></span></div>
-    </form>
-  </section>
   <section class="panel access" id="accessPanel" hidden aria-labelledby="accH">
     <div class="sechead"><div class="eyebrow">Only you can see this</div><h2 id="accH">Who's using this page</h2></div>
     <p class="accsum" id="accSum"></p>
@@ -747,30 +771,6 @@ document.querySelectorAll("input:not(#qkmR):not(#qkmN):not(#qyrR):not(#qyrN)").f
 loadModel();calc();
 
 
-// ---- lead form (public GitHub page only) ----
-const LEAD_URL="";
-(function(){
-  const onClaude=/(^|\.)claude\.ai$|claudeusercontent|anthropic/i.test(location.hostname)||!/^https?:$/.test(location.protocol);
-  if(!LEAD_URL||onClaude)return;
-  $("leadPanel").hidden=false;
-  const fillCar=()=>{if(document.activeElement===$("lCar"))return;const m=MODELS[sel.value],isP=$("cfuel").value==="petrol";
-    let v="";if(isP&&PETROL[m.n]){const pl=PETROL[m.n][+$("pvar").value||0];v=pl?pl[0]:""}else{const cv=curVar();v=cv?cv.v:""}
-    $("lCar").value=`${m.n} ${v}`.trim()};
-  fillCar();document.addEventListener("click",()=>setTimeout(fillCar,0));document.addEventListener("change",()=>setTimeout(fillCar,0));
-  $("leadForm").addEventListener("submit",async e=>{
-    e.preventDefault();const msg=$("lMsg");msg.className="leadmsg";
-    const name=$("lName").value.trim(),digits=$("lPhone").value.replace(/\D/g,"").replace(/^(91|0)(?=\d{10}$)/,"");
-    if(name.length<2){msg.textContent="Please enter your name.";msg.classList.add("err");$("lName").focus();return}
-    if(!/^[6-9]\d{9}$/.test(digits)){msg.textContent="Please enter a valid 10-digit mobile number.";msg.classList.add("err");$("lPhone").focus();return}
-    if(!$("lOk").checked){msg.textContent="Please tick the box to agree to a call back.";msg.classList.add("err");return}
-    $("lSend").disabled=true;msg.textContent="Sending…";
-    const body=new URLSearchParams({name,mobile:digits,car:$("lCar").value.trim(),area:$("lArea").value.trim(),kmPerDay:$("km").value,years:$("yrs").value,fuel:$("cfuel").value,page:location.href});
-    try{await fetch(LEAD_URL,{method:"POST",mode:"no-cors",body});
-      msg.textContent=`Thanks, ${name}. Our team will call you on ••••${digits.slice(-4)} soon.`;msg.classList.add("ok");$("leadForm").reset();fillCar()}
-    catch(err){msg.textContent="Couldn't send right now. Check your internet connection and try again.";msg.classList.add("err")}
-    $("lSend").disabled=false;
-  });
-})();
 // ---- access log + remove access (owner only) ----
 (async()=>{
   try{
