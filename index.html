@@ -428,18 +428,25 @@ ul.insights li.line:focus-visible{outline:3px solid var(--accent-ink);outline-of
 .cnggrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
 .cngset input[type=number]{background:var(--panel)}
 @media (max-width:600px){.cnggrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.cnggrid .field:nth-child(n+3){grid-column:1/-1}.cngset .tunehead h3{font-size:17px}}
+
+.citystep select{font-size:16px;font-weight:600;max-width:420px;background:var(--panel);border:2px solid var(--accent);border-radius:12px;padding:10px 12px}
+.sl .n.pin{background:none;font-size:18px;width:auto}
+@media (max-width:600px){.citystep select{max-width:none}}
 </style>
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">Maruti Suzuki Arena · Hyderabad</div>
+    <div class="eyebrow">Maruti Suzuki Arena · Southeast Zone</div>
     <h1><span class="g">Arena</span> vs Competition Comparison</h1>
     <p class="lede">Pick a Maruti Suzuki Arena car and tell us how you drive. See how it compares with its rivals on price, running cost and features, and what <span style="color:var(--cng-ink);font-weight:700">CNG</span> saves over <span style="color:var(--petrol-ink);font-weight:700">petrol</span>.</p>
     <div class="sharebar"><a class="wa" id="waTop" href="https://wa.me/" target="_blank" rel="noopener">Share on WhatsApp</a><button type="button" class="copyl" id="copyTop">Copy link</button></div>
-    <div class="stamp">Fuel today · Petrol <b id="stP">₹116.15/L</b> · CNG <b id="stC">₹103/kg</b> · Oct 2026</div>
+    <div class="stamp">Fuel today in <b id="stCity">Hyderabad</b> · Petrol <b id="stP">₹116.15/L</b> · CNG <b id="stC">₹112/kg</b> · Oct 2026</div>
   </header>
 
   <section class="panel quick" aria-label="Quick choices">
+    <div class="step citystep"><div class="sl"><span class="n pin">📍</span>Your city</div>
+      <select id="city" aria-label="Your city"></select>
+      <p class="hint" id="cityHint"></p></div>
     <div class="step"><div class="sl"><span class="n">1</span>Pick a car</div><div class="chips" id="qModel"></div></div>
     <div class="step"><div class="sl"><span class="n">2</span>CNG or petrol?</div><div class="chips" id="qFuel"></div></div>
     <div class="step"><div class="sl"><span class="n">3</span>Pick the version</div><div class="chips" id="qVar"></div></div>
@@ -532,7 +539,7 @@ ul.insights li.line:focus-visible{outline:3px solid var(--accent-ink);outline-of
   <section class="panel cngset" aria-labelledby="cngH">
     <div class="tunehead"><h3 id="cngH">CNG settings</h3><p class="hint">These shape the petrol vs CNG result below. Change them to match your city and driving.</p></div>
     <div class="cnggrid">
-      <div class="field"><label for="cp">CNG ₹/kg</label><input type="number" id="cp" value="103" step="0.5" min="1"></div>
+      <div class="field"><label for="cp">CNG ₹/kg</label><input type="number" id="cp" value="112" step="0.5" min="1"></div>
       <div class="field"><label for="cm">CNG km/kg (claimed)</label><input type="number" id="cm" step="0.01" min="1"></div>
       <div class="field">
           <label for="prem">CNG premium (₹)</label>
@@ -607,7 +614,7 @@ ul.insights li.line:focus-visible{outline:3px solid var(--accent-ink);outline-of
     <summary>Data sources and assumptions</summary>
     <p>Ex-showroom prices are CarWale's Hyderabad or nearby Telangana city listings (Oct 2026) wherever available; Seltos from V3Cars (Oct 2026); Baleno from CarWale’s Sep 2026 variant list; Dzire Tour S from ZigWheels (Oct 2026); XL6 only Zeta was priced individually; Brezza, XL6, Grand i10 Nios, Amaze, Kushaq, Elevate and Dzire Tour S from ZigWheels (Jul–Oct 2026). Check against your current dealer price list before quoting a customer.</p>
     <p>Mileage is the manufacturer's claimed (ARAI) figure for every car, petrol and CNG, so the comparison is like for like. Where CarWale did not list a figure, the maker's published claim is used.</p>
-    <p>Hyderabad CNG has been quoted between ₹97 and ₹109/kg this year; ₹103 reflects the July 2026 revision. The blended CNG cost assumes the rest of the driving runs on petrol. Prices refresh automatically each morning.</p>
+    <p>Fuel prices are set per city (Oct 2026: Goodreturns, V3Cars, Business Today, BankBazaar, RozKaBhav). Where a city's CNG price wasn't published, the state average is used and marked. Ex-showroom prices are the same across Telangana, Andhra Pradesh, Odisha and Chhattisgarh (checked on CarWale); on-road prices differ by state road tax. The blended CNG cost assumes the rest of the driving runs on petrol. Prices refresh automatically each morning.</p>
   </details>
 </div>
 
@@ -913,6 +920,42 @@ function compare(){
   $("feats").innerHTML=rows.map(x=>`<div class="feat ${x.msil?"msil":""}"><span class="brand">${x.b}</span><h4>${x.n}</h4><ol>${(FEAT[x.n]||["Feature list not loaded yet"]).map(f=>`<li>${f}</li>`).join("")}</ol></div>`).join("");
 }
 
+
+// ---- Southeast zone cities: fuel prices per city (Oct 2026). est:true = CNG uses the state average ----
+const CITIES=[
+  {n:"Hyderabad",st:"Telangana",p:116.15,c:112},
+  {n:"Warangal",st:"Telangana",p:115.62,c:112,est:1},
+  {n:"Karimnagar",st:"Telangana",p:115.81,c:112,est:1},
+  {n:"Nizamabad",st:"Telangana",p:117.07,c:112,est:1},
+  {n:"Nalgonda",st:"Telangana",p:116.04,c:112,est:1},
+  {n:"Mahbubnagar",st:"Telangana",p:116.64,c:112,est:1},
+  {n:"Vijayawada",st:"Andhra Pradesh",p:116.64,c:103},
+  {n:"Visakhapatnam",st:"Andhra Pradesh",p:116.39,c:99.80},
+  {n:"Guntur",st:"Andhra Pradesh",p:117.68,c:99.80,est:1},
+  {n:"Nellore",st:"Andhra Pradesh",p:118.14,c:98},
+  {n:"Kurnool",st:"Andhra Pradesh",p:117.87,c:99.80,est:1},
+  {n:"Tirupati",st:"Andhra Pradesh",p:118.34,c:98},
+  {n:"Anantapur",st:"Andhra Pradesh",p:117.58,c:98},
+  {n:"Ongole",st:"Andhra Pradesh",p:118.14,c:99.80,est:1},
+  {n:"Rajahmundry",st:"Andhra Pradesh",p:117.16,c:99.99},
+  {n:"Bhubaneswar",st:"Odisha",p:108.97,c:93.50},
+  {n:"Angul",st:"Odisha",p:110.26,c:97.70},
+  {n:"Sambalpur",st:"Odisha",p:109.63,c:93.50,est:1},
+  {n:"Rourkela",st:"Odisha",p:109.33,c:93.50,est:1},
+  {n:"Jeypore",st:"Odisha",p:110.49,c:93.50,est:1},
+  {n:"Raipur",st:"Chhattisgarh",p:108.30,c:87.75},
+  {n:"Bilaspur",st:"Chhattisgarh",p:108.42,c:82}
+];
+(function(){
+  const cs=$("city"),states=[...new Set(CITIES.map(c=>c.st))];
+  cs.innerHTML=states.map(st=>`<optgroup label="${st}">${CITIES.map((c,i)=>c.st===st?`<option value="${i}">${c.n}</option>`:"").join("")}</optgroup>`).join("");
+  let saved=0;try{const v=localStorage.getItem("arenaCity");if(v!==null&&CITIES[+v])saved=+v}catch(e){}
+  function applyCity(i){const c=CITIES[i];$("pp").value=c.p;$("cp").value=c.c;$("stCity").textContent=c.n;
+    $("cityHint").textContent=`${c.st} · Petrol ₹${c.p}/L · CNG ₹${c.c}/kg${c.est?" (state average)":""}. Edit them under More options or CNG settings if your pump differs.`;
+    try{localStorage.setItem("arenaCity",String(i))}catch(e){}}
+  cs.value=saved;applyCity(saved);
+  cs.addEventListener("change",()=>{applyCity(+cs.value);calc()});
+})();
 const KM=[20,40,60,80,120],YRS=[3,5,7,10];
 function chip(attrs,label,sub,on,dis){return `<button type="button" class="chip" ${attrs} aria-pressed="${on}"${dis?" disabled":""}>${label}${sub?`<small>${sub}</small>`:""}</button>`}
 function ensurePvar(m){const pl=PETROL[m.n];if(pl&&$("pvar").dataset.m!==m.n){$("pvar").innerHTML=pl.map((v,i)=>`<option value="${i}">${v[0]} · ${lakh(v[1])}</option>`).join("");$("pvar").dataset.m=m.n}}
