@@ -775,7 +775,7 @@ ul.insights li.line:hover{transform:translateX(3px)}
   <details class="notes">
     <summary>Data sources and assumptions</summary>
     <p>Ex-showroom prices are CarWale's Hyderabad or nearby Telangana city listings (Oct 2026) wherever available; Seltos from V3Cars (Oct 2026); Baleno from CarWale’s Sep 2026 variant list; Dzire Tour S from ZigWheels (Oct 2026); XL6 only Zeta was priced individually; Brezza, XL6, Grand i10 Nios, Amaze, Kushaq, Elevate and Dzire Tour S from ZigWheels (Jul–Oct 2026). Check against your current dealer price list before quoting a customer.</p>
-    <p>Rivals added on 30 Oct 2026 (ex-showroom, mostly Delhi list prices, Sep–Oct 2026): Tigor, Altroz, i20, Magnite and Taisor from V3Cars; Glanza facelift from V3Cars (Oct 2026); Rumion and Citroen C3 from CarDekho; Syros MY26 from CarDekho; Kylaq from Gaadify (Apr 2026); Kiger from Carlelo; Triber from Autocar India; Carens Clavis from CarOnPhone; XUV 3XO CNG from Carlelo (Oct 2026); Bayon from Times Drive and GaadiKey (Oct 2026). Mileage claims from CarWale, Autocar India, Rushlane, CarTrade, V3Cars and CarDekho. Altroz CNG claims differ by source (26.2–27.8 km/kg), so 26.9 is used; Altroz petrol automatics use the published 19.33 km/L claim; Taisor CNG uses the Fronx CNG claim (same engine). Added later: Renault Kwid (Autocar India, Jul 2026; ARAI 21.7/22.5 km/L), Renault Duster 1.3 turbo (CarDekho prices; Renault claims 17.75/18.45 km/L; the 1.0 turbo has no published claim yet) and Nissan Tekton (Autocar India, Jul 2026). Tata Curvv and Tata Sierra are not included because no claimed petrol mileage is published for the versions on sale.</p>
+    <p>Rivals added on 30 Oct 2026 (ex-showroom, mostly Delhi list prices, Sep–Oct 2026): Tigor, Altroz, i20, Magnite and Taisor from V3Cars; Glanza facelift from V3Cars (Oct 2026); Rumion and Citroen C3 from CarDekho; Syros MY26 from CarDekho; Kylaq from Gaadify (Apr 2026); Kiger from Carlelo; Triber from Autocar India; Carens Clavis from CarOnPhone; XUV 3XO CNG from Carlelo (Oct 2026); Bayon from Times Drive and GaadiKey (Oct 2026). Mileage claims from CarWale, Autocar India, Rushlane, CarTrade, V3Cars and CarDekho. Altroz CNG claims differ by source (26.2–27.8 km/kg), so 26.9 is used; Altroz petrol automatics use the published 19.33 km/L claim; Taisor CNG uses the Fronx CNG claim (same engine). Added later: Renault Kwid (Autocar India, Jul 2026; ARAI 21.7/22.5 km/L), Renault Duster 1.3 turbo (CarDekho prices; Renault claims 17.75/18.45 km/L; the 1.0 turbo has no published claim yet); Duster strong hybrid (Times Drive, 17 Oct 2026; ARAI 29 km/L, Emotion priced ₹19.48 L per the official table) and Nissan Tekton (Autocar India, Jul 2026). Tata Curvv and Tata Sierra are not included because no claimed petrol mileage is published for the versions on sale.</p>
     <p>Mileage is the manufacturer's claimed (ARAI) figure for every car, petrol and CNG, so the comparison is like for like. Where CarWale did not list a figure, the maker's published claim is used.</p>
     <p>Fuel prices are set per city (Oct 2026: Goodreturns, V3Cars, Business Today, BankBazaar, RozKaBhav). Where a city's CNG price wasn't published, the state average is used and marked. Ex-showroom prices are the same across Telangana, Andhra Pradesh, Odisha and Chhattisgarh (checked on CarWale); on-road prices differ by state road tax. The blended CNG cost assumes the rest of the driving runs on petrol. Prices refresh automatically each morning.</p>
   </details>
@@ -909,7 +909,7 @@ const PRIVALS={
   "Rumion":{b:"Toyota",vars:[["E",9.79,20.51],["S",10.77,20.51],["G",11.93,20.51],["S AT",12.35,20.11],["V",12.70,20.51],["G AT",13.44,20.11],["V AT",14.21,20.11]]},
   "C3":{b:"Citroen",vars:[["Live",4.99,19.3],["Live (O)",5.69,19.3],["Feel",6.00,19.3],["Feel (O)",7.03,19.3],["Feel Turbo",7.58,19.3],["Shine",7.86,19.3],["Shine Turbo",8.97,19.3],["Shine Turbo AT",9.68,19.3]]},
   "Kwid":{b:"Renault",vars:[["Evolution",4.53,21.7],["Evolution AMT",4.90,22.5],["Climber",5.15,21.7],["Climber AMT",5.61,22.5]]},
-  "Duster":{b:"Renault",vars:[["Evolution 1.3 Turbo",12.99,17.75],["Techno 1.3 Turbo",14.49,17.75],["Evolution 1.3 Turbo DCT",14.49,18.45],["Techno Plus 1.3 Turbo",15.29,17.75],["Techno 1.3 Turbo DCT",15.89,18.45],["Techno Plus 1.3 Turbo DCT",16.69,18.45],["Iconic 1.3 Turbo",16.99,17.75],["Iconic 1.3 Turbo DCT",18.49,18.45]]},
+  "Duster":{b:"Renault",vars:[["Evolution 1.3 Turbo",12.99,17.75],["Techno 1.3 Turbo",14.49,17.75],["Evolution 1.3 Turbo DCT",14.49,18.45],["Techno Plus 1.3 Turbo",15.29,17.75],["Techno 1.3 Turbo DCT",15.89,18.45],["Techno Plus 1.3 Turbo DCT",16.69,18.45],["Iconic 1.3 Turbo",16.99,17.75],["Iconic 1.3 Turbo DCT",18.49,18.45],["Evolution Strong Hybrid",16.99,29.0],["Techno Strong Hybrid",18.99,29.0],["Emotion Strong Hybrid",19.48,29.0]]},
   "Tekton":{b:"Nissan",vars:[["Visia 1.0 Turbo",10.49,19.4],["Visia Plus 1.0 Turbo",11.14,19.4],["Acenta 1.0 Turbo",11.79,19.4],["N-Connecta 1.0 Turbo",13.69,19.4],["Acenta 1.3 Turbo DCT",14.99,18.5],["N-Connecta 1.3 Turbo",14.99,17.8],["Tekna 1.0 Turbo",15.39,19.4],["Tekna 1.3 Turbo",16.39,17.8],["N-Connecta 1.3 Turbo DCT",16.49,18.5],["Tekna Plus 1.0 Turbo",16.49,19.4],["Tekna 1.3 Turbo DCT",17.79,18.5],["Tekna Plus 1.3 Turbo DCT",18.59,18.5]]},
   "Bayon":{b:"Hyundai",vars:[["HX 2",10.00,18.7],["HX 3",10.90,18.7],["HX 3 Plus",11.80,18.7],["HX 5",12.45,18.7],["HX 6",13.57,18.7],["HX 5 CVT",13.85,18.6],["HX 6 CVT",14.97,18.6],["HX 8",15.10,18.7],["HX 8 CVT",16.54,18.6],["HX 10",16.65,18.7],["HX 10 CVT",18.00,18.6]]},
   "XUV 3XO":{b:"Mahindra",vars:[["MX1 1.2T",7.79,19.62],["REVX M 1.2T",8.59,19.62],["REVX M (O) 1.2T",9.09,19.62],["REVX EDGE 1.2T",9.39,19.62],["REVX EDGE (O) 1.2T",9.89,19.62],["REVX M (O) 1.2T AT",9.99,18.14],["AX5 1.2T",10.00,19.62]]}
@@ -918,7 +918,7 @@ const PRIVALS={
 // Top 5 buyer-facing features (summarised from CarWale, RushLane, Gaadify; some only on higher variants)
 const FEAT={
  "Kwid":["8-inch touchscreen, wired Android Auto / CarPlay","6 airbags (Climber)","Rear camera with sensors","Tyre pressure monitor","184 mm ground clearance"],
- "Duster":["1.0 and 1.3 turbo petrol engines","Manual or DCT automatic (1.3)","Strong hybrid version announced","Six variants","Rugged SUV design"],
+ "Duster":["1.3 turbo petrol, manual or DCT","1.8 strong hybrid, 29 km/L claimed (ARAI)","Hybrid runs on electric up to 80% in city (Renault claim)","7-year warranty; 8-year/1.6 lakh km hybrid battery","Rugged SUV design"],
  "Tekton":["Panoramic sunroof","Ventilated front seats","Level 2 ADAS","360° camera with blind-spot view","10.1-inch touchscreen and 10.25-inch digital cluster"],
  "Tigor":["Factory CNG with manual or AMT","Twin-cylinder CNG keeps boot usable","10.25-inch touchscreen, wireless phone link (XZ Plus)","360° camera (XZ Plus Lux)","Push-button start (XZ Plus)"],
  "Altroz":["6 airbags and ESC as standard","10.25-inch touchscreen, wireless phone link","360° camera","Sunroof (S trims)","Petrol, CNG, AMT and DCA options"],
@@ -1397,7 +1397,8 @@ $("cmpHead").addEventListener("keydown",e=>{const li=e.target.closest("li.line[d
 $("dlgX").addEventListener("click",closeDetail);
 $("dlg").addEventListener("click",e=>{if(e.target===$("dlg"))closeDetail()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDetail()});
-function nearest(vars,price){let bi=0,bd=1e9;vars.forEach((v,i)=>{const d=Math.abs(v[1]-price);if(d<bd){bd=d;bi=i}});return bi}
+function nearest(vars,price,name){const hy=/hybrid/i.test(name||""),pool=hy&&vars.some(v=>/hybrid/i.test(v[0]))?v=>/hybrid/i.test(v[0]):()=>true;
+  let bi=0,bd=1e9;vars.forEach((v,i)=>{if(!pool(v))return;const d=Math.abs(v[1]-price);if(d<bd){bd=d;bi=i}});return bi}
 function compare(){
   queueMicrotask(()=>{try{renderQuick()}catch(e){}});
   const m=MODELS[sel.value],fuel=$("cfuel").value,mode=$("bmode").value,band=+$("band").value,isP=fuel==="petrol";
@@ -1422,7 +1423,7 @@ function compare(){
   const cost=(price,c)=>{const cpk=fp/(c*rw),fuelYr=cpk*kmYr;return{cpk,fuelYr,tot:price*1e5+fuelYr*yrs}};
   const ms={b:"Maruti Suzuki",n:m.n,v:mv.v,x:mv.x,c:mv.c,msil:true};Object.assign(ms,cost(ms.x,ms.c));
   const rows=[ms],pk=fuel+":";
-  rivals.forEach(rn=>{const R=POOL[rn],i=rivalPick[pk+rn]!=null?rivalPick[pk+rn]:nearest(R.vars,mv.x),rv=R.vars[i];
+  rivals.forEach(rn=>{const R=POOL[rn],i=rivalPick[pk+rn]!=null?rivalPick[pk+rn]:nearest(R.vars,mv.x,mv.v),rv=R.vars[i];
     const r={b:R.b,n:rn,v:rv[0],x:rv[1],c:rv[2]||R.c,idx:i};Object.assign(r,cost(r.x,r.c));rows.push(r)});
   let html=`<tr><th>Car · variant</th><th>Ex-showroom</th><th>Claimed ${unit}</th><th>Cost / km</th><th>Total, ${plural(yrs,"yr")}</th><th>${ms.n} is</th></tr>`;
   rows.forEach(x=>{
