@@ -1,0 +1,783 @@
+<title>Arena vs Competition Comparison</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: one reading column — controls panel, then "Petrol or CNG" verdict section, then "Against the competition" section; cards stack on phones */
+:root{
+  --bg:#fbf9ff; --panel:#ffffff; --ink:#2b2542; --muted:#6a6485; --line:#ebe5f6; --soft:#f6f2fc;
+  --accent:#c4b5ff; --accent-ink:#5b48c2; --accent-soft:#efebff;
+  --pink:#ffb3cd; --pink-ink:#b23a6d; --pink-soft:#ffeaf2;
+  --cyan:#a6e0f2; --cyan-ink:#1d7896; --cyan-soft:#e6f6fb;
+  --yellow:#ffe08a; --yellow-soft:#fff8de;
+  --cng:#a3e6c8; --cng-ink:#25795a; --cng-soft:#e6f8ef;
+  --petrol:#ffc9a3; --petrol-ink:#a95518; --petrol-soft:#fff2e8;
+  --bad:#b8405e; --on-bright:#2b2542;
+  --display:"Bricolage Grotesque",Georgia,serif; --body:"Figtree",system-ui,sans-serif; --num:"JetBrains Mono",ui-monospace,monospace;
+  --r:16px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#16132a; --panel:#1f1b36; --ink:#f3f0fb; --muted:#b4add0; --line:#342e55; --soft:#272244;
+  --accent:#b3a2ff; --accent-ink:#cbbfff; --accent-soft:#2c2650;
+  --pink:#ffa8c6; --pink-ink:#ffb9d2; --pink-soft:#3a2238;
+  --cyan:#98d9ee; --cyan-ink:#a9e4f5; --cyan-soft:#1b3142;
+  --yellow:#ffdb7a; --yellow-soft:#37301c;
+  --cng:#97e2c0; --cng-ink:#a3ebcb; --cng-soft:#1a3530;
+  --petrol:#ffc199; --petrol-ink:#ffc9a6; --petrol-soft:#3b2a20;
+  --bad:#ff9db4; --on-bright:#221d38; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#16132a; --panel:#1f1b36; --ink:#f3f0fb; --muted:#b4add0; --line:#342e55; --soft:#272244;
+  --accent:#b3a2ff; --accent-ink:#cbbfff; --accent-soft:#2c2650;
+  --pink:#ffa8c6; --pink-ink:#ffb9d2; --pink-soft:#3a2238;
+  --cyan:#98d9ee; --cyan-ink:#a9e4f5; --cyan-soft:#1b3142;
+  --yellow:#ffdb7a; --yellow-soft:#37301c;
+  --cng:#97e2c0; --cng-ink:#a3ebcb; --cng-soft:#1a3530;
+  --petrol:#ffc199; --petrol-ink:#ffc9a6; --petrol-soft:#3b2a20;
+  --bad:#ff9db4; --on-bright:#221d38; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55}
+.wrap{max-width:1080px;margin:0 auto;padding-block:32px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:28px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(28px,4.4vw,42px);font-weight:800;line-height:1.1}
+h1 .p{color:var(--petrol-ink)} h1 .c{color:var(--cng-ink)}
+h1 .g{background:linear-gradient(90deg,var(--accent-ink),var(--pink-ink));-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-size:clamp(22px,3vw,28px);font-weight:800}
+h3{font-size:18px;font-weight:600}
+.eyebrow{font-size:12.5px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--pink-ink)}
+.lede{color:var(--muted);margin:10px 0 0;max-width:64ch;font-size:17px}
+.stamp{display:inline-flex;gap:8px;align-items:center;margin-top:14px;font-size:13px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.stamp b{font-family:var(--num);color:var(--ink);font-weight:500}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.sechead{display:grid;gap:4px;margin-bottom:4px}
+/* controls */
+.controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+@media (max-width:860px){.controls{grid-template-columns:minmax(0,1fr)}}
+.group{display:grid;gap:14px;align-content:start}
+.group h3{font-family:var(--body);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.field{display:grid;gap:6px}
+.field label{font-weight:600;font-size:14.5px;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.field label output{font-family:var(--num);font-size:14px;color:var(--accent-ink);font-variant-numeric:tabular-nums}
+.hint{font-size:13px;color:var(--muted);margin:0}
+select,input[type=number]{font:inherit;font-size:15px;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+input[type=number]{font-family:var(--num);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent-ink);height:22px}
+select:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+details.adv{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}
+details.adv summary{cursor:pointer;font-weight:600;font-size:14.5px;color:var(--accent-ink)}
+details.adv .advgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:14px}
+.chan{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--pink-soft);color:var(--pink-ink);letter-spacing:.04em}
+/* verdict */
+.verdict{border-radius:var(--r);padding:24px;background:linear-gradient(135deg,var(--cng-soft),var(--accent-soft));border:1px solid var(--line);display:grid;gap:10px}
+.verdict.neg{background:linear-gradient(135deg,var(--petrol-soft),var(--pink-soft))}
+.verdict .tag{justify-self:start;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:999px;background:var(--cng);color:var(--on-bright)}
+.verdict.neg .tag{background:var(--petrol)}
+.verdict p{margin:0;font-size:clamp(17px,2.2vw,20px);line-height:1.45;max-width:60ch;text-wrap:pretty}
+.verdict b{font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:720px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;border-top:4px solid var(--accent)}
+.kpi:nth-child(2){border-top-color:var(--pink-ink)}.kpi:nth-child(3){border-top-color:var(--cng)}.kpi:nth-child(4){border-top-color:var(--petrol)}
+.kpi .l{font-size:13px;color:var(--muted);font-weight:600}
+.kpi .v{font-family:var(--num);font-size:clamp(19px,2.4vw,24px);font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:620px){.duo{grid-template-columns:minmax(0,1fr)}}
+.fuel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.fuel h3{font-family:var(--body);font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.fuel h3::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--petrol)}
+.fuel.cng h3::before{background:var(--cng)}
+.row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.row:last-child{border-bottom:0}
+.row span:last-child{font-family:var(--num);font-variant-numeric:tabular-nums;font-weight:500}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--muted);margin:4px 0 8px}
+.legend i{height:5px!important;display:inline-block;width:16px;height:4px;vertical-align:middle;margin-right:6px;border-radius:2px}
+.chartbox{overflow-x:auto}
+svg text{font-family:var(--num);font-size:11px;fill:var(--muted)}
+.stack{display:grid;gap:14px}
+/* competition */
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px 20px}
+.insights{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.insights li{border-left:4px solid var(--accent)!important;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.pill{font-family:var(--num);font-size:13px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap;background:var(--cng);color:var(--on-bright)}
+.pill.bad{background:var(--petrol);color:var(--on-bright)}
+.insights p{margin:0;min-width:0;text-wrap:pretty}
+.insights b{font-weight:700}
+.tbl{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:14.5px}
+th,td{text-align:right;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+th:first-child,td:first-child{text-align:left}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;background:var(--soft);white-space:nowrap}
+td{font-family:var(--num);font-variant-numeric:tabular-nums;white-space:nowrap}
+td:first-child{font-family:var(--body);white-space:normal;min-width:190px}
+tr.msil td{background:var(--accent-soft)}
+tr.msil td:first-child{box-shadow:inset 5px 0 0 var(--accent)}
+.mname{font-weight:700;font-size:15px}
+.brand{display:block;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.02em}
+td select{font-size:13.5px;padding:6px 8px;margin-top:6px;width:100%;max-width:240px}
+.good{color:var(--cng-ink);font-weight:700}.bad{color:var(--bad);font-weight:700}
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:minmax(0,230px) 1fr minmax(0,86px);gap:12px;align-items:center;font-size:14.5px}
+.bar .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar.msil .nm{font-weight:700}
+.bar .track{height:16px;background:var(--soft);border-radius:4px;overflow:hidden}
+.bar .fill{height:100%;background:var(--muted);opacity:.45;border-radius:4px}
+.bar.msil .fill{background:linear-gradient(90deg,var(--accent),var(--pink));opacity:1}
+.bar .val{font-family:var(--num);text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:560px){.bar{grid-template-columns:1fr auto}.bar .track{grid-column:1/-1;order:3}}
+.feats{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.feat{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--panel);min-width:0}
+.feat.msil{border:2px solid var(--accent);background:var(--accent-soft)}
+.feat h4{margin:0 0 10px;font-family:var(--display);font-size:18px;font-weight:600}
+.feat ol{margin:0;padding-left:20px;font-size:14.5px;display:grid;gap:6px}
+.feat li::marker{color:var(--muted);font-family:var(--num);font-size:12.5px}
+.subhead{font-family:var(--body);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:6px 0 -4px}
+.empty{background:var(--panel);border:1px dashed var(--line);border-radius:12px;padding:18px;color:var(--muted);margin:0}
+details.notes{font-size:14px;color:var(--muted)}
+details.notes summary{cursor:pointer;font-weight:600;color:var(--ink)}
+details.notes p{margin:8px 0 0;max-width:80ch}
+
+/* colour layer */
+body{background:radial-gradient(900px 500px at 0% 0%,var(--pink-soft),transparent 60%),radial-gradient(800px 500px at 100% 5%,var(--cyan-soft),transparent 60%),radial-gradient(900px 600px at 50% 100%,var(--accent-soft),transparent 60%),var(--bg);background-attachment:fixed}
+header{padding:26px;border-radius:22px;background:linear-gradient(120deg,var(--accent-soft),var(--pink-soft) 45%,var(--yellow-soft) 75%,var(--cyan-soft));border:1px solid var(--line)}
+.stamp{background:var(--panel)}
+.group{padding:16px;border-radius:14px;background:var(--soft)}
+.group:nth-child(1){background:var(--accent-soft)}.group:nth-child(2){background:var(--pink-soft)}.group:nth-child(3){background:var(--cyan-soft)}
+.group:nth-child(1) h3{color:var(--accent-ink)}.group:nth-child(2) h3{color:var(--pink-ink)}.group:nth-child(3) h3{color:var(--cyan-ink)}
+.group select,.group input[type=number]{background:var(--panel)}
+.kpi:nth-child(1){background:var(--accent-soft)}.kpi:nth-child(2){background:var(--pink-soft)}.kpi:nth-child(3){background:var(--cng-soft)}.kpi:nth-child(4){background:var(--yellow-soft);border-top-color:var(--yellow)}
+.fuel.pet{background:var(--petrol-soft);border-color:transparent}.fuel.cng{background:var(--cng-soft);border-color:transparent}
+.fuel .row{border-bottom-color:color-mix(in srgb,var(--ink) 10%,transparent)}
+th{background:linear-gradient(90deg,var(--accent-soft),var(--pink-soft),var(--cyan-soft))}
+.sechead h2{background:linear-gradient(90deg,var(--accent-ink),var(--pink-ink));-webkit-background-clip:text;background-clip:text;color:transparent;justify-self:start}
+.insights li:nth-child(6n+1){border-left-color:var(--cyan)!important;background:linear-gradient(90deg,var(--cyan-soft),var(--panel) 40%)}
+.insights li:nth-child(6n+2){border-left-color:var(--pink)!important;background:linear-gradient(90deg,var(--pink-soft),var(--panel) 40%)}
+.insights li:nth-child(6n+3){border-left-color:var(--yellow)!important;background:linear-gradient(90deg,var(--yellow-soft),var(--panel) 40%)}
+.insights li:nth-child(6n+4){border-left-color:var(--accent)!important;background:linear-gradient(90deg,var(--accent-soft),var(--panel) 40%)}
+.insights li:nth-child(6n+5){border-left-color:var(--petrol)!important;background:linear-gradient(90deg,var(--petrol-soft),var(--panel) 40%)}
+.insights li:nth-child(6n+6){border-left-color:var(--cng)!important;background:linear-gradient(90deg,var(--cng-soft),var(--panel) 40%)}
+.bar:not(.msil) .fill{opacity:.9}
+.bar:not(.msil):nth-child(5n+1) .fill{background:var(--cyan)}
+.bar:not(.msil):nth-child(5n+2) .fill{background:var(--yellow)}
+.bar:not(.msil):nth-child(5n+3) .fill{background:var(--petrol)}
+.bar:not(.msil):nth-child(5n+4) .fill{background:var(--cng)}
+.bar:not(.msil):nth-child(5n+5) .fill{background:var(--pink)}
+.feat:not(.msil){border-top:5px solid var(--cyan)}
+.feat:not(.msil):nth-child(5n+2){border-top-color:var(--pink-ink);background:linear-gradient(180deg,var(--pink-soft),var(--panel) 55%)}
+.feat:not(.msil):nth-child(5n+3){border-top-color:var(--yellow);background:linear-gradient(180deg,var(--yellow-soft),var(--panel) 55%)}
+.feat:not(.msil):nth-child(5n+4){border-top-color:var(--cyan-ink);background:linear-gradient(180deg,var(--cyan-soft),var(--panel) 55%)}
+.feat:not(.msil):nth-child(5n+5){border-top-color:var(--petrol);background:linear-gradient(180deg,var(--petrol-soft),var(--panel) 55%)}
+.feat:not(.msil):nth-child(5n+1){border-top-color:var(--cng);background:linear-gradient(180deg,var(--cng-soft),var(--panel) 55%)}
+.feat.msil{background:linear-gradient(160deg,var(--accent-soft),var(--pink-soft))}
+.panel{box-shadow:0 1px 0 var(--line)}
+input[type=range]{accent-color:var(--pink-ink)}
+/* row highlights */
+#cmpTbl tr:not(.msil):nth-child(odd) td{background:var(--cyan-soft)}
+#cmpTbl tr:not(.msil):nth-child(even) td{background:var(--yellow-soft)}
+#cmpTbl tr:first-child td{background:transparent}
+#cmpTbl tr:not(:first-child) td{transition:background .15s}
+#cmpTbl tr:not(:first-child):hover td{background:var(--pink-soft)}
+#cmpTbl tr.msil td{background:linear-gradient(90deg,var(--accent-soft),var(--pink-soft));font-weight:700}
+#cmpTbl tr.msil td:first-child .mname::after{content:"Our pick";margin-left:8px;font-family:var(--body);font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--accent);color:var(--on-bright);vertical-align:middle}
+.fuel .row{padding:9px 10px;border-radius:8px;border-bottom:0}
+.fuel .row:nth-child(odd){background:color-mix(in srgb,var(--panel) 70%,transparent)}
+.fuel .row:hover{background:var(--panel)}
+@media (prefers-reduced-motion:reduce){#cmpTbl tr td{transition:none}}
+
+/* quick steps */
+.quick{display:grid;gap:18px;background:linear-gradient(135deg,var(--panel),var(--accent-soft))}
+.step{display:grid;gap:10px}
+.steprow{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:700px){.steprow{grid-template-columns:minmax(0,1fr)}}
+.sl{font-family:var(--display);font-size:19px;font-weight:600;display:flex;align-items:center;gap:10px}
+.sl .n{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--pink));color:var(--on-bright);font-family:var(--num);font-size:14px;font-weight:700;flex:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:15px;font-weight:600;color:var(--ink);background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:9px 16px;cursor:pointer;min-height:44px;line-height:1.2;text-align:left}
+.chip small{display:block;font-family:var(--num);font-size:12px;font-weight:500;color:var(--muted);margin-top:2px}
+.chip:hover{border-color:var(--pink-ink)}
+.chip[aria-pressed="true"]{background:linear-gradient(135deg,var(--accent),var(--pink));border-color:var(--accent-ink);color:var(--on-bright)}
+.chip[aria-pressed="true"] small{color:var(--on-bright);opacity:.85}
+.chip:disabled{opacity:.45;cursor:not-allowed}
+.chip:focus-visible{outline:3px solid var(--cyan-ink);outline-offset:2px}
+.qnote{font-size:14px;color:var(--muted);margin:0}
+details.more summary{cursor:pointer;font-family:var(--display);font-size:19px;font-weight:600;color:var(--accent-ink)}
+details.more summary span{display:block;font-family:var(--body);font-size:14px;font-weight:500;color:var(--muted)}
+details.more .moregrid{display:grid;gap:22px;margin-top:18px}
+details.more #model,details.more #variant{pointer-events:auto}
+
+/* simple scorecards */
+ul.insights{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+ul.insights li.vs{display:grid!important;grid-template-columns:1fr!important;gap:8px;padding:16px 18px;border-left-width:0!important;border-top:5px solid var(--accent)}
+ul.insights li.vs:nth-child(6n+1){border-top-color:var(--cyan)}ul.insights li.vs:nth-child(6n+2){border-top-color:var(--pink)}ul.insights li.vs:nth-child(6n+3){border-top-color:var(--yellow)}ul.insights li.vs:nth-child(6n+4){border-top-color:var(--accent)}ul.insights li.vs:nth-child(6n+5){border-top-color:var(--petrol)}ul.insights li.vs:nth-child(6n+6){border-top-color:var(--cng)}
+.vsh b{display:block;font-family:var(--display);font-size:19px;font-weight:600;line-height:1.25}
+.vr{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.vr span{color:var(--muted)}
+.vr b{display:inline-flex;align-items:center;gap:8px;font-weight:600;text-align:right}
+.ic{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;font-size:13px;font-weight:800;flex:none}
+.ic.ok{background:var(--cng);color:var(--on-bright)}.ic.no{background:var(--petrol);color:var(--on-bright)}
+.vsall{margin-top:4px;padding:10px 12px;border-radius:10px;font-size:15px}
+.vsall.ok{background:var(--cng-soft);color:var(--cng-ink)}.vsall.no{background:var(--petrol-soft);color:var(--petrol-ink)}
+.vsall b{font-family:var(--num)}
+details.full summary{cursor:pointer;font-weight:700;color:var(--accent-ink);padding:6px 0}
+details.full .tbl{margin-top:10px}
+
+.exact{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:4px}
+.exact input[type=range]{flex:1 1 180px;min-width:0}
+.exact .num{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px}
+.exact .num input{width:96px;text-align:center;font-size:17px;font-weight:700;background:var(--panel);border:2px solid var(--accent);border-radius:10px;padding:8px}
+
+/* one line per rival */
+ul.insights{grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+ul.insights li.line{display:grid!important;grid-template-columns:minmax(150px,1.3fr) repeat(3,minmax(0,1fr)) minmax(120px,auto)!important;align-items:center;gap:12px;padding:12px 16px;border-top:0!important;border-left:5px solid var(--accent)!important;font-size:14.5px}
+ul.insights li.line:nth-child(6n+1){border-left-color:var(--cyan)!important}ul.insights li.line:nth-child(6n+2){border-left-color:var(--pink)!important}ul.insights li.line:nth-child(6n+3){border-left-color:var(--yellow)!important}ul.insights li.line:nth-child(6n+5){border-left-color:var(--petrol)!important}ul.insights li.line:nth-child(6n+6){border-left-color:var(--cng)!important}
+.line .who{font-family:var(--display);font-size:17px;font-weight:600;min-width:0}
+.line .who small{display:block;font-family:var(--body);font-size:12.5px;font-weight:500;color:var(--muted)}
+.line .vsw{font-family:var(--num);font-size:11px;font-weight:700;color:var(--muted);margin-right:6px;text-transform:uppercase}
+.line .m{display:inline-flex;align-items:center;gap:6px;font-weight:600;white-space:nowrap;min-width:0}
+.line .lab{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.line .ov{justify-self:end;padding:6px 12px;border-radius:999px;font-weight:700;white-space:nowrap}
+.line .ov.ok{background:var(--cng);color:var(--on-bright)}.line .ov.no{background:var(--petrol);color:var(--on-bright)}
+.line .ov b{font-family:var(--num)}
+.lineHead{display:grid;grid-template-columns:minmax(150px,1.3fr) repeat(3,minmax(0,1fr)) minmax(120px,auto);gap:12px;padding:0 16px 0 21px;font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.lineHead span:last-child{text-align:right}
+.line .lab{display:none}
+@media (max-width:760px){
+  .lineHead{display:none}
+  ul.insights li.line{grid-template-columns:1fr auto!important}
+  .line .who{grid-column:1/-1}
+  .line .m{grid-column:1/-1}
+  .line .lab{display:inline;min-width:64px}
+  .line .ov{grid-column:1/-1;justify-self:start}
+}
+
+/* compact single-line rivals */
+ul.insights{gap:4px!important}
+ul.insights li.line{display:flex!important;flex-wrap:wrap;align-items:center;gap:4px 14px;padding:7px 12px!important;border-left-width:4px!important;border-radius:10px!important;font-size:14px;background:var(--panel)!important}
+.line .who{font-family:var(--body);font-size:14px;font-weight:500;color:var(--muted)}
+.line .who b{color:var(--ink);font-weight:700}
+.line .who small{display:inline;font-size:12.5px;color:var(--muted)}
+.line .m{gap:5px;font-weight:600;font-size:13.5px}
+.line .ic{width:18px;height:18px;font-size:11px}
+.line .ov{margin-left:auto;padding:3px 10px;font-size:13.5px}
+@media (max-width:760px){ul.insights li.line{display:flex!important}.line .ov{margin-left:0}}
+
+.access{display:grid;gap:12px;border:2px solid var(--accent)}
+.access table{min-width:480px}
+.access td{font-family:var(--body)}
+.privacy{text-align:center;font-size:12.5px}
+
+.accsum{font-family:var(--num);font-size:15px;font-weight:700;margin:0}
+.acctools{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.acctools input[type=search]{font:inherit;font-size:14.5px;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:8px 14px;min-width:0;flex:0 1 220px}
+.chip.sm{min-height:36px;padding:6px 12px;font-size:13.5px}
+.chip.sm small{display:inline;margin:0 0 0 4px}
+.act{font:inherit;font-size:13px;font-weight:700;border-radius:999px;padding:5px 12px;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;margin-left:6px}
+.act:hover{border-color:var(--bad)}
+.act.danger{background:var(--bad);color:var(--panel);border-color:var(--bad)}
+.act.restore{border-color:var(--cng-ink);color:var(--cng-ink)}
+.act:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px}
+#accTbl tr.isBlocked td{opacity:.6}
+#accTbl td:last-child{text-align:right}
+.blockedMsg{text-align:center;padding:40px 22px}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Maruti Suzuki Arena · Hyderabad</div>
+    <h1><span class="g">Arena</span> vs Competition Comparison</h1>
+    <p class="lede">Pick a Maruti Suzuki Arena car and tell us how you drive. See how it compares with its rivals on price, running cost and features, and what <span style="color:var(--cng-ink);font-weight:700">CNG</span> saves over <span style="color:var(--petrol-ink);font-weight:700">petrol</span>.</p>
+    <div class="stamp">Fuel today · Petrol <b id="stP">₹116.15/L</b> · CNG <b id="stC">₹103/kg</b> · Oct 2026</div>
+  </header>
+
+  <section class="panel quick" aria-label="Quick choices">
+    <div class="step"><div class="sl"><span class="n">1</span>Pick a car</div><div class="chips" id="qModel"></div></div>
+    <div class="step"><div class="sl"><span class="n">2</span>CNG or petrol?</div><div class="chips" id="qFuel"></div></div>
+    <div class="step"><div class="sl"><span class="n">3</span>Pick the version</div><div class="chips" id="qVar"></div></div>
+    <div class="steprow">
+      <div class="step"><div class="sl"><span class="n">4</span>How far do you drive in a day?</div><div class="exact"><input type="range" id="qkmR" min="1" max="300" step="1" aria-label="Daily km (drag)"><label class="num"><input type="number" id="qkmN" min="1" max="500" step="1" inputmode="numeric" aria-label="Daily km (type exact)"><span>km a day</span></label></div></div>
+      <div class="step"><div class="sl"><span class="n">5</span>How many years will you keep it?</div><div class="exact"><input type="range" id="qyrR" min="0.5" max="15" step="0.1" aria-label="Years (drag)"><label class="num"><input type="number" id="qyrN" min="0.5" max="20" step="0.1" inputmode="decimal" aria-label="Years (type exact)"><span>years</span></label></div></div>
+    </div>
+  </section>
+
+  <details class="more panel">
+    <summary>More options <span>fuel prices, mileage, CNG premium and how rivals are picked</span></summary>
+    <div class="moregrid">
+    <div class="controls">
+      <div class="group">
+        <h3>Your car</h3>
+        <div class="field">
+          <label for="model">Model <span class="chan" id="chan">Arena</span></label>
+          <select id="model"></select>
+        </div>
+        <div class="field" id="varField">
+          <label for="variant">CNG variant</label>
+          <select id="variant"></select>
+          <p class="hint" id="varHint"></p>
+        </div>
+      </div>
+      <div class="group">
+        <h3>Your driving</h3>
+        <div class="field">
+          <label for="km">Daily running <output id="kmO"></output></label>
+          <input type="range" id="km" min="1" max="500" step="1" value="40">
+          <p class="hint" id="kmHint"></p>
+        </div>
+        <div class="field">
+          <label for="yrs">Years you'll keep it <output id="yrsO"></output></label>
+          <input type="range" id="yrs" min="0.5" max="20" step="0.1" value="5">
+        </div>
+      </div>
+      <div class="group">
+        <h3>Prices</h3>
+        <div class="pair">
+          <div class="field"><label for="pp">Petrol ₹/L</label><input type="number" id="pp" value="116.15" step="0.01" min="1"></div>
+          <div class="field"><label for="cp">CNG ₹/kg</label><input type="number" id="cp" value="103" step="0.5" min="1"></div>
+        </div>
+        <div class="field">
+          <label for="prem">CNG premium (₹)</label>
+          <input type="number" id="prem" value="95000" step="1000" min="0">
+          <p class="hint" id="premHint"></p>
+        </div>
+      </div>
+    </div>
+    <details class="adv">
+      <summary>Fine-tune mileage and upkeep</summary>
+      <div class="advgrid">
+        <div class="field"><label for="pm">Petrol km/L (claimed)</label><input type="number" id="pm" step="0.01" min="1"></div>
+        <div class="field"><label for="cm">CNG km/kg (claimed)</label><input type="number" id="cm" step="0.01" min="1"></div>
+        <div class="field">
+          <label for="rw">Real-world vs claimed <output id="rwO"></output></label>
+          <input type="range" id="rw" min="60" max="100" step="5" value="80">
+          <p class="hint">City driving usually gets 75–85% of the claimed figure.</p>
+        </div>
+        <div class="field">
+          <label for="share">Driven on CNG <output id="shareO"></output></label>
+          <input type="range" id="share" min="50" max="100" step="5" value="90">
+          <p class="hint">Lower it if CNG stations are scarce on your routes.</p>
+        </div>
+        <div class="field">
+          <label for="mx">Extra CNG upkeep ₹/year</label>
+          <input type="number" id="mx" value="2500" step="500" min="0">
+          <p class="hint">Cylinder testing, kit checks and similar.</p>
+        </div>
+      </div>
+    </details>
+      <div class="morecmp">
+        <h3 class="subhead">How rivals are picked</h3>
+        <div class="modes">
+      <div class="modes">
+        <div class="field"><label for="cfuel">Compare</label>
+          <select id="cfuel"><option value="cng" selected>CNG vs CNG</option><option value="petrol">Petrol vs Petrol</option></select></div>
+        <div class="field" id="pvarField" hidden><label for="pvar">Maruti petrol variant</label><select id="pvar"></select></div>
+        <div class="field"><label for="bmode">Choose rivals by</label>
+          <select id="bmode"><option value="price" selected>Similar price (any brand)</option><option value="seg">Segment rivals</option></select></div>
+        <div class="field" id="bandField"><label for="band">Price range <output id="bandO"></output></label>
+          <input type="range" id="band" min="25000" max="150000" step="5000" value="75000"></div>
+      </div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="stack" aria-labelledby="s2">
+    <div class="sechead"><div class="eyebrow">Price, running cost and features</div><h2 id="s2">How each rival compares</h2></div>
+    <p class="empty" id="cmpNone" hidden></p>
+    <div class="stack" id="cmpRes">
+            <ul class="insights" id="cmpHead"></ul>
+      <details class="full"><summary>See full numbers and change rival versions</summary><div class="tbl"><table id="cmpTbl"></table></div></details>
+      <h3 class="subhead">Total cost of ownership</h3>
+      <div class="bars" id="bars"></div>
+      <h3 class="subhead">Top 5 features</h3>
+      <div class="feats" id="feats"></div>
+      <p class="hint">Rivals open on their variant nearest in price; change it in the table. Total = ex-showroom price + fuel for the period. Registration, insurance, service and resale are not included. Some features are on higher variants only.</p>
+    </div>
+  </section>
+
+  <section class="stack" aria-labelledby="s1">
+    <div class="sechead"><div class="eyebrow">Same car, two fuels</div><h2 id="s1">Petrol or CNG?</h2></div>
+    <div class="verdict" id="verdict"><span class="tag" id="vTag">Go CNG</span><p id="vText"></p></div>
+    <div class="kpis">
+      <div class="kpi"><div class="l">Saving per month</div><div class="v" id="kMon"></div></div>
+      <div class="kpi"><div class="l">Saving per year</div><div class="v" id="kYr"></div></div>
+      <div class="kpi"><div class="l">Premium paid back in</div><div class="v" id="kBE"></div></div>
+      <div class="kpi"><div class="l">Net gain over period</div><div class="v" id="kNet"></div></div>
+    </div>
+    <div class="duo">
+      <div class="fuel pet"><h3>Petrol</h3>
+        <div class="row"><span>Real-world mileage</span><span id="pEff"></span></div>
+        <div class="row"><span>Cost per km</span><span id="pCpk"></span></div>
+        <div class="row"><span>Fuel per month</span><span id="pMon"></span></div>
+        <div class="row"><span>Fuel over the period</span><span id="pTot"></span></div>
+      </div>
+      <div class="fuel cng"><h3>CNG</h3>
+        <div class="row"><span>Real-world mileage</span><span id="cEff"></span></div>
+        <div class="row"><span>Cost per km (blended)</span><span id="cCpk"></span></div>
+        <div class="row"><span>Fuel + upkeep per month</span><span id="cMon"></span></div>
+        <div class="row"><span>Total incl. premium</span><span id="cTot"></span></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Running cost over time</h3>
+      <div class="legend"><span><i style="background:var(--petrol-ink)"></i>Petrol</span><span><i style="background:var(--cng-ink)"></i>CNG (starts with the premium)</span></div>
+      <div class="chartbox"><svg id="chart" viewBox="0 0 720 300" width="100%" style="min-width:440px" role="img" aria-label="Cumulative running cost, petrol vs CNG"></svg></div>
+    </div>
+  </section>
+
+
+  <section class="panel access" id="accessPanel" hidden aria-labelledby="accH">
+    <div class="sechead"><div class="eyebrow">Only you can see this</div><h2 id="accH">Who's using this page</h2></div>
+    <p class="accsum" id="accSum"></p>
+    <div class="acctools">
+      <div class="chips" id="accTabs"></div>
+      <input type="search" id="accQ" placeholder="Search by name" aria-label="Search visitors by name">
+    </div>
+    <p class="empty" id="accErr" hidden></p>
+    <div class="tbl"><table id="accTbl"></table></div>
+    <button type="button" class="chip sm" id="accMore" hidden></button>
+    <p class="hint">Removing access blocks that person from using this page straight away. To remove them completely, also take them off the list in the page's Share menu.</p>
+  </section>
+  <p class="hint privacy">Opening this page records your name and the time of your visit for the dealership team.</p>
+  <details class="notes">
+    <summary>Data sources and assumptions</summary>
+    <p>Ex-showroom prices are CarWale's Hyderabad or nearby Telangana city listings (Oct 2026) wherever available; Seltos from V3Cars (Oct 2026); Baleno from CarWale’s Sep 2026 variant list; XL6 only Zeta was priced individually; some CNG lists from V3Cars, Team-BHP and Carlelo (Jan–Oct 2026); Nexon CNG figures are estimates. Check against your current dealer price list before quoting a customer.</p>
+    <p>Mileage is the manufacturer's claimed (ARAI) figure for every car, petrol and CNG, so the comparison is like for like. Where CarWale did not list a figure, the maker's published claim is used.</p>
+    <p>Hyderabad CNG has been quoted between ₹97 and ₹109/kg this year; ₹103 reflects the July 2026 revision. The blended CNG cost assumes the rest of the driving runs on petrol. Prices refresh automatically each morning.</p>
+  </details>
+</div>
+
+<script>
+// Ex-showroom ₹ lakh. v = CNG variant, x = CNG price, pv/px = matching petrol variant & price, c = claimed km/kg, p = petrol claimed km/L
+const MODELS=[
+  {n:"Swift",ch:"Arena",p:24.80,c:32.85,vars:[
+    {v:"VXi CNG",x:7.574,pv:"VXi",px:6.679},
+    {v:"VXi (O) CNG",x:7.834,pv:"VXi (O)",px:6.939},
+    {v:"ZXi CNG",x:8.514,pv:"ZXi",px:7.619},
+    {v:"VXi CNG AMT",x:7.924,pv:"VXi AMT",px:7.129,c:35.34,p:25.75}]},
+  {n:"Dzire",ch:"Arena",p:24.79,c:33.73,vars:[
+    {v:"VXi CNG",x:8.031,pv:"VXi",px:7.17},
+    {v:"ZXi CNG",x:9.037,pv:"ZXi",px:8.18},
+    {v:"VXi CNG AMT",x:8.531,pv:"VXi AMT",px:7.62,c:36.47,p:25.71}]},
+  {n:"Wagon R",ch:"Arena",p:24.35,c:34.05,vars:[
+    {v:"LXi CNG",x:5.939,pv:"LXi",px:4.989},
+    {v:"VXi CNG",x:6.469,pv:"VXi",px:5.519}]},
+  {n:"Brezza",ch:"Arena",p:17.38,c:25.51,vars:[
+    {v:"LXi CNG",x:9.299,pv:"LXi",px:8.299},
+    {v:"VXi CNG",x:9.99,pv:"VXi",px:9.259},
+    {v:"ZXi CNG",x:11.499,pv:"ZXi",px:10.499}]},
+  {n:"Victoris",ch:"Arena",p:21.18,c:27.02,vars:[
+    {v:"LXi CNG",x:11.55,pv:"LXi",px:10.50},
+    {v:"VXi CNG",x:12.90,pv:"VXi",px:11.85},
+    {v:"ZXi CNG",x:14.67,pv:"ZXi",px:13.62}]},
+  {n:"Alto K10",ch:"Arena",p:24.39,c:33.40,vars:[
+    {v:"LXi (O) CNG",x:4.84,pv:"LXi (O)",px:4.00},
+    {v:"VXi (O) CNG",x:5.34,pv:"VXi (O)",px:4.52}]},
+  {n:"S-Presso",ch:"Arena",p:24.44,c:32.73,vars:[
+    {v:"LXi (O) CNG",x:4.64,pv:"LXi (O)",px:3.82},
+    {v:"VXi (O) CNG",x:5.14,pv:"VXi (O)",px:4.32}]},
+  {n:"Celerio",ch:"Arena",p:25.17,c:34.43,vars:[
+    {v:"VXi CNG",x:5.98,pv:"VXi",px:5.18}]},
+  {n:"Eeco",ch:"Arena",p:19.71,c:26.78},
+  {n:"Ertiga",ch:"Arena",p:20.51,c:26.11,vars:[
+    {v:"VXi CNG",x:10.94,pv:"VXi",px:9.95},
+    {v:"ZXi CNG",x:12.00,pv:"ZXi",px:11.02}]}
+];
+const RIVALS={
+  "Tiago":{b:"Tata",c:26.49,vars:[["Smart CNG",5.87],["Pure CNG",6.58],["Pure Plus CNG",7.10],["Pure CNG AMT",7.13,28.06],["Pure Plus A CNG",7.57],["Pure Plus CNG AMT",7.65,28.06],["Creative CNG",8.07],["Pure Plus A CNG AMT",8.12,28.06],["Creative CNG AMT",8.62,28.06]]},
+  "Punch":{b:"Tata",c:26.99,vars:[["Smart CNG",6.69],["Pure CNG",7.49],["Pure+ CNG",7.99],["Adventure CNG",8.59],["Accomplished CNG",9.29]]},
+  "Exter":{b:"Hyundai",c:27.10,vars:[["EX CNG",6.99],["S CNG",7.43],["S+ CNG",8.26],["SX CNG",8.93],["SX(O) CNG",9.40]]},
+  "Aura":{b:"Hyundai",c:28.0,vars:[["S CNG",7.89],["Corporate CNG",7.98],["SX CNG",8.67]]},
+  "Hyryder":{b:"Toyota",c:26.6,vars:[["S CNG",13.71],["G CNG",15.72]]},
+  "Baleno":{b:"Maruti Suzuki Nexa",c:33.61,vars:[["Delta CNG",7.92],["Delta CNG AMT",8.32,34.47],["Zeta CNG",8.92],["Zeta CNG AMT",9.32,34.47]]},
+  "Fronx":{b:"Maruti Suzuki Nexa",c:28.51,vars:[["Sigma CNG",7.94],["Delta CNG",8.74]]},
+  "Brezza":{b:"Maruti Suzuki Arena",c:25.51,vars:[["LXi CNG",9.299],["VXi CNG",9.99],["ZXi CNG",11.499]]},
+  "Grand Vitara":{b:"Maruti Suzuki Nexa",c:26.6,vars:[["Delta CNG",13.05],["Zeta CNG",14.80]]},
+  "Nexon":{b:"Tata",c:24.0,vars:[["Smart (O) CNG",8.99],["Smart+ CNG",9.69],["Pure CNG",10.69],["Pure S CNG",10.99],["Creative CNG",11.69],["Creative+ CNG",12.19],["Fearless+ PS CNG",14.59]]}
+};
+
+// Petrol: Hyderabad/Telangana ex-showroom ₹ lakh (CarWale, Oct 2026). [variant, price, claimed km/L]
+const PETROL={
+  "Swift":[["LXi",5.84,24.80],["VXi",6.68,24.80],["VXi (O)",6.94,24.80],["VXi AMT",7.13,25.75],["VXi (O) AMT",7.39,25.75],["ZXi",7.62,24.80],["ZXi AMT",8.07,25.75],["ZXi Plus",8.29,24.80],["ZXi Plus AMT",8.74,25.75]],
+  "Dzire":[["LXi",6.31,24.79],["VXi",7.27,24.79],["VXi AMT",7.72,25.71],["ZXi",8.28,24.79],["ZXi AMT",8.73,25.71],["ZXi Plus",8.96,24.79],["ZXi Plus AMT",9.41,25.71]],
+  "Wagon R":[["LXi 1.0",4.99,24.35],["VXi 1.0",5.55,24.35],["VXi 1.0 AMT",5.99,25.19],["ZXi 1.2",5.98,23.56],["ZXi Plus 1.2",6.41,23.56],["ZXi 1.2 AMT",6.43,24.43],["ZXi Plus 1.2 AMT",6.86,24.43]],
+  "Victoris":[["LXi",10.50,21.18],["VXi",11.85,21.18],["VXi AT",13.41,20.45],["ZXi",13.62,21.18],["ZXi (O)",13.69,21.18],["ZXi AT",15.18,20.45],["ZXi Plus",15.39,21.18],["ZXi Plus (O)",15.48,21.18],["VXi Strong Hybrid",16.43,28.65],["ZXi Plus AT",17.34,20.45],["ZXi Strong Hybrid",17.85,28.65]],
+  "Ertiga":[["LXi",8.90,20.51],["VXi",9.95,20.51],["ZXi",11.02,20.51],["VXi AT",11.30,20.3],["ZXi Plus",11.79,20.51],["ZXi AT",12.37,20.3],["ZXi Plus AT",13.14,20.3]],
+  "Alto K10":[["STD (O)",3.70,24.39],["LXi (O)",4.00,24.39],["VXi (O)",4.52,24.39],["VXi (O) AMT",4.97,24.9],["VXi Plus (O)",5.00,24.39],["VXi Plus (O) AMT",5.45,24.9]],
+  "S-Presso":[["STD (O)",3.50,24.44],["LXi (O)",3.82,24.44],["VXi (O)",4.32,24.44],["VXi (O) AMT",4.77,25.3],["VXi Plus (O)",4.82,24.44],["VXi Plus (O) AMT",5.27,25.3]],
+  "Celerio":[["LXi",4.70,25.17],["VXi",5.18,25.17],["VXi AMT",5.63,26.23],["ZXi",5.73,25.17],["ZXi AMT",6.18,26.23],["ZXi Plus",6.30,25.17],["ZXi Plus AMT",6.75,26.23]],
+  "Brezza":[["LXi 1.0 Turbo",7.50,20.13],["VXi (from)",8.65,20.13],["ZXi (from)",9.95,20.13],["ZXi Plus (from)",11.26,20.13]]
+};
+const PRIVALS={
+  "Tiago":{b:"Tata",vars:[["Smart",4.77,20.09],["Pure",5.57,20.09],["Pure AMT",6.10,19.43],["Pure Plus",6.10,20.09],["Pure Plus A",6.56,20.09],["Pure Plus AMT",6.65,19.43],["Creative",7.06,20.09],["Pure Plus A AMT",7.11,19.43],["Creative Plus",7.36,20.09],["Creative AMT",7.61,19.43],["Creative Plus AMT",7.91,19.43]]},
+  "Grand i10 Nios":{b:"Hyundai",vars:[["Era",5.60,20.7]]},
+  "Punch":{b:"Tata",vars:[["Smart",5.75,20.09],["Pure",6.65,20.09],["Pure Plus",7.17,20.09],["Pure Plus (S)",7.52,20.09],["Pure Plus AMT",7.75,18.8],["Adventure",7.77,20.09],["Pure Plus (S) AMT",8.10,18.8],["Adventure (S)",8.12,20.09],["Adventure AMT",8.35,18.8],["Accomplished",8.47,20.09],["Accomplished AMT",9.05,18.8],["Accomplished Plus (S)",9.17,20.09],["Accomplished Plus (S) AMT",9.75,18.8]]},
+  "Exter":{b:"Hyundai",vars:[["HX 2",5.81,19.4],["HX 3",6.30,19.4],["HX 3 AMT",6.95,19.2],["HX 4",7.28,19.4],["HX 6",7.99,19.4],["HX 4 Plus AMT",8.10,19.2],["HX 8",8.40,19.4],["HX 6 AMT",8.59,19.2],["HX 8 AMT",9.12,19.2],["HX 10 AMT",9.46,19.2]]},
+  "Aura":{b:"Hyundai",vars:[["E",6.00,20.5],["S",6.98,20.5],["SX",7.77,20.5],["SX (O)",8.23,20.5],["SX Plus AMT",8.42,20.1]]},
+  "Amaze":{b:"Honda",vars:[["V",7.65,18.65]]},
+  "Nexon":{b:"Tata",vars:[["Smart 1.2T",7.40,17.44],["Smart Plus 1.2T",8.22,17.44],["Smart Plus (S) 1.2T",8.52,17.44],["Smart Plus 1.2T AMT",8.92,17.18],["Pure Plus 1.2T",9.07,17.44],["Pure Plus (S) 1.2T",9.37,17.44],["Pure Plus 1.2T AMT",9.72,17.18],["Creative 1.2T",10.17,17.44],["Creative 1.2T AMT",10.87,17.18],["Creative 1.2T DCT",11.42,17.01]]},
+  "Venue":{b:"Hyundai",vars:[["HX 2 1.2",8.00,18.5],["HX 4 1.2",9.00,18.5],["HX 2 Turbo",8.91,18.74],["HX 5 1.2",9.56,18.5],["HX 5 Turbo",9.90,18.74],["HX 5 Plus 1.2",10.00,18.5],["HX 6T 1.2",10.89,18.5],["HX 5 Turbo DCT",10.92,20.0]]},
+  "Sonet":{b:"Kia",vars:[["HTE 1.2",7.41,18.83],["HTE (O) 1.2",7.84,18.83],["HTK (O) 1.2",8.85,18.83],["HTK Plus 1.2",9.24,18.83],["HTK (O) Turbo iMT",9.25,18.7],["HTK Plus (O) 1.2",9.72,18.83],["HTK (O) Turbo DCT",10.00,19.2]]},
+  "Creta":{b:"Hyundai",vars:[["E 1.5",10.91,17.4],["EX 1.5",12.07,17.4],["EX (O) 1.5",13.14,17.4],["S (O) 1.5",14.21,17.4],["EX (O) 1.5 CVT",14.50,17.7],["SX 1.5",15.04,17.4],["S (O) 1.5 CVT",15.66,17.7],["SX Premium 1.5",16.34,17.4],["SX Premium 1.5 CVT",17.79,17.7]]},
+  "Hyryder":{b:"Toyota",vars:[["E",11.31,21.11],["S",12.82,21.11],["S AT",14.17,20.58],["G (O)",14.87,21.11],["G (O) AT",16.18,20.58],["V",16.42,21.11],["S Hybrid",17.18,27.97],["V AT",17.67,20.58],["G (O) Hybrid",19.24,27.97],["V Hybrid",19.99,27.97]]},
+  "Baleno":{b:"Maruti Suzuki Nexa",vars:[["Sigma",5.99,23.8],["Delta",7.00,23.8],["Delta AMT",7.50,24.77],["Zeta",8.00,23.8],["Zeta AMT",8.50,24.77],["Alpha",9.10,23.8],["Alpha (O)",9.50,23.8],["Alpha AMT",9.60,24.77],["Alpha (O) AMT",9.99,24.77]]},
+  "Fronx":{b:"Maruti Suzuki Nexa",vars:[["Sigma 1.2",6.90,21.79],["Delta 1.2",7.75,21.79],["Delta Plus 1.2",8.15,21.79],["Delta 1.2 AMT",8.25,22.89],["Delta Plus 1.2 AMT",8.65,22.89],["Delta Plus 1.0 Turbo",8.97,21.5],["Zeta 1.0 Turbo",9.76,21.5],["Alpha 1.0 Turbo",10.61,21.5],["Zeta 1.0 Turbo AT",11.04,20.01],["Alpha 1.0 Turbo AT",11.89,20.01]]},
+  "Brezza":{b:"Maruti Suzuki Arena",vars:[["LXi 1.0 Turbo",7.50,20.13],["VXi (from)",8.65,20.13],["ZXi (from)",9.95,20.13],["ZXi Plus (from)",11.26,20.13]]},
+  "XL6":{b:"Maruti Suzuki Nexa",vars:[["Zeta",11.62,20.97]]},
+  "Grand Vitara":{b:"Maruti Suzuki Nexa",vars:[["Sigma",10.77,21.11],["Delta",12.15,21.11],["Delta AT",13.50,20.16],["Zeta",13.85,21.11],["Zeta (O)",13.89,21.11],["Zeta AT",15.20,20.16],["Alpha",15.35,21.11],["Alpha AT",16.60,20.16],["Delta Plus Strong Hybrid",16.68,27.97],["Zeta Plus Strong Hybrid",17.97,27.97],["Alpha AWD AT",18.05,20.16],["Alpha Plus Strong Hybrid",19.55,27.97]]},
+  "Seltos":{b:"Kia",vars:[["HTE 1.5",11.24,16.5],["HTE (O) 1.5",12.41,16.5],["HTK 1.5",13.41,16.5],["HTE (O) 1.5 CVT",13.71,16.5],["HTK (O) 1.5",14.51,16.5],["HTK 1.5 CVT",14.71,16.5],["HTK (O) 1.5 CVT",15.81,16.5],["HTX 1.5",15.91,16.5],["HTX (A) 1.5",17.01,16.5],["HTX 1.5 CVT",17.21,16.5],["HTX (A) 1.5 CVT",18.31,16.5],["GTX 1.5 CVT",18.71,16.5],["GTX (A) 1.5 CVT",19.81,16.5]]},
+  "Taigun":{b:"Volkswagen",vars:[["Comfortline 1.0 TSI",11.00,19.98],["Highline 1.0 TSI",12.70,19.98],["Highline 1.0 TSI AT",13.80,19.54],["Highline Plus 1.0 TSI",14.30,19.98],["GT Line 1.0 TSI",14.60,19.98],["Highline Plus 1.0 TSI AT",15.45,19.54],["GT Line 1.0 TSI AT",15.75,19.54],["Topline 1.0 TSI",16.00,19.98],["Topline 1.0 TSI AT",17.18,19.54]]},
+  "Kushaq":{b:"Skoda",vars:[["Classic Plus 1.0 TSI",10.69,19.66]]},
+  "Elevate":{b:"Honda",vars:[["SV",11.80,15.31]]},
+  "XUV 3XO":{b:"Mahindra",vars:[["MX1 1.2T",7.79,19.62],["REVX M 1.2T",8.59,19.62],["REVX M (O) 1.2T",9.09,19.62],["REVX EDGE 1.2T",9.39,19.62],["REVX EDGE (O) 1.2T",9.89,19.62],["REVX M (O) 1.2T AT",9.99,18.14],["AX5 1.2T",10.00,19.62]]}
+};
+
+// Top 5 buyer-facing features (summarised from CarWale, RushLane, Gaadify; some only on higher variants)
+const FEAT={
+ "Swift":["6 airbags and ESP standard on every variant","9-inch touchscreen, wireless Android Auto / CarPlay","LED projector headlamps (ZXi and up)","Cruise control (ZXi Plus)","Rear AC vents and wireless charger (ZXi and up)"],
+ "Dzire":["5-star Global NCAP and Bharat NCAP","6 airbags and ESP standard","Electric sunroof (top variants)","9-inch touchscreen and 360° camera (top variants)","382-litre boot"],
+ "Wagon R":["Tall-boy cabin with generous headroom","341-litre boot, 60:40 split rear seat","Up to 6 airbags (ZXi Plus)","7-inch touchscreen, Android Auto / CarPlay","1.0 and 1.2 petrol plus factory-fitted CNG"],
+ "Brezza":["5-star Bharat NCAP","6 airbags, ESP, hill hold, ISOFIX standard","10.1-inch HD touchscreen","1.0 turbo petrol with 48V mild hybrid","360° camera and sunroof"],
+ "Alto K10":["Lowest entry price, from ₹3.70 lakh","Up to 6 airbags","7-inch touchscreen, Android Auto / CarPlay","214-litre boot","Factory CNG, 33.40 km/kg claimed"],
+ "S-Presso":["180 mm ground clearance","ESP and hill-hold assist","Dual airbags with ABS and EBD","7-inch touchscreen, Android Auto / CarPlay","Factory CNG, 32.73 km/kg claimed"],
+ "Celerio":["6 airbags standard","3-star Global NCAP (6-airbag version)","Up to 26.68 km/L petrol, 34.43 km/kg CNG claimed","7-inch touchscreen, Android Auto / CarPlay","313-litre boot"],
+ "Tiago":["Twin CNG cylinders under the boot floor","CNG AMT with paddle shifters","Up to 10.25-inch touchscreen (Creative)","360° camera (Creative)","Dual wireless charging pads (Creative Plus)"],
+ "Punch":["5-star Bharat NCAP","6 airbags including curtain airbags","193 mm ground clearance","210-litre boot even with CNG","Petrol AMT option"],
+ "Exter":["6 airbags including curtain airbags","391-litre boot","Bi-fuel CNG with changeover switch","3-year unlimited-km warranty, extendable to 7 years","Petrol AMT option"],
+ "Aura":["Up to 6 airbags with ESC","8-inch touchscreen, Android Auto / CarPlay","1.2 petrol in manual and AMT","Factory CNG option","Tall ground clearance for a sedan"],
+ "Nexon":["5-star Bharat NCAP","6 airbags standard","Panoramic sunroof (most variants)","360° camera","10.25-inch touchscreen"],
+ "Grand i10 Nios":["8-inch touchscreen, Android Auto / CarPlay","260-litre boot","Up to 6 airbags (top variant)","Petrol and CNG options","Manual and AMT gearboxes"],
+ "Amaze":["Level 2 ADAS","5-star Bharat NCAP","6 airbags and ESP","416-litre boot","8-inch screen, auto climate control, rear AC vents"],
+ "Venue":["Level 2 ADAS","Twin 12.3-inch curved screens","360° camera","Ventilated front seats","Disc brakes on all four wheels"],
+ "Sonet":["Level 1 ADAS","10.25-inch touchscreen","Sunroof on most variants","360° camera and dashcam","Up to 6 airbags"],
+ "Baleno":["6 airbags standard","Head-up display (top variants)","360° camera (top variants)","9-inch touchscreen","CNG with AMT option, 34.47 km/kg claimed"],
+ "Fronx":["6 airbags standard","1.0 turbo petrol option","Head-up display and 360° camera (top variants)","9-inch touchscreen","Factory CNG option"],
+ "Ertiga":["7 seats in three rows","1.5 petrol with smart hybrid, manual or automatic","Factory CNG option","6 airbags","Flexible boot with third row folded"],
+ "XL6":["6 seats with second-row captain chairs","1.5 petrol with smart hybrid, manual or automatic","360° camera (top variants)","Ventilated front seats (top variants)","Factory CNG option"],
+ "Grand Vitara":["Strong hybrid, 27.97 km/L claimed","Factory CNG option","AWD option (Alpha AT)","Panoramic sunroof (higher variants)","360° camera (top variants)"],
+ "Victoris":["5-star Bharat NCAP and Global NCAP","Level 2 ADAS and 360° camera","Panoramic sunroof (selected variants)","10.25-inch digital cluster with large touchscreen","Petrol, CNG, strong hybrid (28.65 km/L) and AWD options"],
+ "Creta":["Level 2 ADAS (top variants)","Panoramic sunroof","Dual 10.25-inch screens","6 airbags standard","Ventilated front seats (top variants)"],
+ "Hyryder":["Strong hybrid option, 27.97 km/L claimed","Factory CNG option","Panoramic sunroof (top variants)","360° camera (top variants)","AWD option on select variants"],
+ "Seltos":["5-star Bharat NCAP","6 airbags standard","Level 2 ADAS and 360° camera (HTX (A) and up)","Panoramic sunroof (HTK (O) and up)","Up to 12.3-inch twin screens"],
+ "Taigun":["5-star Global NCAP","6 airbags standard","1.0 TSI turbo petrol, manual or automatic","Sunroof (higher variants)","Large touchscreen (higher variants)"],
+ "Kushaq":["5-star Global NCAP","6 airbags standard","1.0 TSI turbo petrol","Sunroof (higher variants)","Large touchscreen (higher variants)"],
+ "Elevate":["Level 2 ADAS (top variants)","Single-pane sunroof (higher variants)","10.25-inch touchscreen (higher variants)","CVT automatic option","1.5 i-VTEC petrol"],
+ "XUV 3XO":["5-star Bharat NCAP","6 airbags standard","Level 2 ADAS","Panoramic sunroof","Dual 10.25-inch screens"]
+};
+const PMATCH={"Victoris":["Grand Vitara","Creta","Seltos","Hyryder","Taigun","Kushaq","Elevate"],"Alto K10":["Tiago"],"S-Presso":["Tiago"],"Celerio":["Tiago","Grand i10 Nios"],"Swift":["Baleno","Fronx","Tiago","Grand i10 Nios","Punch","Exter"],"Dzire":["Aura","Amaze"],"Wagon R":["Tiago","Grand i10 Nios"],"Brezza":["Fronx","Nexon","Venue","Sonet","XUV 3XO"],"Ertiga":["XL6"]};
+const MATCH={"Victoris":["Grand Vitara","Hyryder"],"Alto K10":["Tiago"],"S-Presso":["Tiago"],"Celerio":["Tiago"],"Swift":["Baleno","Fronx","Tiago","Exter","Punch"],"Dzire":["Aura"],"Wagon R":["Tiago"],"Brezza":["Fronx","Nexon"]};
+
+const $=id=>document.getElementById(id);
+const sel=$("model"),vSel=$("variant");
+MODELS.forEach((m,i)=>{const o=document.createElement("option");o.value=i;o.textContent=m.n;sel.appendChild(o)});
+sel.value=MODELS.findIndex(m=>m.n==="Swift");
+const inr=v=>{const s=v<0?"−":"";v=Math.abs(v);if(v>=1e5)return s+"₹"+(v/1e5).toFixed(2)+" L";return s+"₹"+Math.round(v).toLocaleString("en-IN")};
+const inr2=v=>"₹"+v.toFixed(2);
+const lakh=v=>"₹"+v.toFixed(2)+" L";
+const plural=(n,w)=>{const v=Math.round(n*10)/10;return `${v} ${w}${v===1?"":"s"}`};
+let rivalPick={};
+function curVar(){const m=MODELS[sel.value];return m.vars?m.vars[vSel.value]:null}
+function loadModel(){
+  const m=MODELS[sel.value];$("chan").textContent=m.ch;rivalPick={};
+  if(m.vars){$("varField").hidden=false;vSel.innerHTML=m.vars.map((v,i)=>`<option value="${i}">${v.v} · ${lakh(v.x)}</option>`).join("");vSel.value=0}
+  else $("varField").hidden=true;
+  $("pvar").dataset.m="";loadVariant();
+}
+function loadVariant(){
+  const m=MODELS[sel.value],v=curVar();
+  if(v){$("pm").value=v.p||m.p;$("cm").value=v.c||m.c;$("prem").value=Math.round((v.x-v.px)*1e5);
+    $("varHint").textContent=`Compared with petrol ${v.pv} at ${lakh(v.px)}.`;
+    $("premHint").textContent=`${v.v} ${lakh(v.x)} minus ${v.pv} ${lakh(v.px)}, ex-showroom.`}
+  else{$("pm").value=m.p;$("cm").value=m.c;$("prem").value=95000;$("premHint").textContent="Typical gap over the matching petrol variant. Edit to your price list."}
+}
+function calc(){
+  const km=+$("km").value,yrs=+$("yrs").value,share=+$("share").value/100,rw=+$("rw").value/100;
+  const pp=+$("pp").value||0,cp=+$("cp").value||0,prem=+$("prem").value||0,mx=+$("mx").value||0;
+  const pm=(+$("pm").value||1)*rw,cm=(+$("cm").value||1)*rw;
+  $("kmO").textContent=km+" km";$("yrsO").textContent=plural(yrs,"year");
+  $("shareO").textContent=Math.round(share*100)+"%";$("rwO").textContent=Math.round(rw*100)+"%";
+  $("kmHint").textContent=`About ${(km*30).toLocaleString("en-IN")} km a month, ${(km*365).toLocaleString("en-IN")} km a year.`;
+  $("stP").textContent=`₹${pp}/L`;$("stC").textContent=`₹${cp}/kg`;
+  const pCpk=pp/pm,cCpk=share*(cp/cm)+(1-share)*pCpk,mKm=km*365/12;
+  const pMon=pCpk*mKm,cMon=cCpk*mKm+mx/12,save=pMon-cMon,months=yrs*12;
+  const pTot=pMon*months,cTot=prem+cMon*months,net=pTot-cTot,be=save>0?prem/save:Infinity;
+  $("pEff").textContent=pm.toFixed(1)+" km/L";$("cEff").textContent=cm.toFixed(1)+" km/kg";
+  $("pCpk").textContent=inr2(pCpk);$("cCpk").textContent=inr2(cCpk);
+  $("pMon").textContent=inr(pMon);$("cMon").textContent=inr(cMon);
+  $("pTot").textContent=inr(pTot);$("cTot").textContent=inr(cTot);
+  $("kMon").textContent=inr(save);$("kYr").textContent=inr(save*12);$("kNet").textContent=inr(net);
+  const beTxt=!isFinite(be)?"Never":be<12?be.toFixed(1)+" months":(be/12).toFixed(1)+" years";
+  $("kBE").textContent=beTxt;
+  const m=MODELS[sel.value],vv=curVar(),name=vv?`${m.n} ${vv.v}`:`${m.n} CNG`,v=$("verdict");
+  if(net>0){v.classList.remove("neg");$("vTag").textContent="Go CNG";
+    $("vText").innerHTML=`The <b>${name}</b> pays back its ${inr(prem)} premium in <b>${beTxt}</b> and leaves you <b>${inr(net)} better off</b> over ${plural(yrs,"year")}.`}
+  else{v.classList.add("neg");$("vTag").textContent="Stay petrol";
+    $("vText").innerHTML=isFinite(be)?`At ${km} km a day, the CNG premium takes <b>${beTxt}</b> to pay back, longer than ${plural(yrs,"year")}. Petrol stays <b>${inr(-net)} cheaper</b>.`
+      :`At these prices CNG doesn't cost less per km than petrol, so the premium never pays back.`}
+  draw(prem,pMon,cMon,months,be);compare();
+}
+function draw(prem,pMon,cMon,months,be){
+  const W=720,H=300,L=64,R=16,T=16,B=34,svg=$("chart");
+  const maxY=Math.max(pMon*months,prem+cMon*months)*1.05||1;
+  const x=t=>L+(W-L-R)*t/months,y=v=>T+(H-T-B)*(1-v/maxY);
+  let g="";const step=Math.pow(10,Math.floor(Math.log10(maxY/4))),nice=[1,2,2.5,5,10].map(k=>k*step).find(s=>maxY/s<=6);
+  for(let v=0;v<=maxY;v+=nice)g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end">${v>=1e5?"₹"+(v/1e5).toFixed(v%1e5?1:0)+"L":"₹"+Math.round(v/1000)+"k"}</text>`;
+  const ys=months/12>10?2:1;
+  for(let k=0;k<=months/12;k+=ys)g+=`<text x="${x(k*12)}" y="${H-10}" text-anchor="middle">${k===0?"Buy":"Year "+k}</text>`;
+  g+=`<path d="M${x(0)},${y(0)} L${x(months)},${y(pMon*months)}" stroke="var(--petrol-ink)" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M${x(0)},${y(prem)} L${x(months)},${y(prem+cMon*months)}" stroke="var(--cng-ink)" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  if(isFinite(be)&&be<=months){const bx=x(be),by=y(pMon*be),right=bx>W-170;
+    g+=`<line x1="${bx}" x2="${bx}" y1="${T}" y2="${H-B}" stroke="var(--accent-ink)" stroke-dasharray="4 4"/><circle cx="${bx}" cy="${by}" r="6" fill="var(--accent-ink)"/><text x="${right?bx-10:bx+10}" y="${T+14}" text-anchor="${right?"end":"start"}" style="fill:var(--accent-ink);font-weight:700">Paid back · month ${Math.ceil(be)}</text>`}
+  svg.innerHTML=g;
+}
+function nearest(vars,price){let bi=0,bd=1e9;vars.forEach((v,i)=>{const d=Math.abs(v[1]-price);if(d<bd){bd=d;bi=i}});return bi}
+function compare(){
+  queueMicrotask(()=>{try{renderQuick()}catch(e){}});
+  const m=MODELS[sel.value],fuel=$("cfuel").value,mode=$("bmode").value,band=+$("band").value,isP=fuel==="petrol";
+  $("bandO").textContent="± "+inr(band);$("bandField").hidden=mode!=="price";$("pvarField").hidden=!isP;
+  const POOL=isP?PRIVALS:RIVALS,MAP=isP?PMATCH:MATCH,unit=isP?"km/L":"km/kg",per=isP?"litre":"kg",fp=isP?(+$("pp").value||0):(+$("cp").value||0);
+  let mv=null;
+  if(isP){const pl=PETROL[m.n];
+    if(pl){if($("pvar").dataset.m!==m.n){$("pvar").innerHTML=pl.map((v,i)=>`<option value="${i}">${v[0]} · ${lakh(v[1])}</option>`).join("");$("pvar").dataset.m=m.n}
+      const pv=pl[+$("pvar").value||0];mv={v:pv[0],x:pv[1],c:pv[2]}}}
+  else{const cv=curVar();if(cv)mv={v:cv.v,x:cv.x,c:cv.c||m.c}}
+  let rivals=null;
+  if(mv){if(mode==="price"){rivals=Object.keys(POOL).filter(rn=>rn!==m.n&&POOL[rn].vars.some(v=>Math.abs(v[1]-mv.x)*1e5<=band));if(!rivals.length)rivals=null}else rivals=(MAP[m.n]||[]).filter(rn=>rn!==m.n&&POOL[rn]);if(!rivals.length)rivals=null}
+  if(!rivals||!mv){$("cmpNone").hidden=false;$("cmpRes").hidden=true;
+    $("cmpNone").textContent=!mv?`${m.n} has no ${isP?"petrol":"CNG"} variant prices loaded${isP?"":" — try Petrol vs Petrol"}.`
+      :mode==="price"?`No rival ${isP?"petrol":"CNG"} variant is priced within ± ${inr(band)} of the ${m.n} ${mv.v}. Widen the price range or switch to segment rivals.`
+      :`No direct ${isP?"petrol":"CNG"} rival is mapped for the ${m.n}. Try "Similar price".`;return}
+  $("cmpNone").hidden=true;$("cmpRes").hidden=false;
+  const km=+$("km").value,yrs=+$("yrs").value,rw=+$("rw").value/100,kmYr=km*365;
+  const cost=(price,c)=>{const cpk=fp/(c*rw),fuelYr=cpk*kmYr;return{cpk,fuelYr,tot:price*1e5+fuelYr*yrs}};
+  const ms={b:"Maruti Suzuki",n:m.n,v:mv.v,x:mv.x,c:mv.c,msil:true};Object.assign(ms,cost(ms.x,ms.c));
+  const rows=[ms],pk=fuel+":";
+  rivals.forEach(rn=>{const R=POOL[rn],i=rivalPick[pk+rn]!=null?rivalPick[pk+rn]:nearest(R.vars,mv.x),rv=R.vars[i];
+    const r={b:R.b,n:rn,v:rv[0],x:rv[1],c:rv[2]||R.c,idx:i};Object.assign(r,cost(r.x,r.c));rows.push(r)});
+  let html=`<tr><th>Car · variant</th><th>Ex-showroom</th><th>Claimed ${unit}</th><th>Cost / km</th><th>Total, ${plural(yrs,"yr")}</th><th>${ms.n} is</th></tr>`;
+  rows.forEach(x=>{
+    let diff="—",name=`<span class="brand">${x.b}</span><span class="mname">${x.n}</span> · ${x.v}`;
+    if(!x.msil){const d=x.tot-ms.tot;diff=d>=0?`<span class="good">${inr(d)} cheaper</span>`:`<span class="bad">${inr(-d)} dearer</span>`;
+      name=`<span class="brand">${x.b}</span><span class="mname">${x.n}</span><br><select class="rv" data-r="${x.n}" aria-label="${x.n} variant">${POOL[x.n].vars.map((v,i)=>`<option value="${i}"${i===x.idx?" selected":""}>${v[0]} · ${lakh(v[1])}</option>`).join("")}</select>`}
+    html+=`<tr class="${x.msil?"msil":""}"><td>${name}</td><td>${lakh(x.x)}</td><td>${x.c.toFixed(2)}</td><td>${inr2(x.cpk)}</td><td>${inr(x.tot)}</td><td>${diff}</td></tr>`});
+  $("cmpTbl").innerHTML=html;
+  $("cmpTbl").querySelectorAll("select.rv").forEach(s=>s.addEventListener("change",e=>{rivalPick[pk+e.target.dataset.r]=+e.target.value;compare()}));
+  const msName=`${ms.n} ${ms.v}`;
+  const tick=ok=>ok?'<span class="ic ok" aria-label="Maruti better">✓</span>':'<span class="ic no" aria-label="Rival better">✗</span>';
+  $("cmpHead").innerHTML=rows.slice(1).map(x=>{
+    const gap=(ms.x-x.x)*1e5,pct=Math.round((ms.c/x.c-1)*100),fuelSave=x.fuelYr-ms.fuelYr,d=x.tot-ms.tot;
+    const price=gap<=0?[true,gap===0?"Same price":`${inr(-gap)} lower`]:[false,`${inr(gap)} higher`];
+    const mil=pct>=0?[true,pct===0?"About the same":`${pct}% better`]:[false,`${-pct}% lower`];
+    const fuel=fuelSave>=0?[true,`Saves ${inr(fuelSave)}`]:[false,`${inr(-fuelSave)} more`];
+    const all=d>=0?`<div class="vsall ok">Maruti saves <b>${inr(d)}</b> over ${plural(yrs,"year")}</div>`:`<div class="vsall no">${x.n} is <b>${inr(-d)}</b> cheaper over ${plural(yrs,"year")}</div>`;
+    const ov=d>=0?`<span class="ov ok">${ms.n} saves <b>${inr(d)}</b></span>`:`<span class="ov no">${x.n} saves <b>${inr(-d)}</b></span>`;
+    return `<li class="line"><span class="who">vs <b>${x.n}</b> <small>${x.v}</small></span><span class="m">${tick(price[0])}${price[1]} price</span><span class="m">${tick(mil[0])}${mil[1]} mileage</span><span class="m">${tick(fuel[0])}${fuel[1].replace("Saves ","saves ")} fuel/yr</span>${ov}</li>`}).join("");
+  const max=Math.max(...rows.map(r=>r.tot));
+  $("bars").innerHTML=rows.slice().sort((a,b)=>a.tot-b.tot).map(x=>`<div class="bar ${x.msil?"msil":""}"><span class="nm" title="${x.n} ${x.v}">${x.n} ${x.v}</span><div class="track"><div class="fill" style="width:${(x.tot/max*100).toFixed(1)}%"></div></div><span class="val">${inr(x.tot)}</span></div>`).join("");
+  $("feats").innerHTML=rows.map(x=>`<div class="feat ${x.msil?"msil":""}"><span class="brand">${x.b}</span><h4>${x.n}</h4><ol>${(FEAT[x.n]||["Feature list not loaded yet"]).map(f=>`<li>${f}</li>`).join("")}</ol></div>`).join("");
+}
+
+const KM=[20,40,60,80,120],YRS=[3,5,7,10];
+function chip(attrs,label,sub,on,dis){return `<button type="button" class="chip" ${attrs} aria-pressed="${on}"${dis?" disabled":""}>${label}${sub?`<small>${sub}</small>`:""}</button>`}
+function ensurePvar(m){const pl=PETROL[m.n];if(pl&&$("pvar").dataset.m!==m.n){$("pvar").innerHTML=pl.map((v,i)=>`<option value="${i}">${v[0]} · ${lakh(v[1])}</option>`).join("");$("pvar").dataset.m=m.n}}
+function renderQuick(){
+  const m=MODELS[sel.value],isP=$("cfuel").value==="petrol";
+  $("qModel").innerHTML=MODELS.map((x,i)=>chip(`data-model="${i}"`,x.n,"",String(i)===String(sel.value))).join("");
+  $("qFuel").innerHTML=chip('data-fuel="cng"',"CNG","",!isP,!m.vars)+chip('data-fuel="petrol"',"Petrol","",isP,!PETROL[m.n]);
+  if(isP&&PETROL[m.n]){ensurePvar(m);$("qVar").innerHTML=PETROL[m.n].map((v,i)=>chip(`data-pvar="${i}"`,v[0],lakh(v[1]),String(i)===String($("pvar").value))).join("")}
+  else if(!isP&&m.vars){$("qVar").innerHTML=m.vars.map((v,i)=>chip(`data-cvar="${i}"`,v.v,lakh(v.x),String(i)===String(vSel.value))).join("")}
+  else $("qVar").innerHTML=`<p class="qnote">No ${isP?"petrol":"CNG"} versions loaded for the ${m.n}.</p>`;
+  const km=+$("km").value,yrs=+$("yrs").value;
+
+  syncExact();
+
+}
+document.querySelector(".quick").addEventListener("click",e=>{
+  const b=e.target.closest("button.chip");if(!b||b.disabled)return;const d=b.dataset;
+  if(d.model!=null){sel.value=d.model;sel.dispatchEvent(new Event("change"));
+    const m=MODELS[sel.value];if(!m.vars&&PETROL[m.n]){$("cfuel").value="petrol";compare()}else if(!PETROL[m.n]){$("cfuel").value="cng";compare()}}
+  else if(d.fuel){$("cfuel").value=d.fuel;rivalPick={};compare()}
+  else if(d.cvar!=null){vSel.value=d.cvar;vSel.dispatchEvent(new Event("change"))}
+  else if(d.pvar!=null){ensurePvar(MODELS[sel.value]);$("pvar").value=d.pvar;rivalPick={};compare()}
+  else if(d.km){$("km").value=d.km;calc()}
+  else if(d.yrs){$("yrs").value=d.yrs;calc()}
+  renderQuick();
+});
+
+function syncExact(){const km=+$("km").value,yr=+$("yrs").value,ae=document.activeElement;
+  $("qkmR").value=Math.min(km,300);if(ae!==$("qkmN"))$("qkmN").value=km;
+  $("qyrR").value=Math.min(yr,15);if(ae!==$("qyrN"))$("qyrN").value=Math.round(yr*10)/10}
+function setKm(v){v=Math.round(+v);if(!(v>=1))return;$("km").value=Math.min(v,500);calc()}
+function setYr(v){v=Math.round(+v*10)/10;if(!(v>=0.5))return;$("yrs").value=Math.min(v,20);calc()}
+$("qkmR").addEventListener("input",e=>setKm(e.target.value));
+$("qkmN").addEventListener("input",e=>setKm(e.target.value));
+$("qyrR").addEventListener("input",e=>setYr(e.target.value));
+$("qyrN").addEventListener("input",e=>setYr(e.target.value));
+$("qkmN").addEventListener("blur",syncExact);$("qyrN").addEventListener("blur",syncExact);
+sel.addEventListener("change",()=>{loadModel();calc()});
+vSel.addEventListener("change",()=>{rivalPick={};loadVariant();calc()});
+$("bmode").addEventListener("change",()=>{rivalPick={};compare()});
+$("cfuel").addEventListener("change",compare);
+$("pvar").addEventListener("change",()=>{rivalPick={};compare()});
+document.querySelectorAll("input:not(#qkmR):not(#qkmN):not(#qyrR):not(#qyrN)").forEach(el=>el.addEventListener("input",calc));
+loadModel();calc();
+
+// ---- access log + remove access (owner only) ----
+(async()=>{
+  try{
+    const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
+    if(!db||!user)return;
+    const uid=await user.id(),owner=await user.isOwner();
+    if(uid&&!owner){
+      try{const b=await db.doc("blocked/"+uid).get();
+        if(b.exists){document.querySelector(".wrap").innerHTML='<section class="panel blockedMsg"><h2>Access removed</h2><p class="lede">The page owner has removed your access to this page. Contact them if you think this is a mistake.</p></section>';return}}catch(e){}
+    }
+    if(uid){
+      try{const ref=db.doc("visits/"+uid),snap=await ref.get(),prev=snap.exists?snap.data():null,now=new Date().toISOString();
+        await ref.set({count:((prev&&prev.count)||0)+1,first:(prev&&prev.first)||now,last:now});}catch(e){}
+    }
+    if(!owner)return;
+    $("accessPanel").hidden=false;
+    let visits=[],blocked=new Set(),filter="all",q="",showAll=false,confirmId=null;
+    const fmt=t=>t?new Date(t).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"}):"—";
+    const DAY=864e5,since=d=>Date.now()-d*DAY;
+    async function render(){
+      const ps=await user.profiles(visits.map(v=>v.id));
+      const t0=new Date();t0.setHours(0,0,0,0);
+      const isToday=v=>new Date(v.last)>=t0,inWeek=v=>new Date(v.last)>=since(7),idle=v=>new Date(v.last)<since(7);
+      const cnt={all:visits.length,today:visits.filter(isToday).length,week:visits.filter(inWeek).length,idle:visits.filter(idle).length,blocked:visits.filter(v=>blocked.has(v.id)).length};
+      $("accSum").textContent=visits.length?`Today ${cnt.today} · This week ${cnt.week} · All time ${cnt.all} people`:"No one has opened it yet. Visits appear here as soon as someone you've shared it with opens the page.";
+      const tabs=[["all","All"],["today","Today"],["week","This week"],["idle","Inactive 7+ days"],["blocked","Access removed"]];
+      $("accTabs").innerHTML=tabs.map(([k,l])=>`<button type="button" class="chip sm" data-f="${k}" aria-pressed="${filter===k}">${l} <small>${cnt[k]}</small></button>`).join("");
+      let rows=visits.filter(v=>filter==="all"||(filter==="today"&&isToday(v))||(filter==="week"&&inWeek(v))||(filter==="idle"&&idle(v))||(filter==="blocked"&&blocked.has(v.id)));
+      if(q)rows=rows.filter(v=>((ps[v.id]&&ps[v.id].name)||"someone").toLowerCase().includes(q));
+      const total=rows.length;if(!showAll)rows=rows.slice(0,10);
+      const t=$("accTbl");t.textContent="";
+      if(!total){$("accMore").hidden=true;const r=t.insertRow(),c=r.insertCell();c.colSpan=5;c.textContent="No one matches this filter.";return}
+      const hr=t.insertRow();["Person","Visits","First visit","Last visit",""].forEach(h=>{const th=document.createElement("th");th.textContent=h;hr.appendChild(th)});
+      rows.forEach(v=>{const p=ps[v.id]||{},tr=t.insertRow(),isB=blocked.has(v.id);if(isB)tr.className="isBlocked";
+        const c0=tr.insertCell();c0.textContent=(p.name||"Someone")+(p.isMe?" (you)":"")+(p.guest?" · guest":"")+(isB?" · access removed":"");
+        tr.insertCell().textContent=v.count||0;tr.insertCell().textContent=fmt(v.first);tr.insertCell().textContent=fmt(v.last);
+        const ca=tr.insertCell();
+        if(p.isMe)return;
+        const btn=document.createElement("button");btn.type="button";btn.className="act"+(isB?" restore":confirmId===v.id?" danger":"");
+        btn.dataset.id=v.id;btn.dataset.op=isB?"restore":confirmId===v.id?"remove":"ask";
+        btn.textContent=isB?"Restore access":confirmId===v.id?"Yes, remove":"Remove access";ca.appendChild(btn);
+        if(confirmId===v.id&&!isB){const x=document.createElement("button");x.type="button";x.className="act";x.dataset.op="cancel";x.textContent="Cancel";ca.appendChild(x)}
+      });
+      $("accMore").hidden=total<=10;$("accMore").textContent=showAll?"Show fewer":`Show all ${total}`;
+    }
+    $("accTabs").addEventListener("click",e=>{const b=e.target.closest("button[data-f]");if(!b)return;filter=b.dataset.f;showAll=false;render()});
+    $("accQ").addEventListener("input",e=>{q=e.target.value.trim().toLowerCase();render()});
+    $("accMore").addEventListener("click",()=>{showAll=!showAll;render()});
+    $("accTbl").addEventListener("click",async e=>{const b=e.target.closest("button.act");if(!b)return;const op=b.dataset.op,id=b.dataset.id;
+      if(op==="ask"){confirmId=id;render();return}
+      if(op==="cancel"){confirmId=null;render();return}
+      b.disabled=true;
+      try{if(op==="remove")await db.doc("blocked/"+id).set({at:new Date().toISOString()});
+          if(op==="restore")await db.doc("blocked/"+id).delete();
+          confirmId=null;$("accErr").hidden=true}
+      catch(err){$("accErr").hidden=false;$("accErr").textContent="That change didn't save. Check your connection and try again."}
+      render()});
+    db.collection("visits").onSnapshot(snap=>{visits=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(b.last).localeCompare(String(a.last)));render()},()=>{});
+    db.collection("blocked").onSnapshot(snap=>{blocked=new Set(snap.docs.map(d=>d.id));render()},()=>{});
+  }catch(e){}
+})();
+</script>
