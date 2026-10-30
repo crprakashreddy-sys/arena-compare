@@ -1496,7 +1496,8 @@ const LOG_URL="https://script.google.com/macros/s/AKfycbzvTIZH5hYpOR_ZF6KvFKb8DS
     let arr=[...people.values()].map(p=>{p.list.sort((a,b)=>String(b.t).localeCompare(String(a.t)));p.last=p.list[0].t;return p}).sort((a,b)=>String(b.last).localeCompare(String(a.last)));
     const ql=q.trim().toLowerCase();if(ql)arr=arr.filter(p=>p.n.toLowerCase().includes(ql)||p.m.includes(ql.replace(/\D/g,"")||"#"));
     const today=V.filter(v=>new Date(v.t).getTime()>=startOfToday());
-    $("ownSum").textContent=`${V.length.toLocaleString("en-IN")} visits · ${new Set(V.map(v=>v.m)).size} people · ${today.length} visits today · ${B.size} removed`;
+    const pl=(n,a,b)=>`${n.toLocaleString("en-IN")} ${n===1?a:b}`,ppl=new Set(V.map(v=>v.m)).size;
+    $("ownSum").textContent=`${pl(V.length,"visit","visits")} · ${pl(ppl,"person","people")} · ${pl(today.length,"visit","visits")} today · ${B.size} removed`;
     const tabs=[["all","All time"],["today","Today"],["week","Last 7 days"]];
     $("ownTabs").innerHTML=tabs.map(([k,l])=>`<button type="button" class="chip sm" data-t="${k}" aria-pressed="${tab===k}">${l}</button>`).join("");
     const cities=[...new Set(V.map(v=>v.c).filter(Boolean))].sort();
