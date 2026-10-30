@@ -1284,41 +1284,54 @@ function updateShare(ms,rows,yrs,km,isP){
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
 function cmpImage(){
   const C=CMP;if(!C)return null;const ms=C.rows[0],rivals=C.rows.slice(1);
-  const W=1080,P=56,RH=168,H=360+rivals.length*(RH+20)+190;
-  const cv=document.createElement("canvas");cv.width=W;cv.height=H;const g=cv.getContext("2d");
+  const S=2,W=1080,P=44,RH=128,GAP=14,HEAD=372,COLH=56;
+  const H=HEAD+COLH+rivals.length*(RH+GAP)+90;
+  const cv=document.createElement("canvas");cv.width=W*S;cv.height=H*S;const g=cv.getContext("2d");g.scale(S,S);
   const disp='"Bricolage Grotesque",Georgia,serif',body='"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
+  const INK="#241f3a",MUT="#6a6485",GOOD="#1f7a55",BAD="#b5541a";
   let cityN="";try{cityN=CITIES[+$("city").value].n}catch(e){}
-  // background
-  let bg=g.createLinearGradient(0,0,W,H);bg.addColorStop(0,"#f1ecff");bg.addColorStop(.45,"#ffeef5");bg.addColorStop(1,"#e8f7fb");g.fillStyle=bg;g.fillRect(0,0,W,H);
-  // header
-  g.fillStyle="#b23a6d";g.font=`800 26px ${body}`;g.fillText("MARUTI SUZUKI ARENA · SOUTHEAST ZONE",P,P+30);
-  g.fillStyle="#2b2542";g.font=`800 58px ${disp}`;g.fillText(`${ms.n} ${ms.v}`,P,P+108);
-  g.fillStyle="#5b48c2";g.font=`700 36px ${body}`;g.fillText(`vs competition · ${C.isP?"Petrol":"CNG"}`,P,P+158);
-  g.fillStyle="#6a6485";g.font=`500 28px ${body}`;
-  g.fillText(`${C.km} km a day · ${plural(C.yrs,"year")}${cityN?" · "+cityN:""} · ex-showroom ${lakh(ms.x)}`,P,P+206);
-  g.fillText(`Saving = ex-showroom price + fuel over ${plural(C.yrs,"year")}`,P,P+246);
-  // rows
-  let y=330;
-  rivals.forEach(x=>{
+  // page background
+  g.fillStyle="#f7f4fd";g.fillRect(0,0,W,H);
+  // header card
+  let hg=g.createLinearGradient(0,0,W,HEAD);hg.addColorStop(0,"#d9cffd");hg.addColorStop(.5,"#ffd6e6");hg.addColorStop(1,"#cdeff7");
+  rr(g,P/2,P/2,W-P,HEAD-P/2-10,32);g.fillStyle=hg;g.fill();
+  g.fillStyle="#9b2f5e";g.font=`800 24px ${body}`;g.fillText("MARUTI SUZUKI ARENA  ·  SOUTHEAST ZONE",P+16,P+44);
+  g.fillStyle=INK;g.font=`800 64px ${disp}`;g.fillText(`${ms.n} ${ms.v}`,P+16,P+122);
+  g.fillStyle="#4b3aa8";g.font=`700 34px ${body}`;g.fillText(`vs competition`,P+16,P+170);
+  // chips
+  const chips=[C.isP?"Petrol":"CNG",`${C.km} km/day`,plural(C.yrs,"year"),cityN,`Ex-showroom ${lakh(ms.x)}`].filter(Boolean);
+  let cx=P+16;g.font=`700 24px ${body}`;
+  chips.forEach(t=>{const w=g.measureText(t).width+32;if(cx+w>W-P)return;rr(g,cx,P+196,w,44,22);g.fillStyle="rgba(255,255,255,.85)";g.fill();g.fillStyle=INK;g.fillText(t,cx+16,P+226);cx+=w+10});
+  const wins=rivals.filter(x=>x.tot>=ms.tot).length;
+  g.fillStyle=INK;g.font=`700 26px ${body}`;g.fillText(`${ms.n} costs less to own than ${wins} of ${rivals.length} rivals over ${plural(C.yrs,"year")}`,P+16,P+290);
+  // columns
+  const X={name:P+24,price:P+330,mil:P+500,fuel:P+640,save:W-P-20};
+  let y=HEAD+10;g.fillStyle=MUT;g.font=`800 19px ${body}`;
+  g.fillText("RIVAL",X.name,y+30);g.fillText("PRICE",X.price,y+30);g.fillText("MILEAGE",X.mil,y+30);g.fillText("FUEL / YEAR",X.fuel,y+30);
+  g.textAlign="right";g.fillText(`${plural(C.yrs,"YR").toUpperCase()} TOTAL`,X.save,y+30);g.textAlign="left";
+  y+=COLH;
+  rivals.forEach((x,k)=>{
     const d=x.tot-ms.tot,win=d>=0,gap=(ms.x-x.x)*1e5,pct=Math.round((ms.c/x.c-1)*100),fs=x.fuelYr-ms.fuelYr;
-    g.save();g.shadowColor="rgba(90,60,180,.18)";g.shadowBlur=24;g.shadowOffsetY=8;rr(g,P,y,W-2*P,RH,26);g.fillStyle="#ffffff";g.fill();g.restore();
-    rr(g,P,y,12,RH,6);g.fillStyle=win?"#7fd3ae":"#ffb489";g.fill();
-    g.fillStyle="#6a6485";g.font=`600 26px ${body}`;g.fillText("vs",P+40,y+52);
-    g.fillStyle="#2b2542";g.font=`800 36px ${disp}`;g.fillText(x.n,P+82,y+54);
-    const nw=g.measureText(x.n).width;g.fillStyle="#6a6485";g.font=`500 26px ${body}`;g.fillText(x.v,P+82+nw+14,y+54);
-    g.font=`600 26px ${body}`;
-    const bits=[[gap<=0,gap===0?"Same price":gap<0?`${inr(-gap)} lower price`:`${inr(gap)} higher price`],[pct>=0,pct===0?"Same mileage":pct>0?`${pct}% better mileage`:`${-pct}% lower mileage`],[fs>=0,fs>=0?`saves ${inr(fs)} fuel/yr`:`${inr(-fs)} more fuel/yr`]];
-    const tw=bits.reduce((t,[ok,b])=>t+g.measureText((ok?"✓ ":"✗ ")+b).width+30,0);if(tw>W-2*P-60)g.font=`600 ${Math.floor(26*(W-2*P-60)/tw)}px ${body}`;
-    let bx=P+40;bits.forEach(([ok,t])=>{g.fillStyle=ok?"#25795a":"#a95518";g.fillText((ok?"✓ ":"✗ ")+t,bx,y+100);bx+=g.measureText((ok?"✓ ":"✗ ")+t).width+30});
-    const pill=win?`${ms.n} saves ${inr(d)}`:`${x.n} saves ${inr(-d)}`;
-    g.font=`800 28px ${body}`;const pw=g.measureText(pill).width+40;rr(g,P+40,y+118,pw,40,20);g.fillStyle=win?"#a3e6c8":"#ffc9a3";g.fill();
-    g.fillStyle="#2b2542";g.fillText(pill,P+60,y+148);
-    y+=RH+20;
+    g.save();g.shadowColor="rgba(70,40,150,.12)";g.shadowBlur=18;g.shadowOffsetY=6;rr(g,P/2,y,W-P,RH,22);g.fillStyle="#ffffff";g.fill();g.restore();
+    rr(g,P/2,y,10,RH,5);g.fillStyle=win?"#5cc79a":"#ff9f6b";g.fill();
+    // name
+    g.fillStyle=MUT;g.font=`600 18px ${body}`;g.fillText(x.b.replace("Maruti Suzuki ",""),X.name,y+34);
+    g.fillStyle=INK;let fs1=34;g.font=`800 ${fs1}px ${disp}`;while(g.measureText(x.n).width>X.price-X.name-20&&fs1>22){fs1-=2;g.font=`800 ${fs1}px ${disp}`}g.fillText(x.n,X.name,y+74);
+    g.fillStyle=MUT;let fs2=21;g.font=`500 ${fs2}px ${body}`;while(g.measureText(x.v).width>X.price-X.name-20&&fs2>14){fs2--;g.font=`500 ${fs2}px ${body}`}g.fillText(x.v,X.name,y+106);
+    // metric helper
+    const metric=(xx,ok,big,small)=>{g.fillStyle=ok?GOOD:BAD;g.font=`800 28px ${body}`;g.fillText(big,xx,y+64);g.fillStyle=MUT;g.font=`600 18px ${body}`;g.fillText(small,xx,y+94)};
+    metric(X.price,gap<=0,gap===0?"Same":inr(Math.abs(gap)),gap===0?"same price":gap<0?`${ms.n} cheaper`:`${ms.n} dearer`);
+    metric(X.mil,pct>=0,pct===0?"Same":`${pct>0?"+":"−"}${Math.abs(pct)}%`,pct>=0?`${ms.n} better`:`${x.n} better`);
+    metric(X.fuel,fs>=0,inr(Math.abs(fs)),fs>=0?`${ms.n} saves`:`${x.n} saves`);
+    // saving pill
+    g.font=`800 28px ${body}`;const t=inr(Math.abs(d)),pw=Math.max(g.measureText(t).width+36,150);
+    rr(g,X.save-pw,y+34,pw,48,24);g.fillStyle=win?"#bff0d9":"#ffe0cc";g.fill();
+    g.fillStyle=win?GOOD:BAD;g.textAlign="center";g.fillText(t,X.save-pw/2,y+68);
+    g.font=`700 17px ${body}`;g.fillStyle=MUT;g.fillText(win?`${ms.n} saves`:`${x.n} saves`,X.save-pw/2,y+106);g.textAlign="left";
+    y+=RH+GAP;
   });
-  // footer
-  g.fillStyle="#2b2542";g.font=`800 32px ${body}`;g.fillText("Full price, mileage & features comparison:",P,y+50);
-  g.fillStyle="#5b48c2";g.font=`800 36px ${body}`;g.fillText(SHARE_URL.replace(/^https?:\/\//,""),P,y+100);
-  g.fillStyle="#6a6485";g.font=`500 22px ${body}`;g.fillText("Claimed mileage for every car. Registration, insurance and service not included.",P,y+140);
+  g.fillStyle=MUT;g.font=`500 19px ${body}`;
+  g.fillText(`Total = ex-showroom price + fuel for ${plural(C.yrs,"year")}. Claimed mileage for every car. Green = ${ms.n} better.`,P,y+40);
   return cv;
 }
 $("waCmp").addEventListener("click",async e=>{
@@ -1327,7 +1340,7 @@ $("waCmp").addEventListener("click",async e=>{
   try{
     const blob=await new Promise(r=>cv.toBlob(r,"image/png"));
     const file=new File([blob],"arena-vs-competition.png",{type:"image/png"});
-    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text:`See the full comparison 👉 ${SHARE_URL}`});return}
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file]});return}
     if(!location.hostname.endsWith("github.io")){window.open(waLink(text),"_blank","noopener");return}
     const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="arena-vs-competition.png";document.body.appendChild(a);a.click();a.remove();
     $("copyMsg").textContent="Image saved. Attach it in WhatsApp.";setTimeout(()=>$("copyMsg").textContent="",5000);
