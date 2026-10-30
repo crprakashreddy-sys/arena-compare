@@ -879,6 +879,7 @@ const PRIVALS={
   "Taigun":{b:"Volkswagen",vars:[["Comfortline 1.0 TSI",11.00,19.98],["Highline 1.0 TSI",12.70,19.98],["Highline 1.0 TSI AT",13.80,19.54],["Highline Plus 1.0 TSI",14.30,19.98],["GT Line 1.0 TSI",14.60,19.98],["Highline Plus 1.0 TSI AT",15.45,19.54],["GT Line 1.0 TSI AT",15.75,19.54],["Topline 1.0 TSI",16.00,19.98],["Topline 1.0 TSI AT",17.18,19.54]]},
   "Kushaq":{b:"Skoda",vars:[["Classic Plus 1.0 TSI",10.69,19.76],["Classic Plus 1.0 TSI AT",13.04,19.09],["Signature 1.0 TSI",14.69,19.76],["Sportline 1.0 TSI",14.89,19.76],["Signature 1.0 TSI AT",15.69,19.09],["Sportline 1.0 TSI AT",15.89,19.09],["Prestige 1.0 TSI",16.94,19.76],["Prestige 1.0 TSI AT",17.79,19.09],["Monte Carlo 1.0 TSI AT",18.09,19.09]]},
   "Elevate":{b:"Honda",vars:[["SV",11.80,15.31],["V",12.29,15.31],["V CVT",13.79,16.61],["VX",13.93,15.31],["ZX",15.39,15.31],["VX CVT",15.39,16.61],["ZX Plus",16.80,15.31],["ZX CVT",16.89,16.61],["ZX Plus CVT",18.30,16.61]]},
+  "Bayon":{b:"Hyundai",vars:[["HX 2",10.00,18.7],["HX 3",10.90,18.7],["HX 3 Plus",11.80,18.7],["HX 5",12.45,18.7],["HX 6",13.57,18.7],["HX 5 CVT",13.85,18.6],["HX 6 CVT",14.97,18.6],["HX 8",15.10,18.7],["HX 8 CVT",16.54,18.6],["HX 10",16.65,18.7],["HX 10 CVT",18.00,18.6]]},
   "XUV 3XO":{b:"Mahindra",vars:[["MX1 1.2T",7.79,19.62],["REVX M 1.2T",8.59,19.62],["REVX M (O) 1.2T",9.09,19.62],["REVX EDGE 1.2T",9.39,19.62],["REVX EDGE (O) 1.2T",9.89,19.62],["REVX M (O) 1.2T AT",9.99,18.14],["AX5 1.2T",10.00,19.62]]}
 };
 
@@ -898,6 +899,7 @@ const FEAT={
  "Nexon":["5-star Bharat NCAP","6 airbags standard","Panoramic sunroof (most variants)","360° camera","10.25-inch touchscreen"],
  "Grand i10 Nios":["8-inch touchscreen, Android Auto / CarPlay","260-litre boot","Up to 6 airbags (top variant)","Petrol and CNG options","Manual and AMT gearboxes"],
  "Amaze":["Level 2 ADAS","5-star Bharat NCAP","6 airbags and ESP","416-litre boot","8-inch screen, auto climate control, rear AC vents"],
+ "Bayon":["1.5 petrol, manual or CVT automatic","6 airbags, ESC and hill-start assist as standard","Panoramic sunroof","Ventilated front seats and 360° camera","Level 2 ADAS (top trim)"],
  "Venue":["Level 2 ADAS","Twin 12.3-inch curved screens","360° camera","Ventilated front seats","Disc brakes on all four wheels"],
  "Sonet":["Level 1 ADAS","10.25-inch touchscreen","Sunroof on most variants","360° camera and dashcam","Up to 6 airbags"],
  "Baleno":["6 airbags standard","Head-up display (top variants)","360° camera (top variants)","9-inch touchscreen","CNG with AMT option, 34.47 km/kg claimed"],
@@ -961,6 +963,14 @@ const VFEAT={
   "Adventure (S)":["Sunroof","360° camera","Blind-view monitor","Automatic climate control","Auto headlamps"],
   "Accomplished":["10.25-inch touchscreen","Cooled glovebox","Hill-descent control","Keyless entry","360° camera"],
   "Accomplished Plus (S)":["Sunroof","Wireless charger","7-inch colour digital cluster","Rear armrest","LED cornering fog lamps"]},
+ "Bayon":{
+  "HX 2":["6 airbags","ESC with hill-start assist","LED projector headlamps","Rear parking sensors","Manual AC"],
+  "HX 3":["10.25-inch touchscreen","Wireless Android Auto / CarPlay","Push-button start","Steering-mounted controls","6 speakers"],
+  "HX 3 Plus":["Electric sunroof","17-inch wheels","Roof rails","10.25-inch touchscreen","Push-button start"],
+  "HX 5":["Automatic AC","Cruise control","Wireless charger","Auto headlamps","Connected car tech"],
+  "HX 6":["Panoramic sunroof","17-inch diamond-cut alloys","Ambient lighting","Rear wiper","Sliding front armrest"],
+  "HX 8":["Ventilated front seats","360° camera","Powered driver seat","Dashcam","All-wheel disc brakes"],
+  "HX 10":["Level 2 ADAS","Dual 12.3-inch curved screens","Bose 8-speaker sound","Adaptive cruise control","Auto-dimming inside mirror"]},
  "Dzire":{
   "LXi":["6 airbags","ABS, EBD and ESP","Hill-hold assist","Keyless entry","Power windows"],
   "VXi":["7-inch touchscreen","Wireless Android Auto / CarPlay","Electric-folding mirrors","Rear AC vents","4 speakers"],
@@ -1102,7 +1112,7 @@ function featFor(model,variant){
     if(best)return{list:T[best],label:`${best} features`,exact:true}}
   return{list:FEAT[model]||["Feature list not loaded yet"],label:"Model highlights",exact:false};
 }
-const PMATCH={"Victoris":["Grand Vitara","Creta","Seltos","Hyryder","Taigun","Kushaq","Elevate"],"Alto K10":["Tiago"],"S-Presso":["Tiago"],"Celerio":["Tiago","Grand i10 Nios"],"Swift":["Baleno","Fronx","Tiago","Grand i10 Nios","Punch","Exter"],"Dzire":["Aura","Amaze"],"Wagon R":["Tiago","Grand i10 Nios"],"Brezza":["Fronx","Nexon","Venue","Sonet","XUV 3XO"],"Ertiga":["XL6"]};
+const PMATCH={"Victoris":["Grand Vitara","Creta","Seltos","Hyryder","Taigun","Kushaq","Elevate","Bayon"],"Alto K10":["Tiago"],"S-Presso":["Tiago"],"Celerio":["Tiago","Grand i10 Nios"],"Swift":["Baleno","Fronx","Tiago","Grand i10 Nios","Punch","Exter"],"Dzire":["Aura","Amaze"],"Wagon R":["Tiago","Grand i10 Nios"],"Brezza":["Fronx","Nexon","Venue","Sonet","XUV 3XO"],"Ertiga":["XL6"]};
 const MATCH={"Ertiga":["XL6"],"Eeco":["Tiago"],"Victoris":["Grand Vitara","Hyryder"],"Alto K10":["Tiago"],"S-Presso":["Tiago"],"Celerio":["Tiago"],"Swift":["Baleno","Fronx","Tiago","Grand i10 Nios","Exter","Punch"],"Dzire":["Aura"],"Wagon R":["Tiago","Grand i10 Nios"],"Brezza":["Fronx","Nexon"]};
 
 const $=id=>document.getElementById(id);
