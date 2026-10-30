@@ -366,6 +366,13 @@ html,body{max-width:100%;overflow-x:hidden}
 .copyl{font:inherit;font-size:14px;font-weight:600;color:var(--ink);background:var(--panel);border:1.5px solid var(--line);border-radius:999px;padding:9px 16px;cursor:pointer;min-height:44px}
 .copied{font-size:13.5px;font-weight:600;color:var(--cng-ink)}
 @media (max-width:600px){.sharebar .wa{flex:1 1 100%;justify-content:center}.sharebar .copyl{flex:1 1 100%}}
+
+.tune{display:grid;gap:14px;border-top:4px solid var(--cyan)}
+.tunehead{display:grid;gap:4px}
+.tunehead h3{font-family:var(--display);font-size:19px;font-weight:600}
+.tune .advgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:0}
+.tune input[type=number]{background:var(--panel)}
+@media (max-width:600px){.tune .advgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.tune .advgrid .field:nth-child(n+3){grid-column:1/-1}.tunehead h3{font-size:17px}}
 </style>
 
 <div class="wrap">
@@ -388,7 +395,7 @@ html,body{max-width:100%;overflow-x:hidden}
   </section>
 
   <details class="more panel">
-    <summary>More options <span>fuel prices, mileage, CNG premium and how rivals are picked</span></summary>
+    <summary>More options <span>fuel prices, CNG premium and how rivals are picked</span></summary>
     <div class="moregrid">
     <div class="controls">
       <div class="group">
@@ -428,9 +435,27 @@ html,body{max-width:100%;overflow-x:hidden}
         </div>
       </div>
     </div>
-    <details class="adv">
-      <summary>Fine-tune mileage and upkeep</summary>
-      <div class="advgrid">
+    
+      <div class="morecmp">
+        <h3 class="subhead">How rivals are picked</h3>
+        <div class="modes">
+      <div class="modes">
+        <div class="field"><label for="cfuel">Compare</label>
+          <select id="cfuel"><option value="cng" selected>CNG vs CNG</option><option value="petrol">Petrol vs Petrol</option></select></div>
+        <div class="field" id="pvarField" hidden><label for="pvar">Maruti petrol variant</label><select id="pvar"></select></div>
+        <div class="field"><label for="bmode">Choose rivals by</label>
+          <select id="bmode"><option value="price" selected>Similar price (any brand)</option><option value="seg">Segment rivals</option></select></div>
+        <div class="field" id="bandField"><label for="band">Price range <output id="bandO"></output></label>
+          <input type="range" id="band" min="25000" max="150000" step="5000" value="75000"></div>
+      </div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <section class="panel tune" aria-labelledby="tuneH">
+    <div class="tunehead"><h3 id="tuneH">Fine-tune mileage and upkeep</h3><p class="hint">Adjust these to match real driving. Results below update as you change them.</p></div>
+    <div class="advgrid">
         <div class="field"><label for="pm">Petrol km/L (claimed)</label><input type="number" id="pm" step="0.01" min="1"></div>
         <div class="field"><label for="cm">CNG km/kg (claimed)</label><input type="number" id="cm" step="0.01" min="1"></div>
         <div class="field">
@@ -449,23 +474,7 @@ html,body{max-width:100%;overflow-x:hidden}
           <p class="hint">Cylinder testing, kit checks and similar.</p>
         </div>
       </div>
-    </details>
-      <div class="morecmp">
-        <h3 class="subhead">How rivals are picked</h3>
-        <div class="modes">
-      <div class="modes">
-        <div class="field"><label for="cfuel">Compare</label>
-          <select id="cfuel"><option value="cng" selected>CNG vs CNG</option><option value="petrol">Petrol vs Petrol</option></select></div>
-        <div class="field" id="pvarField" hidden><label for="pvar">Maruti petrol variant</label><select id="pvar"></select></div>
-        <div class="field"><label for="bmode">Choose rivals by</label>
-          <select id="bmode"><option value="price" selected>Similar price (any brand)</option><option value="seg">Segment rivals</option></select></div>
-        <div class="field" id="bandField"><label for="band">Price range <output id="bandO"></output></label>
-          <input type="range" id="band" min="25000" max="150000" step="5000" value="75000"></div>
-      </div>
-        </div>
-      </div>
-    </div>
-  </details>
+  </section>
 
   <section class="stack" aria-labelledby="s2">
     <div class="sechead"><div class="eyebrow">Price, running cost and features</div><h2 id="s2">How each rival compares</h2></div>
