@@ -1,0 +1,43 @@
+{
+  "name": "zappd",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "private": true,
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "fix-deps": "expo install --fix",
+    "typecheck": "tsc --noEmit",
+    "phone": "expo start --tunnel"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "*",
+    "@react-native-async-storage/async-storage": "*",
+    "@shopify/react-native-skia": "*",
+    "react-native-gesture-handler": "*",
+    "@supabase/supabase-js": "^2.45.0",
+    "base64-arraybuffer": "^1.0.2",
+    "expo": "*",
+    "@react-native-google-signin/google-signin": "*",
+    "expo-apple-authentication": "*",
+    "expo-constants": "*",
+    "expo-image": "*",
+    "expo-image-manipulator": "*",
+    "expo-image-picker": "*",
+    "expo-linking": "*",
+    "expo-location": "*",
+    "expo-router": "*",
+    "expo-status-bar": "*",
+    "react": "*",
+    "react-native": "*",
+    "react-native-maps": "*",
+    "react-native-safe-area-context": "*",
+    "react-native-screens": "*",
+    "react-native-url-polyfill": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "*",
+    "typescript": "*"
+  }
+}
