@@ -1294,82 +1294,71 @@ function updateShare(ms,rows,yrs,km,isP){
 // ---- share the comparison as an image ----
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
 function cmpImage(){
-  const C=CMP;if(!C)return null;const ms=C.rows[0],rivals=C.rows.slice(1);
-  const S=2,W=1080,P=44,RH=128,GAP=14,HEAD=372,COLH=56;
-  // SIP: invest the monthly fuel saving + the price difference at an assumed 10% a year
-  const RATE=0.10,mths=Math.round(C.yrs*12),i=RATE/12;
-  const sip=m=>m>0?m*((Math.pow(1+i,mths)-1)/i)*(1+i):0;
-  const inv=rivals.map(x=>{const gap=(x.x-ms.x)*1e5,mon=(x.fuelYr-ms.fuelYr)/12;
-    const fv=sip(Math.max(mon,0))+gap*Math.pow(1+RATE,C.yrs),put=Math.max(mon,0)*mths+gap;return{x,mon,gap,fv,put}}).filter(o=>o.fv>0&&o.mon>0).sort((a,b)=>b.fv-a.fv);
-  const IH=inv.length?190+inv.length*64+90:0;
-  const H=HEAD+COLH+rivals.length*(RH+GAP)+90+IH;
+  const C=CMP;if(!C)return null;const ms=C.rows[0],all=C.rows.slice(1);
+  // phone-shaped: 1080 wide, at most 1920 tall (9:16), drawn at 2x for sharpness
+  const S=2,W=1080,P=40,MAXH=1920,HEAD=300,COLH=44,RH=96,GAP=10,FOOT=50,SIPH=230;
+  const RATE=0.10,mths=Math.round(C.yrs*12),i=RATE/12,sip=m=>m>0?m*((Math.pow(1+i,mths)-1)/i)*(1+i):0;
+  const invOf=x=>{const gap=(x.x-ms.x)*1e5,mon=(x.fuelYr-ms.fuelYr)/12,fv=sip(Math.max(mon,0))+gap*Math.pow(1+RATE,C.yrs);return{mon,fv}};
+  const anyInv=all.some(x=>{const o=invOf(x);return o.mon>0&&o.fv>0});
+  const fixed=HEAD+COLH+FOOT+(anyInv?SIPH:0)+30;
+  const fitN=Math.max(1,Math.floor((MAXH-fixed)/(RH+GAP)));
+  const rivals=all.slice(0,fitN),more=all.length-rivals.length;
+  const H=Math.min(MAXH,fixed+rivals.length*(RH+GAP)+(more?34:0));
   const cv=document.createElement("canvas");cv.width=W*S;cv.height=H*S;const g=cv.getContext("2d");g.scale(S,S);
   const disp='"Bricolage Grotesque",Georgia,serif',body='"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
   const INK="#241f3a",MUT="#6a6485",GOOD="#1f7a55",BAD="#b5541a";
+  const fitText=(t,wt,fam,max,min,x,y,w,col,al)=>{let f=max;g.font=`${wt} ${f}px ${fam}`;while(g.measureText(t).width>w&&f>min){f--;g.font=`${wt} ${f}px ${fam}`}g.fillStyle=col;g.textAlign=al||"left";g.fillText(t,x,y);g.textAlign="left"};
   let cityN="";try{cityN=CITIES[+$("city").value].n}catch(e){}
-  // page background
   g.fillStyle="#f7f4fd";g.fillRect(0,0,W,H);
-  // header card
+  // header
   let hg=g.createLinearGradient(0,0,W,HEAD);hg.addColorStop(0,"#d9cffd");hg.addColorStop(.5,"#ffd6e6");hg.addColorStop(1,"#cdeff7");
-  rr(g,P/2,P/2,W-P,HEAD-P/2-10,32);g.fillStyle=hg;g.fill();
-  g.fillStyle="#9b2f5e";g.font=`800 24px ${body}`;g.fillText("MARUTI SUZUKI ARENA  ·  SOUTHEAST ZONE",P+16,P+44);
-  g.fillStyle=INK;g.font=`800 64px ${disp}`;g.fillText(`${ms.n} ${ms.v}`,P+16,P+122);
-  g.fillStyle="#4b3aa8";g.font=`700 34px ${body}`;g.fillText(`vs competition · CompareX`,P+16,P+170);
-  // chips
+  rr(g,P/2,P/2,W-P,HEAD-P/2-14,30);g.fillStyle=hg;g.fill();
+  g.fillStyle="#9b2f5e";g.font=`800 21px ${body}`;g.fillText("MARUTI SUZUKI ARENA  ·  SOUTHEAST ZONE  ·  CompareX",P+14,P+36);
+  fitText(`${ms.n} ${ms.v}`,800,disp,56,36,P+14,P+100,W-2*P-30,INK);
+  g.fillStyle="#4b3aa8";g.font=`700 28px ${body}`;g.fillText("vs competition",P+14,P+140);
   const chips=[C.isP?"Petrol":"CNG",`${C.km} km/day`,plural(C.yrs,"year"),cityN,`Ex-showroom ${lakh(ms.x)}`].filter(Boolean);
-  let cx=P+16;g.font=`700 24px ${body}`;
-  chips.forEach(t=>{const w=g.measureText(t).width+32;if(cx+w>W-P)return;rr(g,cx,P+196,w,44,22);g.fillStyle="rgba(255,255,255,.85)";g.fill();g.fillStyle=INK;g.fillText(t,cx+16,P+226);cx+=w+10});
-  const wins=rivals.filter(x=>x.tot>=ms.tot).length;
-  g.fillStyle=INK;g.font=`700 26px ${body}`;g.fillText(`${ms.n} costs less to own than ${wins} of ${rivals.length} rivals over ${plural(C.yrs,"year")}`,P+16,P+290);
+  let cx=P+14;g.font=`700 21px ${body}`;
+  chips.forEach(t=>{const w=g.measureText(t).width+28;if(cx+w>W-P)return;rr(g,cx,P+160,w,38,19);g.fillStyle="rgba(255,255,255,.85)";g.fill();g.fillStyle=INK;g.fillText(t,cx+14,P+186);cx+=w+8});
+  const wins=all.filter(x=>x.tot>=ms.tot).length;
+  fitText(`${ms.n} costs less to own than ${wins} of ${all.length} rivals over ${plural(C.yrs,"year")}`,700,body,23,16,P+14,P+236,W-2*P-30,INK);
   // columns
-  const X={name:P+24,price:P+330,mil:P+500,fuel:P+640,save:W-P-20};
-  let y=HEAD+10;g.fillStyle=MUT;g.font=`800 19px ${body}`;
-  g.fillText("RIVAL",X.name,y+30);g.fillText("PRICE",X.price,y+30);g.fillText("MILEAGE",X.mil,y+30);g.fillText("FUEL / YEAR",X.fuel,y+30);
-  g.textAlign="right";g.fillText(`${plural(C.yrs,"YR").toUpperCase()} TOTAL`,X.save,y+30);g.textAlign="left";
+  const X={name:P+20,price:P+330,mil:P+500,fuel:P+640,save:W-P-14};
+  let y=HEAD+4;g.fillStyle=MUT;g.font=`800 16px ${body}`;
+  g.fillText("RIVAL",X.name,y+24);g.fillText("PRICE",X.price,y+24);g.fillText("MILEAGE",X.mil,y+24);g.fillText("FUEL / YEAR",X.fuel,y+24);
+  g.textAlign="right";g.fillText(`${plural(C.yrs,"YR").toUpperCase()} TOTAL`,X.save,y+24);g.textAlign="left";
   y+=COLH;
-  rivals.forEach((x,k)=>{
-    const d=x.tot-ms.tot,win=d>=0,gap=(ms.x-x.x)*1e5,pct=Math.round((ms.c/x.c-1)*100),fs=x.fuelYr-ms.fuelYr;
-    g.save();g.shadowColor="rgba(70,40,150,.12)";g.shadowBlur=18;g.shadowOffsetY=6;rr(g,P/2,y,W-P,RH,22);g.fillStyle="#ffffff";g.fill();g.restore();
-    rr(g,P/2,y,10,RH,5);g.fillStyle=win?"#5cc79a":"#ff9f6b";g.fill();
-    // name
-    g.fillStyle=MUT;g.font=`600 18px ${body}`;g.fillText(x.b.replace("Maruti Suzuki ",""),X.name,y+34);
-    g.fillStyle=INK;let fs1=34;g.font=`800 ${fs1}px ${disp}`;while(g.measureText(x.n).width>X.price-X.name-20&&fs1>22){fs1-=2;g.font=`800 ${fs1}px ${disp}`}g.fillText(x.n,X.name,y+74);
-    g.fillStyle=MUT;let fs2=21;g.font=`500 ${fs2}px ${body}`;while(g.measureText(x.v).width>X.price-X.name-20&&fs2>14){fs2--;g.font=`500 ${fs2}px ${body}`}g.fillText(x.v,X.name,y+106);
-    // metric helper
-    const metric=(xx,ok,big,small)=>{g.fillStyle=ok?GOOD:BAD;g.font=`800 28px ${body}`;g.fillText(big,xx,y+64);g.fillStyle=MUT;g.font=`600 18px ${body}`;g.fillText(small,xx,y+94)};
-    metric(X.price,gap<=0,gap===0?"Same":inr(Math.abs(gap)),gap===0?"same price":gap<0?`${ms.n} cheaper`:`${ms.n} dearer`);
-    metric(X.mil,pct>=0,pct===0?"Same":`${pct>0?"+":"−"}${Math.abs(pct)}%`,pct>=0?`${ms.n} better`:`${x.n} better`);
-    metric(X.fuel,fs>=0,inr(Math.abs(fs)),fs>=0?`${ms.n} saves`:`${x.n} saves`);
-    // saving pill
-    g.font=`800 28px ${body}`;const t=inr(Math.abs(d)),pw=Math.max(g.measureText(t).width+36,150);
-    rr(g,X.save-pw,y+34,pw,48,24);g.fillStyle=win?"#bff0d9":"#ffe0cc";g.fill();
-    g.fillStyle=win?GOOD:BAD;g.textAlign="center";g.fillText(t,X.save-pw/2,y+68);
-    g.font=`700 17px ${body}`;g.fillStyle=MUT;g.fillText(win?`${ms.n} saves`:`${x.n} saves`,X.save-pw/2,y+106);g.textAlign="left";
-    y+=RH+GAP;
+  rivals.forEach(x=>{
+    const d=x.tot-ms.tot,win=d>=0,gap=(ms.x-x.x)*1e5,pct=Math.round((ms.c/x.c-1)*100),fs=x.fuelYr-ms.fuelYr,iv=invOf(x);
+    g.save();g.shadowColor="rgba(70,40,150,.10)";g.shadowBlur=14;g.shadowOffsetY=4;rr(g,P/2,y,W-P,RH,18);g.fillStyle="#ffffff";g.fill();g.restore();
+    rr(g,P/2,y,9,RH,4);g.fillStyle=win?"#5cc79a":"#ff9f6b";g.fill();
+    fitText(x.n,800,disp,28,18,X.name,y+42,X.price-X.name-16,INK);
+    fitText(`${x.b.replace("Maruti Suzuki ","")} · ${x.v}`,500,body,17,12,X.name,y+72,X.price-X.name-16,MUT);
+    const metric=(xx,w,ok,big,small)=>{fitText(big,800,body,24,16,xx,y+44,w,ok?GOOD:BAD);fitText(small,600,body,15,11,xx,y+70,w,MUT)};
+    metric(X.price,160,gap<=0,gap===0?"Same":inr(Math.abs(gap)),gap===0?"same price":gap<0?`${ms.n} cheaper`:`${ms.n} dearer`);
+    metric(X.mil,130,pct>=0,pct===0?"Same":`${pct>0?"+":"−"}${Math.abs(pct)}%`,pct>=0?`${ms.n} better`:`${x.n} better`);
+    metric(X.fuel,130,fs>=0,inr(Math.abs(fs)),fs>=0?`${ms.n} saves`:`${x.n} saves`);
+    g.font=`800 24px ${body}`;const t=inr(Math.abs(d)),pw=Math.max(g.measureText(t).width+30,128);
+    rr(g,X.save-pw,y+14,pw,40,20);g.fillStyle=win?"#bff0d9":"#ffe0cc";g.fill();
+    g.fillStyle=win?GOOD:BAD;g.textAlign="center";g.fillText(t,X.save-pw/2,y+42);
+    g.font=`700 15px ${body}`;
+    if(iv.mon>0&&iv.fv>0){g.fillStyle="#9b5a00";g.fillText(`SIP ${inr(iv.fv)}`,X.save-pw/2,y+78)}else{g.fillStyle=MUT;g.fillText(win?`${ms.n} saves`:`${x.n} saves`,X.save-pw/2,y+78)}
+    g.textAlign="left";y+=RH+GAP;
   });
-  g.fillStyle=MUT;g.font=`500 19px ${body}`;
-  g.fillText(`All prices are ex-showroom. Total = ex-showroom price + fuel for ${plural(C.yrs,"year")}. Claimed mileage. Green = ${ms.n} better.`,P,y+40);
-  if(inv.length){
-    y+=80;const top=inv[0];
-    let ig=g.createLinearGradient(0,y,W,y+IH);ig.addColorStop(0,"#fff4d6");ig.addColorStop(1,"#dff6ea");
-    rr(g,P/2,y,W-P,IH-30,28);g.fillStyle=ig;g.fill();
-    g.fillStyle="#9b5a00";g.font=`800 22px ${body}`;g.fillText("💰 INVEST WHAT YOU SAVE  ·  SIP @ 10% A YEAR",P+16,y+44);
-    const best=inv.reduce((a,b)=>b.mon>a.mon?b:a,inv[0]),fv=top.fv;
-    const gift=fv>=150000?"a diamond ring for your better half 💍":fv>=70000?"a family holiday on fuel savings 🏖️":fv>=30000?"a gold chain for your better half 💛":"a new phone for your better half 📱";
-    const fit=(t,wt,fam,max,min,yy,col)=>{let f=max;g.font=`${wt} ${f}px ${fam}`;while(g.measureText(t).width>W-2*P-30&&f>min){f--;g.font=`${wt} ${f}px ${fam}`}g.fillStyle=col;g.fillText(t,P+16,yy)};
+  if(more){g.fillStyle=MUT;g.font=`600 18px ${body}`;g.fillText(`+ ${more} more rival${more>1?"s":""} on the page`,P+14,y+20);y+=34}
+  g.fillStyle=MUT;fitText(`All prices are ex-showroom. Total = ex-showroom price + fuel for ${plural(C.yrs,"year")}. Claimed mileage. Green = ${ms.n} better.`,500,body,17,12,P+6,y+28,W-2*P,MUT);
+  y+=FOOT;
+  if(anyInv){
+    const inv=all.map(x=>({x,...invOf(x)})).filter(o=>o.mon>0&&o.fv>0);
+    const best=inv.reduce((a,b)=>b.mon>a.mon?b:a,inv[0]),top=inv.reduce((a,b)=>b.fv>a.fv?b:a,inv[0]),fv=top.fv;
     const treat=best.mon<=1000?"a movie date for two, every month 🍿":best.mon<=2000?"a dinner date, every month 🍽️":best.mon<=4000?"a family day outing, every month 🎡":"a short trip, every month 🚗";
-    fit(`Save up to ${inr(best.mon)} a month = ${treat}`,800,disp,30,20,y+88,INK);
-    fit(`As a SIP, it grows to ${inr(fv)} in ${plural(C.yrs,"year")}: ${gift}`,700,body,24,16,y+126,"#4b3aa8");
-    const CX={r:P+24,m:P+380,p:P+620,v:W-P-20};
-    g.fillStyle=MUT;g.font=`800 18px ${body}`;g.fillText("VS RIVAL",CX.r,y+174);g.fillText("SAVED PER MONTH",CX.m,y+174);g.fillText("TOTAL SAVED",CX.p,y+174);
-    g.textAlign="right";g.fillText(`SIP VALUE (${plural(C.yrs,"YR").toUpperCase()})`,CX.v,y+174);g.textAlign="left";
-    let yy=y+190;
-    inv.forEach(o=>{rr(g,P,yy,W-2*P,54,14);g.fillStyle="rgba(255,255,255,.9)";g.fill();
-      g.fillStyle=INK;g.font=`800 24px ${body}`;g.fillText(o.x.n,CX.r,yy+36);
-      g.font=`700 24px ${body}`;g.fillText(inr(o.mon),CX.m,yy+36);g.fillText(inr(Math.max(o.put,0)),CX.p,yy+36);
-      g.fillStyle=GOOD;g.font=`800 26px ${body}`;g.textAlign="right";g.fillText(inr(o.fv),CX.v,yy+37);g.textAlign="left";yy+=64});
-    g.fillStyle=MUT;g.font=`500 17px ${body}`;
-    ["All prices are ex-showroom. Monthly fuel saving invested as a SIP, plus the ex-showroom price difference at the same rate.","10% a year is an assumed return for illustration only. Returns are not guaranteed; this is not investment advice."].forEach((t,k)=>g.fillText(t,P+16,yy+16+k*24));
+    const gift=fv>=150000?"a diamond ring for your better half 💍":fv>=70000?"a family holiday on fuel savings 🏖️":fv>=30000?"a gold chain for your better half 💛":"a new phone for your better half 📱";
+    let ig=g.createLinearGradient(0,y,W,y+SIPH);ig.addColorStop(0,"#fff4d6");ig.addColorStop(1,"#dff6ea");
+    rr(g,P/2,y,W-P,SIPH-20,26);g.fillStyle=ig;g.fill();
+    g.fillStyle="#9b5a00";g.font=`800 19px ${body}`;g.fillText("💰 INVEST WHAT YOU SAVE  ·  SIP @ 10% A YEAR",P+14,y+38);
+    fitText(`Save up to ${inr(best.mon)} a month = ${treat}`,800,disp,28,18,P+14,y+82,W-2*P-30,INK);
+    fitText(`As a SIP, it grows to ${inr(fv)} in ${plural(C.yrs,"year")}: ${gift}`,700,body,22,14,P+14,y+118,W-2*P-30,"#4b3aa8");
+    g.fillStyle=MUT;g.font=`500 15px ${body}`;
+    ["SIP value per rival is shown under each saving. Monthly fuel saving as a SIP, plus the ex-showroom price difference at the same rate.","10% a year is an assumed return for illustration only. Returns are not guaranteed; this is not investment advice."].forEach((t,k)=>fitText(t,500,body,15,11,P+14,y+156+k*22,W-2*P-30,MUT));
   }
   return cv;
 }
