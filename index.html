@@ -3,10 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-title" content="CompareX">
+<meta name="application-name" content="CompareX">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
-<title>Arena vs Competition Comparison</title>
+<title>CompareX</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
@@ -446,6 +448,8 @@ details.more .controls>.group:nth-child(-n+2){display:none}
 .feat h4 small{display:block;font-family:var(--body);font-size:12.5px;font-weight:600;color:var(--muted);margin-top:2px}
 .ftag{margin:2px 0 6px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
 .ftag.ex{color:var(--cng-ink)}
+.tagline{margin:4px 0 0;font-family:var(--display);font-weight:700;font-size:clamp(18px,2.6vw,24px);color:var(--accent-ink);letter-spacing:-.01em}
+.gatebox .tagline{margin:-8px 0 0;font-size:18px}
 .fuel .fv{margin:-2px 0 8px;font-weight:700;font-size:15px}
 
 /* mobile sign-in gate + owner log */
@@ -582,7 +586,8 @@ ul.insights li.line:hover{transform:translateX(3px)}
 <div class="wrap">
   <header>
     <div class="eyebrow">Maruti Suzuki Arena · Southeast Zone</div>
-    <h1><span class="g">Arena</span> vs Competition Comparison</h1>
+    <h1>Compare<span class="g">X</span></h1>
+    <p class="tagline">Arena vs everyone, in one tap</p>
     <p class="lede">Pick a Maruti Suzuki Arena car and tell us how you drive. See how it compares with its rivals on price, running cost and features, and what <span style="color:var(--cng-ink);font-weight:700">CNG</span> saves over <span style="color:var(--petrol-ink);font-weight:700">petrol</span>.</p>
     <div class="stamp">Fuel today in <b id="stCity">Hyderabad</b> · Petrol <b id="stP">₹116.15/L</b> · CNG <b id="stC">₹112/kg</b> · Oct 2026</div>
   </header>
@@ -771,10 +776,10 @@ ul.insights li.line:hover{transform:translateX(3px)}
     <div class="tbl"><table id="ownTbl"></table></div>
     <div class="acctools"><button type="button" class="chip sm" id="ownMore" hidden></button><span></span><span><button type="button" class="act" id="ownRefresh">Refresh</button><button type="button" class="act" id="ownOut">Hide list</button><button type="button" class="act" id="ownSignOut">Sign out as owner</button></span></div>
   </section>
-  <footer class="foot"><span class="road" aria-hidden="true"></span><p>Made for <b>Maruti Suzuki Arena</b> · Southeast Zone · Prices refresh every morning</p></footer>
+  <footer class="foot"><span class="road" aria-hidden="true"></span><p><b>CompareX</b> · Made for Maruti Suzuki Arena · Southeast Zone · Prices refresh every morning</p></footer>
   <details class="notes">
     <summary>Data sources and assumptions</summary>
-    <p>Ex-showroom prices are CarWale's Hyderabad or nearby Telangana city listings (Oct 2026) wherever available; Seltos from V3Cars (Oct 2026); Baleno from CarWale’s Sep 2026 variant list; Dzire Tour S from ZigWheels (Oct 2026); Hyundai Exter from Autocar India and CarWale Hyderabad (29–31 Oct 2026); XL6 only Zeta was priced individually; Brezza, XL6, Grand i10 Nios, Amaze, Kushaq, Elevate and Dzire Tour S from ZigWheels (Jul–Oct 2026). Check against your current dealer price list before quoting a customer.</p>
+    <p>Ex-showroom prices are CarWale's Hyderabad or nearby Telangana city listings (Oct 2026) wherever available; Seltos from V3Cars (Oct 2026); Baleno from CarWale’s Sep 2026 variant list; Dzire Tour S from ZigWheels (Oct 2026); XL6 only Zeta was priced individually; Brezza, XL6, Grand i10 Nios, Amaze, Kushaq, Elevate and Dzire Tour S from ZigWheels (Jul–Oct 2026). Check against your current dealer price list before quoting a customer.</p>
     <p>Rivals added on 30 Oct 2026 (ex-showroom, mostly Delhi list prices, Sep–Oct 2026): Tigor, Altroz, i20, Magnite and Taisor from V3Cars; Glanza facelift from V3Cars (Oct 2026); Rumion and Citroen C3 from CarDekho; Syros MY26 from CarDekho; Kylaq from Gaadify (Apr 2026); Kiger from Carlelo; Triber from Autocar India; Carens Clavis from CarOnPhone; XUV 3XO CNG from Carlelo (Oct 2026); Bayon from Times Drive and GaadiKey (Oct 2026). Mileage claims from CarWale, Autocar India, Rushlane, CarTrade, V3Cars and CarDekho. Altroz CNG claims differ by source (26.2–27.8 km/kg), so 26.9 is used; Altroz petrol automatics use the published 19.33 km/L claim; Taisor CNG uses the Fronx CNG claim (same engine). Added later: Renault Kwid (Autocar India, Jul 2026; ARAI 21.7/22.5 km/L), Renault Duster 1.3 turbo (CarDekho prices; Renault claims 17.75/18.45 km/L; the 1.0 turbo has no published claim yet); Duster strong hybrid (Times Drive, 17 Oct 2026; ARAI 29 km/L, Emotion priced ₹19.48 L per the official table) and Nissan Tekton (Autocar India, Jul 2026). Tata Curvv and Tata Sierra are not included because no claimed petrol mileage is published for the versions on sale.</p>
     <p>Mileage is the manufacturer's claimed (ARAI) figure for every car, petrol and CNG, so the comparison is like for like. Where CarWale did not list a figure, the maker's published claim is used.</p>
     <p>Fuel prices are set per city (Oct 2026: Goodreturns, V3Cars, Business Today, BankBazaar, RozKaBhav). Where a city's CNG price wasn't published, the state average is used and marked. Ex-showroom prices are the same across Telangana, Andhra Pradesh, Odisha and Chhattisgarh (checked on CarWale); on-road prices differ by state road tax. The blended CNG cost assumes the rest of the driving runs on petrol. Prices refresh automatically each morning.</p>
@@ -784,7 +789,7 @@ ul.insights li.line:hover{transform:translateX(3px)}
 <div class="gate" id="gate" hidden role="dialog" aria-modal="true" aria-labelledby="gateH">
   <form class="gatebox" id="gateForm" novalidate>
     <div class="eyebrow">Maruti Suzuki Arena · Southeast Zone</div>
-    <h2 id="gateH"><span class="g">Arena</span> vs Competition</h2>
+    <h2 id="gateH">Compare<span class="g">X</span></h2><p class="tagline">Arena vs everyone, in one tap</p>
     <p class="hint" id="gateSub">Enter your name and mobile number to open the comparison.</p>
     <div class="field" id="gName"><label for="gN">Your name</label><input type="text" id="gN" autocomplete="name" maxlength="60" required></div>
     <div class="field" id="gMob"><label for="gM">Mobile number</label><div class="mob"><span>+91</span><input type="tel" id="gM" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="10-digit number" required></div></div>
@@ -842,7 +847,7 @@ const MODELS=[
 const RIVALS={
   "Tiago":{b:"Tata",c:26.49,vars:[["Smart CNG",5.87],["Pure CNG",6.58],["Pure Plus CNG",7.10],["Pure CNG AMT",7.13,28.06],["Pure Plus A CNG",7.57],["Pure Plus CNG AMT",7.65,28.06],["Creative CNG",8.07],["Pure Plus A CNG AMT",8.12,28.06],["Creative CNG AMT",8.62,28.06]]},
   "Punch":{b:"Tata",c:26.99,vars:[["Smart CNG",6.85],["Pure CNG",7.68],["Pure Plus CNG",8.20],["Pure Plus (S) CNG",8.55],["Pure Plus CNG AMT",8.77],["Adventure CNG",8.80],["Adventure (S) CNG",9.15],["Adventure CNG AMT",9.37],["Accomplished CNG",9.50],["Adventure (S) CNG AMT",9.72],["Accomplished Plus (S) CNG AMT",10.77]]},
-  "Exter":{b:"Hyundai",c:27.10,vars:[["HX 2 CNG",7.00],["HX 3 CNG",7.50],["HX 4 CNG",8.33],["HX 6 CNG",9.00],["HX 8 CNG",9.47]]},
+  "Exter":{b:"Hyundai",c:27.10,vars:[["HX 2 CNG",7.00],["HX 3 CNG",7.45],["HX 4 CNG",8.28],["HX 6 CNG",8.95],["HX 8 CNG",9.42]]},
   "Aura":{b:"Hyundai",c:28.0,vars:[["S CNG",7.89],["Corporate CNG",7.98],["SX CNG",8.67]]},
   "Hyryder":{b:"Toyota",c:26.6,vars:[["S CNG",13.71],["G CNG",15.72]]},
   "Baleno":{b:"Maruti Suzuki Nexa",c:33.61,vars:[["Delta CNG",7.92],["Delta CNG AMT",8.32,34.47],["Zeta CNG",8.92],["Zeta CNG AMT",9.32,34.47]]},
@@ -878,7 +883,7 @@ const PRIVALS={
   "Tiago":{b:"Tata",vars:[["Smart",4.77,20.09],["Pure",5.57,20.09],["Pure AMT",6.10,19.43],["Pure Plus",6.10,20.09],["Pure Plus A",6.56,20.09],["Pure Plus AMT",6.65,19.43],["Creative",7.06,20.09],["Pure Plus A AMT",7.11,19.43],["Creative Plus",7.36,20.09],["Creative AMT",7.61,19.43],["Creative Plus AMT",7.91,19.43]]},
   "Grand i10 Nios":{b:"Hyundai",vars:[["Era",5.60,20.7],["Magna",6.37,20.7],["Corporate",6.60,20.7],["Magna AMT",6.85,20.1],["Sportz",6.93,20.7],["Sportz (O)",7.18,20.7],["Corporate AMT",7.21,20.1],["Sportz AMT",7.45,20.1],["Asta",7.57,20.7],["Sportz (O) AMT",7.72,20.1],["Asta AMT",8.09,20.1]]},
   "Punch":{b:"Tata",vars:[["Smart",5.75,20.09],["Pure",6.65,20.09],["Pure Plus",7.17,20.09],["Pure Plus (S)",7.52,20.09],["Pure Plus AMT",7.75,18.8],["Adventure",7.77,20.09],["Pure Plus (S) AMT",8.10,18.8],["Adventure (S)",8.12,20.09],["Adventure AMT",8.35,18.8],["Accomplished",8.47,20.09],["Accomplished AMT",9.05,18.8],["Accomplished Plus (S)",9.17,20.09],["Accomplished Plus (S) AMT",9.75,18.8]]},
-  "Exter":{b:"Hyundai",vars:[["HX 2",5.81,19.4],["HX 3",6.34,19.4],["HX 3 AMT",6.99,19.2],["HX 4",7.32,19.4],["HX 6",8.03,19.4],["HX 4 Plus AMT",8.14,19.2],["HX 8",8.44,19.4],["HX 6 AMT",8.63,19.2],["HX 8 AMT",9.16,19.2],["HX 10 AMT",9.50,19.2]]},
+  "Exter":{b:"Hyundai",vars:[["HX 2",5.81,19.4],["HX 3",6.30,19.4],["HX 3 AMT",6.95,19.2],["HX 4",7.28,19.4],["HX 6",7.99,19.4],["HX 4 Plus AMT",8.10,19.2],["HX 8",8.40,19.4],["HX 6 AMT",8.59,19.2],["HX 8 AMT",9.12,19.2],["HX 10 AMT",9.46,19.2]]},
   "Aura":{b:"Hyundai",vars:[["E",6.00,20.5],["S",6.98,20.5],["SX",7.77,20.5],["SX (O)",8.23,20.5],["SX Plus AMT",8.42,20.1]]},
   "Amaze":{b:"Honda",vars:[["V",7.65,18.65],["VX",8.65,18.65],["V CVT",8.70,19.46],["ZX",9.39,18.65],["VX CVT",9.40,19.46],["ZX CVT",10.00,19.46]]},
   "Nexon":{b:"Tata",vars:[["Smart 1.2T",7.40,17.44],["Smart Plus 1.2T",8.22,17.44],["Smart Plus (S) 1.2T",8.52,17.44],["Smart Plus 1.2T AMT",8.92,17.18],["Pure Plus 1.2T",9.07,17.44],["Pure Plus (S) 1.2T",9.37,17.44],["Pure Plus 1.2T AMT",9.72,17.18],["Creative 1.2T",10.17,17.44],["Creative 1.2T AMT",10.87,17.18],["Creative 1.2T DCT",11.42,17.01]]},
@@ -1303,7 +1308,7 @@ function cmpImage(){
   rr(g,P/2,P/2,W-P,HEAD-P/2-10,32);g.fillStyle=hg;g.fill();
   g.fillStyle="#9b2f5e";g.font=`800 24px ${body}`;g.fillText("MARUTI SUZUKI ARENA  ·  SOUTHEAST ZONE",P+16,P+44);
   g.fillStyle=INK;g.font=`800 64px ${disp}`;g.fillText(`${ms.n} ${ms.v}`,P+16,P+122);
-  g.fillStyle="#4b3aa8";g.font=`700 34px ${body}`;g.fillText(`vs competition`,P+16,P+170);
+  g.fillStyle="#4b3aa8";g.font=`700 34px ${body}`;g.fillText(`vs competition · CompareX`,P+16,P+170);
   // chips
   const chips=[C.isP?"Petrol":"CNG",`${C.km} km/day`,plural(C.yrs,"year"),cityN,`Ex-showroom ${lakh(ms.x)}`].filter(Boolean);
   let cx=P+16;g.font=`700 24px ${body}`;
@@ -1345,10 +1350,10 @@ $("waCmp").addEventListener("click",async e=>{
   const text=decodeURIComponent((($("waCmp").href.split("text=")[1])||"").replace(/\+/g," "));
   try{
     const blob=await new Promise(r=>cv.toBlob(r,"image/png"));
-    const file=new File([blob],"arena-vs-competition.png",{type:"image/png"});
+    const file=new File([blob],"comparex.png",{type:"image/png"});
     if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file]});return}
     if(!location.hostname.endsWith("github.io")){window.open(waLink(text),"_blank","noopener");return}
-    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="arena-vs-competition.png";document.body.appendChild(a);a.click();a.remove();
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="comparex.png";document.body.appendChild(a);a.click();a.remove();
     $("copyMsg").textContent="Image saved. Attach it in WhatsApp.";setTimeout(()=>$("copyMsg").textContent="",5000);
   }catch(x){if(x&&x.name==="AbortError")return;window.open(waLink(text),"_blank","noopener")}
 });
@@ -1736,7 +1741,6 @@ const LOG_URL="https://script.google.com/macros/s/AKfycbzvTIZH5hYpOR_ZF6KvFKb8DS
   show(v==="feat"?"feat":"cost");
 })();
 </script>
-
 
 </body>
 </html>
