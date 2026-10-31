@@ -1298,7 +1298,8 @@ function cmpImage(){
   // phone-shaped: 1080 wide, at most 1920 tall (9:16), drawn at 2x for sharpness
   const S=2,W=1080,P=40,MAXH=1920,HEAD=300,COLH=44,RH=96,GAP=10,FOOT=50,SIPH=230;
   const RATE=0.10,mths=Math.round(C.yrs*12),i=RATE/12,sip=m=>m>0?m*((Math.pow(1+i,mths)-1)/i)*(1+i):0;
-  const invOf=x=>{const gap=(x.x-ms.x)*1e5,mon=(x.fuelYr-ms.fuelYr)/12,fv=sip(Math.max(mon,0))+gap*Math.pow(1+RATE,C.yrs);return{mon,fv}};
+  // overall saving from buying the Maruti version (ex-showroom difference + fuel over the period), spread monthly and invested as a SIP
+  const invOf=x=>{const mon=(x.tot-ms.tot)/mths,fv=sip(Math.max(mon,0));return{mon,fv}};
   const anyInv=all.some(x=>{const o=invOf(x);return o.mon>0&&o.fv>0});
   const fixed=HEAD+COLH+FOOT+(anyInv?SIPH:0)+30;
   const fitN=Math.max(1,Math.floor((MAXH-fixed)/(RH+GAP)));
@@ -1351,14 +1352,14 @@ function cmpImage(){
     const inv=all.map(x=>({x,...invOf(x)})).filter(o=>o.mon>0&&o.fv>0);
     const best=inv.reduce((a,b)=>b.mon>a.mon?b:a,inv[0]),top=inv.reduce((a,b)=>b.fv>a.fv?b:a,inv[0]),fv=top.fv;
     const treat=best.mon<=1000?"a movie date for two, every month 🍿":best.mon<=2000?"a dinner date, every month 🍽️":best.mon<=4000?"a family day outing, every month 🎡":"a short trip, every month 🚗";
-    const gift=fv>=150000?"a diamond ring for your better half 💍":fv>=70000?"a family holiday on fuel savings 🏖️":fv>=30000?"a gold chain for your better half 💛":"a new phone for your better half 📱";
+    const gift=fv>=150000?"a diamond ring for your better half 💍":fv>=70000?"a family holiday on your savings 🏖️":fv>=30000?"a gold chain for your better half 💛":"a new phone for your better half 📱";
     let ig=g.createLinearGradient(0,y,W,y+SIPH);ig.addColorStop(0,"#fff4d6");ig.addColorStop(1,"#dff6ea");
     rr(g,P/2,y,W-P,SIPH-20,26);g.fillStyle=ig;g.fill();
     g.fillStyle="#9b5a00";g.font=`800 19px ${body}`;g.fillText("💰 INVEST WHAT YOU SAVE  ·  SIP @ 10% A YEAR",P+14,y+38);
-    fitText(`Save up to ${inr(best.mon)} a month = ${treat}`,800,disp,28,18,P+14,y+82,W-2*P-30,INK);
+    fitText(`Buying the ${ms.n} ${ms.v} saves up to ${inr(best.mon)} a month = ${treat}`,800,disp,28,17,P+14,y+82,W-2*P-30,INK);
     fitText(`As a SIP, it grows to ${inr(fv)} in ${plural(C.yrs,"year")}: ${gift}`,700,body,22,14,P+14,y+118,W-2*P-30,"#4b3aa8");
     g.fillStyle=MUT;g.font=`500 15px ${body}`;
-    ["SIP value per rival is shown under each saving. Monthly fuel saving as a SIP, plus the ex-showroom price difference at the same rate.","10% a year is an assumed return for illustration only. Returns are not guaranteed; this is not investment advice."].forEach((t,k)=>fitText(t,500,body,15,11,P+14,y+156+k*22,W-2*P-30,MUT));
+    [`Overall saving (ex-showroom price difference + fuel over ${plural(C.yrs,"year")}) split into equal monthly SIPs. SIP value per rival is under each saving.`,"10% a year is an assumed return for illustration only. Returns are not guaranteed; this is not investment advice."].forEach((t,k)=>fitText(t,500,body,15,11,P+14,y+156+k*22,W-2*P-30,MUT));
   }
   return cv;
 }
