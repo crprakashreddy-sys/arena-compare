@@ -1301,7 +1301,7 @@ function cmpImage(){
   const sip=m=>m>0?m*((Math.pow(1+i,mths)-1)/i)*(1+i):0;
   const inv=rivals.map(x=>{const gap=(x.x-ms.x)*1e5,mon=(x.fuelYr-ms.fuelYr)/12;
     const fv=sip(Math.max(mon,0))+gap*Math.pow(1+RATE,C.yrs),put=Math.max(mon,0)*mths+gap;return{x,mon,gap,fv,put}}).filter(o=>o.fv>0&&o.mon>0).sort((a,b)=>b.fv-a.fv);
-  const IH=inv.length?150+inv.length*64+90:0;
+  const IH=inv.length?190+inv.length*64+90:0;
   const H=HEAD+COLH+rivals.length*(RH+GAP)+90+IH;
   const cv=document.createElement("canvas");cv.width=W*S;cv.height=H*S;const g=cv.getContext("2d");g.scale(S,S);
   const disp='"Bricolage Grotesque",Georgia,serif',body='"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
@@ -1348,24 +1348,27 @@ function cmpImage(){
     y+=RH+GAP;
   });
   g.fillStyle=MUT;g.font=`500 19px ${body}`;
-  g.fillText(`Total = ex-showroom price + fuel for ${plural(C.yrs,"year")}. Claimed mileage for every car. Green = ${ms.n} better.`,P,y+40);
+  g.fillText(`All prices are ex-showroom. Total = ex-showroom price + fuel for ${plural(C.yrs,"year")}. Claimed mileage. Green = ${ms.n} better.`,P,y+40);
   if(inv.length){
     y+=80;const top=inv[0];
     let ig=g.createLinearGradient(0,y,W,y+IH);ig.addColorStop(0,"#fff4d6");ig.addColorStop(1,"#dff6ea");
     rr(g,P/2,y,W-P,IH-30,28);g.fillStyle=ig;g.fill();
     g.fillStyle="#9b5a00";g.font=`800 22px ${body}`;g.fillText("💰 INVEST WHAT YOU SAVE  ·  SIP @ 10% A YEAR",P+16,y+44);
-    g.fillStyle=INK;g.font=`800 32px ${disp}`;
-    g.fillText(`Pick ${ms.n} over ${top.x.n}, invest the savings: ${inr(top.fv)} in ${plural(C.yrs,"year")}`.slice(0,70),P+16,y+92);
+    const best=inv.reduce((a,b)=>b.mon>a.mon?b:a,inv[0]),fv=top.fv;
+    const gift=fv>=150000?"a diamond ring for your better half 💍":fv>=70000?"a family holiday on fuel savings 🏖️":fv>=30000?"a gold chain for your better half 💛":"a new phone for your better half 📱";
+    const fit=(t,wt,fam,max,min,yy,col)=>{let f=max;g.font=`${wt} ${f}px ${fam}`;while(g.measureText(t).width>W-2*P-30&&f>min){f--;g.font=`${wt} ${f}px ${fam}`}g.fillStyle=col;g.fillText(t,P+16,yy)};
+    fit(`Save up to ${inr(best.mon)} a month = a movie date for two, every month 🍿`,800,disp,30,20,y+88,INK);
+    fit(`As a SIP, it grows to ${inr(fv)} in ${plural(C.yrs,"year")}: ${gift}`,700,body,24,16,y+126,"#4b3aa8");
     const CX={r:P+24,m:P+380,p:P+620,v:W-P-20};
-    g.fillStyle=MUT;g.font=`800 18px ${body}`;g.fillText("VS RIVAL",CX.r,y+134);g.fillText("SIP PER MONTH",CX.m,y+134);g.fillText("TOTAL SAVED",CX.p,y+134);
-    g.textAlign="right";g.fillText(`GROWS TO (${plural(C.yrs,"YR").toUpperCase()})`,CX.v,y+134);g.textAlign="left";
-    let yy=y+150;
+    g.fillStyle=MUT;g.font=`800 18px ${body}`;g.fillText("VS RIVAL",CX.r,y+174);g.fillText("SAVED PER MONTH",CX.m,y+174);g.fillText("TOTAL SAVED",CX.p,y+174);
+    g.textAlign="right";g.fillText(`SIP VALUE (${plural(C.yrs,"YR").toUpperCase()})`,CX.v,y+174);g.textAlign="left";
+    let yy=y+190;
     inv.forEach(o=>{rr(g,P,yy,W-2*P,54,14);g.fillStyle="rgba(255,255,255,.9)";g.fill();
       g.fillStyle=INK;g.font=`800 24px ${body}`;g.fillText(o.x.n,CX.r,yy+36);
       g.font=`700 24px ${body}`;g.fillText(inr(o.mon),CX.m,yy+36);g.fillText(inr(Math.max(o.put,0)),CX.p,yy+36);
       g.fillStyle=GOOD;g.font=`800 26px ${body}`;g.textAlign="right";g.fillText(inr(o.fv),CX.v,yy+37);g.textAlign="left";yy+=64});
     g.fillStyle=MUT;g.font=`500 17px ${body}`;
-    ["Monthly fuel saving invested as a SIP, plus the purchase-price difference invested (or subtracted) at the same rate.","10% a year is an assumed return for illustration only. Returns are not guaranteed; this is not investment advice."].forEach((t,k)=>g.fillText(t,P+16,yy+16+k*24));
+    ["All prices are ex-showroom. Monthly fuel saving invested as a SIP, plus the ex-showroom price difference at the same rate.","10% a year is an assumed return for illustration only. Returns are not guaranteed; this is not investment advice."].forEach((t,k)=>g.fillText(t,P+16,yy+16+k*24));
   }
   return cv;
 }
