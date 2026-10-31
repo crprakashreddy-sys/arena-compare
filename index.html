@@ -1357,7 +1357,8 @@ function cmpImage(){
     const best=inv.reduce((a,b)=>b.mon>a.mon?b:a,inv[0]),fv=top.fv;
     const gift=fv>=150000?"a diamond ring for your better half 💍":fv>=70000?"a family holiday on fuel savings 🏖️":fv>=30000?"a gold chain for your better half 💛":"a new phone for your better half 📱";
     const fit=(t,wt,fam,max,min,yy,col)=>{let f=max;g.font=`${wt} ${f}px ${fam}`;while(g.measureText(t).width>W-2*P-30&&f>min){f--;g.font=`${wt} ${f}px ${fam}`}g.fillStyle=col;g.fillText(t,P+16,yy)};
-    fit(`Save up to ${inr(best.mon)} a month = a movie date for two, every month 🍿`,800,disp,30,20,y+88,INK);
+    const treat=best.mon<=1000?"a movie date for two, every month 🍿":best.mon<=2000?"a dinner date, every month 🍽️":best.mon<=4000?"a family day outing, every month 🎡":"a short trip, every month 🚗";
+    fit(`Save up to ${inr(best.mon)} a month = ${treat}`,800,disp,30,20,y+88,INK);
     fit(`As a SIP, it grows to ${inr(fv)} in ${plural(C.yrs,"year")}: ${gift}`,700,body,24,16,y+126,"#4b3aa8");
     const CX={r:P+24,m:P+380,p:P+620,v:W-P-20};
     g.fillStyle=MUT;g.font=`800 18px ${body}`;g.fillText("VS RIVAL",CX.r,y+174);g.fillText("SAVED PER MONTH",CX.m,y+174);g.fillText("TOTAL SAVED",CX.p,y+174);
