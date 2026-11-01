@@ -1,14 +1,4 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="apple-mobile-web-app-title" content="CompareX India">
-<meta name="application-name" content="CompareX India">
-<meta name="theme-color" content="#5b3fd6">
-</head>
-<body>
-<title>CompareX India</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="apple-mobile-web-app-title" content="CompareX India"><meta name="application-name" content="CompareX India"><meta name="theme-color" content="#5b3fd6"><title>CompareX India</title></head><body><title>CompareX India</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700;800&display=swap">
@@ -213,6 +203,7 @@ button{font:inherit;color:inherit}
       <p><b>Ex-showroom prices</b> are national list prices. We checked Swift, Creta and Nexon in Delhi, Mumbai, Kolkata, Bengaluru and Chennai (Autocar India, Oct 2026) and Maruti/rival prices in Hyderabad, Bhubaneswar, Vijayawada and Raipur (CarWale): ex-showroom was identical in every city. On-road price (road tax, insurance) differs by state and is not included.</p>
       <p><b>Fuel prices</b> by city: petrol from Business Today (31 Oct–1 Nov 2026; a few cities from their latest October listing); CNG from Goodreturns state pages and Aaj Tak (Sep–Nov 2026). Srinagar has no city-gas CNG network listed, so CNG is not offered there. You can edit any price in ⚙️ Settings.</p>
       <p><b>Mileage</b> is the manufacturer's claimed figure for every car. Real-world is assumed at 80% of claimed (change in Settings). <b>EVs:</b> efficiency = claimed range ÷ battery size; charging cost assumed ₹9/kWh at home (change in Settings). e Vitara prices are with battery (no BaaS). EV rival prices: Rushlane (Feb 2026), ranges: Rushlane / MeraEV.</p>
+      <p><b>Invicto and Innova Hycross:</b> ex-showroom from Autocar India (Mumbai/Navi Mumbai, Oct 2026); claimed 23.24 km/L hybrid, 16.13 km/L Hycross petrol (CarWale). Invicto hybrids are matched with Hycross hybrids.</p>
       <p><b>Jimny:</b> Mahindra Thar and Force Gurkha don't publish claimed mileage, so a like-for-like running-cost comparison isn't shown.</p>
       <p><b>SIP</b> in the shared image assumes 10% a year, for illustration only. Returns are not guaranteed; not investment advice.</p>
     </details>
@@ -653,9 +644,12 @@ const NEXA=[
  {n:"Grand Vitara",ch:"Nexa",p:21.11,c:26.6,vars:[{v:"Delta CNG",x:13.05,pv:"Delta",px:12.15},{v:"Zeta CNG",x:14.80,pv:"Zeta",px:13.85}]},
  {n:"XL6",ch:"Nexa",p:20.97,c:26.32,vars:[{v:"Zeta CNG",x:12.61,pv:"Zeta",px:11.62}]},
  {n:"Jimny",ch:"Nexa",p:16.94,vars:[]},
+ {n:"Invicto",ch:"Nexa",p:23.24,vars:[]},
  {n:"e Vitara",ch:"Nexa",ev:true,vars:[]}];
 const NEXA_PETROL={
- "Jimny":[["Zeta MT",12.39,16.94],["Alpha MT",13.31,16.94],["Zeta AT",13.45,16.39],["Alpha AT",14.37,16.39]]};
+ "Jimny":[["Zeta MT",12.39,16.94],["Alpha MT",13.31,16.94],["Zeta AT",13.45,16.39],["Alpha AT",14.37,16.39]],
+ "Invicto":[["Zeta Plus 7-seat Strong Hybrid",24.97,23.24],["Zeta Plus 8-seat Strong Hybrid",25.37,23.24],["Alpha Plus 7-seat Strong Hybrid",28.71,23.24]]};
+PRIVALS["Innova Hycross"]={b:"Toyota",vars:[["G 7-seat petrol",18.70,16.13],["GX 7-seat petrol",19.53,16.13],["GX (O) 7-seat petrol",20.97,16.13],["VX 7-seat Hybrid",26.76,23.24],["VX (O) 7-seat Hybrid",28.77,23.24],["ZX 7-seat Hybrid",31.20,23.24],["ZX (O) 7-seat Hybrid",31.84,23.24]]};
 // EV: [version, ex-showroom ₹ lakh (with battery), km per kWh = claimed range ÷ battery]
 const EV_MARUTI={"e Vitara":[["Delta 49 kWh",15.99,440/49],["Zeta 61 kWh",17.49,543/61],["Alpha 61 kWh",19.79,543/61],["Alpha Dual Tone 61 kWh",20.01,543/61]]};
 const EVRIVALS={
@@ -677,15 +671,20 @@ const EV_FEAT={
  "ZS EV":["50.3 kWh (461 km)","Panoramic sunroof (top)","Level 2 ADAS (top)","Battery-rental option","10.1-inch touchscreen"],
  "VF 6":["59.6 kWh battery, 468 km claimed","Level 2 ADAS","5-seat electric SUV"],
  "Atto 3":["49.9 kWh (468 km) or 60.5 kWh (521 km)","Rotating touchscreen","Panoramic sunroof","Level 2 ADAS","5-star Euro NCAP"],
+ "Invicto":["2.0 strong hybrid, 23.24 km/L claimed","7 or 8 seats","6 airbags","Electronic parking brake with auto hold","Panoramic sunroof and 360° camera (Alpha Plus)"],
+ "Innova Hycross":["2.0 petrol (16.13 km/L) or strong hybrid (23.24 km/L)","7 or 8 seats","Hybrid from VX upward","Panoramic sunroof (top)","Level 2 ADAS (top)"],
  "Jimny":["4x4 with low-range transfer case (AllGrip Pro)","1.5 petrol, manual or automatic","6 airbags","9-inch touchscreen (Alpha)","Ladder-frame off-roader"]};
-const EV_VFEAT={"e Vitara":{
+const EV_VFEAT={"Invicto":{
+ "Zeta Plus":["17-inch dual-tone alloys","8-inch touchscreen, Android Auto / CarPlay","Automatic AC with rear vents","6 airbags","Electronic parking brake with auto hold"],
+ "Alpha Plus":["Panoramic sunroof","Powered tailgate","10.1-inch touchscreen","360° camera","Ventilated front seats"]},
+ "e Vitara":{
  "Delta":["18-inch alloys","10.1-inch touchscreen, wireless phone link","7 airbags","Push-button start","Reclining, sliding rear seats"],
  "Zeta":["Wireless charger","Rear camera","Rear parcel shelf","10.1-inch touchscreen, wireless phone link","7 airbags"],
  "Alpha":["Level 2 ADAS","360° camera","Infinity 8-speaker sound","Ventilated front seats","Fixed glass roof"]}};
 // extra segment matchups for Nexa models
 const NEXA_MATCH={"Baleno":["Glanza","Altroz","Punch","Exter","Tiago"],"Fronx":["Taisor","Nexon","XUV 3XO","Punch","Exter"],"Grand Vitara":["Hyryder"],"XL6":["Rumion"]};
 const NEXA_PMATCH={"Baleno":["i20","Altroz","Glanza","Punch","Exter","Tiago"],"Fronx":["Taisor","Nexon","Venue","Sonet","XUV 3XO","Kylaq","Syros","Magnite","Kiger","Punch"],
- "Grand Vitara":["Hyryder","Creta","Seltos","Taigun","Kushaq","Elevate","Bayon","Duster","Tekton"],"XL6":["Carens Clavis","Rumion","Triber"],"Jimny":[]};
+ "Grand Vitara":["Hyryder","Creta","Seltos","Taigun","Kushaq","Elevate","Bayon","Duster","Tekton"],"XL6":["Carens Clavis","Rumion","Triber"],"Jimny":[],"Invicto":["Innova Hycross","Carens Clavis"]};
 const EMATCH={"e Vitara":Object.keys(EVRIVALS)};
 
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
@@ -956,6 +955,4 @@ setCity(S.city);
   setTimeout(check,1500);document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")setTimeout(check,500)})})();
 
 </script>
-
-</body>
-</html>
+</body></html>
