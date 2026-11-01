@@ -820,11 +820,11 @@ const MODELS=[
     {v:"Tour S CNG",x:7.25,pv:"Tour S",px:6.29,c:34.3,p:26.06}]},
   {n:"Wagon R",ch:"Arena",p:24.35,c:34.05,vars:[
     {v:"LXi CNG",x:5.939,pv:"LXi",px:4.989},
-    {v:"VXi CNG",x:6.469,pv:"VXi",px:5.519}]},
+    {v:"VXi CNG",x:6.494,pv:"VXi",px:5.544}]},
   {n:"Brezza",ch:"Arena",p:20.95,c:25.51,vars:[
-    {v:"LXi CNG",x:9.30,pv:"LXi 1.5",px:8.30},
-    {v:"VXi CNG",x:10.00,pv:"VXi 1.5",px:9.26},
-    {v:"ZXi CNG",x:11.50,pv:"ZXi 1.5",px:10.50}]},
+    {v:"LXi CNG",x:9.35,pv:"LXi 1.5",px:8.30},
+    {v:"VXi CNG",x:9.99,pv:"VXi 1.5",px:9.26},
+    {v:"ZXi CNG",x:11.55,pv:"ZXi 1.5",px:10.50}]},
   {n:"Victoris",ch:"Arena",p:21.18,c:27.02,vars:[
     {v:"LXi CNG",x:11.55,pv:"LXi",px:10.50},
     {v:"VXi CNG",x:12.90,pv:"VXi",px:11.85},
@@ -850,12 +850,12 @@ const RIVALS={
   "Exter":{b:"Hyundai",c:27.10,vars:[["HX 2 CNG",7.00],["HX 3 CNG",7.50],["HX 4 CNG",8.33],["HX 6 CNG",9.00],["HX 8 CNG",9.47]]},
   "Aura":{b:"Hyundai",c:28.0,vars:[["S CNG",7.89],["Corporate CNG",7.98],["SX CNG",8.67]]},
   "Hyryder":{b:"Toyota",c:26.6,vars:[["S CNG",13.71],["G CNG",15.72]]},
-  "Baleno":{b:"Maruti Suzuki Nexa",c:33.61,vars:[["Delta CNG",7.92],["Delta CNG AMT",8.32,34.47],["Zeta CNG",8.92],["Zeta CNG AMT",9.32,34.47]]},
+  "Baleno":{b:"Maruti Suzuki Nexa",c:33.61,vars:[["Delta CNG",7.92],["Delta CNG AMT",8.23,34.47],["Zeta CNG",8.92],["Zeta CNG AMT",9.32,34.47]]},
   "Fronx":{b:"Maruti Suzuki Nexa",c:28.51,vars:[["Sigma CNG",7.94],["Delta CNG",8.74]]},
-  "Brezza":{b:"Maruti Suzuki Arena",c:25.51,vars:[["LXi CNG",9.30],["VXi CNG",10.00],["ZXi CNG",11.50]]},
+  "Brezza":{b:"Maruti Suzuki Arena",c:25.51,vars:[["LXi CNG",9.35],["VXi CNG",9.99],["ZXi CNG",11.55]]},
   "XL6":{b:"Maruti Suzuki Nexa",c:26.32,vars:[["Zeta CNG",12.61]]},
   "Grand i10 Nios":{b:"Hyundai",c:27.3,vars:[["Magna CNG",7.33],["Sportz CNG",7.59],["Sportz Duo CNG",7.83]]},
-  "Grand Vitara":{b:"Maruti Suzuki Nexa",c:26.6,vars:[["Delta CNG",13.05],["Zeta CNG",14.80]]},
+  "Grand Vitara":{b:"Maruti Suzuki Nexa",c:26.6,vars:[["Delta CNG",13.05],["Zeta CNG",14.65]]},
   "Tigor":{b:"Tata",c:26.49,vars:[["XT CNG",7.44],["XZ CNG",7.99],["XZA CNG AMT",8.54,28.06],["XZ Plus CNG",8.54],["XZ Plus Lux CNG",8.99],["XZA Plus CNG AMT",9.09,28.06]]},
   "Altroz":{b:"Tata",c:26.90,vars:[["Smart CNG",7.29],["Pure CNG",8.19],["Pure S CNG",8.49],["Creative CNG",9.14],["Creative S CNG",9.49],["Accomplished S CNG",10.34]]},
   "Glanza":{b:"Toyota",c:33.61,vars:[["S CNG",8.76],["S CNG AMT",9.31,34.47],["G CNG",9.68],["G CNG AMT",10.23,34.47]]},
@@ -863,7 +863,7 @@ const RIVALS={
   "Rumion":{b:"Toyota",c:26.11,vars:[["S CNG",11.69]]},
   "XUV 3XO":{b:"Mahindra",c:24.7,vars:[["MX EDGE CNG",9.99],["REVX EDGE (O) CNG",10.79],["AX5 CNG",11.19],["REVX A CNG",12.27]]},
   "C3":{b:"Citroen",c:28.1,vars:[["Live CNG",5.73],["Feel (O) CNG",7.58],["Shine CNG",8.16]]},
-  "Nexon":{b:"Tata",c:24.0,vars:[["Smart CNG",8.35],["Smart Plus CNG",9.27],["Smart Plus (S) CNG",9.57],["Pure Plus CNG",10.00],["Pure Plus (S) CNG",10.00],["Pure Plus (PS) CNG",10.62],["Creative CNG",11.22],["Creative Plus (S) CNG",11.52]]},
+  "Nexon":{b:"Tata",c:24.0,vars:[["Smart CNG",8.35],["Smart Plus CNG",9.27],["Smart Plus (S) CNG",9.57],["Pure Plus CNG",9.90],["Pure Plus (S) CNG",10.00],["Pure Plus (PS) CNG",10.62],["Creative CNG",11.22],["Creative Plus (S) CNG",11.52]]},
 };
 
 // Petrol: Hyderabad/Telangana ex-showroom ₹ lakh (CarWale, Oct 2026). [variant, price, claimed km/L]
@@ -873,30 +873,30 @@ const PETROL={
   "Wagon R":[["LXi 1.0",4.99,24.35],["VXi 1.0",5.55,24.35],["VXi 1.0 AMT",5.99,25.19],["ZXi 1.2",5.98,23.56],["ZXi Plus 1.2",6.41,23.56],["ZXi 1.2 AMT",6.43,24.43],["ZXi Plus 1.2 AMT",6.86,24.43]],
   "Victoris":[["LXi",10.50,21.18],["VXi",11.85,21.18],["VXi AT",13.41,20.45],["ZXi",13.62,21.18],["ZXi (O)",13.69,21.18],["ZXi AT",15.18,20.45],["ZXi (O) AT",15.25,20.45],["ZXi Plus",15.39,21.18],["ZXi Plus (O)",15.48,21.18],["VXi Strong Hybrid",16.43,28.65],["ZXi Plus AT",17.34,20.45],["ZXi Plus (O) AT",17.43,20.45],["ZXi Strong Hybrid",17.85,28.65],["ZXi (O) Strong Hybrid",18.44,28.65],["ZXi Plus AWD AT",18.69,20.45],["ZXi Plus (O) AWD AT",19.27,20.45],["ZXi Plus Strong Hybrid",19.52,28.65],["ZXi Plus (O) Strong Hybrid",19.99,28.65],["Aurum Edition Strong Hybrid",20.22,28.65]],
   "Eeco":[["STD (O) 5-seater",5.28,19.71],["AC (O) Star Edition",5.54,19.71],["STD (O) 6-seater",5.55,19.71],["AC (O)",5.61,19.71]],
-  "Ertiga":[["LXi",8.90,20.51],["VXi",9.95,20.51],["ZXi",11.02,20.51],["VXi AT",11.30,20.3],["ZXi Plus",11.79,20.51],["ZXi AT",12.37,20.3],["ZXi Plus AT",13.14,20.3]],
+  "Ertiga":[["LXi",8.90,20.51],["VXi",9.95,20.51],["ZXi",11.02,20.51],["VXi AT",11.30,20.3],["ZXi Plus",11.69,20.51],["ZXi AT",12.37,20.3],["ZXi Plus AT",13.04,20.3]],
   "Alto K10":[["STD (O)",3.70,24.39],["LXi (O)",4.00,24.39],["VXi (O)",4.52,24.39],["VXi (O) AMT",4.97,24.9],["VXi Plus (O)",5.00,24.39],["VXi Plus (O) AMT",5.45,24.9]],
   "S-Presso":[["STD (O)",3.50,24.44],["LXi (O)",3.82,24.44],["VXi (O)",4.32,24.44],["VXi (O) AMT",4.77,25.3],["VXi Plus (O)",4.82,24.44],["VXi Plus (O) AMT",5.27,25.3]],
   "Celerio":[["LXi",4.70,25.17],["VXi",5.18,25.17],["VXi AMT",5.63,26.23],["ZXi",5.73,25.17],["ZXi AMT",6.18,26.23],["ZXi Plus",6.30,25.17],["ZXi Plus AMT",6.75,26.23]],
-  "Brezza":[["LXi 1.0 Turbo",7.50,20.13],["LXi 1.5",8.30,20.95],["VXi 1.0 Turbo",8.55,20.13],["VXi 1.5",9.26,20.95],["ZXi 1.0 Turbo",9.85,20.13],["ZXi 1.5",10.50,20.95],["VXi 1.5 AT",10.70,20.17],["ZXi Plus 1.0 Turbo",11.16,20.13],["ZXi 1.5 AT",11.85,20.17],["ZXi Plus 1.5 AT",13.55,20.17]],
+  "Brezza":[["LXi 1.0 Turbo",7.40,20.13],["LXi 1.5",8.30,20.95],["VXi 1.0 Turbo",8.55,20.13],["VXi 1.5",9.26,20.95],["ZXi 1.0 Turbo",9.85,20.13],["ZXi 1.5",10.50,20.95],["VXi 1.5 AT",10.61,20.17],["ZXi Plus 1.0 Turbo",11.16,20.13],["ZXi 1.5 AT",11.85,20.17],["ZXi Plus 1.5 AT",13.55,20.17]],
 };
 const PRIVALS={
-  "Tiago":{b:"Tata",vars:[["Smart",4.77,20.09],["Pure",5.57,20.09],["Pure AMT",6.10,19.43],["Pure Plus",6.10,20.09],["Pure Plus A",6.56,20.09],["Pure Plus AMT",6.65,19.43],["Creative",7.06,20.09],["Pure Plus A AMT",7.11,19.43],["Creative Plus",7.36,20.09],["Creative AMT",7.61,19.43],["Creative Plus AMT",7.91,19.43]]},
+  "Tiago":{b:"Tata",vars:[["Smart",4.77,20.09],["Pure",5.57,20.09],["Pure AMT",6.00,19.43],["Pure Plus",6.00,20.09],["Pure Plus A",6.56,20.09],["Pure Plus AMT",6.65,19.43],["Creative",7.06,20.09],["Pure Plus A AMT",7.11,19.43],["Creative Plus",7.36,20.09],["Creative AMT",7.61,19.43],["Creative Plus AMT",7.91,19.43]]},
   "Grand i10 Nios":{b:"Hyundai",vars:[["Era",5.60,20.7],["Magna",6.37,20.7],["Corporate",6.60,20.7],["Magna AMT",6.85,20.1],["Sportz",6.93,20.7],["Sportz (O)",7.18,20.7],["Corporate AMT",7.21,20.1],["Sportz AMT",7.45,20.1],["Asta",7.57,20.7],["Sportz (O) AMT",7.72,20.1],["Asta AMT",8.09,20.1]]},
   "Punch":{b:"Tata",vars:[["Smart",5.75,20.09],["Pure",6.65,20.09],["Pure Plus",7.17,20.09],["Pure Plus (S)",7.52,20.09],["Pure Plus AMT",7.75,18.8],["Adventure",7.77,20.09],["Pure Plus (S) AMT",8.10,18.8],["Adventure (S)",8.12,20.09],["Adventure AMT",8.35,18.8],["Accomplished",8.47,20.09],["Accomplished AMT",9.05,18.8],["Accomplished Plus (S)",9.17,20.09],["Accomplished Plus (S) AMT",9.75,18.8]]},
   "Exter":{b:"Hyundai",vars:[["HX 2",5.81,19.4],["HX 3",6.34,19.4],["HX 3 AMT",6.99,19.2],["HX 4",7.32,19.4],["HX 6",8.03,19.4],["HX 4 Plus AMT",8.14,19.2],["HX 8",8.44,19.4],["HX 6 AMT",8.63,19.2],["HX 8 AMT",9.16,19.2],["HX 10 AMT",9.50,19.2]]},
   "Aura":{b:"Hyundai",vars:[["E",6.00,20.5],["S",6.98,20.5],["SX",7.77,20.5],["SX (O)",8.23,20.5],["SX Plus AMT",8.42,20.1]]},
   "Amaze":{b:"Honda",vars:[["V",7.65,18.65],["VX",8.65,18.65],["V CVT",8.70,19.46],["ZX",9.39,18.65],["VX CVT",9.40,19.46],["ZX CVT",10.00,19.46]]},
-  "Nexon":{b:"Tata",vars:[["Smart 1.2T",7.40,17.44],["Smart Plus 1.2T",8.22,17.44],["Smart Plus (S) 1.2T",8.52,17.44],["Smart Plus 1.2T AMT",8.92,17.18],["Pure Plus 1.2T",9.07,17.44],["Pure Plus (S) 1.2T",9.37,17.44],["Pure Plus 1.2T AMT",9.72,17.18],["Creative 1.2T",10.17,17.44],["Creative 1.2T AMT",10.87,17.18],["Creative 1.2T DCT",11.42,17.01]]},
+  "Nexon":{b:"Tata",vars:[["Smart 1.2T",7.40,17.44],["Smart Plus 1.2T",8.22,17.44],["Smart Plus (S) 1.2T",8.52,17.44],["Smart Plus 1.2T AMT",8.92,17.18],["Pure Plus 1.2T",9.07,17.44],["Pure Plus (S) 1.2T",9.37,17.44],["Pure Plus 1.2T AMT",9.72,17.18],["Creative 1.2T",10.00,17.44],["Creative 1.2T AMT",10.87,17.18],["Creative 1.2T DCT",11.42,17.01]]},
   "Venue":{b:"Hyundai",vars:[["HX 2 1.2",8.00,18.5],["HX 4 1.2",9.00,18.5],["HX 2 Turbo",8.91,18.74],["HX 5 1.2",9.56,18.5],["HX 5 Turbo",9.90,18.74],["HX 5 Plus 1.2",10.00,18.5],["HX 6T 1.2",10.89,18.5],["HX 5 Turbo DCT",10.92,20.0]]},
   "Sonet":{b:"Kia",vars:[["HTE 1.2",7.41,18.83],["HTE (O) 1.2",7.84,18.83],["HTK (O) 1.2",8.85,18.83],["HTK Plus 1.2",9.24,18.83],["HTK (O) Turbo iMT",9.25,18.7],["HTK Plus (O) 1.2",9.72,18.83],["HTK (O) Turbo DCT",10.00,19.2]]},
   "Creta":{b:"Hyundai",vars:[["E 1.5",10.91,17.4],["EX 1.5",12.07,17.4],["EX (O) 1.5",13.14,17.4],["S (O) 1.5",14.21,17.4],["EX (O) 1.5 CVT",14.50,17.7],["SX 1.5",15.04,17.4],["S (O) 1.5 CVT",15.66,17.7],["SX Premium 1.5",16.34,17.4],["SX Premium 1.5 CVT",17.79,17.7]]},
   "Hyryder":{b:"Toyota",vars:[["E",11.31,21.11],["S",12.82,21.11],["S AT",14.17,20.58],["G (O)",14.87,21.11],["G (O) AT",16.18,20.58],["V",16.42,21.11],["S Hybrid",17.18,27.97],["V AT",17.67,20.58],["G (O) Hybrid",19.24,27.97],["V Hybrid",19.99,27.97]]},
   "Baleno":{b:"Maruti Suzuki Nexa",vars:[["Sigma",5.99,23.8],["Delta",7.00,23.8],["Delta AMT",7.50,24.77],["Zeta",8.00,23.8],["Zeta AMT",8.50,24.77],["Alpha",9.10,23.8],["Alpha (O)",9.50,23.8],["Alpha AMT",9.60,24.77],["Alpha (O) AMT",9.99,24.77]]},
   "Fronx":{b:"Maruti Suzuki Nexa",vars:[["Sigma 1.2",6.90,21.79],["Delta 1.2",7.75,21.79],["Delta Plus 1.2",8.15,21.79],["Delta 1.2 AMT",8.25,22.89],["Delta Plus 1.2 AMT",8.65,22.89],["Delta Plus 1.0 Turbo",8.97,21.5],["Zeta 1.0 Turbo",9.76,21.5],["Alpha 1.0 Turbo",10.61,21.5],["Zeta 1.0 Turbo AT",11.04,20.01],["Alpha 1.0 Turbo AT",11.89,20.01]]},
-  "Brezza":{b:"Maruti Suzuki Arena",vars:[["LXi 1.0 Turbo",7.50,20.13],["LXi 1.5",8.30,20.95],["VXi 1.0 Turbo",8.55,20.13],["VXi 1.5",9.26,20.95],["ZXi 1.0 Turbo",9.85,20.13],["ZXi 1.5",10.50,20.95],["VXi 1.5 AT",10.70,20.17],["ZXi Plus 1.0 Turbo",11.16,20.13],["ZXi 1.5 AT",11.85,20.17],["ZXi Plus 1.5 AT",13.55,20.17]]},
-  "XL6":{b:"Maruti Suzuki Nexa",vars:[["Zeta",11.62,20.97],["Alpha",12.59,20.97],["Zeta AT",12.97,20.27],["Alpha Plus",13.17,20.97],["Alpha AT",13.94,20.27],["Alpha Plus AT",14.52,20.27]]},
-  "Grand Vitara":{b:"Maruti Suzuki Nexa",vars:[["Sigma",10.77,21.11],["Delta",12.15,21.11],["Delta AT",13.50,20.16],["Zeta",13.85,21.11],["Zeta (O)",13.89,21.11],["Zeta AT",15.20,20.16],["Alpha",15.35,21.11],["Alpha AT",16.60,20.16],["Delta Plus Strong Hybrid",16.68,27.97],["Zeta Plus Strong Hybrid",17.97,27.97],["Alpha AWD AT",18.05,20.16],["Alpha Plus Strong Hybrid",19.55,27.97]]},
-  "Seltos":{b:"Kia",vars:[["HTE 1.5",11.24,16.5],["HTE (O) 1.5",12.41,16.5],["HTK 1.5",13.41,16.5],["HTE (O) 1.5 CVT",13.71,16.5],["HTK (O) 1.5",14.51,16.5],["HTK 1.5 CVT",14.71,16.5],["HTK (O) 1.5 CVT",15.81,16.5],["HTX 1.5",15.91,16.5],["HTX (A) 1.5",17.01,16.5],["HTX 1.5 CVT",17.21,16.5],["HTX (A) 1.5 CVT",18.31,16.5],["GTX 1.5 CVT",18.71,16.5],["GTX (A) 1.5 CVT",19.81,16.5]]},
+  "Brezza":{b:"Maruti Suzuki Arena",vars:[["LXi 1.0 Turbo",7.40,20.13],["LXi 1.5",8.30,20.95],["VXi 1.0 Turbo",8.55,20.13],["VXi 1.5",9.26,20.95],["ZXi 1.0 Turbo",9.85,20.13],["ZXi 1.5",10.50,20.95],["VXi 1.5 AT",10.61,20.17],["ZXi Plus 1.0 Turbo",11.16,20.13],["ZXi 1.5 AT",11.85,20.17],["ZXi Plus 1.5 AT",13.55,20.17]]},
+  "XL6":{b:"Maruti Suzuki Nexa",vars:[["Zeta",11.62,20.97],["Alpha",12.59,20.97],["Zeta AT",12.97,20.27],["Alpha Plus",12.97,20.97],["Alpha AT",13.94,20.27],["Alpha Plus AT",14.52,20.27]]},
+  "Grand Vitara":{b:"Maruti Suzuki Nexa",vars:[["Sigma",10.77,21.11],["Delta",12.15,21.11],["Delta AT",13.50,20.16],["Zeta",13.85,21.11],["Zeta (O)",13.89,21.11],["Zeta AT",15.20,20.16],["Alpha",15.35,21.11],["Alpha AT",16.70,20.16],["Delta Plus Strong Hybrid",16.68,27.97],["Zeta Plus Strong Hybrid",17.97,27.97],["Alpha AWD AT",18.05,20.16],["Alpha Plus Strong Hybrid",19.55,27.97]]},
+  "Seltos":{b:"Kia",vars:[["HTE 1.5",11.00,16.5],["HTE (O) 1.5",12.41,16.5],["HTK 1.5",13.41,16.5],["HTE (O) 1.5 CVT",13.71,16.5],["HTK (O) 1.5",14.51,16.5],["HTK 1.5 CVT",14.71,16.5],["HTK (O) 1.5 CVT",15.81,16.5],["HTX 1.5",15.91,16.5],["HTX (A) 1.5",17.01,16.5],["HTX 1.5 CVT",17.21,16.5],["HTX (A) 1.5 CVT",18.31,16.5],["GTX 1.5 CVT",18.71,16.5],["GTX (A) 1.5 CVT",19.81,16.5]]},
   "Taigun":{b:"Volkswagen",vars:[["Comfortline 1.0 TSI",11.00,19.98],["Highline 1.0 TSI",12.70,19.98],["Highline 1.0 TSI AT",13.80,19.54],["Highline Plus 1.0 TSI",14.30,19.98],["GT Line 1.0 TSI",14.60,19.98],["Highline Plus 1.0 TSI AT",15.45,19.54],["GT Line 1.0 TSI AT",15.75,19.54],["Topline 1.0 TSI",16.00,19.98],["Topline 1.0 TSI AT",17.18,19.54]]},
   "Kushaq":{b:"Skoda",vars:[["Classic Plus 1.0 TSI",10.69,19.76],["Classic Plus 1.0 TSI AT",13.04,19.09],["Signature 1.0 TSI",14.69,19.76],["Sportline 1.0 TSI",14.89,19.76],["Signature 1.0 TSI AT",15.69,19.09],["Sportline 1.0 TSI AT",15.89,19.09],["Prestige 1.0 TSI",16.94,19.76],["Prestige 1.0 TSI AT",17.79,19.09],["Monte Carlo 1.0 TSI AT",18.09,19.09]]},
   "Elevate":{b:"Honda",vars:[["SV",11.80,15.31],["V",12.29,15.31],["V CVT",13.79,16.61],["VX",13.93,15.31],["ZX",15.39,15.31],["VX CVT",15.39,16.61],["ZX Plus",16.80,15.31],["ZX CVT",16.89,16.61],["ZX Plus CVT",18.30,16.61]]},
@@ -906,7 +906,7 @@ const PRIVALS={
   "i20":{b:"Hyundai",vars:[["Era",5.99,20.35],["Magna",7.04,20.35],["Sportz",7.85,20.35],["Sportz (O)",8.38,20.35],["Asta",8.71,20.35],["Sportz IVT",8.86,19.65],["Asta (O)",9.24,20.35],["Sportz (O) IVT",9.30,19.65],["Asta (O) IVT",10.43,19.65]]},
   "Taisor":{b:"Toyota",vars:[["E 1.2",7.43,21.71],["S 1.2",8.33,21.71],["S Plus 1.2",8.68,21.71],["S 1.2 AMT",8.94,22.79],["S Plus 1.2 AMT",9.29,22.79],["G 1.0 Turbo",10.45,21.18],["V 1.0 Turbo",11.36,21.18],["G 1.0 Turbo AT",11.86,19.86],["V 1.0 Turbo AT",12.78,19.86]]},
   "Syros":{b:"Kia",vars:[["HTE Turbo",8.40,18.2],["HTE (O) Turbo",9.20,18.2],["HTK (EX) Turbo",9.80,18.2],["HTK Plus Turbo",10.74,18.2],["HTK Plus Turbo DCT",11.94,17.68],["HTK Plus (O) Turbo",12.00,18.2],["HTK Plus (O) Turbo DCT",13.20,17.68],["HTX Turbo DCT",14.00,17.68],["HTX (O) Turbo DCT",15.00,17.68]]},
-  "Kylaq":{b:"Skoda",vars:[["Classic",7.59,19.68],["Classic Plus",8.25,19.68],["Classic Plus AT",9.25,19.05],["Signature",9.43,19.68],["Signature AT",10.43,19.05],["Signature Plus",10.77,19.68],["Prestige",11.75,19.68],["Signature Plus AT",11.77,19.05],["Prestige Plus",11.99,19.68],["Prestige AT",12.75,19.05],["Prestige Plus AT",12.99,19.05]]},
+  "Kylaq":{b:"Skoda",vars:[["Classic",7.59,19.68],["Classic Plus",8.29,19.68],["Classic Plus AT",9.29,19.05],["Signature",9.49,19.68],["Signature AT",10.49,19.05],["Signature Plus",10.79,19.68],["Signature Plus AT",11.79,19.05],["Prestige",11.85,19.68],["Prestige Plus",12.09,19.68],["Prestige AT",12.85,19.05],["Prestige Plus AT",13.09,19.05]]},
   "Magnite":{b:"Nissan",vars:[["Visia",5.61,19.4],["Visia Plus",6.07,19.4],["Visia AMT",6.16,19.7],["Acenta",6.66,19.4],["Acenta AMT",7.17,19.7],["N-Connecta",7.29,19.4],["N-Connecta AMT",7.79,19.7],["Tekna",8.15,19.4],["Tekna Plus",8.47,19.4],["N-Connecta Turbo",8.58,19.9],["Tekna AMT",8.66,19.7],["Tekna Plus AMT",8.98,19.7],["Acenta Turbo CVT",9.14,17.9],["Tekna Turbo",9.31,19.9],["N-Connecta Turbo CVT",9.63,17.9],["Tekna Plus Turbo",9.64,19.9],["Tekna Turbo CVT",10.42,17.9],["Tekna Plus Turbo CVT",10.75,17.9]]},
   "Kiger":{b:"Renault",vars:[["Authentic",5.81,19.17],["Evolution",6.54,19.17],["Evolution Plus",6.99,19.17],["Evolution AMT",7.00,19.03],["Evolution Plus AMT",7.45,19.03],["Techno",7.55,19.17],["Evolution Plus Turbo",7.89,20.38],["Techno AMT",8.00,19.03],["Emotion",8.42,19.17],["Techno Turbo",8.45,20.38],["Emotion Turbo",9.33,20.38],["Techno Turbo CVT",9.36,18.24],["Emotion Turbo CVT",10.34,18.24]]},
   "Triber":{b:"Renault",vars:[["Authentic",5.80,19.76],["Evolution",6.73,19.76],["Techno",7.44,19.76],["Evolution Turbo",7.84,21.0],["Emotion",8.05,19.76],["Techno Turbo",8.53,21.0],["Emotion Turbo",8.99,21.0]]},
@@ -917,7 +917,7 @@ const PRIVALS={
   "Duster":{b:"Renault",vars:[["Evolution 1.3 Turbo",12.99,17.75],["Techno 1.3 Turbo",14.49,17.75],["Evolution 1.3 Turbo DCT",14.49,18.45],["Techno Plus 1.3 Turbo",15.29,17.75],["Techno 1.3 Turbo DCT",15.89,18.45],["Techno Plus 1.3 Turbo DCT",16.69,18.45],["Iconic 1.3 Turbo",16.99,17.75],["Iconic 1.3 Turbo DCT",18.49,18.45],["Evolution Strong Hybrid",16.99,29.0],["Techno Strong Hybrid",18.99,29.0],["Emotion Strong Hybrid",19.48,29.0]]},
   "Tekton":{b:"Nissan",vars:[["Visia 1.0 Turbo",10.49,19.4],["Visia Plus 1.0 Turbo",11.14,19.4],["Acenta 1.0 Turbo",11.79,19.4],["N-Connecta 1.0 Turbo",13.69,19.4],["Acenta 1.3 Turbo DCT",14.99,18.5],["N-Connecta 1.3 Turbo",14.99,17.8],["Tekna 1.0 Turbo",15.39,19.4],["Tekna 1.3 Turbo",16.39,17.8],["N-Connecta 1.3 Turbo DCT",16.49,18.5],["Tekna Plus 1.0 Turbo",16.49,19.4],["Tekna 1.3 Turbo DCT",17.79,18.5],["Tekna Plus 1.3 Turbo DCT",18.59,18.5]]},
   "Bayon":{b:"Hyundai",vars:[["HX 2",10.00,18.7],["HX 3",10.90,18.7],["HX 3 Plus",11.80,18.7],["HX 5",12.45,18.7],["HX 6",13.57,18.7],["HX 5 CVT",13.85,18.6],["HX 6 CVT",14.97,18.6],["HX 8",15.10,18.7],["HX 8 CVT",16.54,18.6],["HX 10",16.65,18.7],["HX 10 CVT",18.00,18.6]]},
-  "XUV 3XO":{b:"Mahindra",vars:[["MX1 1.2T",7.79,19.62],["REVX M 1.2T",8.59,19.62],["REVX M (O) 1.2T",9.09,19.62],["REVX EDGE 1.2T",9.39,19.62],["REVX EDGE (O) 1.2T",9.89,19.62],["REVX M (O) 1.2T AT",9.99,18.14],["AX5 1.2T",10.00,19.62]]}
+  "XUV 3XO":{b:"Mahindra",vars:[["MX1 1.2T",7.79,19.62],["REVX M 1.2T",8.59,19.62],["REVX M (O) 1.2T",9.09,19.62],["REVX EDGE 1.2T",9.39,19.62],["REVX EDGE (O) 1.2T",9.89,19.62],["REVX M (O) 1.2T AT",9.99,18.14],["AX5 1.2T",10.30,19.62]]}
 };
 
 // Top 5 buyer-facing features (summarised from CarWale, RushLane, Gaadify; some only on higher variants)
@@ -1759,6 +1759,5 @@ const LOG_URL="https://script.google.com/macros/s/AKfycbzvTIZH5hYpOR_ZF6KvFKb8DS
   show(v==="feat"?"feat":"cost");
 })();
 </script>
-
 </body>
 </html>
