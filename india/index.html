@@ -1,4 +1,14 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="apple-mobile-web-app-title" content="CompareX India"><meta name="application-name" content="CompareX India"><meta name="theme-color" content="#5b3fd6"><title>CompareX India</title></head><body><title>CompareX India</title>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-title" content="CompareX India">
+<meta name="application-name" content="CompareX India">
+<meta name="theme-color" content="#5b3fd6">
+<title>CompareX India</title>
+</head>
+<body>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700;800&display=swap">
@@ -228,9 +238,9 @@ button{font:inherit;color:inherit}
   <footer class="foot card">
     <details><summary>Data sources and assumptions</summary>
       <p><b>Ex-showroom prices</b> are national list prices. We checked Swift, Creta and Nexon in Delhi, Mumbai, Kolkata, Bengaluru and Chennai (Autocar India, Oct 2026) and Maruti/rival prices in Hyderabad, Bhubaneswar, Vijayawada and Raipur (CarWale): ex-showroom was identical in every city. On-road price (road tax, insurance) differs by state and is not included.</p>
-      <p><b>Fuel prices</b> by city: petrol from Business Today (31 Oct–1 Nov 2026; a few cities from their latest October listing); CNG from Goodreturns state pages and Aaj Tak (Sep–Nov 2026). Srinagar has no city-gas CNG network listed, so CNG is not offered there. You can edit any price in ⚙️ Settings.</p>
+      <p><b>Fuel prices</b> by city: petrol from Business Today (31 Oct–1 Nov 2026; a few cities from their latest October listing); CNG from Goodreturns state pages and Aaj Tak (Sep–Nov 2026); Ahmedabad and Vadodara updated 2 Nov 2026 for the Adani Total Gas hike of ₹4.45/kg effective 23 Oct 2026 (DeshGujarat, Patrika, Goodreturns). Srinagar has no city-gas CNG network listed, so CNG is not offered there. You can edit any price in ⚙️ Settings.</p>
       <p><b>Mileage</b> is the manufacturer's claimed figure for every car. Real-world is assumed at 80% of claimed (change in Settings). <b>EVs:</b> efficiency = claimed range ÷ battery size; charging cost assumed ₹9/kWh at home (change in Settings). e Vitara prices are with battery (no BaaS). EV prices rechecked 1 Nov 2026: e Vitara (Cars24/V3Cars, Aug 2026 revision), Creta Electric, Curvv EV, XEV 9e (Autocar India, Oct 2026), BE 6, Windsor EV, Clavis EV (CarDekho, Nov 2026), XEV 9S (Cars24, Jul 2026). Ranges are claimed (ARAI/MIDC).</p>
-      <p><b>Rechecked 1 Nov 2026:</b> Maruti and main rival prices against Autocar India and CarDekho Delhi price lists (Oct–Nov 2026).</p>
+      <p><b>Rechecked 1–2 Nov 2026:</b> Maruti and main rival prices against Autocar India and CarDekho Delhi price lists (Oct–Nov 2026); Grand Vitara list confirmed against Cars24 (28 Oct 2026 revision).</p>
       <p><b>Invicto and Innova Hycross:</b> ex-showroom from Autocar India (Mumbai/Navi Mumbai, Oct 2026); claimed 23.24 km/L hybrid, 16.13 km/L Hycross petrol (CarWale). Invicto hybrids are matched with Hycross hybrids.</p>
       <p><b>Jimny:</b> Mahindra Thar and Force Gurkha don't publish claimed mileage, so a like-for-like running-cost comparison isn't shown.</p>
       <p><b>SIP</b> in the shared image assumes 10% a year, for illustration only. Returns are not guaranteed; not investment advice.</p>
@@ -644,14 +654,14 @@ const VFEAT={
 const PMATCH={"Victoris":["Grand Vitara","Creta","Seltos","Hyryder","Taigun","Kushaq","Elevate","Bayon","Duster","Tekton"],"Alto K10":["Tiago","Kwid"],"S-Presso":["Tiago","Kwid"],"Celerio":["Tiago","Grand i10 Nios","C3","Kwid"],"Swift":["Baleno","Fronx","Tiago","Grand i10 Nios","Punch","Exter","i20","Altroz","Glanza"],"Dzire":["Aura","Amaze","Tigor"],"Wagon R":["Tiago","Grand i10 Nios","C3"],"Brezza":["Fronx","Nexon","Venue","Sonet","XUV 3XO","Syros","Kylaq","Magnite","Kiger","Taisor"],"Ertiga":["XL6","Carens Clavis","Triber","Rumion"],"Eeco":["Triber","Tiago","Kwid"]};
 const MATCH={"Ertiga":["XL6","Rumion"],"Eeco":["Tiago"],"Victoris":["Grand Vitara","Hyryder"],"Alto K10":["Tiago"],"S-Presso":["Tiago"],"Celerio":["Tiago","C3"],"Swift":["Baleno","Fronx","Tiago","Grand i10 Nios","Exter","Punch","Altroz","Glanza","C3"],"Dzire":["Aura","Tigor"],"Wagon R":["Tiago","Grand i10 Nios","C3"],"Brezza":["Fronx","Nexon","XUV 3XO","Taisor"]};
 
-// ---- 50 cities: petrol ₹/L, CNG ₹/kg (null = no CNG network). Sources in the notes. Updated 1 Nov 2026 ----
+// ---- 50 cities: petrol ₹/L, CNG ₹/kg (null = no CNG network). Sources in the notes. Updated 2 Nov 2026 ----
 const CITIES=[
  {n:"Delhi",st:"Delhi",p:102.12,c:86.98},{n:"Mumbai",st:"Maharashtra",p:111.21,c:89.00},{n:"Bengaluru",st:"Karnataka",p:111.68,c:99.00},
  {n:"Hyderabad",st:"Telangana",p:116.15,c:112.00},{n:"Chennai",st:"Tamil Nadu",p:107.76,c:99.50},{n:"Kolkata",st:"West Bengal",p:113.51,c:93.50},
- {n:"Pune",st:"Maharashtra",p:111.90,c:100.50},{n:"Ahmedabad",st:"Gujarat",p:102.15,c:94.02},{n:"Surat",st:"Gujarat",p:101.82,c:88.76},
+ {n:"Pune",st:"Maharashtra",p:111.90,c:100.50},{n:"Ahmedabad",st:"Gujarat",p:102.15,c:98.47},{n:"Surat",st:"Gujarat",p:101.82,c:88.76},
  {n:"Jaipur",st:"Rajasthan",p:114.15,c:99.50},{n:"Lucknow",st:"Uttar Pradesh",p:101.86,c:95.75},{n:"Kanpur",st:"Uttar Pradesh",p:101.78,c:98.31},
  {n:"Nagpur",st:"Maharashtra",p:111.72,c:88.90},{n:"Indore",st:"Madhya Pradesh",p:114.58,c:97.76},{n:"Bhopal",st:"Madhya Pradesh",p:114.54,c:97.50},
- {n:"Thane",st:"Maharashtra",p:111.31,c:85.75},{n:"Visakhapatnam",st:"Andhra Pradesh",p:116.39,c:99.80},{n:"Vadodara",st:"Gujarat",p:101.46,c:92.10},
+ {n:"Thane",st:"Maharashtra",p:111.31,c:85.75},{n:"Visakhapatnam",st:"Andhra Pradesh",p:116.39,c:99.80},{n:"Vadodara",st:"Gujarat",p:101.46,c:96.55},
  {n:"Patna",st:"Bihar",p:113.59,c:93.00},{n:"Ludhiana",st:"Punjab",p:105.79,c:92.75},{n:"Agra",st:"Uttar Pradesh",p:101.66,c:95.75},
  {n:"Nashik",st:"Maharashtra",p:112.44,c:93.65},{n:"Faridabad",st:"Haryana",p:103.35,c:99.70},{n:"Meerut",st:"Uttar Pradesh",p:101.99,c:96.50},
  {n:"Rajkot",st:"Gujarat",p:101.72,c:88.76},{n:"Varanasi",st:"Uttar Pradesh",p:102.23,c:93.00},{n:"Srinagar",st:"Jammu & Kashmir",p:108.41,c:null},
@@ -663,7 +673,7 @@ const CITIES=[
  {n:"Ghaziabad",st:"Uttar Pradesh",p:101.88,c:95.59},{n:"Bhubaneswar",st:"Odisha",p:108.97,c:93.50},{n:"Dehradun",st:"Uttarakhand",p:99.54,c:99.50},
  {n:"Kochi",st:"Kerala",p:113.53,c:102.50},{n:"Thiruvananthapuram",st:"Kerala",p:115.49,c:99.00},{n:"Amritsar",st:"Punjab",p:105.56,c:91.33},
  {n:"Prayagraj",st:"Uttar Pradesh",p:101.96,c:103.00},{n:"Jamshedpur",st:"Jharkhand",p:105.28,c:93.00}];
-const PRICE_DATE="1 Nov 2026";
+const PRICE_DATE="2 Nov 2026";
 
 // ---- Nexa models (CNG versions paired with their petrol twin) ----
 const NEXA=[
@@ -987,4 +997,5 @@ setCity(S.city);
   setTimeout(check,1500);document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")setTimeout(check,500)})})();
 
 </script>
-</body></html>
+</body>
+</html>
