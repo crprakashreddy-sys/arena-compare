@@ -1,0 +1,961 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-title" content="CompareX India">
+<meta name="application-name" content="CompareX India">
+<meta name="theme-color" content="#5b3fd6">
+</head>
+<body>
+<title>CompareX India</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#f4f1fb;--card:#ffffff;--ink:#1f1a36;--muted:#6b6584;--line:#e8e3f4;--soft:#f6f3fd;
+  --brand:#5b3fd6;--brand2:#d9468f;--brand-soft:#ece7ff;--mint:#1f8a5b;--mint-soft:#dcf5e9;--amber:#b45f12;--amber-soft:#fff0e1;
+  --gold:#9b5a00;--gold-soft:#fff5d9;--shadow:0 1px 2px rgba(40,20,90,.06),0 12px 30px -14px rgba(60,30,150,.28);
+  --display:"Bricolage Grotesque",Georgia,serif;--body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--r:22px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#120f22;--card:#1c1833;--ink:#f2effb;--muted:#aaa3c6;--line:#2d2750;--soft:#231e3e;
+  --brand:#a996ff;--brand2:#ff8cbf;--brand-soft:#2a2350;--mint:#7fe0b2;--mint-soft:#163a2c;--amber:#ffb27a;--amber-soft:#3b2818;
+  --gold:#ffd37a;--gold-soft:#3a2f17;--shadow:0 1px 2px rgba(0,0,0,.3),0 14px 34px -16px rgba(0,0,0,.7);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#120f22;--card:#1c1833;--ink:#f2effb;--muted:#aaa3c6;--line:#2d2750;--soft:#231e3e;--brand:#a996ff;--brand2:#ff8cbf;--brand-soft:#2a2350;--mint:#7fe0b2;--mint-soft:#163a2c;--amber:#ffb27a;--amber-soft:#3b2818;--gold:#ffd37a;--gold-soft:#3a2f17;--shadow:0 1px 2px rgba(0,0,0,.3),0 14px 34px -16px rgba(0,0,0,.7);color-scheme:dark}
+*{box-sizing:border-box}
+html,body{max-width:100%;overflow-x:hidden}
+body{margin:0;background:radial-gradient(700px 420px at 0% -10%,rgba(91,63,214,.16),transparent 60%),radial-gradient(700px 420px at 100% 0%,rgba(217,70,143,.12),transparent 60%),var(--bg);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+.app{max-width:760px;margin:0 auto;padding:0 max(14px,env(safe-area-inset-left,0px)) 110px max(14px,env(safe-area-inset-right,0px));display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+.app>*{min-width:0}
+/* top bar */
+.top{position:sticky;top:0;z-index:30;margin:0 calc(-1*max(14px,env(safe-area-inset-left,0px)));padding:12px max(14px,env(safe-area-inset-left,0px)) 10px;background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);display:flex;align-items:center;gap:10px;border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+.logo{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-.02em;line-height:1}
+.logo b{background:linear-gradient(120deg,var(--brand),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.logo small{display:block;font-family:var(--body);font-size:10.5px;font-weight:800;letter-spacing:.12em;color:var(--muted);margin-top:3px}
+.citybtn{margin-left:auto;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font-weight:700;font-size:14.5px;cursor:pointer;box-shadow:var(--shadow);max-width:58%}
+.citybtn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iconbtn{border:1px solid var(--line);background:var(--card);border-radius:50%;width:40px;height:40px;display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow);flex:none}
+/* hero */
+.hero{padding:18px 4px 2px}
+.hero h1{font-family:var(--display);font-size:clamp(26px,6vw,36px);line-height:1.08;margin:0;letter-spacing:-.02em}
+.hero h1 em{font-style:normal;background:linear-gradient(120deg,var(--brand),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{margin:8px 0 0;color:var(--muted)}
+.fuelstamp{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.fuelstamp span{font-size:12.5px;font-weight:700;padding:5px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
+/* cards */
+.card{background:var(--card);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);border:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+.step{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:18px;margin:0 0 12px}
+.step i{font-style:normal;display:inline-grid;place-items:center;width:28px;height:28px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;font-family:var(--body);font-size:13px;font-weight:800}
+.seg{display:inline-flex;background:var(--soft);border-radius:14px;padding:4px;gap:4px;border:1px solid var(--line)}
+.seg button{border:0;background:transparent;border-radius:10px;padding:8px 16px;font-weight:800;font-size:14px;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 2px 8px -2px rgba(60,30,150,.25)}
+.seg button:disabled{opacity:.35;cursor:not-allowed}
+.cars{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px}
+.car{border:2px solid var(--line);background:var(--soft);border-radius:18px;padding:12px;text-align:left;cursor:pointer;display:grid;gap:4px;min-height:84px;transition:transform .12s,border-color .12s}
+.car:hover{transform:translateY(-1px)}
+.car b{font-family:var(--display);font-size:18px;font-weight:800;line-height:1.1}
+.car small{color:var(--muted);font-size:12.5px;font-weight:600}
+.car .tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px}
+.car .tags em{font-style:normal;font-size:10.5px;font-weight:800;letter-spacing:.04em;padding:2px 7px;border-radius:999px;background:var(--card);color:var(--muted)}
+.car .tags em.cng{color:var(--mint)}.car .tags em.ev{color:var(--brand)}
+.car[aria-pressed="true"]{border-color:transparent;background:linear-gradient(135deg,var(--brand-soft),color-mix(in srgb,var(--brand2) 14%,var(--card)));box-shadow:0 0 0 2px var(--brand) inset,var(--shadow)}
+.row2{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center}
+.vers{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;scroll-snap-type:x proximity;scrollbar-width:thin}
+.ver{flex:none;scroll-snap-align:start;border:2px solid var(--line);background:var(--card);border-radius:14px;padding:8px 12px;cursor:pointer;text-align:left;font-weight:700;font-size:14px}
+.ver small{display:block;font-weight:600;color:var(--muted);font-size:12px}
+.ver[aria-pressed="true"]{border-color:var(--brand);background:var(--brand-soft)}
+.usage{display:grid;gap:14px}
+.ctl{display:grid;gap:6px}
+.ctl label{display:flex;justify-content:space-between;font-weight:700;font-size:14px}
+.ctl .in{display:flex;align-items:center;gap:10px}
+.ctl input[type=range]{flex:1;min-width:0;accent-color:var(--brand);height:24px}
+.ctl input[type=number]{width:78px;text-align:center;font:inherit;font-weight:800;font-size:16px;border:2px solid var(--line);background:var(--soft);color:var(--ink);border-radius:12px;padding:7px}
+/* result */
+.summary{border-radius:var(--r);padding:18px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;box-shadow:var(--shadow)}
+.summary .k{font-size:12px;font-weight:800;letter-spacing:.1em;opacity:.85}
+.summary h2{font-family:var(--display);font-size:clamp(22px,5vw,28px);margin:6px 0 4px;line-height:1.15}
+.summary p{margin:0;opacity:.92;font-size:14.5px}
+.tabs{position:sticky;top:64px;z-index:20;display:flex;gap:6px;background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);padding:6px 0;overflow-x:auto}
+.tabs button{flex:1 0 auto;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 14px;font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.rv{display:grid;gap:10px}
+.rcard{background:var(--card);border-radius:20px;padding:14px 14px 12px;box-shadow:var(--shadow);border:1px solid color-mix(in srgb,var(--line) 60%,transparent);cursor:pointer;display:grid;gap:10px;position:relative;overflow:hidden}
+.rcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--mint)}
+.rcard.lose::before{background:var(--amber)}
+.rhead{display:flex;align-items:flex-start;gap:10px}
+.rhead .nm{min-width:0}
+.rhead .nm b{font-family:var(--display);font-size:20px;font-weight:800;display:block;line-height:1.1}
+.rhead .nm small{color:var(--muted);font-weight:600;font-size:12.5px}
+.save{margin-left:auto;text-align:right;flex:none}
+.save b{display:inline-block;padding:6px 12px;border-radius:999px;background:var(--mint-soft);color:var(--mint);font-weight:800;font-size:15px;white-space:nowrap}
+.rcard.lose .save b{background:var(--amber-soft);color:var(--amber)}
+.save small{display:block;font-size:11.5px;color:var(--muted);font-weight:700;margin-top:3px}
+.mets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.met{background:var(--soft);border-radius:12px;padding:8px 10px;min-width:0}
+.met span{display:block;font-size:11px;font-weight:800;letter-spacing:.05em;color:var(--muted);text-transform:uppercase}
+.met b{font-size:15px;font-weight:800;white-space:nowrap}
+.met b.ok{color:var(--mint)}.met b.no{color:var(--amber)}
+.met small{display:block;font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rfoot{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--muted);font-weight:700}
+.rfoot .sip{color:var(--gold);background:var(--gold-soft);padding:3px 9px;border-radius:999px}
+.note{font-size:12.5px;color:var(--muted);margin:2px 4px}
+.empty{background:var(--card);border:1px dashed var(--line);border-radius:18px;padding:16px;color:var(--muted)}
+/* petrol vs cng */
+.verdict{border-radius:var(--r);padding:16px;background:linear-gradient(135deg,var(--mint-soft),var(--brand-soft));display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center}
+.verdict.neg{background:linear-gradient(135deg,var(--amber-soft),var(--brand-soft))}
+.verdict .tag{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.08em;padding:4px 10px;border-radius:999px;background:var(--mint);color:var(--card)}
+.verdict.neg .tag{background:var(--amber)}
+.verdict p{margin:8px 0 0;font-size:15.5px}
+.ring{--p:50;width:96px;height:96px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--mint) calc(var(--p)*1%),color-mix(in srgb,var(--mint) 22%,transparent) 0)}
+.ring.late{background:conic-gradient(var(--amber) 100%,transparent 0)}
+.ring>div{width:74px;height:74px;border-radius:50%;background:var(--card);display:grid;place-content:center;text-align:center;line-height:1.1}
+.ring b{font-family:var(--display);font-size:18px}.ring span{font-size:10px;color:var(--muted);font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.kpi{background:var(--card);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow)}
+.kpi span{font-size:12px;color:var(--muted);font-weight:700}.kpi b{display:block;font-family:var(--display);font-size:22px}
+.duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.fuel{background:var(--card);border-radius:18px;padding:12px 14px;box-shadow:var(--shadow);min-width:0}
+.fuel h4{margin:0 0 6px;font-size:12.5px;letter-spacing:.08em;color:var(--muted)}
+.fuel .fv{font-family:var(--display);font-weight:800;font-size:16px;margin-bottom:6px}
+.fuel .r{display:flex;justify-content:space-between;gap:6px;font-size:13.5px;padding:5px 0;border-top:1px dashed var(--line)}
+.fuel .r b{white-space:nowrap}
+/* features */
+.feats{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.feat{background:var(--card);border-radius:18px;padding:14px;box-shadow:var(--shadow);min-width:0}
+.feat.me{box-shadow:0 0 0 2px var(--brand) inset,var(--shadow)}
+.feat b{font-family:var(--display);font-size:17px}
+.feat small{display:block;color:var(--muted);font-weight:600;font-size:12.5px}
+.feat ol{margin:8px 0 0;padding-left:20px;display:grid;gap:4px;font-size:14px}
+/* sheets */
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(18,12,40,.5);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--card);width:100%;max-width:760px;max-height:88vh;overflow:auto;border-radius:24px 24px 0 0;padding:10px 16px max(18px,env(safe-area-inset-bottom,0px));box-shadow:0 -20px 60px rgba(20,10,50,.35)}
+.grab{width:42px;height:5px;border-radius:5px;background:var(--line);margin:4px auto 10px}
+.sheet h3{font-family:var(--display);font-size:21px;margin:0 0 10px;display:flex;align-items:center;gap:10px}
+.sheet h3 .x{margin-left:auto}
+.search{width:100%;font:inherit;font-size:16px;padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:var(--soft);color:var(--ink)}
+.clist{margin-top:10px;display:grid;gap:2px}
+.clist h5{margin:12px 4px 4px;font-size:11.5px;letter-spacing:.1em;color:var(--muted)}
+.clist button{border:0;background:transparent;text-align:left;padding:11px 10px;border-radius:12px;display:flex;justify-content:space-between;gap:10px;cursor:pointer;font-weight:700}
+.clist button:hover,.clist button[aria-current="true"]{background:var(--brand-soft)}
+.clist button small{color:var(--muted);font-weight:600}
+.dt{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+.dt th,.dt td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:right}
+.dt th:first-child,.dt td:first-child{text-align:left;color:var(--muted);font-weight:600}
+.dt th{font-size:13px}
+.dt td.win{color:var(--mint);font-weight:800}
+.sel{width:100%;font:inherit;padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:var(--soft);color:var(--ink)}
+.set{display:grid;gap:12px}
+.set .f{display:grid;gap:4px}.set .f label{font-weight:700;font-size:14px}
+.set input{font:inherit;padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:var(--soft);color:var(--ink)}
+/* bottom bar */
+.bbar{position:fixed;left:0;right:0;bottom:0;z-index:40;padding:10px max(14px,env(safe-area-inset-left,0px)) max(12px,env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--bg) 86%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+.bbar .in{max-width:760px;margin:0 auto;display:flex;gap:10px}
+.pbtn{flex:1;border:0;border-radius:16px;padding:14px;font-weight:800;font-size:15.5px;cursor:pointer;background:linear-gradient(135deg,#25D366,#1ebe5b);color:#062b14;box-shadow:var(--shadow)}
+.sbtn{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:14px 16px;font-weight:800;cursor:pointer}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:70;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:700;font-size:14px}
+.foot{font-size:12.5px;color:var(--muted)}
+.foot details summary{cursor:pointer;font-weight:800;color:var(--ink)}
+.foot p{margin:6px 0}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+@media (max-width:420px){.mets{gap:6px}.met{padding:7px 8px}.met b{font-size:14px}.cars{grid-template-columns:repeat(2,minmax(0,1fr))}.duo{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+[hidden]{display:none!important}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="logo">Compare<b>X</b><small>INDIA · MARUTI SUZUKI</small></div>
+    <button class="citybtn" id="cityBtn" type="button" aria-label="Change city">📍 <span id="cityName">Delhi</span> ▾</button>
+    <button class="iconbtn" id="setBtn" type="button" aria-label="Settings">⚙️</button>
+  </header>
+
+  <section class="hero">
+    <h1>Maruti vs <em>everyone</em>, in one tap</h1>
+    <p>Pick a car and how you drive. See price, running cost and features against every rival in your city.</p>
+    <div class="fuelstamp" id="fuelStamp"></div>
+  </section>
+
+  <section class="card">
+    <div class="step"><i>1</i>Pick your Maruti</div>
+    <div class="seg" id="chSeg" role="group" aria-label="Channel"><button type="button" data-ch="Arena" aria-pressed="true">Arena</button><button type="button" data-ch="Nexa" aria-pressed="false">Nexa</button></div>
+    <div class="cars" id="cars"></div>
+  </section>
+
+  <section class="card">
+    <div class="step"><i>2</i>Fuel and version</div>
+    <div class="seg" id="fuelSeg" role="group" aria-label="Fuel"></div>
+    <div class="vers" id="vers" style="margin-top:12px"></div>
+  </section>
+
+  <section class="card usage">
+    <div class="step" style="margin:0"><i>3</i>How you drive</div>
+    <div class="ctl"><label for="kmR">Daily running <span id="kmO"></span></label><div class="in"><input type="range" id="kmR" min="5" max="300" step="1" value="40" aria-label="Daily km"><input type="number" id="kmN" min="1" max="500" value="40" inputmode="numeric" aria-label="Daily km, type"></div></div>
+    <div class="ctl"><label for="yrR">Years you'll keep it <span id="yrO"></span></label><div class="in"><input type="range" id="yrR" min="1" max="15" step="0.5" value="5" aria-label="Years"><input type="number" id="yrN" min="0.5" max="20" step="0.5" value="5" inputmode="decimal" aria-label="Years, type"></div></div>
+  </section>
+
+  <section class="summary" id="summary"></section>
+
+  <nav class="tabs" role="tablist" aria-label="Results">
+    <button type="button" role="tab" data-t="rivals" aria-selected="true">Rivals</button>
+    <button type="button" role="tab" data-t="fuel" id="tabFuel" aria-selected="false">Petrol vs CNG</button>
+    <button type="button" role="tab" data-t="feat" aria-selected="false">Top 5 features</button>
+  </nav>
+
+  <section id="pRivals" role="tabpanel"><div class="rv" id="rivals"></div><p class="note" id="rivNote"></p></section>
+  <section id="pFuel" role="tabpanel" hidden></section>
+  <section id="pFeat" role="tabpanel" hidden><div class="feats" id="feats"></div><p class="note">Version-wise where available; otherwise model highlights. Some features are on higher versions only.</p></section>
+
+  <footer class="foot card">
+    <details><summary>Data sources and assumptions</summary>
+      <p><b>Ex-showroom prices</b> are national list prices. We checked Swift, Creta and Nexon in Delhi, Mumbai, Kolkata, Bengaluru and Chennai (Autocar India, Oct 2026) and Maruti/rival prices in Hyderabad, Bhubaneswar, Vijayawada and Raipur (CarWale): ex-showroom was identical in every city. On-road price (road tax, insurance) differs by state and is not included.</p>
+      <p><b>Fuel prices</b> by city: petrol from Business Today (31 Oct–1 Nov 2026; a few cities from their latest October listing); CNG from Goodreturns state pages and Aaj Tak (Sep–Nov 2026). Srinagar has no city-gas CNG network listed, so CNG is not offered there. You can edit any price in ⚙️ Settings.</p>
+      <p><b>Mileage</b> is the manufacturer's claimed figure for every car. Real-world is assumed at 80% of claimed (change in Settings). <b>EVs:</b> efficiency = claimed range ÷ battery size; charging cost assumed ₹9/kWh at home (change in Settings). e Vitara prices are with battery (no BaaS). EV rival prices: Rushlane (Feb 2026), ranges: Rushlane / MeraEV.</p>
+      <p><b>Jimny:</b> Mahindra Thar and Force Gurkha don't publish claimed mileage, so a like-for-like running-cost comparison isn't shown.</p>
+      <p><b>SIP</b> in the shared image assumes 10% a year, for illustration only. Returns are not guaranteed; not investment advice.</p>
+    </details>
+  </footer>
+</div>
+
+<div class="bbar"><div class="in"><button type="button" class="pbtn" id="shareImg">Share as image on WhatsApp</button><button type="button" class="sbtn" id="shareTxt" aria-label="Share as text">Text</button></div></div>
+
+<div class="scrim" id="citySheet" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="cityH"><div class="grab"></div><h3 id="cityH">Choose your city <button class="iconbtn x" type="button" data-close>✕</button></h3><input class="search" id="cityQ" type="search" placeholder="Search 50 cities" aria-label="Search city"><div class="clist" id="cityList"></div></div></div>
+<div class="scrim" id="detSheet" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="detH"><div class="grab"></div><h3 id="detH"></h3><div id="detBody"></div></div></div>
+<div class="scrim" id="setSheet" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="setH"><div class="grab"></div><h3 id="setH">Settings <button class="iconbtn x" type="button" data-close>✕</button></h3>
+  <div class="set">
+    <div class="f"><label for="sP">Petrol ₹/L</label><input id="sP" type="number" step="0.01" inputmode="decimal"></div>
+    <div class="f"><label for="sC">CNG ₹/kg</label><input id="sC" type="number" step="0.01" inputmode="decimal"></div>
+    <div class="f"><label for="sE">EV charging ₹/kWh</label><input id="sE" type="number" step="0.5" inputmode="decimal"></div>
+    <div class="f"><label for="sRw">Real-world vs claimed mileage (%)</label><input id="sRw" type="number" min="50" max="100" step="5"></div>
+    <div class="f"><label for="sMode">Rivals shown</label><select id="sMode" class="sel"><option value="seg">Segment rivals</option><option value="price">Segment rivals + any car at a similar price</option></select></div>
+    <div class="f"><label for="sBand">Similar price range ± ₹</label><input id="sBand" type="number" step="5000" min="10000"></div>
+    <p class="note">Prices reset to your city's when you change city.</p>
+  </div></div></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const MODELS=[
+  {n:"Swift",ch:"Arena",p:24.80,c:32.85,vars:[
+    {v:"VXi CNG",x:7.57,pv:"VXi",px:6.68},
+    {v:"VXi (O) CNG",x:7.83,pv:"VXi (O)",px:6.94},
+    {v:"ZXi CNG",x:8.51,pv:"ZXi",px:7.62},
+    {v:"VXi CNG AMT",x:7.92,pv:"VXi AMT",px:7.13,c:35.34,p:25.75},
+    {v:"VXi (O) CNG AMT",x:8.18,pv:"VXi (O) AMT",px:7.39,c:35.34,p:25.75},
+    {v:"ZXi CNG AMT",x:8.86,pv:"ZXi AMT",px:8.07,c:35.34,p:25.75}]},
+  {n:"Dzire",ch:"Arena",p:24.79,c:33.73,vars:[
+    {v:"VXi CNG",x:8.18,pv:"VXi",px:7.27},
+    {v:"ZXi CNG",x:9.19,pv:"ZXi",px:8.28},
+    {v:"VXi CNG AMT",x:8.53,pv:"VXi AMT",px:7.72,c:36.47,p:25.71},
+    {v:"ZXi CNG AMT",x:9.54,pv:"ZXi AMT",px:8.73,c:36.47,p:25.71},
+    {v:"Tour S CNG",x:7.25,pv:"Tour S",px:6.29,c:34.3,p:26.06}]},
+  {n:"Wagon R",ch:"Arena",p:24.35,c:34.05,vars:[
+    {v:"LXi CNG",x:5.939,pv:"LXi",px:4.989},
+    {v:"VXi CNG",x:6.469,pv:"VXi",px:5.519}]},
+  {n:"Brezza",ch:"Arena",p:20.95,c:25.51,vars:[
+    {v:"LXi CNG",x:9.30,pv:"LXi 1.5",px:8.30},
+    {v:"VXi CNG",x:10.00,pv:"VXi 1.5",px:9.26},
+    {v:"ZXi CNG",x:11.50,pv:"ZXi 1.5",px:10.50}]},
+  {n:"Victoris",ch:"Arena",p:21.18,c:27.02,vars:[
+    {v:"LXi CNG",x:11.55,pv:"LXi",px:10.50},
+    {v:"VXi CNG",x:12.90,pv:"VXi",px:11.85},
+    {v:"ZXi CNG",x:14.67,pv:"ZXi",px:13.62}]},
+  {n:"Alto K10",ch:"Arena",p:24.39,c:33.40,vars:[
+    {v:"LXi (O) CNG",x:4.84,pv:"LXi (O)",px:4.00},
+    {v:"VXi (O) CNG",x:5.34,pv:"VXi (O)",px:4.52}]},
+  {n:"S-Presso",ch:"Arena",p:24.44,c:32.73,vars:[
+    {v:"LXi (O) CNG",x:4.64,pv:"LXi (O)",px:3.82},
+    {v:"VXi (O) CNG",x:5.14,pv:"VXi (O)",px:4.32}]},
+  {n:"Celerio",ch:"Arena",p:25.17,c:34.43,vars:[
+    {v:"VXi CNG",x:5.98,pv:"VXi",px:5.18}]},
+  {n:"Eeco",ch:"Arena",p:19.71,c:26.78,vars:[
+    {v:"AC (O) CNG Star Edition",x:6.36,pv:"AC (O) Star Edition",px:5.54},
+    {v:"AC (O) CNG",x:6.46,pv:"AC (O)",px:5.61}]},
+  {n:"Ertiga",ch:"Arena",p:20.51,c:26.11,vars:[
+    {v:"VXi CNG",x:10.94,pv:"VXi",px:9.95},
+    {v:"ZXi CNG",x:12.00,pv:"ZXi",px:11.02}]}
+];
+const RIVALS={
+  "Tiago":{b:"Tata",c:26.49,vars:[["Smart CNG",5.87],["Pure CNG",6.58],["Pure Plus CNG",7.10],["Pure CNG AMT",7.13,28.06],["Pure Plus A CNG",7.57],["Pure Plus CNG AMT",7.65,28.06],["Creative CNG",8.07],["Pure Plus A CNG AMT",8.12,28.06],["Creative CNG AMT",8.62,28.06]]},
+  "Punch":{b:"Tata",c:26.99,vars:[["Smart CNG",6.85],["Pure CNG",7.68],["Pure Plus CNG",8.20],["Pure Plus (S) CNG",8.55],["Pure Plus CNG AMT",8.77],["Adventure CNG",8.80],["Adventure (S) CNG",9.15],["Adventure CNG AMT",9.37],["Accomplished CNG",9.50],["Adventure (S) CNG AMT",9.72],["Accomplished Plus (S) CNG AMT",10.77]]},
+  "Exter":{b:"Hyundai",c:27.10,vars:[["HX 2 CNG",7.00],["HX 3 CNG",7.50],["HX 4 CNG",8.33],["HX 6 CNG",9.00],["HX 8 CNG",9.47]]},
+  "Aura":{b:"Hyundai",c:28.0,vars:[["S CNG",7.89],["Corporate CNG",7.98],["SX CNG",8.67]]},
+  "Hyryder":{b:"Toyota",c:26.6,vars:[["S CNG",13.71],["G CNG",15.72]]},
+  "Baleno":{b:"Maruti Suzuki Nexa",c:33.61,vars:[["Delta CNG",7.92],["Delta CNG AMT",8.32,34.47],["Zeta CNG",8.92],["Zeta CNG AMT",9.32,34.47]]},
+  "Fronx":{b:"Maruti Suzuki Nexa",c:28.51,vars:[["Sigma CNG",7.94],["Delta CNG",8.74]]},
+  "Brezza":{b:"Maruti Suzuki Arena",c:25.51,vars:[["LXi CNG",9.30],["VXi CNG",10.00],["ZXi CNG",11.50]]},
+  "XL6":{b:"Maruti Suzuki Nexa",c:26.32,vars:[["Zeta CNG",12.61]]},
+  "Grand i10 Nios":{b:"Hyundai",c:27.3,vars:[["Magna CNG",7.33],["Sportz CNG",7.59],["Sportz Duo CNG",7.83]]},
+  "Grand Vitara":{b:"Maruti Suzuki Nexa",c:26.6,vars:[["Delta CNG",13.05],["Zeta CNG",14.80]]},
+  "Tigor":{b:"Tata",c:26.49,vars:[["XT CNG",7.44],["XZ CNG",7.99],["XZA CNG AMT",8.54,28.06],["XZ Plus CNG",8.54],["XZ Plus Lux CNG",8.99],["XZA Plus CNG AMT",9.09,28.06]]},
+  "Altroz":{b:"Tata",c:26.90,vars:[["Smart CNG",7.29],["Pure CNG",8.19],["Pure S CNG",8.49],["Creative CNG",9.14],["Creative S CNG",9.49],["Accomplished S CNG",10.34]]},
+  "Glanza":{b:"Toyota",c:33.61,vars:[["S CNG",8.76],["S CNG AMT",9.31,34.47],["G CNG",9.68],["G CNG AMT",10.23,34.47]]},
+  "Taisor":{b:"Toyota",c:28.51,vars:[["E CNG",8.45]]},
+  "Rumion":{b:"Toyota",c:26.11,vars:[["S CNG",11.69]]},
+  "XUV 3XO":{b:"Mahindra",c:24.7,vars:[["MX EDGE CNG",9.99],["REVX EDGE (O) CNG",10.79],["AX5 CNG",11.19],["REVX A CNG",12.27]]},
+  "C3":{b:"Citroen",c:28.1,vars:[["Live CNG",5.73],["Feel (O) CNG",7.58],["Shine CNG",8.16]]},
+  "Nexon":{b:"Tata",c:24.0,vars:[["Smart CNG",8.35],["Smart Plus CNG",9.27],["Smart Plus (S) CNG",9.57],["Pure Plus CNG",10.00],["Pure Plus (S) CNG",10.00],["Pure Plus (PS) CNG",10.62],["Creative CNG",11.22],["Creative Plus (S) CNG",11.52]]},
+};
+const PETROL={
+  "Swift":[["LXi",5.84,24.80],["VXi",6.68,24.80],["VXi (O)",6.94,24.80],["VXi AMT",7.13,25.75],["VXi (O) AMT",7.39,25.75],["ZXi",7.62,24.80],["ZXi AMT",8.07,25.75],["ZXi Plus",8.29,24.80],["ZXi Plus AMT",8.74,25.75]],
+  "Dzire":[["Tour S",6.29,26.06],["LXi",6.31,24.79],["VXi",7.27,24.79],["VXi AMT",7.72,25.71],["ZXi",8.28,24.79],["ZXi AMT",8.73,25.71],["ZXi Plus",8.96,24.79],["ZXi Plus AMT",9.41,25.71]],
+  "Wagon R":[["LXi 1.0",4.99,24.35],["VXi 1.0",5.55,24.35],["VXi 1.0 AMT",5.99,25.19],["ZXi 1.2",5.98,23.56],["ZXi Plus 1.2",6.41,23.56],["ZXi 1.2 AMT",6.43,24.43],["ZXi Plus 1.2 AMT",6.86,24.43]],
+  "Victoris":[["LXi",10.50,21.18],["VXi",11.85,21.18],["VXi AT",13.41,20.45],["ZXi",13.62,21.18],["ZXi (O)",13.69,21.18],["ZXi AT",15.18,20.45],["ZXi (O) AT",15.25,20.45],["ZXi Plus",15.39,21.18],["ZXi Plus (O)",15.48,21.18],["VXi Strong Hybrid",16.43,28.65],["ZXi Plus AT",17.34,20.45],["ZXi Plus (O) AT",17.43,20.45],["ZXi Strong Hybrid",17.85,28.65],["ZXi (O) Strong Hybrid",18.44,28.65],["ZXi Plus AWD AT",18.69,20.45],["ZXi Plus (O) AWD AT",19.27,20.45],["ZXi Plus Strong Hybrid",19.52,28.65],["ZXi Plus (O) Strong Hybrid",19.99,28.65],["Aurum Edition Strong Hybrid",20.22,28.65]],
+  "Eeco":[["STD (O) 5-seater",5.28,19.71],["AC (O) Star Edition",5.54,19.71],["STD (O) 6-seater",5.55,19.71],["AC (O)",5.61,19.71]],
+  "Ertiga":[["LXi",8.90,20.51],["VXi",9.95,20.51],["ZXi",11.02,20.51],["VXi AT",11.30,20.3],["ZXi Plus",11.79,20.51],["ZXi AT",12.37,20.3],["ZXi Plus AT",13.14,20.3]],
+  "Alto K10":[["STD (O)",3.70,24.39],["LXi (O)",4.00,24.39],["VXi (O)",4.52,24.39],["VXi (O) AMT",4.97,24.9],["VXi Plus (O)",5.00,24.39],["VXi Plus (O) AMT",5.45,24.9]],
+  "S-Presso":[["STD (O)",3.50,24.44],["LXi (O)",3.82,24.44],["VXi (O)",4.32,24.44],["VXi (O) AMT",4.77,25.3],["VXi Plus (O)",4.82,24.44],["VXi Plus (O) AMT",5.27,25.3]],
+  "Celerio":[["LXi",4.70,25.17],["VXi",5.18,25.17],["VXi AMT",5.63,26.23],["ZXi",5.73,25.17],["ZXi AMT",6.18,26.23],["ZXi Plus",6.30,25.17],["ZXi Plus AMT",6.75,26.23]],
+  "Brezza":[["LXi 1.0 Turbo",7.50,20.13],["LXi 1.5",8.30,20.95],["VXi 1.0 Turbo",8.55,20.13],["VXi 1.5",9.26,20.95],["ZXi 1.0 Turbo",9.85,20.13],["ZXi 1.5",10.50,20.95],["VXi 1.5 AT",10.70,20.17],["ZXi Plus 1.0 Turbo",11.16,20.13],["ZXi 1.5 AT",11.85,20.17],["ZXi Plus 1.5 AT",13.55,20.17]],
+};
+const PRIVALS={
+  "Tiago":{b:"Tata",vars:[["Smart",4.77,20.09],["Pure",5.57,20.09],["Pure AMT",6.10,19.43],["Pure Plus",6.10,20.09],["Pure Plus A",6.56,20.09],["Pure Plus AMT",6.65,19.43],["Creative",7.06,20.09],["Pure Plus A AMT",7.11,19.43],["Creative Plus",7.36,20.09],["Creative AMT",7.61,19.43],["Creative Plus AMT",7.91,19.43]]},
+  "Grand i10 Nios":{b:"Hyundai",vars:[["Era",5.60,20.7],["Magna",6.37,20.7],["Corporate",6.60,20.7],["Magna AMT",6.85,20.1],["Sportz",6.93,20.7],["Sportz (O)",7.18,20.7],["Corporate AMT",7.21,20.1],["Sportz AMT",7.45,20.1],["Asta",7.57,20.7],["Sportz (O) AMT",7.72,20.1],["Asta AMT",8.09,20.1]]},
+  "Punch":{b:"Tata",vars:[["Smart",5.75,20.09],["Pure",6.65,20.09],["Pure Plus",7.17,20.09],["Pure Plus (S)",7.52,20.09],["Pure Plus AMT",7.75,18.8],["Adventure",7.77,20.09],["Pure Plus (S) AMT",8.10,18.8],["Adventure (S)",8.12,20.09],["Adventure AMT",8.35,18.8],["Accomplished",8.47,20.09],["Accomplished AMT",9.05,18.8],["Accomplished Plus (S)",9.17,20.09],["Accomplished Plus (S) AMT",9.75,18.8]]},
+  "Exter":{b:"Hyundai",vars:[["HX 2",5.81,19.4],["HX 3",6.34,19.4],["HX 3 AMT",6.99,19.2],["HX 4",7.32,19.4],["HX 6",8.03,19.4],["HX 4 Plus AMT",8.14,19.2],["HX 8",8.44,19.4],["HX 6 AMT",8.63,19.2],["HX 8 AMT",9.16,19.2],["HX 10 AMT",9.50,19.2]]},
+  "Aura":{b:"Hyundai",vars:[["E",6.00,20.5],["S",6.98,20.5],["SX",7.77,20.5],["SX (O)",8.23,20.5],["SX Plus AMT",8.42,20.1]]},
+  "Amaze":{b:"Honda",vars:[["V",7.65,18.65],["VX",8.65,18.65],["V CVT",8.70,19.46],["ZX",9.39,18.65],["VX CVT",9.40,19.46],["ZX CVT",10.00,19.46]]},
+  "Nexon":{b:"Tata",vars:[["Smart 1.2T",7.40,17.44],["Smart Plus 1.2T",8.22,17.44],["Smart Plus (S) 1.2T",8.52,17.44],["Smart Plus 1.2T AMT",8.92,17.18],["Pure Plus 1.2T",9.07,17.44],["Pure Plus (S) 1.2T",9.37,17.44],["Pure Plus 1.2T AMT",9.72,17.18],["Creative 1.2T",10.17,17.44],["Creative 1.2T AMT",10.87,17.18],["Creative 1.2T DCT",11.42,17.01]]},
+  "Venue":{b:"Hyundai",vars:[["HX 2 1.2",8.00,18.5],["HX 4 1.2",9.00,18.5],["HX 2 Turbo",8.91,18.74],["HX 5 1.2",9.56,18.5],["HX 5 Turbo",9.90,18.74],["HX 5 Plus 1.2",10.00,18.5],["HX 6T 1.2",10.89,18.5],["HX 5 Turbo DCT",10.92,20.0]]},
+  "Sonet":{b:"Kia",vars:[["HTE 1.2",7.41,18.83],["HTE (O) 1.2",7.84,18.83],["HTK (O) 1.2",8.85,18.83],["HTK Plus 1.2",9.24,18.83],["HTK (O) Turbo iMT",9.25,18.7],["HTK Plus (O) 1.2",9.72,18.83],["HTK (O) Turbo DCT",10.00,19.2]]},
+  "Creta":{b:"Hyundai",vars:[["E 1.5",10.91,17.4],["EX 1.5",12.07,17.4],["EX (O) 1.5",13.14,17.4],["S (O) 1.5",14.21,17.4],["EX (O) 1.5 CVT",14.50,17.7],["SX 1.5",15.04,17.4],["S (O) 1.5 CVT",15.66,17.7],["SX Premium 1.5",16.34,17.4],["SX Premium 1.5 CVT",17.79,17.7]]},
+  "Hyryder":{b:"Toyota",vars:[["E",11.31,21.11],["S",12.82,21.11],["S AT",14.17,20.58],["G (O)",14.87,21.11],["G (O) AT",16.18,20.58],["V",16.42,21.11],["S Hybrid",17.18,27.97],["V AT",17.67,20.58],["G (O) Hybrid",19.24,27.97],["V Hybrid",19.99,27.97]]},
+  "Baleno":{b:"Maruti Suzuki Nexa",vars:[["Sigma",5.99,23.8],["Delta",7.00,23.8],["Delta AMT",7.50,24.77],["Zeta",8.00,23.8],["Zeta AMT",8.50,24.77],["Alpha",9.10,23.8],["Alpha (O)",9.50,23.8],["Alpha AMT",9.60,24.77],["Alpha (O) AMT",9.99,24.77]]},
+  "Fronx":{b:"Maruti Suzuki Nexa",vars:[["Sigma 1.2",6.90,21.79],["Delta 1.2",7.75,21.79],["Delta Plus 1.2",8.15,21.79],["Delta 1.2 AMT",8.25,22.89],["Delta Plus 1.2 AMT",8.65,22.89],["Delta Plus 1.0 Turbo",8.97,21.5],["Zeta 1.0 Turbo",9.76,21.5],["Alpha 1.0 Turbo",10.61,21.5],["Zeta 1.0 Turbo AT",11.04,20.01],["Alpha 1.0 Turbo AT",11.89,20.01]]},
+  "Brezza":{b:"Maruti Suzuki Arena",vars:[["LXi 1.0 Turbo",7.50,20.13],["LXi 1.5",8.30,20.95],["VXi 1.0 Turbo",8.55,20.13],["VXi 1.5",9.26,20.95],["ZXi 1.0 Turbo",9.85,20.13],["ZXi 1.5",10.50,20.95],["VXi 1.5 AT",10.70,20.17],["ZXi Plus 1.0 Turbo",11.16,20.13],["ZXi 1.5 AT",11.85,20.17],["ZXi Plus 1.5 AT",13.55,20.17]]},
+  "XL6":{b:"Maruti Suzuki Nexa",vars:[["Zeta",11.62,20.97],["Alpha",12.59,20.97],["Zeta AT",12.97,20.27],["Alpha Plus",13.17,20.97],["Alpha AT",13.94,20.27],["Alpha Plus AT",14.52,20.27]]},
+  "Grand Vitara":{b:"Maruti Suzuki Nexa",vars:[["Sigma",10.77,21.11],["Delta",12.15,21.11],["Delta AT",13.50,20.16],["Zeta",13.85,21.11],["Zeta (O)",13.89,21.11],["Zeta AT",15.20,20.16],["Alpha",15.35,21.11],["Alpha AT",16.60,20.16],["Delta Plus Strong Hybrid",16.68,27.97],["Zeta Plus Strong Hybrid",17.97,27.97],["Alpha AWD AT",18.05,20.16],["Alpha Plus Strong Hybrid",19.55,27.97]]},
+  "Seltos":{b:"Kia",vars:[["HTE 1.5",11.24,16.5],["HTE (O) 1.5",12.41,16.5],["HTK 1.5",13.41,16.5],["HTE (O) 1.5 CVT",13.71,16.5],["HTK (O) 1.5",14.51,16.5],["HTK 1.5 CVT",14.71,16.5],["HTK (O) 1.5 CVT",15.81,16.5],["HTX 1.5",15.91,16.5],["HTX (A) 1.5",17.01,16.5],["HTX 1.5 CVT",17.21,16.5],["HTX (A) 1.5 CVT",18.31,16.5],["GTX 1.5 CVT",18.71,16.5],["GTX (A) 1.5 CVT",19.81,16.5]]},
+  "Taigun":{b:"Volkswagen",vars:[["Comfortline 1.0 TSI",11.00,19.98],["Highline 1.0 TSI",12.70,19.98],["Highline 1.0 TSI AT",13.80,19.54],["Highline Plus 1.0 TSI",14.30,19.98],["GT Line 1.0 TSI",14.60,19.98],["Highline Plus 1.0 TSI AT",15.45,19.54],["GT Line 1.0 TSI AT",15.75,19.54],["Topline 1.0 TSI",16.00,19.98],["Topline 1.0 TSI AT",17.18,19.54]]},
+  "Kushaq":{b:"Skoda",vars:[["Classic Plus 1.0 TSI",10.69,19.76],["Classic Plus 1.0 TSI AT",13.04,19.09],["Signature 1.0 TSI",14.69,19.76],["Sportline 1.0 TSI",14.89,19.76],["Signature 1.0 TSI AT",15.69,19.09],["Sportline 1.0 TSI AT",15.89,19.09],["Prestige 1.0 TSI",16.94,19.76],["Prestige 1.0 TSI AT",17.79,19.09],["Monte Carlo 1.0 TSI AT",18.09,19.09]]},
+  "Elevate":{b:"Honda",vars:[["SV",11.80,15.31],["V",12.29,15.31],["V CVT",13.79,16.61],["VX",13.93,15.31],["ZX",15.39,15.31],["VX CVT",15.39,16.61],["ZX Plus",16.80,15.31],["ZX CVT",16.89,16.61],["ZX Plus CVT",18.30,16.61]]},
+  "Tigor":{b:"Tata",vars:[["XM",5.69,19.2],["XT",6.44,19.2],["XZ",6.99,19.2],["XTA AMT",6.99,19.0],["XZ Plus",7.54,19.2],["XZA AMT",7.54,19.0],["XZ Plus Lux",7.99,19.2],["XZ Plus AMT",8.09,19.0]]},
+  "Altroz":{b:"Tata",vars:[["Smart",5.99,19.33],["Pure",7.14,19.33],["Pure S",7.44,19.33],["Pure AMT",7.71,19.33],["Creative",8.09,19.33],["Creative S",8.44,19.33],["Creative AMT",8.66,19.33],["Creative S AMT",9.01,19.33],["Accomplished S",9.29,19.33],["Creative S DCA",9.64,19.33],["Accomplished S DCA",10.49,19.33],["Accomplished Plus S DCA",10.74,19.33]]},
+  "Glanza":{b:"Toyota",vars:[["E",6.99,23.80],["S",7.71,23.80],["S AMT",8.31,24.77],["G",8.73,23.80],["G AMT",9.33,24.77],["V",9.99,23.80],["V (O)",10.49,23.80],["V AMT",10.59,24.77],["V (O) AMT",10.98,24.77]]},
+  "i20":{b:"Hyundai",vars:[["Era",5.99,20.35],["Magna",7.04,20.35],["Sportz",7.85,20.35],["Sportz (O)",8.38,20.35],["Asta",8.71,20.35],["Sportz IVT",8.86,19.65],["Asta (O)",9.24,20.35],["Sportz (O) IVT",9.30,19.65],["Asta (O) IVT",10.43,19.65]]},
+  "Taisor":{b:"Toyota",vars:[["E 1.2",7.43,21.71],["S 1.2",8.33,21.71],["S Plus 1.2",8.68,21.71],["S 1.2 AMT",8.94,22.79],["S Plus 1.2 AMT",9.29,22.79],["G 1.0 Turbo",10.45,21.18],["V 1.0 Turbo",11.36,21.18],["G 1.0 Turbo AT",11.86,19.86],["V 1.0 Turbo AT",12.78,19.86]]},
+  "Syros":{b:"Kia",vars:[["HTE Turbo",8.40,18.2],["HTE (O) Turbo",9.20,18.2],["HTK (EX) Turbo",9.80,18.2],["HTK Plus Turbo",10.74,18.2],["HTK Plus Turbo DCT",11.94,17.68],["HTK Plus (O) Turbo",12.00,18.2],["HTK Plus (O) Turbo DCT",13.20,17.68],["HTX Turbo DCT",14.00,17.68],["HTX (O) Turbo DCT",15.00,17.68]]},
+  "Kylaq":{b:"Skoda",vars:[["Classic",7.59,19.68],["Classic Plus",8.25,19.68],["Classic Plus AT",9.25,19.05],["Signature",9.43,19.68],["Signature AT",10.43,19.05],["Signature Plus",10.77,19.68],["Prestige",11.75,19.68],["Signature Plus AT",11.77,19.05],["Prestige Plus",11.99,19.68],["Prestige AT",12.75,19.05],["Prestige Plus AT",12.99,19.05]]},
+  "Magnite":{b:"Nissan",vars:[["Visia",5.61,19.4],["Visia Plus",6.07,19.4],["Visia AMT",6.16,19.7],["Acenta",6.66,19.4],["Acenta AMT",7.17,19.7],["N-Connecta",7.29,19.4],["N-Connecta AMT",7.79,19.7],["Tekna",8.15,19.4],["Tekna Plus",8.47,19.4],["N-Connecta Turbo",8.58,19.9],["Tekna AMT",8.66,19.7],["Tekna Plus AMT",8.98,19.7],["Acenta Turbo CVT",9.14,17.9],["Tekna Turbo",9.31,19.9],["N-Connecta Turbo CVT",9.63,17.9],["Tekna Plus Turbo",9.64,19.9],["Tekna Turbo CVT",10.42,17.9],["Tekna Plus Turbo CVT",10.75,17.9]]},
+  "Kiger":{b:"Renault",vars:[["Authentic",5.81,19.17],["Evolution",6.54,19.17],["Evolution Plus",6.99,19.17],["Evolution AMT",7.00,19.03],["Evolution Plus AMT",7.45,19.03],["Techno",7.55,19.17],["Evolution Plus Turbo",7.89,20.38],["Techno AMT",8.00,19.03],["Emotion",8.42,19.17],["Techno Turbo",8.45,20.38],["Emotion Turbo",9.33,20.38],["Techno Turbo CVT",9.36,18.24],["Emotion Turbo CVT",10.34,18.24]]},
+  "Triber":{b:"Renault",vars:[["Authentic",5.80,19.76],["Evolution",6.73,19.76],["Techno",7.44,19.76],["Evolution Turbo",7.84,21.0],["Emotion",8.05,19.76],["Techno Turbo",8.53,21.0],["Emotion Turbo",8.99,21.0]]},
+  "Carens Clavis":{b:"Kia",vars:[["HTE 1.5",11.49,15.34],["HTE (O) 1.5",12.49,15.34],["HTE (O) Turbo",13.39,15.95],["HTK 1.5",13.49,15.34],["HTK Turbo",14.39,15.95],["HTK Plus Turbo",15.39,15.95],["HTK Plus (O) Turbo",16.19,15.95],["HTK Plus Turbo DCT",16.89,16.66],["HTK Plus (O) Turbo DCT",17.69,16.66],["HTX Turbo",18.39,15.95],["HTX Plus Turbo",19.39,15.95],["HTX Plus Turbo DCT",21.49,16.66]]},
+  "Rumion":{b:"Toyota",vars:[["E",9.79,20.51],["S",10.77,20.51],["G",11.93,20.51],["S AT",12.35,20.11],["V",12.70,20.51],["G AT",13.44,20.11],["V AT",14.21,20.11]]},
+  "C3":{b:"Citroen",vars:[["Live",4.99,19.3],["Live (O)",5.69,19.3],["Feel",6.00,19.3],["Feel (O)",7.03,19.3],["Feel Turbo",7.58,19.3],["Shine",7.86,19.3],["Shine Turbo",8.97,19.3],["Shine Turbo AT",9.68,19.3]]},
+  "Kwid":{b:"Renault",vars:[["Evolution",4.53,21.7],["Evolution AMT",4.90,22.5],["Climber",5.15,21.7],["Climber AMT",5.61,22.5]]},
+  "Duster":{b:"Renault",vars:[["Evolution 1.3 Turbo",12.99,17.75],["Techno 1.3 Turbo",14.49,17.75],["Evolution 1.3 Turbo DCT",14.49,18.45],["Techno Plus 1.3 Turbo",15.29,17.75],["Techno 1.3 Turbo DCT",15.89,18.45],["Techno Plus 1.3 Turbo DCT",16.69,18.45],["Iconic 1.3 Turbo",16.99,17.75],["Iconic 1.3 Turbo DCT",18.49,18.45],["Evolution Strong Hybrid",16.99,29.0],["Techno Strong Hybrid",18.99,29.0],["Emotion Strong Hybrid",19.48,29.0]]},
+  "Tekton":{b:"Nissan",vars:[["Visia 1.0 Turbo",10.49,19.4],["Visia Plus 1.0 Turbo",11.14,19.4],["Acenta 1.0 Turbo",11.79,19.4],["N-Connecta 1.0 Turbo",13.69,19.4],["Acenta 1.3 Turbo DCT",14.99,18.5],["N-Connecta 1.3 Turbo",14.99,17.8],["Tekna 1.0 Turbo",15.39,19.4],["Tekna 1.3 Turbo",16.39,17.8],["N-Connecta 1.3 Turbo DCT",16.49,18.5],["Tekna Plus 1.0 Turbo",16.49,19.4],["Tekna 1.3 Turbo DCT",17.79,18.5],["Tekna Plus 1.3 Turbo DCT",18.59,18.5]]},
+  "Bayon":{b:"Hyundai",vars:[["HX 2",10.00,18.7],["HX 3",10.90,18.7],["HX 3 Plus",11.80,18.7],["HX 5",12.45,18.7],["HX 6",13.57,18.7],["HX 5 CVT",13.85,18.6],["HX 6 CVT",14.97,18.6],["HX 8",15.10,18.7],["HX 8 CVT",16.54,18.6],["HX 10",16.65,18.7],["HX 10 CVT",18.00,18.6]]},
+  "XUV 3XO":{b:"Mahindra",vars:[["MX1 1.2T",7.79,19.62],["REVX M 1.2T",8.59,19.62],["REVX M (O) 1.2T",9.09,19.62],["REVX EDGE 1.2T",9.39,19.62],["REVX EDGE (O) 1.2T",9.89,19.62],["REVX M (O) 1.2T AT",9.99,18.14],["AX5 1.2T",10.00,19.62]]}
+};
+const FEAT={
+ "Kwid":["8-inch touchscreen, wired Android Auto / CarPlay","6 airbags (Climber)","Rear camera with sensors","Tyre pressure monitor","184 mm ground clearance"],
+ "Duster":["1.3 turbo petrol, manual or DCT","1.8 strong hybrid, 29 km/L claimed (ARAI)","Hybrid runs on electric up to 80% in city (Renault claim)","7-year warranty; 8-year/1.6 lakh km hybrid battery","Rugged SUV design"],
+ "Tekton":["Panoramic sunroof","Ventilated front seats","Level 2 ADAS","360° camera with blind-spot view","10.1-inch touchscreen and 10.25-inch digital cluster"],
+ "Tigor":["Factory CNG with manual or AMT","Twin-cylinder CNG keeps boot usable","10.25-inch touchscreen, wireless phone link (XZ Plus)","360° camera (XZ Plus Lux)","Push-button start (XZ Plus)"],
+ "Altroz":["6 airbags and ESC as standard","10.25-inch touchscreen, wireless phone link","360° camera","Sunroof (S trims)","Petrol, CNG, AMT and DCA options"],
+ "Glanza":["6 airbags and ESP as standard","9-inch touchscreen","360° camera and head-up display","Ventilated front seats (V)","ADAS (V (O))"],
+ "i20":["6 airbags and ESC as standard","8 or 10.25-inch touchscreen","Bose sound system (Asta)","Wireless charger (Asta)","Rear camera and cruise control (Sportz)"],
+ "Taisor":["1.2 petrol, 1.0 turbo and CNG options","9-inch touchscreen","360° camera","Head-up display","Wireless charger"],
+ "Syros":["10.25 or 12.3-inch touchscreen","Panoramic sunroof","Front and rear ventilated seats","Sliding, reclining rear seats","Harman Kardon sound"],
+ "Kylaq":["6 airbags as standard","1.0 TSI turbo petrol","Sunroof (Classic Plus up)","Cruise control","Ventilated powered front seats (Prestige Plus)"],
+ "Magnite":["6 airbags as standard","Wireless Android Auto / CarPlay","360° camera (Tekna)","Cruise control (Tekna)","1.0 turbo with CVT option"],
+ "Kiger":["Wireless Android Auto / CarPlay","Automatic AC (Evolution Plus up)","Push-button start","1.0 turbo with CVT option","Large boot for the segment"],
+ "Triber":["7 seats under ₹9 lakh","8-inch touchscreen","Automatic AC","Push-button start","1.0 turbo option"],
+ "Carens Clavis":["6 or 7 seats","Dual 12.3-inch screens","Panoramic sunroof","Ventilated front seats","Level 2 ADAS (top trims)"],
+ "Rumion":["7 seats","7-inch touchscreen, wireless phone link","Push-button start","Cruise control (V)","Factory CNG option"],
+ "C3":["10.25-inch touchscreen","Factory CNG option","1.2 turbo petrol option","6 airbags","Large boot for the segment"],
+ "Swift":["6 airbags and ESP standard on every variant","9-inch touchscreen, wireless Android Auto / CarPlay","LED projector headlamps (ZXi and up)","Cruise control (ZXi Plus)","Rear AC vents and wireless charger (ZXi and up)"],
+ "Dzire":["5-star Global NCAP and Bharat NCAP","6 airbags and ESP standard","Electric sunroof (top variants)","9-inch touchscreen and 360° camera (top variants)","382-litre boot"],
+ "Wagon R":["Tall-boy cabin with generous headroom","341-litre boot, 60:40 split rear seat","Up to 6 airbags (ZXi Plus)","7-inch touchscreen, Android Auto / CarPlay","1.0 and 1.2 petrol plus factory-fitted CNG"],
+ "Brezza":["5-star Bharat NCAP","6 airbags, ESP, hill hold, ISOFIX standard","10.1-inch HD touchscreen","1.0 turbo petrol with 48V mild hybrid","360° camera and sunroof"],
+ "Alto K10":["Lowest entry price, from ₹3.70 lakh","Up to 6 airbags","7-inch touchscreen, Android Auto / CarPlay","214-litre boot","Factory CNG, 33.40 km/kg claimed"],
+ "S-Presso":["180 mm ground clearance","ESP and hill-hold assist","Dual airbags with ABS and EBD","7-inch touchscreen, Android Auto / CarPlay","Factory CNG, 32.73 km/kg claimed"],
+ "Celerio":["6 airbags standard","3-star Global NCAP (6-airbag version)","Up to 26.68 km/L petrol, 34.43 km/kg CNG claimed","7-inch touchscreen, Android Auto / CarPlay","313-litre boot"],
+ "Tiago":["Twin CNG cylinders under the boot floor","CNG AMT with paddle shifters","Up to 10.25-inch touchscreen (Creative)","360° camera (Creative)","Dual wireless charging pads (Creative Plus)"],
+ "Punch":["5-star Bharat NCAP","6 airbags including curtain airbags","193 mm ground clearance","210-litre boot even with CNG","Petrol AMT option"],
+ "Exter":["6 airbags including curtain airbags","391-litre boot","Bi-fuel CNG with changeover switch","3-year unlimited-km warranty, extendable to 7 years","Petrol AMT option"],
+ "Aura":["Up to 6 airbags with ESC","8-inch touchscreen, Android Auto / CarPlay","1.2 petrol in manual and AMT","Factory CNG option","Tall ground clearance for a sedan"],
+ "Nexon":["5-star Bharat NCAP","6 airbags standard","Panoramic sunroof (most variants)","360° camera","10.25-inch touchscreen"],
+ "Grand i10 Nios":["8-inch touchscreen, Android Auto / CarPlay","260-litre boot","Up to 6 airbags (top variant)","Petrol and CNG options","Manual and AMT gearboxes"],
+ "Amaze":["Level 2 ADAS","5-star Bharat NCAP","6 airbags and ESP","416-litre boot","8-inch screen, auto climate control, rear AC vents"],
+ "Bayon":["1.5 petrol, manual or CVT automatic","6 airbags, ESC and hill-start assist as standard","Panoramic sunroof","Ventilated front seats and 360° camera","Level 2 ADAS (top trim)"],
+ "Venue":["Level 2 ADAS","Twin 12.3-inch curved screens","360° camera","Ventilated front seats","Disc brakes on all four wheels"],
+ "Sonet":["Level 1 ADAS","10.25-inch touchscreen","Sunroof on most variants","360° camera and dashcam","Up to 6 airbags"],
+ "Baleno":["6 airbags standard","Head-up display (top variants)","360° camera (top variants)","9-inch touchscreen","CNG with AMT option, 34.47 km/kg claimed"],
+ "Fronx":["6 airbags standard","1.0 turbo petrol option","Head-up display and 360° camera (top variants)","9-inch touchscreen","Factory CNG option"],
+ "Ertiga":["7 seats in three rows","1.5 petrol with smart hybrid, manual or automatic","Factory CNG option","6 airbags","Flexible boot with third row folded"],
+ "XL6":["6 seats with second-row captain chairs","1.5 petrol with smart hybrid, manual or automatic","360° camera (top variants)","Ventilated front seats (top variants)","Factory CNG option"],
+ "Grand Vitara":["Strong hybrid, 27.97 km/L claimed","Factory CNG option","AWD option (Alpha AT)","Panoramic sunroof (higher variants)","360° camera (top variants)"],
+ "Victoris":["5-star Bharat NCAP and Global NCAP","Level 2 ADAS and 360° camera","Panoramic sunroof (selected variants)","10.25-inch digital cluster with large touchscreen","Petrol, CNG, strong hybrid (28.65 km/L) and AWD options"],
+ "Creta":["Level 2 ADAS (top variants)","Panoramic sunroof","Dual 10.25-inch screens","6 airbags standard","Ventilated front seats (top variants)"],
+ "Hyryder":["Strong hybrid option, 27.97 km/L claimed","Factory CNG option","Panoramic sunroof (top variants)","360° camera (top variants)","AWD option on select variants"],
+ "Seltos":["5-star Bharat NCAP","6 airbags standard","Level 2 ADAS and 360° camera (HTX (A) and up)","Panoramic sunroof (HTK (O) and up)","Up to 12.3-inch twin screens"],
+ "Taigun":["5-star Global NCAP","6 airbags standard","1.0 TSI turbo petrol, manual or automatic","Sunroof (higher variants)","Large touchscreen (higher variants)"],
+ "Kushaq":["5-star Global NCAP","6 airbags standard","1.0 TSI turbo petrol","Sunroof (higher variants)","Large touchscreen (higher variants)"],
+ "Elevate":["Level 2 ADAS (top variants)","Single-pane sunroof (higher variants)","10.25-inch touchscreen (higher variants)","CVT automatic option","1.5 i-VTEC petrol"],
+ "XUV 3XO":["5-star Bharat NCAP","6 airbags standard","Level 2 ADAS","Panoramic sunroof","Dual 10.25-inch screens"]
+};
+const VFEAT={
+ "Swift":{
+  "LXi":["6 airbags","ESP stability control","ABS with EBD","Rear parking sensors","Keyless entry with central locking"],
+  "VXi":["7-inch touchscreen","Wireless Android Auto / CarPlay","Power-adjustable mirrors","6 airbags and ESP","Rear parking sensors"],
+  "VXi (O)":["Push-button start with smart key","Suzuki Connect car tech","Power-folding mirrors","Wireless Android Auto / CarPlay","6 airbags and ESP"],
+  "ZXi":["LED projector headlamps with LED DRLs","Automatic headlamps","Automatic climate control","Wireless charger","6 airbags and ESP"],
+  "ZXi Plus":["9-inch touchscreen","Cruise control","Rear parking camera","Arkamys-tuned sound","LED projector headlamps"]},
+ "Brezza":{
+  "LXi":["Side and curtain airbags","ESP with hill-start assist","Remote central locking","Projector headlamps","Power windows and mirrors"],
+  "VXi":["7-inch touchscreen","Wireless Android Auto / CarPlay","Steering-mounted controls","Height-adjustable driver seat","ESP with hill-start assist"],
+  "ZXi":["Electric sunroof","Push-button start with smart key","LED projector headlamps","Wireless Android Auto / CarPlay","ESP with hill-start assist"],
+  "ZXi Plus":["360° camera","10.1-inch touchscreen","Head-up display","Ventilated front seats","Electric sunroof"]},
+ "Alto K10":{
+  "STD (O)":["Side and curtain airbags","ESP stability control","Three-point belts for all five","Rear child locks","No AC or power steering in this trim"],
+  "LXi (O)":["Manual AC with heater","Power steering","ESP stability control","Side and curtain airbags","Rear child locks"],
+  "VXi (O)":["Front power windows","Bluetooth music system with USB","Central locking","Speed-sensing auto door lock","Manual AC and power steering"],
+  "VXi Plus (O)":["7-inch touchscreen","Android Auto / CarPlay (wired)","Steering-mounted controls","Remote central locking","Rear parcel tray"]},
+ "Wagon R":{
+  "LXi":["ESP stability control","Side and curtain airbags","Manual AC with heater","Front power windows","Central locking"],
+  "VXi":["Bluetooth music system","Remote central locking","Power mirrors","60:40 split rear seat","ESP, side and curtain airbags"],
+  "ZXi":["1.2-litre engine option","AMT automatic option","Steering-mounted controls","Bluetooth music system","Remote central locking"],
+  "ZXi Plus":["7-inch touchscreen","Android Auto / CarPlay (wired)","Alloy wheels","Front fog lamps","Rear defogger"]},
+ "Victoris":{
+  "LXi":["7-inch touchscreen, wireless Android Auto / CarPlay","ESC with traction control","Push-button start with smart key","Projector headlamps","60:40 split rear seat"],
+  "VXi":["Rear camera","Tyre pressure monitoring","Cruise control","Electronic parking brake with auto hold (AT)","Wireless Android Auto / CarPlay"],
+  "ZXi":["Gesture-controlled power tailgate","LED projector headlamps","Cooled wireless charger","10.25-inch digital cluster","Rear camera and cruise control"],
+  "ZXi (O)":["Panoramic sunroof","Gesture-controlled power tailgate","LED projector headlamps","Cooled wireless charger","10.25-inch digital cluster"],
+  "ZXi Plus":["360° camera","ADAS with adaptive cruise (petrol AT)","10.1-inch touchscreen with Dolby Atmos","Ventilated front seats","8-way power driver seat"],
+  "ZXi Plus (O)":["Panoramic sunroof","360° camera","ADAS (petrol AT)","10.1-inch touchscreen with Dolby Atmos","Ventilated front seats"]},
+ "Tiago":{
+  "Smart":["Side and curtain airbags","ISOFIX child-seat mounts","Manual AC","Tilt steering","Digital instrument cluster"],
+  "Pure":["Bluetooth music system","Power windows","Remote central locking","Power mirrors","Height-adjustable driver seat"],
+  "Pure Plus":["8-inch touchscreen","Wireless Android Auto / CarPlay","Rear camera","ESP with hill-start assist","Power windows and mirrors"],
+  "Pure Plus A":["Automatic climate control","Push-button start with smart key","Auto headlamps","Front armrest with storage","8-inch touchscreen, wireless phone mirroring"],
+  "Creative":["10.25-inch touchscreen","Lane-watch camera","LED headlamps","Auto-folding mirrors","Automatic climate control"],
+  "Creative Plus":["Wireless charger","LED fog lamps","Dual-tone black roof","Connected-car telematics","10.25-inch touchscreen"]},
+ "Punch":{
+  "Smart":["ESP with hill-start assist","Curtain airbags","Tyre pressure sensors","Manual AC","5-star Bharat NCAP"],
+  "Pure":["Rear AC vents","Steering-mounted controls","Power mirrors","Front armrest","ESP and curtain airbags"],
+  "Pure Plus":["8-inch touchscreen","Wireless Android Auto / CarPlay","Rear camera","Cruise control (not with CNG AMT)","Height-adjustable driver seat"],
+  "Pure Plus (S)":["Sunroof","Auto headlamps","Rain-sensing wipers","8-inch touchscreen, wireless phone mirroring","Rear camera"],
+  "Adventure":["360° camera","Blind-view monitor","Automatic climate control","Push-button start","Auto headlamps"],
+  "Adventure (S)":["Sunroof","360° camera","Blind-view monitor","Automatic climate control","Auto headlamps"],
+  "Accomplished":["10.25-inch touchscreen","Cooled glovebox","Hill-descent control","Keyless entry","360° camera"],
+  "Accomplished Plus (S)":["Sunroof","Wireless charger","7-inch colour digital cluster","Rear armrest","LED cornering fog lamps"]},
+ "Bayon":{
+  "HX 2":["6 airbags","ESC with hill-start assist","LED projector headlamps","Rear parking sensors","Manual AC"],
+  "HX 3":["10.25-inch touchscreen","Wireless Android Auto / CarPlay","Push-button start","Steering-mounted controls","6 speakers"],
+  "HX 3 Plus":["Electric sunroof","17-inch wheels","Roof rails","10.25-inch touchscreen","Push-button start"],
+  "HX 5":["Automatic AC","Cruise control","Wireless charger","Auto headlamps","Connected car tech"],
+  "HX 6":["Panoramic sunroof","17-inch diamond-cut alloys","Ambient lighting","Rear wiper","Sliding front armrest"],
+  "HX 8":["Ventilated front seats","360° camera","Powered driver seat","Dashcam","All-wheel disc brakes"],
+  "HX 10":["Level 2 ADAS","Dual 12.3-inch curved screens","Bose 8-speaker sound","Adaptive cruise control","Auto-dimming inside mirror"]},
+ "Tigor":{
+  "XTA":["Power windows","Remote central locking","Rear parking sensors","Height-adjustable driver seat","Steering-mounted controls"],
+  "XZA":["7-inch touchscreen","Android Auto / CarPlay","ESC stability control","LED headlamps","Rear parking sensors"],
+  "XZA Plus":["10.25-inch touchscreen","Wireless Android Auto / CarPlay","HD rear camera","Push-button start","ESC stability control"],
+  "XT":["Power windows","Remote central locking","Rear parking sensors","Height-adjustable driver seat","Steering-mounted controls"],
+  "XZ":["7-inch touchscreen","Android Auto / CarPlay","ESC stability control","LED headlamps","Rear parking sensors"],
+  "XZ Plus":["10.25-inch touchscreen","Wireless Android Auto / CarPlay","HD rear camera","Push-button start","ESC stability control"],
+  "XZ Plus Lux":["360° camera","Tyre pressure monitor","Rear USB-A and C ports","10.25-inch touchscreen","Push-button start"]},
+ "Altroz":{
+  "Smart":["6 airbags","ESC stability control","Projector headlamps","All power windows","Remote central locking"],
+  "Pure":["7-inch touchscreen","Cruise control","Rear camera","Automatic AC","Height-adjustable driver seat"],
+  "Pure S":["Sunroof","7-inch touchscreen","Cruise control","Rear camera","Automatic AC"],
+  "Creative":["10.25-inch touchscreen","Wireless Android Auto / CarPlay","360° camera","Push-button start","Rear AC vents"],
+  "Creative S":["Sunroof","10.25-inch touchscreen","360° camera","Push-button start","Rear AC vents"],
+  "Accomplished S":["Tyre pressure monitor","7-inch digital cluster","Cornering fog lamps","Sunroof","360° camera"],
+  "Accomplished Plus S":["10.25-inch digital cluster","Blind-spot monitor","Air purifier","Connected car tech","Sunroof"]},
+ "Glanza":{
+  "E":["6 airbags","ESP with hill hold","ABS with EBD","Speed-sensing door lock","Manual AC"],
+  "S":["7-inch touchscreen, wireless phone link","Tyre pressure monitor","Electric mirrors","Rear AC vents","4 speakers"],
+  "G":["9-inch touchscreen","Rear camera","Automatic AC","LED projector headlamps","Connected car tech"],
+  "V":["360° camera","Head-up display","Ventilated front seats","Cruise control","Auto-folding mirrors"],
+  "V (O)":["Adaptive cruise control","Auto emergency braking","Lane keep assist","Lane departure warning","360° camera"]},
+ "i20":{
+  "Era":["6 airbags","ESC with hill assist","Day/night inside mirror","Front power windows","Manual AC"],
+  "Magna":["8-inch touchscreen","Wireless Android Auto / CarPlay","Remote central locking","Rear power windows","Tyre pressure monitor"],
+  "Sportz":["Rear camera","Cruise control","Automatic AC","Rear defogger","Height-adjustable driver seat"],
+  "Asta":["LED headlamps","Push-button start","Bose sound system","Wireless charger","Alloy wheels"],
+  "Asta (O)":["10.25-inch touchscreen","Connected car tech","Bose sound system","Wireless charger","Push-button start"]},
+ "Magnite":{
+  "Visia":["6 airbags","Tyre pressure monitor","ISOFIX mounts","Rear armrest","16-inch wheels"],
+  "Visia Plus":["Rear camera","Wireless Android Auto / CarPlay","Rear defogger","Rear wiper","6 airbags"],
+  "Acenta":["Automatic AC","Power-folding mirrors","Remote central locking","Steering-mounted controls","Speed-sensing door lock"],
+  "N-Connecta":["7-inch colour digital cluster","Rear AC vents","16-inch alloys","Frameless auto-dimming mirror","Parcel tray"],
+  "Tekna":["360° camera","Cruise control","LED projector headlamps","Auto headlamps","LED fog lamps"],
+  "Tekna Plus":["Leatherette upholstery","Ambient lighting","360° camera","Cruise control","LED projector headlamps"]},
+ "Rumion":{
+  "G":["7-inch touchscreen, wireless phone link","Push-button start","Automatic AC","Front fog lamps","Rear defogger"],
+  "V":["Rear camera","Cruise control","Side airbags","Auto headlamps","Leather steering wheel"]},
+ "Dzire":{
+  "LXi":["6 airbags","ABS, EBD and ESP","Hill-hold assist","Keyless entry","Power windows"],
+  "VXi":["7-inch touchscreen","Wireless Android Auto / CarPlay","Electric-folding mirrors","Rear AC vents","4 speakers"],
+  "ZXi":["Rear camera","Tyre pressure monitor","Push-button start","Automatic AC","15-inch alloys"],
+  "ZXi Plus":["9-inch touchscreen","360° camera","Cruise control","Arkamys-tuned sound","Dual-tone alloys"]},
+ "Celerio":{
+  "LXi":["Side and curtain airbags","ESC stability control","Manual AC","Power steering","Front power windows"],
+  "VXi":["All power windows","Power mirrors","Speed-sensing door lock","60:40 split rear seat","Parcel tray"],
+  "ZXi":["Rear defogger","Remote central locking","Bluetooth music","Steering-mounted controls","Tilt steering"],
+  "ZXi Plus":["7-inch touchscreen","Android Auto / CarPlay","Push-button start","Height-adjustable driver seat","Alloy wheels"]},
+ "S-Presso":{
+  "STD (O)":["ESC stability control","Seat-belt pretensioners","Idle start-stop","Sliding front seats","Digital cluster"],
+  "LXi (O)":["AC with heater","Power steering","ESC stability control","Idle start-stop","Digital cluster"],
+  "VXi (O)":["Remote central locking","Front power windows","Bluetooth music","Auto door lock","Info display"],
+  "VXi Plus (O)":["7-inch touchscreen","Android Auto / CarPlay","Steering-mounted controls","Power mirrors","Remote central locking"]},
+ "Ertiga":{
+  "LXi":["Side and curtain airbags","ESC with hill hold","Manual AC","All power windows","3-point belts for all 7"],
+  "VXi":["Remote central locking","Bluetooth music","Power-folding mirrors","Steering-mounted controls","2nd and 3rd-row AC vents"],
+  "ZXi":["7-inch touchscreen","Android Auto / CarPlay","Push-button start","Automatic AC","Height-adjustable driver seat"],
+  "ZXi Plus":["Rear camera","Wireless Android Auto / CarPlay","Cruise control","Tyre pressure monitor","Auto headlamps"]},
+ "Baleno":{
+  "Sigma":["ESC with hill hold","4 airbags","60:40 split rear seat","Manual AC","Keyless entry"],
+  "Delta":["7-inch touchscreen","Wireless Android Auto / CarPlay","Tyre pressure monitor","Power-folding mirrors","Front armrest"],
+  "Zeta":["Rear camera","9-inch touchscreen","LED projector headlamps","Push-button start","Height-adjustable driver seat"],
+  "Alpha":["360° camera","Head-up display","Cruise control","Ventilated front seats","Auto-dimming inside mirror"],
+  "Alpha (O)":["Adaptive cruise control","Forward collision warning","Lane departure warning","Lane keep assist","Auto high beam"]},
+ "Fronx":{
+  "Sigma":["ESC with hill hold","Automatic AC","Projector headlamps","Remote central locking","6 airbags"],
+  "Delta":["7-inch touchscreen","Wireless Android Auto / CarPlay","Steering-mounted controls","Power-folding mirrors","Parcel tray"],
+  "Delta Plus":["LED headlamps","Auto headlamps","LED DRLs","Alloy wheels","Wireless Android Auto / CarPlay"],
+  "Zeta":["Rear camera","Push-button start","Height-adjustable driver seat","Wireless charger","Curtain airbags"],
+  "Alpha":["360° camera","Head-up display","9-inch touchscreen","Cruise control","UV-cut glass"]},
+ "Exter":{
+  "HX 2":["6 airbags","ESC with hill hold","Rear parking sensors","ISOFIX child-seat mounts","Manual AC"],
+  "HX 3":["8-inch touchscreen","Wireless Android Auto / CarPlay","Rear camera","Day/night inside mirror","Steering-mounted controls"],
+  "HX 4":["Tyre pressure monitor","LED DRLs","Electric mirrors","All power windows","Rear AC vents"],
+  "HX 6":["Automatic AC","Dashcam","Rear defogger","Projector headlamps","Cruise control (petrol)"],
+  "HX 8":["Auto headlamps","Wireless charger","Cooled glovebox","15-inch dual-tone alloys","Rear wiper"],
+  "HX 10":["Navigation with OTA updates","Connected car tech","Wireless charger","Auto headlamps","Metal pedals"]},
+ "Aura":{
+  "E":["4 airbags","Front power windows","Manual AC","LED tail lamps","14-inch wheels"],
+  "S":["Music system","Steering-mounted controls","Power mirrors","Rear power windows","Tyre pressure monitor"],
+  "SX":["8-inch touchscreen","Android Auto / CarPlay","Rear camera","ESC with hill hold","Cruise control (petrol)"],
+  "SX (O)":["Curtain airbags","Wireless charger","Automatic AC","Auto headlamps","Projector headlamps"],
+  "SX Plus":["Automatic AC","8-inch touchscreen","Rear camera","ESC with hill hold","Steering-mounted controls"]},
+ "Grand i10 Nios":{
+  "Era":["Side and curtain airbags","Remote central locking","Front power windows","Manual AC","Auto door lock"],
+  "Magna":["Music system","Tyre pressure monitor","Steering-mounted controls","Power mirrors","Rear AC vents"],
+  "Sportz":["8-inch touchscreen","Android Auto / CarPlay","Rear camera","Automatic AC","Rear defogger"],
+  "Asta":["Push-button start","Wireless charger","Cooled glovebox","Rear wiper","ISOFIX child-seat mounts"]},
+ "Nexon":{
+  "Smart":["LED headlamps","ESC with hill hold","6 airbags","Manual AC","Front power windows"],
+  "Smart Plus":["7-inch touchscreen","Android Auto / CarPlay","Remote central locking","Rear power windows","Power-folding mirrors"],
+  "Smart Plus (S)":["Sunroof","Auto headlamps","7-inch touchscreen","Android Auto / CarPlay","Remote central locking"],
+  "Pure Plus":["LED projector headlamps","Electronic AC controls","Rear AC vents","Android Auto / CarPlay","Rear power windows"],
+  "Pure Plus (S)":["Sunroof","Auto headlamps","Auto wipers","Rear AC vents","LED projector headlamps"],
+  "Pure Plus (PS)":["Panoramic sunroof","Auto headlamps","Auto wipers","Rear AC vents","LED projector headlamps"],
+  "Creative":["Push-button start","Automatic AC","Rear camera","Tyre pressure monitor","Height-adjustable driver seat"],
+  "Creative Plus (S)":["360° camera","Blind-spot monitor","10.25-inch touchscreen","Cruise control","Sunroof"]},
+ "Amaze":{
+  "V":["6 airbags","ESC and traction control","8-inch touchscreen, wireless phone link","LED projector headlamps","Remote central locking"],
+  "VX":["Rear camera","Push-button start","Automatic AC with rear vents","Rear defogger","Auto headlamps and wipers"],
+  "ZX":["ADAS safety suite","Adaptive cruise control","Auto emergency braking","Lane keep assist","Auto high beam"]},
+ "Venue":{
+  "HX 2":["6 airbags","ESC with ABS and EBD","LED projector headlamps","10.25-inch touchscreen, wireless phone link","All power windows"],
+  "HX 4":["Rear camera","Tyre pressure monitor","Rear defogger","Electric-folding mirrors","Dual-tone seats"],
+  "HX 5":["Sunroof","Push-button start","Auto-folding mirrors","Rear camera","Tyre pressure monitor"],
+  "HX 6":["Automatic AC","Quad-beam LED headlamps","Wireless charger","Anti-pinch driver window","60:40 split rear seat"],
+  "HX 6T":["Connected car tech","Over-the-air updates","Voice-controlled sunroof","Automatic AC","Wireless charger"],
+  "HX 8":["Ventilated front seats","Drive modes","Traction modes","Electronic parking brake with auto hold","Rear disc brakes"],
+  "HX 10":["Level 2 ADAS","Dual 12.3-inch curved screens","Bose 8-speaker sound","Auto-dimming inside mirror","Front and side parking sensors"]},
+ "Sonet":{
+  "HTE":["6 airbags","Front power windows","Power mirrors","USB-C charging","Speed-sensing door lock"],
+  "HTK":["8-inch touchscreen","Wireless Android Auto / CarPlay","Rear camera","Front parking sensors","Rear power windows"],
+  "HTK Plus":["Push-button start","Automatic AC","Power-folding mirrors","LED fog lamps","Sunroof (turbo)"],
+  "HTX":["Sunroof","Cruise control","60:40 split rear seat","Ventilated seats (automatic)","Paddle shifters (automatic)"],
+  "HTX Plus":["10.25-inch touchscreen","Bose sound system","Ventilated front seats","Sunroof","Cruise control"],
+  "GTX Plus":["360° camera","Forward collision avoidance","Lane keep assist","Blind-spot view monitor","Power driver seat"]},
+ "XUV 3XO":{
+  "MX1":["Curtain airbags","ESC stability control","Projector headlamps","All power windows","16-inch wheels"],
+  "MX2 Pro":["10.25-inch touchscreen","Single-pane sunroof","Steering-mounted controls","Remote central locking","Follow-me-home headlamps"],
+  "MX3":["Wireless Android Auto","Cruise control","Wireless charger","10.25-inch touchscreen","Steering-mounted controls"],
+  "AX5":["Dual-zone automatic AC","Push-button start","Rear camera","10.25-inch digital cluster","Tyre pressure monitor"],
+  "AX7":["Panoramic sunroof","Harman Kardon sound","Leather upholstery","17-inch alloys","Front parking sensors"]},
+ "Creta":{
+  "E":["Side and curtain airbags","ESC stability control","Remote central locking","Front and rear armrests","Manual AC"],
+  "EX":["8-inch touchscreen","Wireless Android Auto / CarPlay","Power mirrors","Steering-mounted controls","Voice commands"],
+  "S":["Rear camera","Cruise control","Rear defogger","Rear wiper","Parcel tray"],
+  "S (O)":["Panoramic sunroof","Dual-zone automatic AC","Push-button start","17-inch alloys","Rear camera"],
+  "SX":["10.25-inch touchscreen","Wireless charger","Remote engine start","Over-the-air updates","Panoramic sunroof"],
+  "SX Tech":["ADAS lane keep assist","Forward collision avoidance","Blind-spot warning","Bose sound system","Adaptive cruise (CVT)"],
+  "SX (O)":["360° camera","Ventilated front seats","Powered driver seat","Front parking sensors","Auto-dimming inside mirror"]},
+ "Seltos":{
+  "HTE":["10.25-inch touchscreen","Wireless Android Auto / CarPlay","LED headlamps","Cruise control","ESC stability control"],
+  "HTE (O)":["60:40 split rear seat","LED light bar at rear","Leatherette and fabric seats","Auto hold (automatic)","Traction modes (automatic)"],
+  "HTK":["Push-button start","Rear defogger","Rear wiper","Tilt and telescopic steering","17-inch wheels (auto/turbo)"],
+  "HTK (O)":["Panoramic sunroof","Wireless charger","Powered driver seat","Front parking sensors","Ventilated seats (automatic)"],
+  "HTX":["12.3-inch touchscreen","Bose sound system","Dual-zone automatic AC","Connected car with OTA updates","Panoramic sunroof"],
+  "HTX (A)":["360° camera","Adaptive cruise with stop-and-go","Forward collision avoidance","Blind-spot alert","Front and side parking sensors"],
+  "GTX":["LED projector headlamps","18-inch alloys","Memory seat and mirrors","12.3-inch touchscreen","Bose sound system"],
+  "GTX (A)":["360° camera","Adaptive cruise control","Blind-spot alert","Rear cross-traffic alert","12.3-inch digital cluster"]},
+ "Hyryder":{
+  "E":["Push-button start","Hill-start assist","Automatic AC","LED DRLs","Rear disc brakes"],
+  "S":["7-inch touchscreen","Android Auto / CarPlay","Cruise control","Rear camera","Connected car tech"],
+  "G":["9-inch touchscreen","LED projector headlamps","Curtain airbags","Auto headlamps","Rear defogger"],
+  "V":["360° camera","Panoramic sunroof","Leather seats","Leather steering wheel","9-inch touchscreen"]},
+ "Taigun":{
+  "Comfortline":["7-inch touchscreen","Android Auto / CarPlay","LED headlamps and tail lamps","Electronic differential lock","Tyre pressure warning"],
+  "Highline":["10-inch touchscreen","Wireless Android Auto / CarPlay","Rear camera","Rear defogger","16-inch alloys"],
+  "Topline":["Electric sunroof","Ventilated front seats","LED projector headlamps","Push-button start","8-inch digital cluster"]},
+ "Kushaq":{
+  "Classic Plus":["6 airbags","Full LED lights","7-inch touchscreen with phone link","Automatic AC with rear vents","16-inch alloys"],
+  "Signature":["10.1-inch touchscreen, wireless phone link","Rear camera","Wireless charger","Keyless entry","17-inch alloys"],
+  "Sportline":["Blacked-out alloys","Gloss-black styling","Black interior","Aluminium pedals","Rear camera"],
+  "Prestige":["Panoramic sunroof","Ventilated powered front seats","Rear massage seats","10.25-inch digital cluster","8-speaker sound with subwoofer"],
+  "Monte Carlo":["Dual-tone paint","Dual-tone alloys","Red accents inside and out","Black leatherette seats","Panoramic sunroof"]},
+ "Elevate":{
+  "SV":["6 airbags","ESC and traction control","Hill-start assist","Rear parking sensors","Automatic AC"],
+  "V":["8-inch touchscreen, wireless phone link","Connected car tech","Multi-angle rear camera","4 speakers","Rear USB-C ports"],
+  "VX":["Electric sunroof","17-inch dual-tone alloys","Wireless charger","Ambient lighting","LED lighting signature"],
+  "ZX":["ADAS safety suite","10.25-inch touchscreen","Ventilated front seats","Leather upholstery","Auto-dimming inside mirror"],
+  "ZX Plus":["360° camera","Front parking sensors","Powered driver seat","Ventilated rear seats","ADAS safety suite"]},
+ "XL6":{
+  "Zeta":["Captain seats in 2nd row","7-inch touchscreen","Android Auto / CarPlay","Cruise control","Push-button start"],
+  "Alpha":["360° camera","Leather seats","Auto headlamps","Leather steering wheel","IR-cut windscreen"],
+  "Alpha Plus":["Ventilated front seats","Tyre pressure monitor","360° camera","Leather seats","Rear spoiler"]},
+ "Grand Vitara":{
+  "Sigma":["ESC stability control","Push-button start","Automatic AC","Projector headlamps","6 airbags"],
+  "Delta":["Rear camera","7-inch touchscreen","Cruise control","Paddle shifters (automatic)","Rear USB charger"],
+  "Zeta":["LED projector headlamps","9-inch touchscreen","Curtain airbags","17-inch alloys","Rear wiper"],
+  "Zeta Plus":["Head-up display","Panoramic sunroof","Wireless charger","Colour digital cluster","Ambient lighting"],
+  "Alpha":["360° camera","Panoramic sunroof","Leather seats","Leather steering wheel","9-inch touchscreen"],
+  "Alpha Plus":["Ventilated front seats","Tyre pressure monitor","360° camera","Head-up display","Better speakers"]},
+};
+const PMATCH={"Victoris":["Grand Vitara","Creta","Seltos","Hyryder","Taigun","Kushaq","Elevate","Bayon","Duster","Tekton"],"Alto K10":["Tiago","Kwid"],"S-Presso":["Tiago","Kwid"],"Celerio":["Tiago","Grand i10 Nios","C3","Kwid"],"Swift":["Baleno","Fronx","Tiago","Grand i10 Nios","Punch","Exter","i20","Altroz","Glanza"],"Dzire":["Aura","Amaze","Tigor"],"Wagon R":["Tiago","Grand i10 Nios","C3"],"Brezza":["Fronx","Nexon","Venue","Sonet","XUV 3XO","Syros","Kylaq","Magnite","Kiger","Taisor"],"Ertiga":["XL6","Carens Clavis","Triber","Rumion"],"Eeco":["Triber","Tiago","Kwid"]};
+const MATCH={"Ertiga":["XL6","Rumion"],"Eeco":["Tiago"],"Victoris":["Grand Vitara","Hyryder"],"Alto K10":["Tiago"],"S-Presso":["Tiago"],"Celerio":["Tiago","C3"],"Swift":["Baleno","Fronx","Tiago","Grand i10 Nios","Exter","Punch","Altroz","Glanza","C3"],"Dzire":["Aura","Tigor"],"Wagon R":["Tiago","Grand i10 Nios","C3"],"Brezza":["Fronx","Nexon","XUV 3XO","Taisor"]};
+
+// ---- 50 cities: petrol ₹/L, CNG ₹/kg (null = no CNG network). Sources in the notes. Updated 1 Nov 2026 ----
+const CITIES=[
+ {n:"Delhi",st:"Delhi",p:102.12,c:86.98},{n:"Mumbai",st:"Maharashtra",p:111.21,c:89.00},{n:"Bengaluru",st:"Karnataka",p:111.68,c:99.00},
+ {n:"Hyderabad",st:"Telangana",p:116.15,c:112.00},{n:"Chennai",st:"Tamil Nadu",p:107.76,c:99.50},{n:"Kolkata",st:"West Bengal",p:113.51,c:93.50},
+ {n:"Pune",st:"Maharashtra",p:111.90,c:100.50},{n:"Ahmedabad",st:"Gujarat",p:102.15,c:94.02},{n:"Surat",st:"Gujarat",p:101.82,c:88.76},
+ {n:"Jaipur",st:"Rajasthan",p:114.15,c:99.50},{n:"Lucknow",st:"Uttar Pradesh",p:101.86,c:95.75},{n:"Kanpur",st:"Uttar Pradesh",p:101.78,c:98.31},
+ {n:"Nagpur",st:"Maharashtra",p:111.72,c:88.90},{n:"Indore",st:"Madhya Pradesh",p:114.58,c:97.76},{n:"Bhopal",st:"Madhya Pradesh",p:114.54,c:97.50},
+ {n:"Thane",st:"Maharashtra",p:111.31,c:85.75},{n:"Visakhapatnam",st:"Andhra Pradesh",p:116.39,c:99.80},{n:"Vadodara",st:"Gujarat",p:101.46,c:92.10},
+ {n:"Patna",st:"Bihar",p:113.59,c:93.00},{n:"Ludhiana",st:"Punjab",p:105.79,c:92.75},{n:"Agra",st:"Uttar Pradesh",p:101.66,c:95.75},
+ {n:"Nashik",st:"Maharashtra",p:112.44,c:93.65},{n:"Faridabad",st:"Haryana",p:103.35,c:99.70},{n:"Meerut",st:"Uttar Pradesh",p:101.99,c:96.50},
+ {n:"Rajkot",st:"Gujarat",p:101.72,c:88.76},{n:"Varanasi",st:"Uttar Pradesh",p:102.23,c:93.00},{n:"Srinagar",st:"Jammu & Kashmir",p:108.41,c:null},
+ {n:"Aurangabad",st:"Maharashtra",p:112.08,c:105.36},{n:"Ranchi",st:"Jharkhand",p:106.19,c:94.50},{n:"Coimbatore",st:"Tamil Nadu",p:108.63,c:96.90},
+ {n:"Jabalpur",st:"Madhya Pradesh",p:116.17,c:106.50},{n:"Gwalior",st:"Madhya Pradesh",p:114.48,c:97.76},{n:"Vijayawada",st:"Andhra Pradesh",p:116.64,c:103.00},
+ {n:"Jodhpur",st:"Rajasthan",p:113.20,c:97.00},{n:"Madurai",st:"Tamil Nadu",p:108.50,c:98.40},{n:"Raipur",st:"Chhattisgarh",p:108.30,c:87.75},
+ {n:"Kota",st:"Rajasthan",p:114.14,c:102.00},{n:"Guwahati",st:"Assam",p:106.51,c:87.00},{n:"Chandigarh",st:"Chandigarh",p:101.54,c:93.80},
+ {n:"Mysuru",st:"Karnataka",p:110.44,c:91.50},{n:"Gurugram",st:"Haryana",p:102.97,c:92.01},{n:"Noida",st:"Uttar Pradesh",p:102.09,c:95.59},
+ {n:"Ghaziabad",st:"Uttar Pradesh",p:101.88,c:95.59},{n:"Bhubaneswar",st:"Odisha",p:108.97,c:93.50},{n:"Dehradun",st:"Uttarakhand",p:99.54,c:99.50},
+ {n:"Kochi",st:"Kerala",p:113.53,c:102.50},{n:"Thiruvananthapuram",st:"Kerala",p:115.49,c:99.00},{n:"Amritsar",st:"Punjab",p:105.56,c:91.33},
+ {n:"Prayagraj",st:"Uttar Pradesh",p:101.96,c:103.00},{n:"Jamshedpur",st:"Jharkhand",p:105.28,c:93.00}];
+const PRICE_DATE="1 Nov 2026";
+
+// ---- Nexa models (CNG versions paired with their petrol twin) ----
+const NEXA=[
+ {n:"Baleno",ch:"Nexa",p:23.80,c:33.61,vars:[{v:"Delta CNG",x:7.92,pv:"Delta",px:7.00},{v:"Delta CNG AMT",x:8.32,pv:"Delta AMT",px:7.50,c:34.47,p:24.77},{v:"Zeta CNG",x:8.92,pv:"Zeta",px:8.00},{v:"Zeta CNG AMT",x:9.32,pv:"Zeta AMT",px:8.50,c:34.47,p:24.77}]},
+ {n:"Fronx",ch:"Nexa",p:21.79,c:28.51,vars:[{v:"Sigma CNG",x:7.94,pv:"Sigma 1.2",px:6.90},{v:"Delta CNG",x:8.74,pv:"Delta 1.2",px:7.75}]},
+ {n:"Grand Vitara",ch:"Nexa",p:21.11,c:26.6,vars:[{v:"Delta CNG",x:13.05,pv:"Delta",px:12.15},{v:"Zeta CNG",x:14.80,pv:"Zeta",px:13.85}]},
+ {n:"XL6",ch:"Nexa",p:20.97,c:26.32,vars:[{v:"Zeta CNG",x:12.61,pv:"Zeta",px:11.62}]},
+ {n:"Jimny",ch:"Nexa",p:16.94,vars:[]},
+ {n:"e Vitara",ch:"Nexa",ev:true,vars:[]}];
+const NEXA_PETROL={
+ "Jimny":[["Zeta MT",12.39,16.94],["Alpha MT",13.31,16.94],["Zeta AT",13.45,16.39],["Alpha AT",14.37,16.39]]};
+// EV: [version, ex-showroom ₹ lakh (with battery), km per kWh = claimed range ÷ battery]
+const EV_MARUTI={"e Vitara":[["Delta 49 kWh",15.99,440/49],["Zeta 61 kWh",17.49,543/61],["Alpha 61 kWh",19.79,543/61],["Alpha Dual Tone 61 kWh",20.01,543/61]]};
+const EVRIVALS={
+ "Creta Electric":{b:"Hyundai",vars:[["42 kWh (base)",17.99,390/42],["51.4 kWh (top)",24.70,473/51.4]]},
+ "Curvv EV":{b:"Tata",vars:[["45 kWh (base)",17.49,430/45],["55 kWh (top)",22.24,502/55]]},
+ "BE 6":{b:"Mahindra",vars:[["59 kWh (base)",18.90,556/59],["79 kWh (top)",27.65,682/79]]},
+ "XEV 9e":{b:"Mahindra",vars:[["59 kWh (base)",21.90,542/59]]},
+ "Windsor EV":{b:"MG",vars:[["52.9 kWh (top)",18.50,449/52.9]]},
+ "ZS EV":{b:"MG",vars:[["50.3 kWh (base)",17.99,461/50.3],["50.3 kWh (top)",20.75,461/50.3]]},
+ "VF 6":{b:"VinFast",vars:[["59.6 kWh (base)",17.29,468/59.6],["59.6 kWh (top)",19.19,468/59.6]]},
+ "Atto 3":{b:"BYD",vars:[["49.9 kWh (base)",24.99,468/49.9]]}};
+const EV_FEAT={
+ "e Vitara":["49 kWh (440 km) or 61 kWh (543 km) battery","7 airbags","10.1-inch touchscreen, wireless phone link","Level 2 ADAS (Alpha)","Reclining, sliding rear seats"],
+ "Creta Electric":["42 kWh (390 km) or 51.4 kWh (473 km)","Based on India's best-selling mid-size SUV","Dual 10.25-inch screens","Ventilated seats (top)","Level 2 ADAS (top)"],
+ "Curvv EV":["45 kWh (430 km) or 55 kWh (502 km)","Coupe-SUV styling","5-star Bharat NCAP","Panoramic sunroof (top)","Level 2 ADAS (top)"],
+ "BE 6":["59 kWh (556 km) or 79 kWh (682 km)","5-star Bharat NCAP","Dual 12.3-inch screens","Head-up display (top)","Level 2 ADAS"],
+ "XEV 9e":["59 kWh (542 km) or 79 kWh (656 km)","5-star Bharat NCAP","Triple screens","Large 5-seat SUV","Level 2 ADAS"],
+ "Windsor EV":["52.9 kWh (449 km) on Pro","Reclining rear seats","15.6-inch touchscreen","Battery-rental option","Large cabin"],
+ "ZS EV":["50.3 kWh (461 km)","Panoramic sunroof (top)","Level 2 ADAS (top)","Battery-rental option","10.1-inch touchscreen"],
+ "VF 6":["59.6 kWh battery, 468 km claimed","Level 2 ADAS","5-seat electric SUV"],
+ "Atto 3":["49.9 kWh (468 km) or 60.5 kWh (521 km)","Rotating touchscreen","Panoramic sunroof","Level 2 ADAS","5-star Euro NCAP"],
+ "Jimny":["4x4 with low-range transfer case (AllGrip Pro)","1.5 petrol, manual or automatic","6 airbags","9-inch touchscreen (Alpha)","Ladder-frame off-roader"]};
+const EV_VFEAT={"e Vitara":{
+ "Delta":["18-inch alloys","10.1-inch touchscreen, wireless phone link","7 airbags","Push-button start","Reclining, sliding rear seats"],
+ "Zeta":["Wireless charger","Rear camera","Rear parcel shelf","10.1-inch touchscreen, wireless phone link","7 airbags"],
+ "Alpha":["Level 2 ADAS","360° camera","Infinity 8-speaker sound","Ventilated front seats","Fixed glass roof"]}};
+// extra segment matchups for Nexa models
+const NEXA_MATCH={"Baleno":["Glanza","Altroz","Punch","Exter","Tiago"],"Fronx":["Taisor","Nexon","XUV 3XO","Punch","Exter"],"Grand Vitara":["Hyryder"],"XL6":["Rumion"]};
+const NEXA_PMATCH={"Baleno":["i20","Altroz","Glanza","Punch","Exter","Tiago"],"Fronx":["Taisor","Nexon","Venue","Sonet","XUV 3XO","Kylaq","Syros","Magnite","Kiger","Punch"],
+ "Grand Vitara":["Hyryder","Creta","Seltos","Taigun","Kushaq","Elevate","Bayon","Duster","Tekton"],"XL6":["Carens Clavis","Rumion","Triber"],"Jimny":[]};
+const EMATCH={"e Vitara":Object.keys(EVRIVALS)};
+
+function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+function cmpImage(){
+  const C=CMP;if(!C)return null;const ms=C.rows[0],all=C.rows.slice(1);
+  // phone-shaped: 1080 wide, at most 1920 tall (9:16), drawn at 2x for sharpness
+  const S=2,W=1080,P=40,MAXH=1920,HEAD=300,COLH=44,RH=96,GAP=10,FOOT=50,SIPH=230;
+  const RATE=0.10,mths=Math.round(C.yrs*12),i=RATE/12,sip=m=>m>0?m*((Math.pow(1+i,mths)-1)/i)*(1+i):0;
+  // overall saving from buying the Maruti version (ex-showroom difference + fuel over the period), spread monthly and invested as a SIP
+  const invOf=x=>{const mon=(x.tot-ms.tot)/mths,fv=sip(Math.max(mon,0));return{mon,fv}};
+  const anyInv=all.some(x=>{const o=invOf(x);return o.mon>0&&o.fv>0});
+  const fixed=HEAD+COLH+FOOT+(anyInv?SIPH:0)+30;
+  const fitN=Math.max(1,Math.floor((MAXH-fixed)/(RH+GAP)));
+  const rivals=all.slice(0,fitN),more=all.length-rivals.length;
+  const H=Math.min(MAXH,fixed+rivals.length*(RH+GAP)+(more?34:0));
+  const cv=document.createElement("canvas");cv.width=W*S;cv.height=H*S;const g=cv.getContext("2d");g.scale(S,S);
+  const disp='"Bricolage Grotesque",Georgia,serif',body='"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
+  const INK="#241f3a",MUT="#6a6485",GOOD="#1f7a55",BAD="#b5541a";
+  const fitText=(t,wt,fam,max,min,x,y,w,col,al)=>{let f=max;g.font=`${wt} ${f}px ${fam}`;while(g.measureText(t).width>w&&f>min){f--;g.font=`${wt} ${f}px ${fam}`}g.fillStyle=col;g.textAlign=al||"left";g.fillText(t,x,y);g.textAlign="left"};
+  const cityN=curCity().n;
+  g.fillStyle="#f7f4fd";g.fillRect(0,0,W,H);
+  // header
+  let hg=g.createLinearGradient(0,0,W,HEAD);hg.addColorStop(0,"#d9cffd");hg.addColorStop(.5,"#ffd6e6");hg.addColorStop(1,"#cdeff7");
+  rr(g,P/2,P/2,W-P,HEAD-P/2-14,30);g.fillStyle=hg;g.fill();
+  g.fillStyle="#9b2f5e";g.font=`800 21px ${body}`;g.fillText(`MARUTI SUZUKI ${C.m.ch.toUpperCase()}  ·  CompareX India`,P+14,P+36);
+  fitText(`${ms.n} ${ms.v}`,800,disp,56,36,P+14,P+100,W-2*P-30,INK);
+  g.fillStyle="#4b3aa8";g.font=`700 28px ${body}`;g.fillText("vs competition",P+14,P+140);
+  const chips=[{petrol:"Petrol",cng:"CNG",ev:"Electric"}[C.fuel],`${C.km} km/day`,plural(C.yrs,"year"),cityN,`Ex-showroom ${lakh(ms.x)}`].filter(Boolean);
+  let cx=P+14;g.font=`700 21px ${body}`;
+  chips.forEach(t=>{const w=g.measureText(t).width+28;if(cx+w>W-P)return;rr(g,cx,P+160,w,38,19);g.fillStyle="rgba(255,255,255,.85)";g.fill();g.fillStyle=INK;g.fillText(t,cx+14,P+186);cx+=w+8});
+  const wins=all.filter(x=>x.tot>=ms.tot).length;
+  fitText(`${ms.n} costs less to own than ${wins} of ${all.length} rivals over ${plural(C.yrs,"year")}`,700,body,23,16,P+14,P+236,W-2*P-30,INK);
+  // columns
+  const X={name:P+20,price:P+330,mil:P+500,fuel:P+640,save:W-P-14};
+  let y=HEAD+4;g.fillStyle=MUT;g.font=`800 16px ${body}`;
+  g.fillText("RIVAL",X.name,y+24);g.fillText("PRICE",X.price,y+24);g.fillText("MILEAGE",X.mil,y+24);g.fillText(C.fuel==="ev"?"CHARGE / YEAR":"FUEL / YEAR",X.fuel,y+24);
+  g.textAlign="right";g.fillText(`${plural(C.yrs,"YR").toUpperCase()} TOTAL`,X.save,y+24);g.textAlign="left";
+  y+=COLH;
+  rivals.forEach(x=>{
+    const d=x.tot-ms.tot,win=d>=0,gap=(ms.x-x.x)*1e5,pct=Math.round((ms.c/x.c-1)*100),fs=x.fuelYr-ms.fuelYr,iv=invOf(x);
+    g.save();g.shadowColor="rgba(70,40,150,.10)";g.shadowBlur=14;g.shadowOffsetY=4;rr(g,P/2,y,W-P,RH,18);g.fillStyle="#ffffff";g.fill();g.restore();
+    rr(g,P/2,y,9,RH,4);g.fillStyle=win?"#5cc79a":"#ff9f6b";g.fill();
+    fitText(x.n,800,disp,28,18,X.name,y+42,X.price-X.name-16,INK);
+    fitText(`${x.b.replace("Maruti Suzuki ","")} · ${x.v}`,500,body,17,12,X.name,y+72,X.price-X.name-16,MUT);
+    const metric=(xx,w,ok,big,small)=>{fitText(big,800,body,24,16,xx,y+44,w,ok?GOOD:BAD);fitText(small,600,body,15,11,xx,y+70,w,MUT)};
+    metric(X.price,160,gap<=0,gap===0?"Same":inr(Math.abs(gap)),gap===0?"same price":gap<0?`${ms.n} cheaper`:`${ms.n} dearer`);
+    metric(X.mil,130,pct>=0,pct===0?"Same":`${pct>0?"+":"−"}${Math.abs(pct)}%`,pct>=0?`${ms.n} better`:`${x.n} better`);
+    metric(X.fuel,130,fs>=0,inr(Math.abs(fs)),fs>=0?`${ms.n} saves`:`${x.n} saves`);
+    g.font=`800 24px ${body}`;const t=inr(Math.abs(d)),pw=Math.max(g.measureText(t).width+30,128);
+    rr(g,X.save-pw,y+14,pw,40,20);g.fillStyle=win?"#bff0d9":"#ffe0cc";g.fill();
+    g.fillStyle=win?GOOD:BAD;g.textAlign="center";g.fillText(t,X.save-pw/2,y+42);
+    g.font=`700 15px ${body}`;
+    if(iv.mon>0&&iv.fv>0){g.fillStyle="#9b5a00";g.fillText(`SIP ${inr(iv.fv)}`,X.save-pw/2,y+78)}else{g.fillStyle=MUT;g.fillText(win?`${ms.n} saves`:`${x.n} saves`,X.save-pw/2,y+78)}
+    g.textAlign="left";y+=RH+GAP;
+  });
+  if(more){g.fillStyle=MUT;g.font=`600 18px ${body}`;g.fillText(`+ ${more} more rival${more>1?"s":""} on the page`,P+14,y+20);y+=34}
+  g.fillStyle=MUT;fitText(`All prices are ex-showroom. Total = ex-showroom price + fuel for ${plural(C.yrs,"year")}. Claimed mileage. Green = ${ms.n} better.`,500,body,17,12,P+6,y+28,W-2*P,MUT);
+  y+=FOOT;
+  if(anyInv){
+    const inv=all.map(x=>({x,...invOf(x)})).filter(o=>o.mon>0&&o.fv>0);
+    const best=inv.reduce((a,b)=>b.mon>a.mon?b:a,inv[0]),top=inv.reduce((a,b)=>b.fv>a.fv?b:a,inv[0]),fv=top.fv;
+    const treat=best.mon<=1000?"a movie date for two, every month 🍿":best.mon<=2000?"a dinner date, every month 🍽️":best.mon<=4000?"a family day outing, every month 🎡":"a short trip, every month 🚗";
+    const gift=fv>=150000?"a diamond ring for your better half 💍":fv>=70000?"a family holiday on your savings 🏖️":fv>=30000?"a gold chain for your better half 💛":"a new phone for your better half 📱";
+    let ig=g.createLinearGradient(0,y,W,y+SIPH);ig.addColorStop(0,"#fff4d6");ig.addColorStop(1,"#dff6ea");
+    rr(g,P/2,y,W-P,SIPH-20,26);g.fillStyle=ig;g.fill();
+    g.fillStyle="#9b5a00";g.font=`800 19px ${body}`;g.fillText("💰 INVEST WHAT YOU SAVE  ·  SIP @ 10% A YEAR",P+14,y+38);
+    fitText(`Buying the ${ms.n} ${ms.v} saves up to ${inr(best.mon)} a month = ${treat}`,800,disp,28,17,P+14,y+82,W-2*P-30,INK);
+    fitText(`As a SIP, it grows to ${inr(fv)} in ${plural(C.yrs,"year")}: ${gift}`,700,body,22,14,P+14,y+118,W-2*P-30,"#4b3aa8");
+    g.fillStyle=MUT;g.font=`500 15px ${body}`;
+    [`Overall saving (ex-showroom price difference + fuel over ${plural(C.yrs,"year")}) split into equal monthly SIPs. SIP value per rival is under each saving.`,"10% a year is an assumed return for illustration only. Returns are not guaranteed; this is not investment advice."].forEach((t,k)=>fitText(t,500,body,15,11,P+14,y+156+k*22,W-2*P-30,MUT));
+  }
+  return cv;
+}
+
+// ================= app =================
+const $=id=>document.getElementById(id);
+const lakh=v=>"₹"+v.toFixed(2)+" L";
+const inr=v=>{const s=v<0?"−":"";v=Math.abs(v);if(v>=1e5)return s+"₹"+(v/1e5).toFixed(2)+" L";return s+"₹"+Math.round(v).toLocaleString("en-IN")};
+const inr2=v=>"₹"+v.toFixed(2);
+const plural=(n,w)=>`${+(+n).toFixed(1)} ${w}${+n===1?"":"s"}`;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const LS={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+const SHARE_URL=location.hostname.endsWith("github.io")?location.origin+location.pathname:"https://crprakashreddy-sys.github.io/arena-compare/india/";
+
+const ALL=[...MODELS,...NEXA];
+const curCity=()=>CITIES[S.city];
+const MATCH2=Object.assign({},MATCH,NEXA_MATCH),PMATCH2=Object.assign({},PMATCH,NEXA_PMATCH);
+const PET=Object.assign({},PETROL,NEXA_PETROL);
+["Baleno","Fronx","Grand Vitara","XL6"].forEach(n=>{if(PRIVALS[n])PET[n]=PRIVALS[n].vars});
+const fuelsOf=m=>m.ev?["ev"]:[...(PET[m.n]&&PET[m.n].length?["petrol"]:[]),...(m.vars&&m.vars.length?["cng"]:[])];
+const versionsOf=(m,f)=>f==="ev"?EV_MARUTI[m.n].map(a=>({v:a[0],x:a[1],c:a[2]})):f==="cng"?m.vars.map(v=>({v:v.v,x:v.x,c:v.c||m.c,raw:v})):(PET[m.n]||[]).map(a=>({v:a[0],x:a[1],c:a[2]}));
+function featFor2(model,variant){
+  const T=Object.assign({},VFEAT,EV_VFEAT)[model];
+  if(T&&variant){const v=variant.toLowerCase();let best=null;Object.keys(T).forEach(k=>{const kl=k.toLowerCase();if((v===kl||v.startsWith(kl+" "))&&(!best||k.length>best.length))best=k});
+    if(best)return{list:T[best],label:`${best} features`,exact:true}}
+  return{list:FEAT[model]||EV_FEAT[model]||["Feature list not loaded yet"],label:"Model highlights",exact:false};
+}
+
+// ---- state ----
+const S={city:0,ch:"Arena",model:"Swift",fuel:"cng",ver:0,km:40,yrs:5,pp:0,cp:0,ep:9,rw:80,mode:"seg",band:75000,tab:"rivals",pick:{}};
+(function load(){const c=+LS.get("cxCity");if(CITIES[c])S.city=c;else{const d=CITIES.findIndex(x=>x.n==="Delhi");S.city=d<0?0:d}})();
+function setCity(i){S.city=i;const c=CITIES[i];S.pp=c.p;S.cp=c.c||0;LS.set("cxCity",String(i));
+  $("cityName").textContent=c.n;
+  $("fuelStamp").innerHTML=`<span>⛽ Petrol ₹${c.p.toFixed(2)}/L</span><span>🟢 CNG ${c.c?`₹${c.c.toFixed(2)}/kg`:"not available"}</span><span>⚡ Charging ₹${S.ep}/kWh</span><span>📅 ${PRICE_DATE}</span>`;
+  if(!c.c&&S.fuel==="cng"){const m=ALL.find(x=>x.n===S.model);if(fuelsOf(m).includes("petrol"))S.fuel="petrol"}
+  render()}
+
+// ---- pickers ----
+function renderCars(){
+  [...$("chSeg").children].forEach(b=>b.setAttribute("aria-pressed",b.dataset.ch===S.ch));
+  const list=ALL.filter(m=>m.ch===S.ch);
+  $("cars").innerHTML=list.map(m=>{const fs=fuelsOf(m),from=Math.min(...fs.flatMap(f=>versionsOf(m,f).map(v=>v.x)));
+    return `<button type="button" class="car" data-m="${esc(m.n)}" aria-pressed="${m.n===S.model}"><b>${esc(m.n)}</b><small>from ${lakh(from)}</small><span class="tags">${fs.map(f=>`<em class="${f}">${f==="ev"?"EV":f==="cng"?"CNG":"PETROL"}</em>`).join("")}</span></button>`}).join("");
+}
+function renderFuel(){
+  const m=ALL.find(x=>x.n===S.model),fs=fuelsOf(m),c=CITIES[S.city];
+  if(!fs.includes(S.fuel))S.fuel=fs.includes("cng")&&c.c?"cng":fs[0];
+  const lab={petrol:"Petrol",cng:"CNG",ev:"Electric"};
+  $("fuelSeg").innerHTML=["petrol","cng","ev"].filter(f=>fs.includes(f)).map(f=>`<button type="button" data-f="${f}" aria-pressed="${f===S.fuel}" ${f==="cng"&&!c.c?"disabled title='No CNG in this city'":""}>${lab[f]}</button>`).join("");
+  const vs=versionsOf(m,S.fuel);if(S.ver>=vs.length)S.ver=0;
+  $("vers").innerHTML=vs.map((v,i)=>`<button type="button" class="ver" data-v="${i}" aria-pressed="${i===S.ver}">${esc(v.v)}<small>${lakh(v.x)}</small></button>`).join("");
+}
+
+// ---- compare ----
+let CMP=null;
+function nearest(vars,price,name){const hy=/hybrid/i.test(name||""),ok=hy&&vars.some(v=>/hybrid/i.test(v[0]))?v=>/hybrid/i.test(v[0]):()=>true;
+  let bi=0,bd=1e9;vars.forEach((v,i)=>{if(!ok(v))return;const d=Math.abs(v[1]-price);if(d<bd){bd=d;bi=i}});return bi}
+function compute(){
+  const m=ALL.find(x=>x.n===S.model),f=S.fuel,vs=versionsOf(m,f),mv=vs[S.ver]||vs[0];
+  const POOL=f==="ev"?EVRIVALS:f==="cng"?RIVALS:PRIVALS,MAP=f==="ev"?EMATCH:f==="cng"?MATCH2:PMATCH2;
+  const fp=f==="ev"?S.ep:f==="cng"?S.cp:S.pp,unit=f==="ev"?"km/kWh":f==="cng"?"km/kg":"km/L",rw=S.rw/100,kmYr=S.km*365;
+  const cost=(x,c)=>{const cpk=fp/(c*rw),fuelYr=cpk*kmYr;return{cpk,fuelYr,tot:x*1e5+fuelYr*S.yrs}};
+  const ms={b:"Maruti Suzuki "+m.ch,n:m.n,v:mv.v,x:mv.x,c:mv.c,msil:true,...cost(mv.x,mv.c)};
+  let names=(MAP[m.n]||[]).filter(n=>POOL[n]&&n!==m.n);
+  if(S.mode==="price")names=[...new Set([...names,...Object.keys(POOL).filter(n=>n!==m.n&&POOL[n].vars.some(v=>Math.abs(v[1]-mv.x)*1e5<=S.band))])];
+  const pk=f+":";
+  const rows=[ms,...names.map(n=>{const R=POOL[n],i=S.pick[pk+n]!=null?S.pick[pk+n]:nearest(R.vars,mv.x,mv.v),rv=R.vars[i];
+    return{b:R.b,n,v:rv[0],x:rv[1],c:rv[2]||R.c,idx:i,...cost(rv[1],rv[2]||R.c)}})];
+  CMP={rows,ms,yrs:S.yrs,km:S.km,isP:f==="petrol",fuel:f,unit,fp,rw,POOL,pk,m};
+  return CMP;
+}
+function renderSummary(){
+  const C=CMP,ms=C.ms,rv=C.rows.slice(1),c=CITIES[S.city];
+  const fl={petrol:"Petrol",cng:"CNG",ev:"Electric"}[C.fuel];
+  if(!rv.length){$("summary").innerHTML=`<div class="k">${esc(c.n.toUpperCase())} · ${fl.toUpperCase()}</div><h2>${esc(ms.n)} ${esc(ms.v)}</h2><p>${S.model==="Jimny"?"Mahindra Thar and Force Gurkha don't publish claimed mileage, so there's no like-for-like running-cost rival.":"No direct rival in this segment. Try Settings → \"any car at a similar price\"."} Ex-showroom ${lakh(ms.x)} · running cost ${inr2(ms.cpk)}/km.</p>`;return}
+  const wins=rv.filter(x=>x.tot>=ms.tot),best=wins.reduce((a,b)=>!a||b.tot-ms.tot>a.tot-ms.tot?b:a,null);
+  $("summary").innerHTML=`<div class="k">${esc(c.n.toUpperCase())} · ${fl.toUpperCase()} · ${S.km} KM/DAY · ${plural(S.yrs,"YEAR").toUpperCase()}</div>
+    <h2>${esc(ms.n)} ${esc(ms.v)} costs less to own than ${wins.length} of ${rv.length} rivals</h2>
+    <p>${best?`Biggest saving: ${inr(best.tot-ms.tot)} vs the ${esc(best.n)} over ${plural(S.yrs,"year")}. `:""}Ex-showroom ${lakh(ms.x)} · ${inr2(ms.cpk)} per km.</p>`;
+}
+function renderRivals(){
+  const C=CMP,ms=C.ms,rv=C.rows.slice(1);
+  if(!rv.length){$("rivals").innerHTML=`<div class="empty">No rivals to show for this choice.</div>`;$("rivNote").textContent="";return}
+  const mths=Math.round(S.yrs*12),i=0.10/12,sip=mo=>mo>0?mo*((Math.pow(1+i,mths)-1)/i)*(1+i):0;
+  $("rivals").innerHTML=rv.map((x,k)=>{const d=x.tot-ms.tot,win=d>=0,gap=(ms.x-x.x)*1e5,pct=Math.round((ms.c/x.c-1)*100),fs=x.fuelYr-ms.fuelYr,sv=sip(d/mths);
+    return `<article class="rcard ${win?"":"lose"}" data-i="${k+1}" tabindex="0" role="button" aria-label="Details: ${esc(ms.n)} vs ${esc(x.n)}">
+      <div class="rhead"><div class="nm"><small>${esc(x.b)}</small><b>${esc(x.n)}</b><small>${esc(x.v)} · ${lakh(x.x)}</small></div>
+      <div class="save"><b>${win?`${esc(ms.n)} saves`:`${esc(x.n)} saves`} ${inr(Math.abs(d))}</b><small>over ${plural(S.yrs,"year")}</small></div></div>
+      <div class="mets">
+        <div class="met"><span>Price</span><b class="${gap<=0?"ok":"no"}">${gap===0?"Same":inr(Math.abs(gap))}</b><small>${gap===0?"same price":gap<0?`${esc(ms.n)} cheaper`:`${esc(ms.n)} dearer`}</small></div>
+        <div class="met"><span>Mileage</span><b class="${pct>=0?"ok":"no"}">${pct===0?"Same":(pct>0?"+":"−")+Math.abs(pct)+"%"}</b><small>${esc(ms.n)} ${ms.c.toFixed(1)} vs ${x.c.toFixed(1)}</small></div>
+        <div class="met"><span>${C.fuel==="ev"?"Charging/yr":"Fuel/yr"}</span><b class="${fs>=0?"ok":"no"}">${inr(Math.abs(fs))}</b><small>${fs>=0?`${esc(ms.n)} saves`:`${esc(x.n)} saves`}</small></div>
+      </div>
+      <div class="rfoot"><span>Tap for full comparison ›</span>${win&&sv>0?`<span class="sip">SIP value ${inr(sv)}</span>`:""}</div></article>`}).join("");
+  $("rivNote").textContent=`Rival versions open nearest in price${/hybrid/i.test(ms.v)?" (hybrid matched with hybrid)":""}; change them inside each card. Total = ex-showroom + ${C.fuel==="ev"?"charging":"fuel"} for ${plural(S.yrs,"year")}. SIP value = the overall saving invested monthly at an assumed 10% a year.`;
+}
+function renderFuelTab(){
+  const m=CMP.m,c=CITIES[S.city];$("tabFuel").hidden=!(m.vars&&m.vars.length)||!c.c;
+  if($("tabFuel").hidden){if(S.tab==="fuel")S.tab="rivals";return}
+  const cv=S.fuel==="cng"?m.vars[S.ver]||m.vars[0]:m.vars.find(v=>v.pv===versionsOf(m,"petrol")[S.ver]?.v)||m.vars[0];
+  const rw=S.rw/100,pm=(cv.p||m.p)*rw,cm=(cv.c||m.c)*rw,prem=(cv.x-cv.px)*1e5,mKm=S.km*365/12,months=S.yrs*12;
+  const pCpk=S.pp/pm,cCpk=S.cp/cm,pMon=pCpk*mKm,cMon=cCpk*mKm+2500/12,save=pMon-cMon,be=save>0?prem/save:Infinity,net=save*months-prem;
+  const beTxt=!isFinite(be)?"Never":be<12?be.toFixed(1)+" mo":(be/12).toFixed(1)+" yr",pct=isFinite(be)?Math.min(100,be/months*100):100;
+  $("pFuel").innerHTML=`<div class="verdict ${net>0?"":"neg"}"><div><span class="tag">${net>0?"GO CNG":"STAY PETROL"}</span>
+    <p>${net>0?`The <b>${esc(m.n)} ${esc(cv.v)}</b> pays back its ${inr(prem)} extra price in <b>${beTxt.replace("mo"," months").replace("yr"," years")}</b> and leaves you <b>${inr(net)} better off</b> over ${plural(S.yrs,"year")} in ${esc(c.n)}.`:`At ${S.km} km a day, the CNG version's ${inr(prem)} extra price ${isFinite(be)?`takes ${beTxt} to pay back`:"never pays back"}. Petrol works out ${inr(-net)} cheaper.`}</p></div>
+    <div class="ring ${isFinite(be)&&be<=months?"":"late"}" style="--p:${pct.toFixed(1)}"><div><b>${beTxt}</b><span>payback</span></div></div></div>
+    <div class="kpis" style="margin-top:10px"><div class="kpi"><span>Saving per month</span><b>${inr(save)}</b></div><div class="kpi"><span>Over ${plural(S.yrs,"year")}</span><b>${inr(net)}</b></div></div>
+    <div class="duo" style="margin-top:10px">
+      <div class="fuel"><h4>⛽ PETROL</h4><div class="fv">${esc(m.n)} ${esc(cv.pv)}</div><div class="r"><span>Ex-showroom</span><b>${lakh(cv.px)}</b></div><div class="r"><span>Real mileage</span><b>${pm.toFixed(1)} km/L</b></div><div class="r"><span>Per km</span><b>${inr2(pCpk)}</b></div><div class="r"><span>Per month</span><b>${inr(pMon)}</b></div></div>
+      <div class="fuel"><h4>🟢 CNG</h4><div class="fv">${esc(m.n)} ${esc(cv.v)}</div><div class="r"><span>Ex-showroom</span><b>${lakh(cv.x)}</b></div><div class="r"><span>Real mileage</span><b>${cm.toFixed(1)} km/kg</b></div><div class="r"><span>Per km</span><b>${inr2(cCpk)}</b></div><div class="r"><span>Per month*</span><b>${inr(cMon)}</b></div></div></div>
+    <p class="note">*Includes ₹2,500 a year extra CNG upkeep. Same version in both fuels, ${esc(c.n)} fuel prices, ${S.rw}% of claimed mileage.</p>`;
+}
+function renderFeat(){
+  const C=CMP;$("feats").innerHTML=C.rows.map(x=>{const F=featFor2(x.n,x.v);return `<div class="feat ${x.msil?"me":""}"><small>${esc(x.b)}</small><b>${esc(x.n)}</b><small>${esc(x.v)} · ${F.label}</small><ol>${F.list.map(t=>`<li>${esc(t)}</li>`).join("")}</ol></div>`}).join("");
+}
+function showTab(t){S.tab=t;document.querySelectorAll(".tabs [data-t]").forEach(b=>b.setAttribute("aria-selected",b.dataset.t===t));
+  $("pRivals").hidden=t!=="rivals";$("pFuel").hidden=t!=="fuel";$("pFeat").hidden=t!=="feat"}
+function render(){
+  renderCars();renderFuel();
+  const m=ALL.find(x=>x.n===S.model);$("tabFuel").textContent="Petrol vs CNG";
+  $("kmO").textContent=S.km+" km";$("yrO").textContent=plural(S.yrs,"year");
+  compute();renderSummary();renderRivals();renderFuelTab();renderFeat();showTab(S.tab);
+}
+
+// ---- detail sheet ----
+function openSheet(id){$(id).hidden=false;document.body.style.overflow="hidden"}
+function closeSheet(id){$(id).hidden=true;document.body.style.overflow=""}
+document.querySelectorAll(".scrim").forEach(s=>{s.addEventListener("click",e=>{if(e.target===s||e.target.closest("[data-close]"))closeSheet(s.id)})});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".scrim:not([hidden])").forEach(s=>closeSheet(s.id))});
+function openDetail(i){
+  const C=CMP,ms=C.ms,x=C.rows[i];if(!x)return;
+  const w=(a,b,lo)=>a===b?["",""]:((lo?a<b:a>b)?["win",""]:["","win"]),rw=C.rw;
+  const rows=[["Ex-showroom",lakh(ms.x),lakh(x.x),w(ms.x,x.x,true)],[`Claimed (${C.unit})`,ms.c.toFixed(2),x.c.toFixed(2),w(ms.c,x.c,false)],
+    [`Real-world (${S.rw}%)`,(ms.c*rw).toFixed(1),(x.c*rw).toFixed(1),w(ms.c,x.c,false)],["Cost per km",inr2(ms.cpk),inr2(x.cpk),w(ms.cpk,x.cpk,true)],
+    [C.fuel==="ev"?"Charging per year":"Fuel per year",inr(ms.fuelYr),inr(x.fuelYr),w(ms.fuelYr,x.fuelYr,true)],[`Total, ${plural(S.yrs,"yr")}`,inr(ms.tot),inr(x.tot),w(ms.tot,x.tot,true)]];
+  const d=x.tot-ms.tot,fm=featFor2(ms.n,ms.v),fx=featFor2(x.n,x.v);
+  $("detH").innerHTML=`${esc(ms.n)} vs ${esc(x.n)} <button class="iconbtn x" type="button" data-close>✕</button>`;
+  $("detBody").innerHTML=`<label class="note" for="dv">${esc(x.n)} version</label><select id="dv" class="sel">${C.POOL[x.n].vars.map((v,k)=>`<option value="${k}"${k===x.idx?" selected":""}>${esc(v[0])} · ${lakh(v[1])}</option>`).join("")}</select>
+    <div class="summary" style="margin-top:12px;padding:14px"><b>${d>=0?`${esc(ms.n)} ${esc(ms.v)} is ${inr(d)} cheaper`:`${esc(x.n)} ${esc(x.v)} is ${inr(-d)} cheaper`}</b> to own over ${plural(S.yrs,"year")} in ${esc(CITIES[S.city].n)}.</div>
+    <table class="dt"><tr><th></th><th>${esc(ms.n)}</th><th>${esc(x.n)}</th></tr>${rows.map(r=>`<tr><td>${r[0]}</td><td class="${r[3][0]}">${r[1]}</td><td class="${r[3][1]}">${r[2]}</td></tr>`).join("")}</table>
+    <div class="feats" style="margin-top:12px"><div class="feat me"><b>${esc(ms.n)}</b><small>${esc(ms.v)} · ${fm.label}</small><ol>${fm.list.map(t=>`<li>${esc(t)}</li>`).join("")}</ol></div><div class="feat"><b>${esc(x.n)}</b><small>${esc(x.v)} · ${fx.label}</small><ol>${fx.list.map(t=>`<li>${esc(t)}</li>`).join("")}</ol></div></div>
+    <p class="note">Green = better. Ex-showroom prices; road tax and insurance not included.</p>`;
+  $("dv").addEventListener("change",e=>{S.pick[C.pk+x.n]=+e.target.value;render();openDetail(CMP.rows.findIndex(r=>r.n===x.n))});
+  openSheet("detSheet");
+}
+$("rivals").addEventListener("click",e=>{const c=e.target.closest(".rcard");if(c)openDetail(+c.dataset.i)});
+$("rivals").addEventListener("keydown",e=>{const c=e.target.closest(".rcard");if(c&&(e.key==="Enter"||e.key===" ")){e.preventDefault();openDetail(+c.dataset.i)}});
+
+// ---- city sheet ----
+function renderCities(q){
+  q=(q||"").trim().toLowerCase();const by={};
+  CITIES.forEach((c,i)=>{if(q&&!c.n.toLowerCase().includes(q)&&!c.st.toLowerCase().includes(q))return;(by[c.st]=by[c.st]||[]).push([c,i])});
+  $("cityList").innerHTML=Object.keys(by).sort().map(st=>`<h5>${esc(st.toUpperCase())}</h5>`+by[st].map(([c,i])=>`<button type="button" data-c="${i}" aria-current="${i===S.city}">${esc(c.n)}<small>₹${c.p.toFixed(2)}/L · ${c.c?`CNG ₹${c.c.toFixed(2)}`:"no CNG"}</small></button>`).join("")).join("")||`<p class="note">No city matches.</p>`;
+}
+$("cityBtn").addEventListener("click",()=>{renderCities("");$("cityQ").value="";openSheet("citySheet");setTimeout(()=>$("cityQ").focus(),50)});
+$("cityQ").addEventListener("input",e=>renderCities(e.target.value));
+$("cityList").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(b){setCity(+b.dataset.c);closeSheet("citySheet")}});
+
+// ---- settings ----
+$("setBtn").addEventListener("click",()=>{$("sP").value=S.pp;$("sC").value=S.cp||"";$("sE").value=S.ep;$("sRw").value=S.rw;$("sMode").value=S.mode;$("sBand").value=S.band;openSheet("setSheet")});
+[["sP","pp"],["sC","cp"],["sE","ep"],["sRw","rw"],["sBand","band"]].forEach(([id,k])=>$(id).addEventListener("input",e=>{const v=+e.target.value;if(v>0){S[k]=v;render()}}));
+$("sMode").addEventListener("change",e=>{S.mode=e.target.value;S.pick={};render()});
+
+// ---- inputs ----
+$("chSeg").addEventListener("click",e=>{const b=e.target.closest("[data-ch]");if(!b)return;S.ch=b.dataset.ch;const first=ALL.find(m=>m.ch===S.ch);S.model=first.n;S.ver=0;S.pick={};render()});
+$("cars").addEventListener("click",e=>{const b=e.target.closest("[data-m]");if(!b)return;S.model=b.dataset.m;S.ver=0;S.pick={};render()});
+$("fuelSeg").addEventListener("click",e=>{const b=e.target.closest("[data-f]");if(!b||b.disabled)return;S.fuel=b.dataset.f;S.ver=0;S.pick={};render()});
+$("vers").addEventListener("click",e=>{const b=e.target.closest("[data-v]");if(!b)return;S.ver=+b.dataset.v;S.pick={};render()});
+const bindPair=(r,n,k,min,max)=>{const set=v=>{v=Math.min(max,Math.max(min,+v||min));S[k]=v;$(r).value=v;render()};
+  $(r).addEventListener("input",e=>{S[k]=+e.target.value;$(n).value=e.target.value;render()});$(n).addEventListener("change",e=>set(e.target.value))};
+bindPair("kmR","kmN","km",1,500);bindPair("yrR","yrN","yrs",0.5,20);
+document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.closest("[data-t]");if(b)showTab(b.dataset.t)});
+
+// ---- share ----
+const toast=t=>{$("toast").textContent=t;$("toast").hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>$("toast").hidden=true,3500)};
+const waLink=t=>"https://wa.me/?text="+encodeURIComponent(t);
+function shareText(){const C=CMP,ms=C.ms;let t=`🚗 ${ms.n} ${ms.v} vs competition (${{petrol:"petrol",cng:"CNG",ev:"electric"}[C.fuel]}) · ${CITIES[S.city].n}\n${S.km} km a day · ${plural(S.yrs,"year")} · ex-showroom prices\n\n`;
+  C.rows.slice(1).forEach(x=>{const d=x.tot-ms.tot;t+=d>=0?`✅ vs ${x.n} ${x.v}: ${ms.n} saves ${inr(d)}\n`:`➖ vs ${x.n} ${x.v}: ${x.n} saves ${inr(-d)}\n`});
+  return t+`\nCompareX 👉 ${SHARE_URL}`}
+$("shareTxt").addEventListener("click",()=>window.open(waLink(shareText()),"_blank","noopener"));
+$("shareImg").addEventListener("click",async()=>{
+  const cv=cmpImage();if(!cv)return;
+  try{const blob=await new Promise(r=>cv.toBlob(r,"image/png"));const file=new File([blob],"comparex.png",{type:"image/png"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file]});return}
+    if(!location.hostname.endsWith("github.io")){window.open(waLink(shareText()),"_blank","noopener");return}
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="comparex.png";document.body.appendChild(a);a.click();a.remove();toast("Image saved. Attach it in WhatsApp.");
+  }catch(x){if(x&&x.name==="AbortError")return;window.open(waLink(shareText()),"_blank","noopener")}
+});
+
+// ---- start ----
+setCity(S.city);
+
+// ---- auto-refresh copies saved on the home screen ----
+(function(){if(!location.hostname.endsWith("github.io"))return;const mine=(document.querySelectorAll("script")[0]||{}).textContent||"";let busy=false;
+  async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch(location.pathname+"?nc="+Date.now(),{cache:"no-store"});if(!r.ok)return;
+    const h=await r.text(),a=h.indexOf("<"+"script>"),b=h.indexOf("<"+"/script>",a);if(a<0||b<0)return;const f=h.slice(a+8,b);
+    if(f.trim()&&f.trim()!==mine.trim()){const k="cxR:"+f.length;let d=false;try{d=sessionStorage.getItem(k)==="1";sessionStorage.setItem(k,"1")}catch(e){}if(!d)location.reload()}}catch(e){}finally{busy=false}}
+  setTimeout(check,1500);document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")setTimeout(check,500)})})();
+
+</script>
+
+</body>
+</html>
