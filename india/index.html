@@ -33,6 +33,16 @@ button{font:inherit;color:inherit}
 .hero h1{font-family:var(--display);font-size:clamp(26px,6vw,36px);line-height:1.08;margin:0;letter-spacing:-.02em}
 .hero h1 em{font-style:normal;background:linear-gradient(120deg,var(--brand),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero p{margin:8px 0 0;color:var(--muted)}
+.vol{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;margin:14px 0 0;box-shadow:var(--shadow)}
+.volhd{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px}
+.volhd span{font-size:11px;font-weight:800;color:var(--mint);background:var(--mint-soft);padding:3px 8px;border-radius:99px;white-space:nowrap}
+.volgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.volgrid div{background:var(--soft);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.volgrid strong{font-size:16px;font-variant-numeric:tabular-nums}
+.volgrid small{font-size:11px;color:var(--muted);line-height:1.2}
+.volgrid em{font-style:normal;font-size:12px;font-weight:800;color:var(--mint)}
+.volsrc{margin:8px 0 0;font-size:11px;color:var(--muted)}
+@media (max-width:520px){.volgrid{grid-template-columns:repeat(2,1fr)}}
 .fuelstamp{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
 .fuelstamp span{font-size:12.5px;font-weight:700;padding:5px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
 /* cards */
@@ -171,6 +181,18 @@ button{font:inherit;color:inherit}
     <h1>Maruti vs <em>everyone</em>, in one tap</h1>
     <p>Pick a car and how you drive. See price, running cost and features against every rival in your city.</p>
     <div class="fuelstamp" id="fuelStamp"></div>
+  </section>
+
+  <!-- MSIL_VOLUME: monthly figures from Maruti Suzuki's official sales release; update on the 1st of each month -->
+  <section class="vol" aria-label="Maruti Suzuki sales volume">
+    <div class="volhd"><b>Maruti Suzuki sales · Oct 2026</b><span>Highest-ever month</span></div>
+    <div class="volgrid">
+      <div><strong>2,76,120</strong><small>Total units</small><em>+25.0%</em></div>
+      <div><strong>2,12,384</strong><small>Domestic cars &amp; SUVs</small><em>+20.5%</em></div>
+      <div><strong>97,787</strong><small>SUVs &amp; MPVs</small><em>+26.1%</em></div>
+      <div><strong>49,872</strong><small>Exports</small><em>+59.3%</em></div>
+    </div>
+    <p class="volsrc">vs Oct 2025. Source: MSIL monthly sales release, 1 Nov 2026.</p>
   </section>
 
   <section class="card">
