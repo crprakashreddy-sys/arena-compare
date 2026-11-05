@@ -238,7 +238,7 @@ button{font:inherit;color:inherit}
   <footer class="foot card">
     <details><summary>Data sources and assumptions</summary>
       <p><b>Ex-showroom prices</b> are national list prices. We checked Swift, Creta and Nexon in Delhi, Mumbai, Kolkata, Bengaluru and Chennai (Autocar India, Oct 2026) and Maruti/rival prices in Hyderabad, Bhubaneswar, Vijayawada and Raipur (CarWale): ex-showroom was identical in every city. On-road price (road tax, insurance) differs by state and is not included.</p>
-      <p><b>Fuel prices</b> by city: petrol from Business Today and Aaj Tak (1–2 Nov 2026; a few cities from their latest October listing); CNG from Goodreturns state pages and Aaj Tak (Sep–Nov 2026); Ahmedabad and Vadodara updated 2 Nov 2026 for the Adani Total Gas hike of ₹4.45/kg effective 23 Oct 2026 (DeshGujarat, Patrika, Goodreturns). Updated 3 Nov 2026: Mumbai CNG ₹90 after MGL’s ₹1 hike from 1 Nov (Free Press Journal, Goodreturns); Lucknow and Agra CNG ₹108 after Green Gas hikes on 3–4 Oct and 1 Nov (India TV, Daily Jagran). Srinagar has no city-gas CNG network listed, so CNG is not offered there. You can edit any price in ⚙️ Settings.</p>
+      <p><b>Fuel prices</b> by city: petrol from Business Today and Aaj Tak (1–2 Nov 2026; a few cities from their latest October listing); CNG from Goodreturns state pages and Aaj Tak (Sep–Nov 2026); Ahmedabad and Vadodara updated 2 Nov 2026 for the Adani Total Gas hike of ₹4.45/kg effective 23 Oct 2026 (DeshGujarat, Patrika, Goodreturns). Updated 3 Nov 2026: Mumbai CNG ₹90 after MGL’s ₹1 hike from 1 Nov (Free Press Journal, Goodreturns); Lucknow and Agra CNG ₹108 after Green Gas hikes on 3–4 Oct and 1 Nov (India TV, Daily Jagran). Updated 6 Nov 2026: Kolkata CNG ₹103 (Goodreturns, 22–25 Oct; CarDekho), Nashik CNG ₹98.50 (Goodreturns, Oct revision), Mysuru CNG ₹97 (Goodreturns, CarDekho), Jabalpur CNG ₹110 (Shriram Finance, V3Cars, from 2 Nov), Noida petrol ₹101.96 (Business Today, Aaj Tak, 4–5 Nov). Srinagar has no city-gas CNG network listed, so CNG is not offered there. You can edit any price in ⚙️ Settings.</p>
       <p><b>Mileage</b> is the manufacturer's claimed figure for every car. Real-world is assumed at 80% of claimed (change in Settings). <b>EVs:</b> efficiency = claimed range ÷ battery size; charging cost assumed ₹9/kWh at home (change in Settings). e Vitara prices are with battery (no BaaS). EV prices rechecked 1 Nov 2026: e Vitara (Cars24/V3Cars, Aug 2026 revision), Creta Electric, Curvv EV, XEV 9e (Autocar India, Oct 2026), BE 6, Windsor EV, Clavis EV (CarDekho, Nov 2026), XEV 9S (Cars24, Jul 2026). Ranges are claimed (ARAI/MIDC).</p>
       <p><b>Rechecked 1–2 Nov 2026:</b> Maruti and main rival prices against Autocar India and CarDekho Delhi price lists (Oct–Nov 2026); Grand Vitara list confirmed against Cars24 (28 Oct 2026 revision).</p>
       <p><b>Invicto and Innova Hycross:</b> ex-showroom from Autocar India (Mumbai/Navi Mumbai, Oct 2026); claimed 23.24 km/L hybrid, 16.13 km/L Hycross petrol (CarWale). Invicto hybrids are matched with Hycross hybrids.</p>
@@ -654,26 +654,26 @@ const VFEAT={
 const PMATCH={"Victoris":["Grand Vitara","Creta","Seltos","Hyryder","Taigun","Kushaq","Elevate","Bayon","Duster","Tekton"],"Alto K10":["Tiago","Kwid"],"S-Presso":["Tiago","Kwid"],"Celerio":["Tiago","Grand i10 Nios","C3","Kwid"],"Swift":["Baleno","Fronx","Tiago","Grand i10 Nios","Punch","Exter","i20","Altroz","Glanza"],"Dzire":["Aura","Amaze","Tigor"],"Wagon R":["Tiago","Grand i10 Nios","C3"],"Brezza":["Fronx","Nexon","Venue","Sonet","XUV 3XO","Syros","Kylaq","Magnite","Kiger","Taisor"],"Ertiga":["XL6","Carens Clavis","Triber","Rumion"],"Eeco":["Triber","Tiago","Kwid"]};
 const MATCH={"Ertiga":["XL6","Rumion"],"Eeco":["Tiago"],"Victoris":["Grand Vitara","Hyryder"],"Alto K10":["Tiago"],"S-Presso":["Tiago"],"Celerio":["Tiago","C3"],"Swift":["Baleno","Fronx","Tiago","Grand i10 Nios","Exter","Punch","Altroz","Glanza","C3"],"Dzire":["Aura","Tigor"],"Wagon R":["Tiago","Grand i10 Nios","C3"],"Brezza":["Fronx","Nexon","XUV 3XO","Taisor"]};
 
-// ---- 50 cities: petrol ₹/L, CNG ₹/kg (null = no CNG network). Sources in the notes. Updated 3 Nov 2026 ----
+// ---- 50 cities: petrol ₹/L, CNG ₹/kg (null = no CNG network). Sources in the notes. Updated 6 Nov 2026 ----
 const CITIES=[
  {n:"Delhi",st:"Delhi",p:102.12,c:86.98},{n:"Mumbai",st:"Maharashtra",p:111.21,c:90.00},{n:"Bengaluru",st:"Karnataka",p:111.68,c:99.00},
- {n:"Hyderabad",st:"Telangana",p:116.15,c:112.00},{n:"Chennai",st:"Tamil Nadu",p:107.76,c:99.50},{n:"Kolkata",st:"West Bengal",p:113.51,c:93.50},
+ {n:"Hyderabad",st:"Telangana",p:116.15,c:112.00},{n:"Chennai",st:"Tamil Nadu",p:107.76,c:99.50},{n:"Kolkata",st:"West Bengal",p:113.51,c:103.00},
  {n:"Pune",st:"Maharashtra",p:111.90,c:100.50},{n:"Ahmedabad",st:"Gujarat",p:102.15,c:98.47},{n:"Surat",st:"Gujarat",p:101.82,c:88.76},
  {n:"Jaipur",st:"Rajasthan",p:114.15,c:99.50},{n:"Lucknow",st:"Uttar Pradesh",p:101.89,c:108.00},{n:"Kanpur",st:"Uttar Pradesh",p:101.82,c:98.31},
  {n:"Nagpur",st:"Maharashtra",p:111.72,c:88.90},{n:"Indore",st:"Madhya Pradesh",p:114.58,c:97.76},{n:"Bhopal",st:"Madhya Pradesh",p:114.36,c:97.50},
  {n:"Thane",st:"Maharashtra",p:111.31,c:85.75},{n:"Visakhapatnam",st:"Andhra Pradesh",p:116.39,c:99.80},{n:"Vadodara",st:"Gujarat",p:101.46,c:96.55},
  {n:"Patna",st:"Bihar",p:113.59,c:93.00},{n:"Ludhiana",st:"Punjab",p:105.79,c:92.75},{n:"Agra",st:"Uttar Pradesh",p:101.66,c:108.00},
- {n:"Nashik",st:"Maharashtra",p:112.24,c:93.65},{n:"Faridabad",st:"Haryana",p:103.35,c:99.70},{n:"Meerut",st:"Uttar Pradesh",p:101.99,c:96.50},
+ {n:"Nashik",st:"Maharashtra",p:112.24,c:98.50},{n:"Faridabad",st:"Haryana",p:103.35,c:99.70},{n:"Meerut",st:"Uttar Pradesh",p:101.99,c:96.50},
  {n:"Rajkot",st:"Gujarat",p:101.59,c:88.76},{n:"Varanasi",st:"Uttar Pradesh",p:102.51,c:93.00},{n:"Srinagar",st:"Jammu & Kashmir",p:108.41,c:null},
  {n:"Aurangabad",st:"Maharashtra",p:112.08,c:105.36},{n:"Ranchi",st:"Jharkhand",p:106.19,c:94.50},{n:"Coimbatore",st:"Tamil Nadu",p:108.63,c:96.90},
- {n:"Jabalpur",st:"Madhya Pradesh",p:116.17,c:106.50},{n:"Gwalior",st:"Madhya Pradesh",p:114.48,c:97.76},{n:"Vijayawada",st:"Andhra Pradesh",p:116.64,c:103.00},
+ {n:"Jabalpur",st:"Madhya Pradesh",p:116.17,c:110.00},{n:"Gwalior",st:"Madhya Pradesh",p:114.48,c:97.76},{n:"Vijayawada",st:"Andhra Pradesh",p:116.64,c:103.00},
  {n:"Jodhpur",st:"Rajasthan",p:113.20,c:97.00},{n:"Madurai",st:"Tamil Nadu",p:108.50,c:98.40},{n:"Raipur",st:"Chhattisgarh",p:108.97,c:87.75},
  {n:"Kota",st:"Rajasthan",p:114.14,c:102.00},{n:"Guwahati",st:"Assam",p:106.51,c:87.00},{n:"Chandigarh",st:"Chandigarh",p:101.54,c:93.80},
- {n:"Mysuru",st:"Karnataka",p:110.44,c:91.50},{n:"Gurugram",st:"Haryana",p:102.97,c:92.01},{n:"Noida",st:"Uttar Pradesh",p:102.09,c:95.59},
+ {n:"Mysuru",st:"Karnataka",p:110.44,c:97.00},{n:"Gurugram",st:"Haryana",p:102.97,c:92.01},{n:"Noida",st:"Uttar Pradesh",p:101.96,c:95.59},
  {n:"Ghaziabad",st:"Uttar Pradesh",p:101.88,c:95.59},{n:"Bhubaneswar",st:"Odisha",p:108.97,c:93.50},{n:"Dehradun",st:"Uttarakhand",p:99.54,c:99.50},
  {n:"Kochi",st:"Kerala",p:113.53,c:102.50},{n:"Thiruvananthapuram",st:"Kerala",p:115.49,c:99.00},{n:"Amritsar",st:"Punjab",p:105.56,c:91.33},
  {n:"Prayagraj",st:"Uttar Pradesh",p:101.96,c:103.00},{n:"Jamshedpur",st:"Jharkhand",p:105.28,c:93.00}];
-const PRICE_DATE="3 Nov 2026";
+const PRICE_DATE="6 Nov 2026";
 
 // ---- Nexa models (CNG versions paired with their petrol twin) ----
 const NEXA=[
