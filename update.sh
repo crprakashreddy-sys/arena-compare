@@ -59,7 +59,7 @@ fi
 
 if [ -n "$newsql" ]; then
   # Always run database files in dependency order (later files build on earlier ones).
-  ORDER="clubs.sql profile.sql issues.sql events.sql notifications.sql dms.sql speeds.sql clubs_plus.sql crew.sql gifs.sql zings_plus.sql bumble.sql zing_video.sql zing_places.sql personality.sql traits.sql club_rules.sql zing_social.sql matches.sql ai_cartoons.sql"
+  ORDER="clubs.sql profile.sql issues.sql events.sql notifications.sql dms.sql speeds.sql clubs_plus.sql crew.sql gifs.sql zings_plus.sql bumble.sql zing_video.sql zing_places.sql personality.sql traits.sql club_rules.sql zing_social.sql matches.sql ai_cartoons.sql hardening.sql"
   sorted=""
   for o in $ORDER; do case " $newsql " in *" $o "*) sorted="$sorted $o" ;; esac; done
   for b in $newsql; do case " $sorted " in *" $b "*) ;; *) sorted="$sorted $b" ;; esac; done
