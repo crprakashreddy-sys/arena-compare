@@ -494,3 +494,14 @@ export async function fetchIntroZaps(limit = 5): Promise<{ photo: string; name: 
     .slice(0, limit)
     .map((r) => ({ photo: r.photo_path as string, name: (r.chargers?.name as string) ?? "zapped" }));
 }
+
+// ───────── Drivers like you ─────────
+export type Suggestion = {
+  id: string; display_name: string; car_model: string | null; city: string | null; avatar_path: string | null; bio: string | null;
+  vehicle_verified: boolean; shared_clubs: number; score: number; reason: string | null;
+};
+export async function fetchSuggestions(limit = 20): Promise<Suggestion[]> {
+  const { data, error } = await supabase.rpc("driver_suggestions", { lim: limit });
+  if (error) return [];
+  return ((data ?? []) as Suggestion[]).filter((s) => !blockedIds.has(s.id));
+}
