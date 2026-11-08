@@ -56,3 +56,20 @@ create view public.dm_inbox with (security_invoker = on) as
     (select count(*) from dm_messages x where x.thread_id = t.id and not x.hidden and x.user_id <> auth.uid()
        and x.created_at > case when t.user_a = auth.uid() then t.a_read_at else t.b_read_at end)::int as unread
   from dm_threads t where auth.uid() in (t.user_a, t.user_b);
+
+-- Privacy: a zing can only go into a chat by its owner, or as a reply to the owner in their chat.
+-- (Stops a private zing being forwarded to someone else.)
+create or replace function public.check_dm_zing() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare owner uuid; t record;
+begin
+  if new.zing_id is null then return new; end if;
+  select user_id into owner from checkins where id = new.zing_id;
+  select user_a, user_b into t from dm_threads where id = new.thread_id;
+  if owner is null or not (owner = new.user_id or owner = t.user_a or owner = t.user_b) then
+    raise exception 'You can only reply to a zing in a chat with the person who posted it.';
+  end if;
+  return new;
+end $$;
+drop trigger if exists dm_zing_owner on public.dm_messages;
+create trigger dm_zing_owner before insert on public.dm_messages for each row execute function public.check_dm_zing();
