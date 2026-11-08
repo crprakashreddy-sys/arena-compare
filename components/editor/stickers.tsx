@@ -17,7 +17,6 @@ export type Sticker = {
   scale: number; rot: number; // radians
 };
 
-const fontMgr = (() => { try { return Skia.FontMgr.System(); } catch { return null; } })();
 
 /** Which looks each kind of sticker can take (tap cycles through them). */
 export function stylesFor(kind: Sticker["kind"]): StickerStyle[] {
@@ -36,8 +35,9 @@ function para(text: string, o: {
   families: string[]; size: number; weight?: number; color: string; italic?: boolean; spacing?: number;
   shadow?: { color: string; x: number; y: number; blur: number }[]; width?: number;
 }): SkParagraph | null {
-  if (!fontMgr) return null;
-  const b = Skia.ParagraphBuilder.Make({ textAlign: TextAlign.Center }, fontMgr);
+  // No font provider: Skia then uses the iPhone's own fonts (Futura, Snell Roundhand, Apple Color Emoji…).
+  try {
+  const b = Skia.ParagraphBuilder.Make({ textAlign: TextAlign.Center });
   b.pushStyle({
     fontFamilies: [...o.families, "Helvetica Neue", "Apple Color Emoji"],
     fontSize: o.size,
@@ -50,6 +50,7 @@ function para(text: string, o: {
   const p = b.build();
   p.layout(o.width ?? 1000);
   return p;
+  } catch { return null; } // a missing font must never crash the editor; the sticker is just skipped
 }
 function fit(p: SkParagraph) {
   const w = Math.ceil(p.getLongestLine()) + 2, h = Math.ceil(p.getHeight());
