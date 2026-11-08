@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AppState, DynamicColorIOS, Platform } from "react-native";
 import { NativeTabs } from "expo-router/native-tabs";
+import { usePathname } from "expo-router";
 import Constants, { ExecutionEnvironment } from "expo-constants";
 import { useAuth } from "../../lib/auth";
 import { useGarage } from "../../lib/vehicles";
@@ -31,6 +32,8 @@ function TabIcon({ name, md }: { name: keyof typeof ICONS; md: string }) {
     : <NativeTabs.Trigger.Icon src={ICONS[name]} renderingMode="original" />;
 }
 
+const TAB_COLORS = { map: "#14A37F", zings: "#FF8A00", clubs: "#5B5CFF", you: "#FF4F8B" };
+
 const INK_OR_WHITE = Platform.OS === "ios" ? DynamicColorIOS({ light: "#1A1A1A", dark: "#FFFFFF" }) : "#1A1A1A";
 const LABEL = Platform.OS === "ios" ? DynamicColorIOS({ light: "#6B6B6B", dark: "#A0A0A0" }) : "#6B6B6B";
 
@@ -42,6 +45,9 @@ export default function TabsLayout() {
   const { profile, session } = useAuth();
   const { vehicles } = useGarage();
   const [dm, setDm] = useState(0);
+  // Each tab lights up in its own colour when selected (matches the colourful icons).
+  const path = usePathname();
+  const tint = path.startsWith("/feed") ? TAB_COLORS.zings : path.startsWith("/clubs") ? TAB_COLORS.clubs : path.startsWith("/profile") ? TAB_COLORS.you : TAB_COLORS.map;
 
   // Keep the profile's car / 2-wheeler / both flag in step with the garage, for the leaderboards.
   const hasCar = vehicles.some((v) => v.kind === "car"), hasTwo = vehicles.some((v) => v.kind !== "car");
@@ -61,7 +67,7 @@ export default function TabsLayout() {
   }, [session?.user.id]);
 
   return (
-    <NativeTabs minimizeBehavior="onScrollDown" tintColor={INK_OR_WHITE}
+    <NativeTabs minimizeBehavior="onScrollDown" tintColor={tint}
       labelStyle={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 10.5, color: LABEL }}>
       <NativeTabs.Trigger name="index">
         <TabIcon name="map" md="map" />
