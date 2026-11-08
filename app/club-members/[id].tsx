@@ -5,6 +5,8 @@ import { Ionicons } from "../../components/SFIcon";
 import { useTheme, CTA, ON_CTA } from "../../lib/theme";
 import { useAuth } from "../../lib/auth";
 import { pickSquarePhoto } from "../../lib/photos";
+import { acceptRequest, fetchConnectionMap, sendRequest, type Link } from "../../lib/community";
+import { startDm } from "../../lib/dms";
 import { fetchClub, fetchInfoStats, setClubPhoto, fetchMembers, myRole, removeMember, setRole, setRules, type Club, type ClubMember, type InfoStats } from "../../lib/clubs";
 import { networkById } from "../../lib/networks";
 import { Icon, type IconName } from "../../components/Icon";
@@ -28,11 +30,13 @@ export default function ClubMembers() {
   const [stats, setStats] = useState<InfoStats | null>(null);
   const [editRules, setEditRules] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [links, setLinks] = useState<Record<string, Link>>({});
 
   const load = useCallback(async () => {
     const [c, m, r] = await Promise.all([fetchClub(clubId), fetchMembers(clubId), me ? myRole(clubId, me) : Promise.resolve(null)]);
     setClub(c); setMembers(m); setAdmin(r === "admin");
     fetchInfoStats(clubId).then(setStats);
+    fetchConnectionMap().then(setLinks).catch(() => {});
   }, [clubId, me]);
   useEffect(() => { load(); }, [load]);
 
@@ -88,6 +92,26 @@ export default function ClubMembers() {
   ] : [];
   const since = stats?.since ? new Date(stats.since).toLocaleDateString("en-IN", { month: "long", year: "numeric" }) : null;
 
+  // Add people to your crew right from the club: Connect → Requested → Message.
+  const ConnectBtn = ({ uid }: { uid: string }) => {
+    const l = links[uid];
+    const go = async () => {
+      try {
+        if (!l) { await sendRequest(uid); setLinks((x) => ({ ...x, [uid]: "sent" })); successHaptic(); }
+        else if (l === "received") { await acceptRequest(uid); setLinks((x) => ({ ...x, [uid]: "connected" })); successHaptic(); }
+        else if (l === "connected") { const tid = await startDm(uid); router.push(`/dm/${tid}`); }
+      } catch (e: any) { Alert.alert("Couldn't do that", e.message); }
+    };
+    const label = !l ? "Connect" : l === "sent" ? "Requested" : l === "received" ? "Accept" : "Message";
+    const on = !l || l === "received";
+    return (
+      <Pressable onPress={go} disabled={l === "sent"} hitSlop={6}
+        style={[s.conn, { backgroundColor: on ? CTA : t.surface, opacity: l === "sent" ? 0.6 : 1 }]}>
+        <Text style={{ color: on ? ON_CTA : t.text, fontWeight: "800", fontSize: 13 }}>{label}</Text>
+      </Pressable>
+    );
+  };
+
   const Member = ({ m }: { m: ClubMember }) => (
     <Pressable onPress={() => act(m)} style={({ pressed }) => [s.row, { borderTopColor: t.line }, pressed && { opacity: 0.6 }]}>
       <Avatar name={m.profiles?.display_name ?? "?"} photo={m.profiles?.avatar_path} size={44} />
@@ -98,6 +122,7 @@ export default function ClubMembers() {
         </Text>
       </View>
       {m.role === "admin" && <View style={s.admin}><Icon name="crown" size={12} color={INK} /><Text style={s.adminText}>Admin</Text></View>}
+      {m.user_id !== me && <ConnectBtn uid={m.user_id} />}
     </Pressable>
   );
 
@@ -218,6 +243,7 @@ const s = StyleSheet.create({
   ruleN: { width: 16, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold" },
   rulesInput: { minHeight: 140, borderRadius: 16, padding: 14, fontSize: 15, lineHeight: 21, textAlignVertical: "top" },
   row: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10, borderTopWidth: StyleSheet.hairlineWidth },
+  conn: { height: 32, paddingHorizontal: 12, borderRadius: 16, justifyContent: "center", marginLeft: 6 },
   admin: { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: LEMON, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
   adminText: { color: INK, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12 },
 });

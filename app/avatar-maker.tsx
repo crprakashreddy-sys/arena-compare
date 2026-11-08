@@ -27,7 +27,7 @@ export default function AvatarMaker() {
   const [rideKind, setRideKind] = useState<"car" | "two">(() => (TWO_SHAPES.has(o.car) ? "two" : "car"));
   const ref = useCanvasRef();
 
-  const svg = useMemo(() => Skia.SVG.MakeFromString(avatarSvg(o)), [o]);
+  const svg = useMemo(() => { try { return Skia.SVG.MakeFromString(avatarSvg(o)); } catch { return null; } }, [o]);
   const set = (p: Partial<AvatarOpts>) => setO((v) => ({ ...v, ...p }));
   const clip = useMemo(() => { const p = Skia.Path.Make(); p.addCircle(SIZE / 2, SIZE / 2, SIZE / 2); return p; }, []);
 

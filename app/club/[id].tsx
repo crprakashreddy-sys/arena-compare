@@ -25,6 +25,7 @@ import { GifPicker, type Pick as FunPick } from "../../components/GifPicker";
 import { ChatMedia, isBare, previewOf } from "../../components/ChatMedia";
 import * as Clipboard from "expo-clipboard";
 import { MessageMenu, ReactionChips, type MenuAction } from "../../components/MessageMenu";
+import { sendRequest } from "../../lib/community";
 import { fetchReactions, pinMessage, subscribeReactions, toggleReaction, type Reaction, type ReactionMap } from "../../lib/clubs";
 
 const INK = "#1A1A1A";
@@ -199,6 +200,8 @@ export default function ClubChat() {
         { text: "Cancel", style: "cancel" }, { text: "Delete", style: "destructive", onPress: () => removeMsg(m) }]) }] : []),
       ...(!mine && admin ? [{ label: "Remove (admin)", icon: "trash-outline", destructive: true, run: () => removeMsg(m) }] : []),
       ...(!mine ? [
+        { label: `View ${name.split(" ")[0]}'s profile`, icon: "person-circle", run: () => router.push(`/driver/${m.user_id}`) },
+        { label: `Add ${name.split(" ")[0]} to my crew`, icon: "people", run: () => sendRequest(m.user_id).then(() => Alert.alert("Request sent ⚡", `${name} will see it in Wants to connect.`)).catch((e) => Alert.alert("Couldn't send", e.message)) },
         { label: "Report", icon: "flag-outline", destructive: true, run: () => otherActions(m, name, 1) },
         { label: `Block ${name}`, icon: "ban", destructive: true, run: () => otherActions(m, name, 2) },
       ] : []),
@@ -380,7 +383,7 @@ function Bubble({ m, mine, showName, replyTo, onLongPress, onDoubleTap }: {
       <Pressable onPress={tap} onLongPress={onLongPress} delayLongPress={280}
         style={[s.bubble, mine ? s.mine : [s.theirs, { backgroundColor: t.bg }], (m.photo_path || m.gif_url) ? { padding: 4 } : null]}>
         {!mine && showName && (
-          <Text style={[s.name, pad, m.photo_path ? { paddingTop: 4 } : null]} numberOfLines={1}>
+          <Text onPress={() => router.push(`/driver/${m.user_id}`)} style={[s.name, pad, m.photo_path ? { paddingTop: 4 } : null]} numberOfLines={1}>
             {name}{m.profiles?.car_model ? <Text style={{ color: t.muted, fontWeight: "500" }}>{`  · ${m.profiles.car_model}`}</Text> : null}
           </Text>
         )}

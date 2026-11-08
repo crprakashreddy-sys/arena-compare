@@ -582,3 +582,18 @@ export async function fetchMemories(userId: string) {
     .order("created_at", { ascending: false }).limit(300);
   return (data ?? []) as (Checkin & { keep: boolean })[];
 }
+
+/** For each driver I have any link with: connected, request sent, or request received. */
+export type Link = "connected" | "sent" | "received";
+export async function fetchConnectionMap(): Promise<Record<string, Link>> {
+  const { data: u } = await supabase.auth.getUser();
+  if (!u.user) return {};
+  const me = u.user.id;
+  const { data } = await supabase.from("connections").select("requester_id,addressee_id,status").or(`requester_id.eq.${me},addressee_id.eq.${me}`);
+  const out: Record<string, Link> = {};
+  (data ?? []).forEach((r: any) => {
+    const other = r.requester_id === me ? r.addressee_id : r.requester_id;
+    out[other] = r.status === "accepted" ? "connected" : r.requester_id === me ? "sent" : "received";
+  });
+  return out;
+}
