@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Share, StyleSheet, Text, View, useWindowDimensions } from "react-native";
-import { Canvas, Circle, Group, Image as SkImage, ImageFormat, RuntimeShader, Skia, useCanvasRef, useImage } from "@shopify/react-native-skia";
+import { Canvas, Circle, Group, Image as SkImage, ImageFormat, Skia, useCanvasRef, useImage } from "@shopify/react-native-skia";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as ImagePicker from "expo-image-picker";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
@@ -9,7 +9,7 @@ import { Ionicons } from "../components/SFIcon";
 import { useTheme, CTA, ON_CTA } from "../lib/theme";
 import { useAuth } from "../lib/auth";
 import { updateProfileExtras, uploadSnap } from "../lib/community";
-import { TOON_EFFECT, TOON_STYLES, toonUniforms } from "../lib/toon";
+import { TOON_STYLES, renderToon } from "../lib/toon";
 import { tapHaptic, tickHaptic, successHaptic } from "../lib/motion";
 
 const BGS = ["#FCE38A", "#BDE7FF", "#FFC7D9", "#C9F2D6", "#E3D4FF", "#1A1A1A"];
@@ -34,6 +34,8 @@ export default function CarToon() {
   const image = useImage(uri);
   const ref = useCanvasRef();
   const st = TOON_STYLES[styleIdx];
+  // The cartoon is rendered once per photo/style/line weight (GPU, a fraction of a second), then just displayed.
+  const toon = useMemo(() => (image ? renderToon(image, st, bold) : null), [image, st, bold]);
 
   const pick = async (camera: boolean) => {
     tapHaptic();
@@ -126,15 +128,13 @@ export default function CarToon() {
                     <Group clip={clip}>
                       <Circle cx={SIZE / 2} cy={SIZE / 2} r={SIZE} color={BGS[bg]} />
                       {image && fit && (
-                        <SkImage image={image} x={fit.x} y={fit.y} width={fit.w} height={fit.h} fit="fill">
-                          {TOON_EFFECT && <RuntimeShader source={TOON_EFFECT} uniforms={toonUniforms(st, bold)} />}
-                        </SkImage>
+                        <SkImage image={toon ?? image} x={fit.x} y={fit.y} width={fit.w} height={fit.h} fit="fill" />
                       )}
                     </Group>
                   </Canvas>
                 </View>
               </GestureDetector>
-              <Text style={{ color: t.faint, fontSize: 12.5 }}>Drag and pinch to frame your car</Text>
+              <Text style={{ color: t.faint, fontSize: 12.5 }}>{image && !toon ? "Cartoon engine didn't start on this phone, send us a screenshot" : "Drag and pinch to frame your car"}</Text>
             </>
           )}
         </View>

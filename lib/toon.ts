@@ -1,104 +1,150 @@
-import { Skia } from "@shopify/react-native-skia";
+import { FilterMode, MipmapMode, Skia, TileMode, type SkImage } from "@shopify/react-native-skia";
 
 /**
- * Turns a real photo of your car into a cartoon, entirely on the phone's GPU (no server, no cost).
- * Three steps in one shader:
- *  1. Smooth: an edge-aware blur flattens paint, reflections and noise into clean areas of colour.
- *  2. Ink: a Sobel edge pass finds the car's real outline, panel gaps, windows and wheels.
- *  3. Colour: brightness is posterised into a few cel-shading bands and the colour is boosted.
- * Because it traces *your* photo, the cartoon keeps your car's exact shape, colour and angle.
+ * Cartoon of your car from your own photo, done the way pro "toon" apps do it, in GPU passes:
+ *  1. Abstraction: an edge-preserving (bilateral) blur run 3 times at growing radius. Road grit,
+ *     leaves and paint noise melt into clean flat areas, but the car's edges stay sharp.
+ *  2. Ink: XDoG (difference of Gaussians) on the *smoothed* image, so only real shapes get lines:
+ *     body outline, windows, grille, wheels. No speckles from texture.
+ *  3. Cel colour: brightness eased into a few soft bands (no harsh dithering), colour boosted.
+ * Runs on the phone, nothing is uploaded until you save.
  */
-const SKSL = `
+
+const BILATERAL = `
 uniform shader image;
-uniform float px;        // sampling distance in pixels (bigger = bolder, flatter)
-uniform float levels;    // cel-shading bands
+uniform float r;      // tap spacing in pixels
+uniform float sigma;  // colour tolerance
+half4 main(float2 xy) {
+  float3 c0 = float3(image.eval(xy).rgb);
+  float3 acc = float3(0.0); float wsum = 0.0;
+  for (int i = -3; i <= 3; i++) {
+    for (int j = -3; j <= 3; j++) {
+      float2 o = float2(float(i), float(j));
+      float3 s = float3(image.eval(xy + o * r).rgb);
+      float3 d = s - c0;
+      float w = exp(-dot(d, d) / (2.0 * sigma * sigma)) * exp(-dot(o, o) / 8.0);
+      acc += s * w; wsum += w;
+    }
+  }
+  return half4(half3(acc / wsum), 1.0);
+}`;
+
+const TOON = `
+uniform shader image;
+uniform float s;         // edge scale in pixels (line weight)
+uniform float levels;    // cel bands
 uniform float sat;       // colour boost
-uniform float edge;      // ink strength 0..1
-uniform float thresh;    // edge threshold
-uniform float lift;      // pastel lift 0..1
+uniform float edge;      // ink strength
+uniform float thresh;    // how much contrast makes a line (lower = more lines)
+uniform float lift;      // pastel lift
 uniform float mono;      // 1 = pencil sketch
-uniform float halftone;  // comic dots 0..1
-uniform float3 ink;      // outline colour
-uniform float glow;      // 1 = neon: dark scene, glowing outlines
+uniform float halftone;  // comic dots
+uniform float3 ink;      // line colour
+uniform float glow;      // 1 = neon
 
 float lum(float3 c) { return dot(c, float3(0.299, 0.587, 0.114)); }
 
 half4 main(float2 xy) {
-  float3 c0 = float3(image.eval(xy).rgb);
-
-  // 1. Edge-aware smoothing (cheap bilateral over a 5x5 ring).
-  float3 acc = float3(0.0); float wsum = 0.0;
-  for (int i = -2; i <= 2; i++) {
-    for (int j = -2; j <= 2; j++) {
-      float3 s = float3(image.eval(xy + float2(float(i), float(j)) * px).rgb);
-      float d = length(s - c0);
-      float w = exp(-d * d * 18.0) * exp(-float(i * i + j * j) * 0.12);
-      acc += s * w; wsum += w;
-    }
-  }
-  float3 c = acc / wsum;
-
-  // 2. Sobel edges on luminance.
-  float tl = lum(float3(image.eval(xy + float2(-px, -px)).rgb));
-  float  t = lum(float3(image.eval(xy + float2(0.0, -px)).rgb));
-  float tr = lum(float3(image.eval(xy + float2(px, -px)).rgb));
-  float  l = lum(float3(image.eval(xy + float2(-px, 0.0)).rgb));
-  float  r = lum(float3(image.eval(xy + float2(px, 0.0)).rgb));
-  float bl = lum(float3(image.eval(xy + float2(-px, px)).rgb));
-  float  b = lum(float3(image.eval(xy + float2(0.0, px)).rgb));
-  float br = lum(float3(image.eval(xy + float2(px, px)).rgb));
-  float gx = -tl - 2.0 * l - bl + tr + 2.0 * r + br;
-  float gy = -tl - 2.0 * t - tr + bl + 2.0 * b + br;
-  float e = smoothstep(thresh, thresh + 0.18, sqrt(gx * gx + gy * gy));
-
-  // 3. Cel shading: posterise brightness, keep hue, boost colour.
+  float3 c = float3(image.eval(xy).rgb);
   float y = lum(c);
-  float q = floor(y * levels + 0.5) / levels;
-  float3 col = c * (q / max(y, 0.04));
+
+  // XDoG: a narrow and a wide blur; where the narrow one is darker, draw ink.
+  float a1 = 0.0, a2 = 0.0, a3 = 0.0;
+  for (int i = 0; i < 12; i++) {
+    float t = float(i) * 0.5235988;
+    float2 dir = float2(cos(t), sin(t));
+    a1 += lum(float3(image.eval(xy + dir * s).rgb));
+    a2 += lum(float3(image.eval(xy + dir * s * 1.8).rgb));
+    a3 += lum(float3(image.eval(xy + dir * s * 3.0).rgb));
+  }
+  float g1 = y * 0.4 + (a1 / 12.0) * 0.6;
+  float g2 = (a2 / 12.0) * 0.5 + (a3 / 12.0) * 0.5;
+  float d = g2 - g1;
+  float e = smoothstep(thresh, thresh * 2.4, d);
+
+  // Soft cel bands: ease between levels instead of hard steps (no speckle on gradients).
+  float v = y * levels;
+  float f = fract(v);
+  float q = (floor(v) + smoothstep(0.35, 0.65, f)) / levels;
+  float3 col = c * (q / max(y, 0.03));
   float g = lum(col);
   col = mix(float3(g), col, sat);
-  col = mix(col, float3(1.0), lift * 0.35);
+  col = mix(col, float3(1.0), lift * 0.32);
 
   if (halftone > 0.0) {
-    float2 cell = fract(xy / 7.0) - 0.5;
-    float dotR = (1.0 - q) * 0.62;
-    float dots = 1.0 - smoothstep(dotR - 0.08, dotR + 0.08, length(cell));
-    col *= 1.0 - dots * halftone * 0.45;
+    float2 cell = fract(xy / (s * 3.2)) - 0.5;
+    float r = (1.0 - q) * 0.55;
+    col *= 1.0 - (1.0 - smoothstep(r - 0.06, r + 0.06, length(cell))) * halftone * 0.4;
   }
   if (mono > 0.5) {
-    float paper = 0.97 - (1.0 - q) * 0.22;
-    col = float3(paper, paper * 0.985, paper * 0.95);
+    float paper = 0.98 - (1.0 - q) * 0.18;
+    col = float3(paper, paper * 0.985, paper * 0.955);
   }
   if (glow > 0.5) {
-    col = col * 0.22;
-    return half4(half3(clamp(col + ink * e * 1.4, 0.0, 1.0)), 1.0);
+    col = col * 0.2;
+    return half4(half3(clamp(col + ink * e * 1.5, 0.0, 1.0)), 1.0);
   }
-  col = mix(col, ink, e * edge);
+  col = mix(col, ink, clamp(e * edge, 0.0, 1.0));
   return half4(half3(clamp(col, 0.0, 1.0)), 1.0);
 }`;
 
-let effect: ReturnType<typeof Skia.RuntimeEffect.Make> = null;
-try { effect = Skia.RuntimeEffect.Make(SKSL); } catch { effect = null; }
-export const TOON_EFFECT = effect;
+const make = (src: string) => { try { return Skia.RuntimeEffect.Make(src); } catch { return null; } };
+const BILATERAL_FX = make(BILATERAL);
+const TOON_FX = make(TOON);
+export const TOON_READY = !!(BILATERAL_FX && TOON_FX);
 
 export type ToonStyle = {
   id: string; name: string; emoji: string;
-  px: number; levels: number; sat: number; edge: number; thresh: number;
+  smooth: number; levels: number; sat: number; edge: number; thresh: number;
   lift: number; mono: number; halftone: number; ink: [number, number, number]; glow: number;
 };
 
 export const TOON_STYLES: ToonStyle[] = [
-  { id: "toon", name: "Toon", emoji: "🎨", px: 1.6, levels: 5, sat: 1.45, edge: 0.95, thresh: 0.22, lift: 0, mono: 0, halftone: 0, ink: [0.07, 0.07, 0.09], glow: 0 },
-  { id: "comic", name: "Comic", emoji: "💥", px: 2.4, levels: 4, sat: 1.75, edge: 1, thresh: 0.2, lift: 0, mono: 0, halftone: 1, ink: [0.02, 0.02, 0.04], glow: 0 },
-  { id: "anime", name: "Anime", emoji: "✨", px: 1.3, levels: 6, sat: 1.25, edge: 0.75, thresh: 0.3, lift: 0.35, mono: 0, halftone: 0, ink: [0.18, 0.14, 0.24], glow: 0 },
-  { id: "pastel", name: "Pastel", emoji: "🍬", px: 1.8, levels: 5, sat: 0.85, edge: 0.55, thresh: 0.28, lift: 1, mono: 0, halftone: 0, ink: [0.35, 0.3, 0.42], glow: 0 },
-  { id: "sketch", name: "Sketch", emoji: "✏️", px: 1.2, levels: 4, sat: 0, edge: 0.9, thresh: 0.16, lift: 0, mono: 1, halftone: 0, ink: [0.16, 0.16, 0.2], glow: 0 },
-  { id: "neon", name: "Neon", emoji: "🌃", px: 1.4, levels: 5, sat: 1.4, edge: 1, thresh: 0.18, lift: 0, mono: 0, halftone: 0, ink: [0.99, 0.89, 0.54], glow: 1 },
+  { id: "toon", name: "Toon", emoji: "🎨", smooth: 1, levels: 5, sat: 1.35, edge: 1, thresh: 0.018, lift: 0, mono: 0, halftone: 0, ink: [0.06, 0.06, 0.08], glow: 0 },
+  { id: "comic", name: "Comic", emoji: "💥", smooth: 1.25, levels: 4, sat: 1.6, edge: 1, thresh: 0.015, lift: 0, mono: 0, halftone: 1, ink: [0.02, 0.02, 0.04], glow: 0 },
+  { id: "anime", name: "Anime", emoji: "✨", smooth: 1.1, levels: 6, sat: 1.2, edge: 0.85, thresh: 0.022, lift: 0.3, mono: 0, halftone: 0, ink: [0.2, 0.15, 0.26], glow: 0 },
+  { id: "pastel", name: "Pastel", emoji: "🍬", smooth: 1.2, levels: 5, sat: 0.85, edge: 0.6, thresh: 0.024, lift: 1, mono: 0, halftone: 0, ink: [0.36, 0.3, 0.44], glow: 0 },
+  { id: "sketch", name: "Sketch", emoji: "✏️", smooth: 0.8, levels: 4, sat: 0, edge: 0.95, thresh: 0.012, lift: 0, mono: 1, halftone: 0, ink: [0.18, 0.18, 0.22], glow: 0 },
+  { id: "neon", name: "Neon", emoji: "🌃", smooth: 1, levels: 5, sat: 1.4, edge: 1, thresh: 0.014, lift: 0, mono: 0, halftone: 0, ink: [0.99, 0.89, 0.54], glow: 1 },
 ];
 
-export function toonUniforms(s: ToonStyle, bold: number) {
-  return {
-    px: s.px * (0.7 + bold * 0.9), levels: s.levels, sat: s.sat, edge: s.edge, thresh: s.thresh,
-    lift: s.lift, mono: s.mono, halftone: s.halftone, ink: s.ink, glow: s.glow,
-  };
+/** Draw one shader pass over an image into a new image the same size. */
+function pass(fx: NonNullable<typeof TOON_FX>, img: SkImage, uniforms: number[]): SkImage | null {
+  const w = img.width(), h = img.height();
+  const surface = Skia.Surface.MakeOffscreen(w, h) ?? Skia.Surface.Make(w, h);
+  if (!surface) return null;
+  const child = img.makeShaderOptions(TileMode.Clamp, TileMode.Clamp, FilterMode.Linear, MipmapMode.None);
+  const paint = Skia.Paint();
+  paint.setShader(fx.makeShaderWithChildren(uniforms, [child]));
+  surface.getCanvas().drawRect(Skia.XYWHRect(0, 0, w, h), paint);
+  surface.flush();
+  const out = surface.makeImageSnapshot();
+  return (out as any).makeNonTextureImage ? (out as any).makeNonTextureImage() : out;
+}
+
+// The smoothing is the slow part, so it's cached per photo and strength.
+let cache: { img: SkImage; smooth: number; out: SkImage } | null = null;
+
+/** Full cartoon at the photo's own resolution. bold 0..1 thickens the lines. */
+export function renderToon(img: SkImage, style: ToonStyle, bold: number): SkImage | null {
+  if (!BILATERAL_FX || !TOON_FX) return null;
+  try {
+    const scale = img.width() / 1000; // keep the look the same at any photo size
+    let smooth = cache && cache.img === img && cache.smooth === style.smooth ? cache.out : null;
+    if (!smooth) {
+      let cur: SkImage | null = img;
+      for (const r of [1.2, 2.2, 3.4]) {
+        cur = cur && pass(BILATERAL_FX, cur, [r * style.smooth * scale, 0.11]);
+      }
+      if (!cur) return null;
+      smooth = cur;
+      cache = { img, smooth: style.smooth, out: cur };
+    }
+    const s = (1.1 + bold * 1.4) * scale;
+    return pass(TOON_FX, smooth, [
+      s, style.levels, style.sat, style.edge, style.thresh, style.lift, style.mono, style.halftone, ...style.ink, style.glow,
+    ]);
+  } catch {
+    return null;
+  }
 }
