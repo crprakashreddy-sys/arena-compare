@@ -21,9 +21,11 @@ const config: ExpoConfig = {
       NSLocationWhenInUseUsageDescription:
         "zingd uses your location to show the EV chargers nearest to you and their distance.",
       NSCameraUsageDescription:
-        "zingd uses the camera so you can post a photo of a charger's status for other drivers.",
+        "zingd uses the camera so you can post a photo or short video of a charger's status for other drivers.",
+      NSMicrophoneUsageDescription:
+        "zingd records sound with your video zings. You can add music instead.",
       NSPhotoLibraryUsageDescription:
-        "zingd lets you choose a photo of a charger to share with other drivers.",
+        "zingd lets you choose a photo or video of a charger to share, or a picture for your profile or club.",
       ITSAppUsesNonExemptEncryption: false,
       LSApplicationQueriesSchemes: ["comgooglemaps"],
     },
@@ -39,6 +41,9 @@ const config: ExpoConfig = {
   plugins: [
     "expo-router",
     ["expo-notifications", { color: "#FCE38A" }],
+    // Zing music and video zings.
+    "expo-audio",
+    "expo-video",
     // Google Maps inside the iPhone app. Needs EXPO_PUBLIC_GOOGLE_MAPS_IOS_KEY; without it iPhone uses Apple Maps.
     ...(process.env.EXPO_PUBLIC_GOOGLE_MAPS_IOS_KEY
       ? [["react-native-maps", { iosGoogleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_IOS_KEY }] as [string, any]]

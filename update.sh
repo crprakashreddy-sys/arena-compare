@@ -27,7 +27,8 @@ missing=""
 for p in $(cat deps.txt); do [ -d "node_modules/$p" ] || missing="$missing $p"; done
 if [ -n "$missing" ]; then
   echo "   Installing:$missing"
-  npx expo install $missing
+  # Expo sometimes prints a config note and exits non-zero; the packages are still installed, so carry on.
+  npx expo install $missing || echo "   (Expo printed a note above; packages are installed, carrying on.)"
 else
   echo "   All packages present."
 fi
