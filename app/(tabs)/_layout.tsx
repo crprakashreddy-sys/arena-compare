@@ -1,4 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useAuth } from "../../lib/auth";
+import { useGarage } from "../../lib/vehicles";
+import { syncVehicleKind } from "../../lib/community";
 import { Pressable, View } from "react-native";
 import { Tabs, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -6,6 +9,12 @@ import { useTheme } from "../../lib/theme";
 
 export default function TabsLayout() {
   const t = useTheme();
+  const { profile } = useAuth();
+  const { active } = useGarage();
+  // Keep the profile's car / 2-wheeler flag in step with the vehicle being driven, for the leaderboards.
+  useEffect(() => {
+    if (profile && active) syncVehicleKind(profile.id, active.kind === "car" ? "car" : "two").catch(() => {});
+  }, [profile?.id, active?.key]);
   return (
     <Tabs
       screenOptions={{

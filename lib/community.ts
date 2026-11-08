@@ -70,7 +70,7 @@ export async function fetchFeed(lat: number, lng: number, km = 25): Promise<Chec
   const b = bbox(lat, lng, km);
   const { data } = await supabase
     .from("checkins")
-    .select(`${CHECKIN_FIELDS},chargers!inner(name,lat,lng,network)`)
+    .select(`${CHECKIN_FIELDS},chargers!inner(name,lat,lng,network,connectors)`)
     .not("photo_path", "is", null)
     .gt("expires_at", new Date().toISOString())
     .gte("chargers.lat", b.minLat).lte("chargers.lat", b.maxLat)
@@ -368,11 +368,25 @@ export async function updateProfileExtras(userId: string, patch: { avatar_path?:
 export type LeaderRow = { user_id: string; display_name: string; car_model: string | null; city: string | null; vehicle_verified: boolean; week_score: number; week_zaps: number };
 
 /** This week's top zappers, in one city when given. */
-export async function fetchLeaderboard(city?: string | null, limit = 20): Promise<LeaderRow[]> {
-  let q = supabase.from("zap_leaderboard").select("*").order("week_score", { ascending: false }).limit(limit);
+export async function fetchLeaderboard(city?: string | null, limit = 20, mode?: "car" | "two"): Promise<LeaderRow[]> {
+  let q = supabase.from("zap_leaderboard").select("*").order("week_score", { ascending: false }).limit(mode ? limit * 4 : limit);
   if (city) q = q.ilike("city", city);
   const { data } = await q;
-  return visible((data ?? []) as any[]) as LeaderRow[];
+  let rows = visible((data ?? []) as any[]) as LeaderRow[];
+  if (mode && rows.length) {
+    // Car drivers and 2-wheeler riders get their own rankings, by the vehicle each one drives.
+    const { data: kinds, error } = await supabase.from("profiles").select("id,vehicle_kind").in("id", rows.map((r) => r.user_id));
+    if (!error) {
+      const k = new Map((kinds ?? []).map((p: any) => [p.id, p.vehicle_kind ?? "car"]));
+      rows = rows.filter((r) => (k.get(r.user_id) ?? "car") === mode);
+    }
+  }
+  return rows.slice(0, limit);
+}
+
+/** Remember whether this driver rides a car or a 2-wheeler, for the separate leaderboards. */
+export async function syncVehicleKind(userId: string, kind: "car" | "two") {
+  await supabase.from("profiles").update({ vehicle_kind: kind }).eq("id", userId);
 }
 
 // ───────── Drivers and connections ─────────

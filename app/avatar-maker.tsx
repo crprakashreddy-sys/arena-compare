@@ -14,6 +14,7 @@ import {
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
 const SIZE = 260;
+const TWO_SHAPES = new Set(["scooter", "bike"]);
 
 /** Free cartoon avatar of you with your EV. Drawn on the phone, saved as your profile photo. */
 export default function AvatarMaker() {
@@ -22,6 +23,7 @@ export default function AvatarMaker() {
   const { active } = useGarage();
   const [o, setO] = useState<AvatarOpts>(() => ({ ...randomAvatar(shapeFor(active)), bg: 0 }));
   const [busy, setBusy] = useState(false);
+  const [rideKind, setRideKind] = useState<"car" | "two">(() => (TWO_SHAPES.has(o.car) ? "two" : "car"));
   const ref = useCanvasRef();
 
   const svg = useMemo(() => Skia.SVG.MakeFromString(avatarSvg(o)), [o]);
@@ -70,7 +72,17 @@ export default function AvatarMaker() {
           <Toggle label="🧔 Beard" value={o.beard} onChange={(beard) => set({ beard })} t={t} />
         </View>
         <Row label="Top" t={t}>{SHIRTS.map((c, i) => <Dot key={c} color={c} on={o.shirt === i} onPress={() => set({ shirt: i })} />)}</Row>
-        <Row label="Your ride" t={t}>{CAR_SHAPES.map((c) => <Pill key={c.key} label={c.label} on={o.car === c.key} onPress={() => set({ car: c.key })} t={t} />)}</Row>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, marginTop: 18 }}>
+          <Text style={{ color: t.text, fontWeight: "800" }}>Your ride</Text>
+          <View style={{ flexDirection: "row", gap: 6 }}>
+            {(["car", "two"] as const).map((k) => (
+              <Pill key={k} label={k === "car" ? "🚗 Cars" : "🛵 2-wheelers"} on={rideKind === k} t={t}
+                onPress={() => { setRideKind(k); set({ car: k === "car" ? "suv" : "scooter" }); }} />
+            ))}
+          </View>
+        </View>
+        <Row label="" t={t}>{CAR_SHAPES.filter((c) => (rideKind === "two") === TWO_SHAPES.has(c.key))
+          .map((c) => <Pill key={c.key} label={c.label} on={o.car === c.key} onPress={() => set({ car: c.key })} t={t} />)}</Row>
         <Row label="Ride colour" t={t}>{CAR_COLORS.map((c, i) => <Dot key={c} color={c} on={o.carColor === i} onPress={() => set({ carColor: i })} />)}</Row>
         <Row label="Background" t={t}>{BGS.map((c, i) => <Dot key={c} color={c} on={o.bg === i} onPress={() => set({ bg: i })} />)}</Row>
       </ScrollView>
@@ -89,7 +101,7 @@ export default function AvatarMaker() {
 function Row({ label, children, t }: { label: string; children: React.ReactNode; t: ReturnType<typeof useTheme> }) {
   return (
     <View style={{ marginTop: 14 }}>
-      <Text style={{ color: t.text, fontWeight: "800", paddingHorizontal: 16, marginBottom: 8 }}>{label}</Text>
+      {!!label && <Text style={{ color: t.text, fontWeight: "800", paddingHorizontal: 16, marginBottom: 8 }}>{label}</Text>}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingHorizontal: 16 }}>{children}</ScrollView>
     </View>
   );

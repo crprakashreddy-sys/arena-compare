@@ -42,7 +42,7 @@ export type Checkin = {
   zap_score?: number;
   score_breakdown?: ScorePart[];
   profiles?: { display_name: string; car_model: string | null; avatar_path?: string | null } | null;
-  chargers?: { name: string; lat: number; lng: number; network: string } | null;
+  chargers?: { name: string; lat: number; lng: number; network: string; connectors?: string[] } | null;
 };
 
 export type Review = {

@@ -9,6 +9,8 @@ import { useGarage } from "../../lib/vehicles";
 import { autoJoinFor, fetchClubs, fetchMyClubs, joinClub, joinWithCode, type Club, type MyClub } from "../../lib/clubs";
 import { timeAgo } from "../../lib/geo";
 import { ClubBadge } from "../../components/ClubBadge";
+import { clubSuits, useMode } from "../../lib/mode";
+import { ModeSwitch } from "../../components/ModeSwitch";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -24,6 +26,7 @@ export default function Clubs() {
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(true);
   const [err, setErr] = useState<string | null>(null);
+  const [mode] = useMode();
 
   const load = useCallback(async () => {
     setErr(null);
@@ -39,9 +42,10 @@ export default function Clubs() {
   const mineIds = useMemo(() => new Set(mine.map((c) => c.id)), [mine]);
   const discover = useMemo(() => {
     const s = q.trim().toLowerCase();
-    return all.filter((c) => !mineIds.has(c.id) && (!s || c.name.toLowerCase().includes(s)));
-  }, [all, mineIds, q]);
+    return all.filter((c) => !mineIds.has(c.id) && clubSuits(c, mode) && (!s || c.name.toLowerCase().includes(s)));
+  }, [all, mineIds, q, mode]);
   const community = discover.filter((c) => c.kind === "custom");
+  const mineShown = mine.filter((c) => clubSuits(c, mode));
   const brands = discover.filter((c) => c.kind === "brand");
   const models = discover.filter((c) => c.kind === "model");
 
@@ -73,6 +77,7 @@ export default function Clubs() {
           <Text style={s.newBtnText}>New</Text>
         </Pressable>
       </View>
+      <View style={{ paddingHorizontal: 16, paddingTop: 14 }}><ModeSwitch /></View>
       {session && (
         <Pressable onPress={askCode} style={{ paddingHorizontal: 16, paddingTop: 10 }}>
           <Text style={{ color: t.muted, fontWeight: "700" }}>🔑 Have an invite code?</Text>
@@ -96,11 +101,11 @@ export default function Clubs() {
 
       {busy && !all.length && !err && <ActivityIndicator style={{ marginTop: 40 }} color={t.muted} />}
 
-      {!!mine.length && (
+      {!!mineShown.length && (
         <>
           <Text style={[s.h2, { color: t.text }]}>Your clubs</Text>
           <View style={{ paddingHorizontal: 16, gap: 10 }}>
-            {mine.map((c) => <MyClubRow key={c.id} c={c} />)}
+            {mineShown.map((c) => <MyClubRow key={c.id} c={c} />)}
           </View>
         </>
       )}

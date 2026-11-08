@@ -3,6 +3,8 @@ import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "rea
 import { Stack, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { fetchLeaderboard, type LeaderRow } from "../lib/community";
+import { useMode } from "../lib/mode";
+import { ModeSwitch } from "../components/ModeSwitch";
 import { useAuth } from "../lib/auth";
 import { DAILY_CAP, FRESH_BONUS, PHOTO_BONUS, TIERS } from "../lib/zapscore";
 import { VerifiedBadge } from "../components/ui";
@@ -15,13 +17,14 @@ export default function Leaderboard() {
   const { profile, session } = useAuth();
   const [city, setCity] = useState<string | null>(profile?.city ?? null);
   const [rows, setRows] = useState<LeaderRow[]>([]);
+  const [mode] = useMode();
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
     setLoading(true);
-    setRows(await fetchLeaderboard(city, 30));
+    setRows(await fetchLeaderboard(city, 30, mode));
     setLoading(false);
-  }, [city]);
+  }, [city, mode]);
   useEffect(() => { load(); }, [load]);
 
   const me = session?.user.id;
@@ -40,6 +43,7 @@ export default function Leaderboard() {
               <Text style={{ color: "#fff", fontSize: 32, fontWeight: "900" }}>This week</Text>
               <Text style={{ color: "#A9B3BC" }}>Resets every Monday · {city ? city : "All of India"}</Text>
             </View>
+            <ModeSwitch dark />
             {profile?.city ? (
               <View style={{ flexDirection: "row", gap: 8 }}>
                 {[profile.city, null].map((c) => (

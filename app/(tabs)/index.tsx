@@ -8,6 +8,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { fetchChargers, isFast, onChargersChanged, speedLabel } from "../../lib/chargers";
 import { useOnboarded } from "../../lib/onboarding";
+import { suits, useMode } from "../../lib/mode";
+import { ModeSwitch } from "../../components/ModeSwitch";
 import { MAP_PROVIDER, USE_GOOGLE, zappdStyle } from "../../lib/maps";
 import { fetchEventsNear, kindOf, type ClubEvent } from "../../lib/events";
 import { fetchLiveStatus, fetchRatings, fetchSnaps, fetchZapBubbles } from "../../lib/community";
@@ -74,6 +76,7 @@ export default function MapScreen() {
   const picked = useRef<string | null>(null);
 
   const [events, setEvents] = useState<ClubEvent[]>([]);
+  const [mode] = useMode();
   const load = useCallback(async (lat: number, lng: number, km = 15) => {
     setLoading(true);
     fetchEventsNear(lat, lng).then(setEvents).catch(() => {});
@@ -146,13 +149,14 @@ export default function MapScreen() {
 
   const shown = useMemo(() => {
     return chargers
+      .filter((c) => suits(c, mode))
       .filter((c) => !hidden.has(c.network))
       .filter((c) => !vehicle || !fitsOnly || fitFor(c, vehicle) !== "no")
       .filter((c) => !fastOnly || isFast(c))
       .filter((c) => !workingOnly || live[c.id]?.status === "working")
       .map((c) => ({ c, d: from ? distanceM(from.lat, from.lng, c.lat, c.lng) : 0 }))
       .sort((a, b) => a.d - b.d);
-  }, [chargers, hidden, fastOnly, workingOnly, live, from, vehicle, fitsOnly]);
+  }, [chargers, hidden, fastOnly, workingOnly, live, from, vehicle, fitsOnly, mode]);
 
   const presentNetworks = useMemo(() => {
     const ids = new Set(chargers.map((c) => c.network));
@@ -364,7 +368,8 @@ export default function MapScreen() {
             ))}
           </View>
         ) : (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingRight: 12 }}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingRight: 12, alignItems: "center" }}>
+            <ModeSwitch compact />
             {vehicle ? (
               <Chip label={`Fits ${vehicle.model}`} icon={vehicle.kind === "car" ? "car-sport" : "bicycle"} on={fitsOnly}
                 onPress={() => setFitsOnly((v) => !v)} />
@@ -528,7 +533,7 @@ export default function MapScreen() {
           keyExtractor={(x) => x.c.id}
           ListEmptyComponent={loading || !from ? null : (
             <EmptyState
-              hiddenCount={chargers.length - shown.length}
+              hiddenCount={chargers.filter((c) => suits(c, mode)).length - shown.length}
               onClear={() => { setFastOnly(false); setWorkingOnly(false); setFitsOnly(false); setHidden(new Set()); }}
               onAdd={() => addHere(from)}
             />

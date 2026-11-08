@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -6,6 +6,8 @@ import * as Location from "expo-location";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { fetchFeed } from "../../lib/community";
+import { suits, useMode } from "../../lib/mode";
+import { ModeSwitch } from "../../components/ModeSwitch";
 import { snapUrl } from "../../lib/supabase";
 import { timeAgo } from "../../lib/geo";
 import { STATUS_LABEL } from "../../lib/theme";
@@ -28,6 +30,8 @@ export default function ZapsFeed() {
   const [loading, setLoading] = useState(true);
   const [where, setWhere] = useState<{ lat: number; lng: number } | null>(null);
   const [viewer, setViewer] = useState<number | null>(null);
+  const [mode] = useMode();
+  const shownZ = useMemo(() => zaps.filter((z) => !z.chargers || suits({ connectors: z.chargers.connectors ?? [], network: z.chargers.network }, mode)), [zaps, mode]);
 
   const load = useCallback(async (p = where) => {
     if (!p) return;
@@ -52,13 +56,14 @@ export default function ZapsFeed() {
   return (
     <View style={{ flex: 1, backgroundColor: BG }}>
       <FlatList
-        data={zaps}
+        data={shownZ}
         keyExtractor={(z) => z.id}
         contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 24, paddingTop: insets.top + 12, gap: 14 }}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={() => load()} tintColor="#FCE38A" />}
         ListHeaderComponent={
           <View style={{ paddingHorizontal: 4, paddingBottom: 6 }}>
             <Text style={{ color: "#fff", fontSize: 40, fontWeight: "900", letterSpacing: -0.5 }}>Zings near you</Text>
+            <View style={{ marginTop: 10, marginBottom: 4 }}><ModeSwitch dark /></View>
             <Text style={{ color: "#A9B3BC" }}>Live from chargers within 25 km · gone in 24 hours</Text>
             <Pressable onPress={() => router.push("/leaderboard")} style={styles.board} accessibilityRole="button">
               <Ionicons name="trophy" size={18} color="#FCE38A" />
@@ -119,7 +124,7 @@ export default function ZapsFeed() {
           );
         }}
       />
-      {viewer !== null && <SnapViewer snaps={zaps} start={viewer} onClose={() => setViewer(null)} onChanged={() => load()} />}
+      {viewer !== null && <SnapViewer snaps={shownZ} start={viewer} onClose={() => setViewer(null)} onChanged={() => load()} />}
     </View>
   );
 }
