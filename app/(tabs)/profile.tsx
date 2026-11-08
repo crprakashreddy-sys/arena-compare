@@ -97,7 +97,8 @@ export default function You() {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ paddingBottom: tabSpace + 28 }}>
+    <View style={{ flex: 1, backgroundColor: t.bg }}>
+    <ScrollView style={{ flex: 1, backgroundColor: t.bg }} contentContainerStyle={{ paddingBottom: tabSpace + 28 }}>
       {/* Hero */}
       <View style={[styles.hero, { paddingTop: insets.top + 18 }]}>
         <Pressable onPress={changePhoto} accessibilityLabel="Change profile photo">
@@ -261,6 +262,9 @@ export default function You() {
         </Pressable>
       </View>
     </ScrollView>
+    {/* Keeps the clock and battery readable when the page scrolls under them */}
+    <View pointerEvents="none" style={{ position: "absolute", top: 0, left: 0, right: 0, height: insets.top, backgroundColor: t.bg, opacity: 0.94 }} />
+    </View>
   );
 }
 

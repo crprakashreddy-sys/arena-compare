@@ -1,5 +1,6 @@
 import React from "react";
-import { Stack } from "expo-router";
+import { Stack, ThemeProvider, DarkTheme, DefaultTheme } from "expo-router";
+import { useColorScheme } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AuthProvider, useAuth } from "../lib/auth";
@@ -14,8 +15,12 @@ export default function RootLayout() {
   const t = useTheme();
   const [loaded, fontError] = useFonts({ SpaceGrotesk_700Bold });
   const fontsLoaded = loaded || !!fontError; // never get stuck on the opening screen
+  // Every screen (tabs included) follows the phone's light/dark setting with zingd's colours.
+  const base = useColorScheme() === "dark" ? DarkTheme : DefaultTheme;
+  const navTheme = { ...base, colors: { ...base.colors, background: t.bg, card: t.bg, text: t.text, border: t.line, primary: t.accent } };
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <ThemeProvider value={navTheme}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: t.bg }}>
       <AuthProvider>
         <StatusBar style="auto" />
         {fontsLoaded && <Stack
@@ -63,6 +68,7 @@ export default function RootLayout() {
         <Intro fontsReady={fontsLoaded} />
       </AuthProvider>
     </GestureHandlerRootView>
+    </ThemeProvider>
   );
 }
 
