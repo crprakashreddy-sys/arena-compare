@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Animated, AppState, Easing, Linking, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, Alert, Animated, AppState, Easing, Linking, Platform, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { CameraView, useCameraPermissions, useMicrophonePermissions, type CameraType } from "expo-camera";
 import { Gesture, GestureDetector, Directions } from "react-native-gesture-handler";
 import * as ImagePicker from "expo-image-picker";
@@ -48,11 +48,12 @@ export default function ZingCamera() {
   // Lenses: 0.5× uses the real ultra-wide camera; 2× and 2.5× zoom the main camera.
   const [lenses, setLenses] = useState<string[]>([]);
   const [ultra, setUltra] = useState(false);
-  const ULTRA = lenses.find((l) => /ultra ?wide/i.test(l));
+  // Real ultra-wide lens, or the iPhone's combined "Dual Wide"/"Triple" camera (which starts at 0.5×).
+  const ULTRA = lenses.find((l) => /ultra ?wide/i.test(l)) ?? lenses.find((l) => /dual ?wide|triple/i.test(l));
   const WIDE = lenses.find((l) => /builtInWideAngleCamera/i.test(l)) ?? lenses.find((l) => /^back camera$/i.test(l))
     ?? lenses.find((l) => /wide/i.test(l) && !/ultra|dual|triple/i.test(l))
     ?? lenses.find((l) => !/ultra|tele|front|dual|triple/i.test(l));
-  const canUltra = facing === "back" && !!ULTRA;
+  const canUltra = facing === "back" && (!!ULTRA || Platform.OS === "ios");
   // Ask the camera which lenses this iPhone has (the change event alone doesn't always fire).
   const readLenses = useCallback(async () => {
     try { const l = await cam.current?.getAvailableLensesAsync(); if (l?.length) setLenses(l); } catch {}
@@ -64,7 +65,15 @@ export default function ZingCamera() {
   const litStop = stops.filter((f) => f <= factor + 0.02).pop() ?? 1;
   const goStop = (f: number) => {
     tickHaptic();
-    if (f === 0.5) { setUltra(true); setZoom(0); return; }
+    if (f === 0.5) {
+      if (!ULTRA) {
+        readLenses();
+        return Alert.alert("0.5× isn't ready yet", lenses.length
+          ? `Your iPhone reported these cameras:\n${lenses.join("\n")}\n\nSend this screenshot to support so we can enable 0.5×.`
+          : "The camera didn't report its lenses. This usually works in the App Store version; in Expo Go it can be blocked.");
+      }
+      setUltra(true); setZoom(0); return;
+    }
     setUltra(false); setZoom((f - 1) / 9);
   };
   const [lookIdx, setLookIdx] = useState(LOOKS.findIndex((l) => l.id === "zing"));
@@ -171,7 +180,7 @@ export default function ZingCamera() {
     .onUpdate((e) => {
       // Pinch out past 1× hops to the ultra-wide lens; pinch in from it hops back.
       if (onUltra) { if (e.scale > 1.35 && !recording) { setUltra(false); setZoom(0); zoomBase.current = 0; } return; }
-      if (canUltra && !recording && zoom < 0.01 && e.scale < 0.7) { tickHaptic(); setUltra(true); return; }
+      if (canUltra && ULTRA && !recording && zoom < 0.01 && e.scale < 0.7) { tickHaptic(); setUltra(true); return; }
       setZoom(Math.max(0, Math.min(0.6, zoomBase.current + (e.scale - 1) * 0.25)));
     });
   const dbl = Gesture.Tap().numberOfTaps(2).runOnJS(true).onEnd(flip);
