@@ -20,6 +20,7 @@ import { NotifyCard } from "../../components/NotifyCard";
 import { Avatar } from "../../components/ui";
 import { StoriesRow, toStories, type Story } from "../../components/StoriesRow";
 import { DriverDeck } from "../../components/DriverDeck";
+import { previewOf } from "../../components/ChatMedia";
 import SnapViewer from "../../components/SnapViewer";
 import { useTabSpace } from "../../lib/tabspace";
 import { tapHaptic } from "../../lib/motion";
@@ -267,12 +268,12 @@ function ChatRow({ x, act, me }: { x: Chat; act?: Activity; me: string }) {
     const c = x.c, last = c.last;
     title = c.name; muted = c.muted;
     preview = !last ? "Say hi to the crew 👋" : last.deleted ? "Message deleted"
-      : `${last.user_id === me ? "You" : last.profiles?.display_name?.split(" ")[0] ?? "Someone"}: ${last.body ?? "📷 Photo"}`;
+      : `${last.user_id === me ? "You" : last.profiles?.display_name?.split(" ")[0] ?? "Someone"}: ${previewOf(last)}`;
     avatar = <View><ClubBadge c={c} size={54} />{!!act?.msgs_today && <View style={s.onlineDot} />}</View>;
   } else {
     const d = x.d, last = d.last;
     title = d.other?.display_name ?? "Driver";
-    preview = !last ? "Say hi 👋" : last.deleted ? "Message deleted" : `${last.user_id === me ? "You: " : ""}${last.body ?? "📷 Photo"}`;
+    preview = !last ? "Say hi 👋" : last.deleted ? "Message deleted" : `${last.user_id === me ? "You: " : ""}${previewOf(last)}`;
     avatar = <Avatar name={title} photo={d.other?.avatar_path} size={54} />;
   }
   return (

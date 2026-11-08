@@ -8,6 +8,7 @@ import { timeAgo } from "../lib/geo";
 import { Avatar } from "../components/ui";
 import { IconTile } from "../components/Icon";
 import { ListSkeleton } from "../components/Skeleton";
+import { previewOf } from "../components/ChatMedia";
 
 /** Inbox: every one-to-one chat, newest first, with unread counts. */
 export default function Messages() {
@@ -41,7 +42,7 @@ export default function Messages() {
       renderItem={({ item: r }) => {
         const name = r.other?.display_name ?? "Driver";
         const last = r.last;
-        const preview = !last ? "Say hi" : last.deleted ? "Message deleted" : last.body ?? "Photo";
+        const preview = !last ? "Say hi" : previewOf(last);
         const unread = r.unread > 0;
         return (
           <Pressable onPress={() => router.push(`/dm/${r.id}`)} style={({ pressed }) => [s.row, pressed && { backgroundColor: t.surface }]}>

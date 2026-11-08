@@ -17,6 +17,8 @@ import {
 } from "../../lib/dms";
 import { Avatar } from "../../components/ui";
 import { IconTile } from "../../components/Icon";
+import { GifPicker, type Pick as FunPick } from "../../components/GifPicker";
+import { ChatMedia, isBare, previewOf } from "../../components/ChatMedia";
 import { tapHaptic } from "../../lib/motion";
 
 const LEMON = "#FCE38A";
@@ -58,6 +60,7 @@ export default function DirectMessage() {
   const [reply, setReply] = useState<DmMessage | null>(null);
   const [sending, setSending] = useState(false);
   const [seenAt, setSeenAt] = useState<string | null>(null);
+  const [fun, setFun] = useState(false);
 
   const byId = useMemo(() => new Map(msgs.map((m) => [m.id, m])), [msgs]);
   const myLatest = msgs.find((m) => m.user_id === me && !m.deleted)?.id;
@@ -93,15 +96,17 @@ export default function DirectMessage() {
     setMsgs((cur) => [...cur, ...more.filter((m) => !cur.some((x) => x.id === m.id))]);
   };
 
-  const send = async (photoPath: string | null = null) => {
+  const send = async (photoPath: string | null = null, extra: { gif_url?: string; sticker?: string } = {}) => {
     if (!me) return router.push("/login");
-    if (!text.trim() && !photoPath) return;
+    const media = !!(extra.gif_url || extra.sticker);
+    if (!text.trim() && !photoPath && !media) return;
     setSending(true);
     try {
-      const m = await sendDm(threadId, me, text, photoPath, reply?.id ?? null);
+      const m = await sendDm(threadId, me, media ? "" : text, photoPath, reply?.id ?? null, extra);
       tapHaptic();
       setMsgs((cur) => (cur.some((x) => x.id === m.id) ? cur : [m, ...cur]));
-      setText(""); setReply(null);
+      if (!media) setText("");
+      setReply(null);
     } catch (e: any) { Alert.alert("Not sent", e.message); }
     setSending(false);
   };
@@ -137,7 +142,7 @@ export default function DirectMessage() {
   const longPress = (m: DmMessage) => {
     if (m.deleted) return;
     if (m.user_id === me) {
-      sheet("Your message", ["Reply", "Delete for both"], 1, (i) => {
+      sheet(previewOf(m).slice(0, 40), ["Reply", "Delete for both"], 1, (i) => {
         if (i === 0) setReply(m);
         else Alert.alert("Delete this message?", "It's removed for both of you.", [
           { text: "Cancel", style: "cancel" },
@@ -226,7 +231,7 @@ export default function DirectMessage() {
           <View style={{ width: 3, alignSelf: "stretch", backgroundColor: CTA, borderRadius: 2 }} />
           <View style={{ flex: 1 }}>
             <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12.5 }}>Replying to {nameOf(reply.user_id)}</Text>
-            <Text style={{ color: t.muted, fontSize: 13 }} numberOfLines={1}>{reply.body ?? "Photo"}</Text>
+            <Text style={{ color: t.muted, fontSize: 13 }} numberOfLines={1}>{previewOf(reply)}</Text>
           </View>
           <Pressable onPress={() => setReply(null)} hitSlop={10}><Ionicons name="close-circle" size={22} color={t.muted} /></Pressable>
         </View>
@@ -236,6 +241,9 @@ export default function DirectMessage() {
         <View style={[s.composer, { backgroundColor: t.bg, borderTopColor: t.line, paddingBottom: Math.max(insets.bottom, 10) }]}>
           <Pressable onPress={sendPhoto} disabled={sending} hitSlop={8} style={[s.iconBtn, { backgroundColor: t.surface }]}>
             <Ionicons name="image" size={20} color={t.text} />
+          </Pressable>
+          <Pressable onPress={() => setFun(true)} disabled={sending} hitSlop={6} style={[s.gifBtn, { backgroundColor: t.surface }]} accessibilityLabel="GIFs and stickers">
+            <Text style={{ color: t.text, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12.5 }}>GIF</Text>
           </Pressable>
           <TextInput value={text} onChangeText={setText} placeholder="Message" placeholderTextColor={t.faint}
             multiline maxLength={2000} style={[s.input, { backgroundColor: t.surface, color: t.text }]} />
@@ -249,6 +257,7 @@ export default function DirectMessage() {
           <Text style={{ color: t.muted, flex: 1, lineHeight: 19 }}>You're no longer connected, so this chat is read-only. Reconnect from their profile to keep talking.</Text>
         </View>
       )}
+      <GifPicker visible={fun} onClose={() => setFun(false)} onPick={(p: FunPick) => send(null, p as any)} />
     </KeyboardAvoidingView>
   );
 }
@@ -268,16 +277,22 @@ function Bubble({ m, mine, tight, replyTo, replyName, onLongPress }: {
 }) {
   const t = useTheme();
   const time = new Date(m.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  const pad = m.photo_path ? { paddingHorizontal: 8 } : null;
+  const pad = (m.photo_path || m.gif_url) ? { paddingHorizontal: 8 } : null;
   return (
     <View style={{ flexDirection: "row", justifyContent: mine ? "flex-end" : "flex-start", marginTop: tight ? 0 : 8 }}>
+      {isBare(m) ? (
+        <Pressable onLongPress={onLongPress} delayLongPress={280} style={{ alignItems: mine ? "flex-end" : "flex-start" }}>
+          <ChatMedia m={m} />
+          <Text style={[s.time, { color: t.faint, marginHorizontal: 6 }]}>{time}</Text>
+        </Pressable>
+      ) : (
       <Pressable onLongPress={onLongPress} delayLongPress={280}
-        style={[s.bubble, mine ? s.mine : [s.theirs, { backgroundColor: t.bg }], m.photo_path ? { padding: 4 } : null]}>
+        style={[s.bubble, mine ? s.mine : [s.theirs, { backgroundColor: t.bg }], (m.photo_path || m.gif_url) ? { padding: 4 } : null]}>
         {replyTo && (
           <View style={[s.quote, { backgroundColor: mine ? "rgba(252,227,138,0.15)" : t.surface }]}>
             <Text style={{ color: mine ? ON_CTA : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12 }}>{replyName(replyTo.user_id)}</Text>
             <Text style={{ color: mine ? MY_BUBBLE_TEXT : t.muted, fontSize: 12.5 }} numberOfLines={2}>
-              {replyTo.deleted ? "Message deleted" : replyTo.body ?? "Photo"}
+              {previewOf(replyTo)}
             </Text>
           </View>
         )}
@@ -286,11 +301,13 @@ function Bubble({ m, mine, tight, replyTo, replyName, onLongPress }: {
         ) : (
           <>
             {m.photo_path && <Image source={{ uri: snapUrl(m.photo_path) }} style={s.photo} contentFit="cover" transition={150} />}
+            {!!m.gif_url && <ChatMedia m={m} />}
             {!!m.body && <Text style={[{ color: mine ? MY_BUBBLE_TEXT : t.text, fontSize: 15.5, lineHeight: 21 }, pad, m.photo_path ? { paddingTop: 6 } : null]}>{m.body}</Text>}
           </>
         )}
         <Text style={[s.time, { color: mine ? "#999" : t.faint }, pad, m.photo_path ? { paddingBottom: 4 } : null]}>{time}</Text>
       </Pressable>
+      )}
     </View>
   );
 }
@@ -306,6 +323,7 @@ const s = StyleSheet.create({
   replyBar: { flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 14, paddingVertical: 8, borderTopWidth: StyleSheet.hairlineWidth },
   composer: { flexDirection: "row", alignItems: "flex-end", gap: 8, paddingHorizontal: 10, paddingTop: 8, borderTopWidth: StyleSheet.hairlineWidth },
   locked: { flexDirection: "row", alignItems: "center", gap: 12, paddingHorizontal: 16, paddingTop: 12, borderTopWidth: StyleSheet.hairlineWidth },
+  gifBtn: { height: 40, paddingHorizontal: 10, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   iconBtn: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   input: { flex: 1, minHeight: 40, maxHeight: 120, borderRadius: 20, paddingHorizontal: 14, paddingTop: 10, paddingBottom: 10, fontSize: 15.5 },
   send: { width: 40, height: 40, borderRadius: 20, backgroundColor: CTA, alignItems: "center", justifyContent: "center" },

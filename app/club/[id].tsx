@@ -21,6 +21,8 @@ import { Avatar } from "../../components/ui";
 import { IssuesBoard } from "../../components/IssuesBoard";
 import { EventsList } from "../../components/EventsList";
 import { IconTile } from "../../components/Icon";
+import { GifPicker, type Pick as FunPick } from "../../components/GifPicker";
+import { ChatMedia, isBare, previewOf } from "../../components/ChatMedia";
 import * as Clipboard from "expo-clipboard";
 import { MessageMenu, ReactionChips, type MenuAction } from "../../components/MessageMenu";
 import { fetchReactions, pinMessage, subscribeReactions, toggleReaction, type Reaction, type ReactionMap } from "../../lib/clubs";
@@ -62,6 +64,7 @@ export default function ClubChat() {
   const [reactions, setReactions] = useState<ReactionMap>({});
   const [msgMenu, setMsgMenu] = useState<ClubMessage | null>(null);
   const [pinned, setPinned] = useState<ClubMessage | null>(null);
+  const [fun, setFun] = useState(false);
 
   const byId = useMemo(() => new Map(msgs.map((m) => [m.id, m])), [msgs]);
 
@@ -111,15 +114,18 @@ export default function ClubChat() {
     fetchReactions(more.map((x) => x.id)).then((r) => setReactions((cur) => ({ ...cur, ...r })));
   };
 
-  const send = async (photoPath: string | null = null) => {
+  const send = async (photoPath: string | null = null, extra: { gif_url?: string; sticker?: string } = {}) => {
     if (!me) return;
     if (!profile) return router.push("/login");
-    if (!text.trim() && !photoPath) return;
+    const media = !!(extra.gif_url || extra.sticker);
+    if (!text.trim() && !photoPath && !media) return;
     setSending(true);
     try {
-      const m = await sendMessage(clubId, me, text, photoPath, reply?.id ?? null);
+      // A GIF or sticker goes on its own; whatever you were typing stays in the box.
+      const m = await sendMessage(clubId, me, media ? null : text, photoPath, reply?.id ?? null, extra);
       setMsgs((cur) => (cur.some((x) => x.id === m.id) ? cur : [m, ...cur]));
-      setText(""); setReply(null);
+      if (!media) setText("");
+      setReply(null);
     } catch (e: any) { Alert.alert("Not sent", e.message); }
     setSending(false);
   };
@@ -288,7 +294,7 @@ export default function ClubChat() {
         </Pressable>
       )}
       <MessageMenu visible={!!msgMenu} onClose={() => setMsgMenu(null)} mine={msgMenu?.user_id === me}
-        preview={msgMenu ? (msgMenu.body ?? "Photo") : ""} picked={msgMenu ? [...myReacts(msgMenu.id)] : []}
+        preview={msgMenu ? previewOf(msgMenu) : ""} picked={msgMenu ? [...myReacts(msgMenu.id)] : []}
         onReact={(r) => msgMenu && react(msgMenu.id, r)} actions={msgMenu ? menuActions(msgMenu) : []} />
       {loading || member === null ? <ActivityIndicator style={{ flex: 1 }} color={t.muted} /> : (
         <FlatList
@@ -328,7 +334,7 @@ export default function ClubChat() {
           <View style={{ width: 3, alignSelf: "stretch", backgroundColor: CTA, borderRadius: 2 }} />
           <View style={{ flex: 1 }}>
             <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12.5 }}>Replying to {reply.profiles?.display_name ?? "driver"}</Text>
-            <Text style={{ color: t.muted, fontSize: 13 }} numberOfLines={1}>{reply.body ?? "Photo"}</Text>
+            <Text style={{ color: t.muted, fontSize: 13 }} numberOfLines={1}>{previewOf(reply)}</Text>
           </View>
           <Pressable onPress={() => setReply(null)} hitSlop={10}><Ionicons name="close-circle" size={22} color={t.muted} /></Pressable>
         </View>
@@ -338,12 +344,16 @@ export default function ClubChat() {
         <Pressable onPress={sendPhoto} disabled={sending} hitSlop={8} style={[s.iconBtn, { backgroundColor: t.surface }]}>
           <Ionicons name="image" size={20} color={t.text} />
         </Pressable>
+        <Pressable onPress={() => setFun(true)} disabled={sending} hitSlop={6} style={[s.gifBtn, { backgroundColor: t.surface }]} accessibilityLabel="GIFs and stickers">
+          <Text style={{ color: t.text, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12.5 }}>GIF</Text>
+        </Pressable>
         <TextInput value={text} onChangeText={setText} placeholder="Message the club" placeholderTextColor={t.faint}
           multiline maxLength={2000} style={[s.input, { backgroundColor: t.surface, color: t.text }]} />
         <Pressable onPress={() => send()} disabled={sending || !text.trim()} style={[s.send, { opacity: text.trim() || sending ? 1 : 0.35 }]}>
           {sending ? <ActivityIndicator color={ON_CTA} size="small" /> : <Ionicons name="arrow-up" size={20} color={ON_CTA} />}
         </Pressable>
       </View>
+      <GifPicker visible={fun} onClose={() => setFun(false)} onPick={(p: FunPick) => send(null, p as any)} />
     </KeyboardAvoidingView>
   );
 }
@@ -356,12 +366,19 @@ function Bubble({ m, mine, showName, replyTo, onLongPress, onDoubleTap }: {
   const t = useTheme();
   const name = m.profiles?.display_name ?? "Driver";
   const time = new Date(m.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  const pad = m.photo_path ? { paddingHorizontal: 8 } : null;
+  const pad = (m.photo_path || m.gif_url) ? { paddingHorizontal: 8 } : null;
   return (
     <View style={{ flexDirection: "row", justifyContent: mine ? "flex-end" : "flex-start", gap: 6, marginTop: showName ? 8 : 0 }}>
       {!mine && <View style={{ width: 30 }}>{showName && <Avatar name={name} photo={m.profiles?.avatar_path} size={30} />}</View>}
+      {isBare(m) ? (
+        <Pressable onPress={tap} onLongPress={onLongPress} delayLongPress={280} style={{ alignItems: mine ? "flex-end" : "flex-start" }}>
+          {!mine && showName && <Text style={[s.name, { marginLeft: 4 }]} numberOfLines={1}>{name}</Text>}
+          <ChatMedia m={m} />
+          <Text style={[s.time, { color: t.faint, alignSelf: mine ? "flex-end" : "flex-start", marginHorizontal: 6 }]}>{time}</Text>
+        </Pressable>
+      ) : (
       <Pressable onPress={tap} onLongPress={onLongPress} delayLongPress={280}
-        style={[s.bubble, mine ? s.mine : [s.theirs, { backgroundColor: t.bg }], m.photo_path ? { padding: 4 } : null]}>
+        style={[s.bubble, mine ? s.mine : [s.theirs, { backgroundColor: t.bg }], (m.photo_path || m.gif_url) ? { padding: 4 } : null]}>
         {!mine && showName && (
           <Text style={[s.name, pad, m.photo_path ? { paddingTop: 4 } : null]} numberOfLines={1}>
             {name}{m.profiles?.car_model ? <Text style={{ color: t.muted, fontWeight: "500" }}>{`  · ${m.profiles.car_model}`}</Text> : null}
@@ -371,7 +388,7 @@ function Bubble({ m, mine, showName, replyTo, onLongPress, onDoubleTap }: {
           <View style={[s.quote, { backgroundColor: mine ? "rgba(252,227,138,0.15)" : t.surface }]}>
             <Text style={{ color: mine ? ON_CTA : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12 }}>{replyTo.profiles?.display_name ?? "Driver"}</Text>
             <Text style={{ color: mine ? MY_BUBBLE_TEXT : t.muted, fontSize: 12.5 }} numberOfLines={2}>
-              {replyTo.deleted ? "Message deleted" : replyTo.body ?? "Photo"}
+              {previewOf(replyTo)}
             </Text>
           </View>
         )}
@@ -380,11 +397,13 @@ function Bubble({ m, mine, showName, replyTo, onLongPress, onDoubleTap }: {
         ) : (
           <>
             {m.photo_path && <Image source={{ uri: snapUrl(m.photo_path) }} style={s.photo} contentFit="cover" transition={150} />}
+            {!!m.gif_url && <ChatMedia m={m} />}
             {!!m.body && <Text style={[{ color: mine ? MY_BUBBLE_TEXT : t.text, fontSize: 15.5, lineHeight: 21 }, pad, m.photo_path ? { paddingTop: 6 } : null]}>{m.body}</Text>}
           </>
         )}
         <Text style={[s.time, { color: mine ? "#999" : t.faint }, pad, m.photo_path ? { paddingBottom: 4 } : null]}>{time}</Text>
       </Pressable>
+      )}
     </View>
   );
 }
@@ -403,6 +422,7 @@ const s = StyleSheet.create({
   time: { fontSize: 10.5, alignSelf: "flex-end", marginTop: 3 },
   replyBar: { flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 14, paddingVertical: 8, borderTopWidth: StyleSheet.hairlineWidth },
   composer: { flexDirection: "row", alignItems: "flex-end", gap: 8, paddingHorizontal: 10, paddingTop: 8, borderTopWidth: StyleSheet.hairlineWidth },
+  gifBtn: { height: 40, paddingHorizontal: 10, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   iconBtn: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   input: { flex: 1, minHeight: 40, maxHeight: 120, borderRadius: 20, paddingHorizontal: 14, paddingTop: 10, paddingBottom: 10, fontSize: 15.5 },
   send: { width: 40, height: 40, borderRadius: 20, backgroundColor: CTA, alignItems: "center", justifyContent: "center" },

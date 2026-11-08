@@ -4,7 +4,8 @@ import { Stack, router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "../../components/SFIcon";
 import { useTheme, CTA, ON_CTA } from "../../lib/theme";
 import { useAuth } from "../../lib/auth";
-import { fetchClub, fetchInfoStats, fetchMembers, myRole, removeMember, setRole, setRules, type Club, type ClubMember, type InfoStats } from "../../lib/clubs";
+import { pickSquarePhoto } from "../../lib/photos";
+import { fetchClub, fetchInfoStats, setClubPhoto, fetchMembers, myRole, removeMember, setRole, setRules, type Club, type ClubMember, type InfoStats } from "../../lib/clubs";
 import { networkById } from "../../lib/networks";
 import { Icon, type IconName } from "../../components/Icon";
 import { successHaptic } from "../../lib/motion";
@@ -26,6 +27,7 @@ export default function ClubMembers() {
   const [admin, setAdmin] = useState(false);
   const [stats, setStats] = useState<InfoStats | null>(null);
   const [editRules, setEditRules] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const load = useCallback(async () => {
     const [c, m, r] = await Promise.all([fetchClub(clubId), fetchMembers(clubId), me ? myRole(clubId, me) : Promise.resolve(null)]);
@@ -48,6 +50,20 @@ export default function ClubMembers() {
         : { text: "Make admin", onPress: () => setRole(clubId, m.user_id, "admin").then(load).catch((e) => Alert.alert("Couldn't change", e.message)) },
       { text: "Remove from club", style: "destructive", onPress: () => removeMember(clubId, m.user_id).then(load).catch((e) => Alert.alert("Couldn't remove", e.message)) },
       { text: "Cancel", style: "cancel" },
+    ]);
+  };
+
+  const changePhoto = () => {
+    const pick = async () => {
+      setUploading(true);
+      try { const p = await pickSquarePhoto(); if (p) { await setClubPhoto(clubId, p); successHaptic(); load(); } }
+      catch (e: any) { Alert.alert("Photo not saved", e.message); }
+      setUploading(false);
+    };
+    Alert.alert("Club photo", "Everyone in and outside the club sees this.", [
+      { text: "Choose a photo", onPress: pick },
+      ...(club?.photo_path ? [{ text: "Remove photo", style: "destructive" as const, onPress: () => setClubPhoto(clubId, null).then(load) }] : []),
+      { text: "Cancel", style: "cancel" as const },
     ]);
   };
 
@@ -91,7 +107,13 @@ export default function ClubMembers() {
 
       {/* Hero */}
       <View style={[s.hero, { backgroundColor: hero }]}>
-        <View style={[s.ring, { borderColor: onHero === INK ? "rgba(26,26,26,0.15)" : "rgba(255,255,255,0.25)" }]}><ClubBadge c={club} size={88} /></View>
+        <Pressable onPress={admin ? changePhoto : undefined} disabled={!admin} accessibilityLabel={admin ? "Change club photo" : undefined}
+          style={[s.ring, { borderColor: onHero === INK ? "rgba(26,26,26,0.15)" : "rgba(255,255,255,0.25)" }]}>
+          <ClubBadge c={club} size={88} />
+          {admin && (
+            <View style={s.cam}>{uploading ? <ActivityIndicator size="small" color={LEMON} /> : <Ionicons name="camera" size={15} color={LEMON} />}</View>
+          )}
+        </Pressable>
         <Text style={[s.name, { color: onHero }]}>{club.name}</Text>
         {!!club.description && <Text style={{ color: onHero, opacity: 0.85, textAlign: "center", lineHeight: 21, fontSize: 15 }}>{club.description}</Text>}
         <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 6, marginTop: 4 }}>
@@ -185,6 +207,7 @@ const s = StyleSheet.create({
   hero: { alignItems: "center", gap: 6, paddingTop: 22, paddingBottom: 24, paddingHorizontal: 20, borderBottomLeftRadius: 32, borderBottomRightRadius: 32 },
   ring: { padding: 4, borderRadius: 60, borderWidth: 3, marginBottom: 6 },
   name: { fontSize: 26, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", textAlign: "center", letterSpacing: -0.8 },
+  cam: { position: "absolute", right: 0, bottom: 0, width: 32, height: 32, borderRadius: 16, backgroundColor: INK, borderWidth: 2.5, borderColor: "#fff", alignItems: "center", justifyContent: "center" },
   pill: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999 },
   btn: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 16, height: 42, borderRadius: 999 },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 8, paddingHorizontal: 16, marginTop: 16 },

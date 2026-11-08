@@ -35,6 +35,9 @@ const TABLES = [
   ["charger_speed_stats", "charger_id,kind,typical_kw,charges", "speeds.sql"],
   ["clubs", "rules,pinned_message_id", "clubs_plus.sql"],
   ["club_reactions", "message_id,user_id,emoji", "clubs_plus.sql"],
+  ["club_messages", "gif_url,sticker", "gifs.sql"],
+  ["dm_messages", "gif_url,sticker", "gifs.sql"],
+  ["clubs", "photo_path", "gifs.sql"],
 ];
 // [function, safe dummy arguments, SQL file]. Called signed-out, so they do nothing.
 // Joins the app makes. "More than one relationship" here breaks loading names on messages.
@@ -81,7 +84,7 @@ for (const [fn, args, file] of FUNCS) {
 
 if (networkErr) { console.log(`   ⚠️  Couldn't reach Supabase (${networkErr}). Check your internet.`); process.exit(0); }
 if (!missing.size) { console.log("   ✅ Database matches the app."); process.exit(0); }
-const order = ["schema.sql", "profile.sql", "clubs.sql", "issues.sql", "events.sql", "notifications.sql", "dms.sql", "speeds.sql", "clubs_plus.sql", "crew.sql"];
+const order = ["schema.sql", "profile.sql", "clubs.sql", "issues.sql", "events.sql", "notifications.sql", "dms.sql", "speeds.sql", "clubs_plus.sql", "crew.sql", "gifs.sql"];
 const files = [...missing.keys()].sort((a, b) => order.indexOf(a) - order.indexOf(b));
 console.log("   ❌ Your database is missing parts the app needs:");
 for (const f of files) { console.log(`      • supabase/${f}`); missing.get(f).slice(0, 3).forEach((w) => console.log(`          ${w}`)); }

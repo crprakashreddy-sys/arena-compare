@@ -4,15 +4,16 @@ import { isBlocked } from "./community";
 export type DmMessage = {
   id: string; thread_id: string; user_id: string; body: string | null; photo_path: string | null;
   reply_to: string | null; deleted: boolean; created_at: string;
+  gif_url?: string | null; sticker?: string | null;
 };
 export type DmPerson = { id: string; display_name: string; avatar_path: string | null; car_model: string | null };
 export type DmThread = {
   id: string; last_at: string; other_id: string; unread: number;
-  last: { body: string | null; photo_path: string | null; user_id: string; deleted: boolean; created_at: string } | null;
+  last: { body: string | null; photo_path: string | null; gif_url?: string | null; sticker?: string | null; user_id: string; deleted: boolean; created_at: string } | null;
   other?: DmPerson;
 };
 
-const FIELDS = "id,thread_id,user_id,body,photo_path,reply_to,deleted,created_at";
+const FIELDS = "id,thread_id,user_id,body,photo_path,gif_url,sticker,reply_to,deleted,created_at";
 
 /** Opens (or reuses) the chat with a connected driver and returns its id. */
 export async function startDm(otherId: string): Promise<string> {
@@ -69,9 +70,10 @@ export async function fetchDm(id: string): Promise<DmMessage | null> {
   return (data as DmMessage) ?? null;
 }
 
-export async function sendDm(threadId: string, userId: string, body: string, photoPath: string | null, replyTo: string | null) {
+export async function sendDm(threadId: string, userId: string, body: string, photoPath: string | null, replyTo: string | null,
+  extra: { gif_url?: string; sticker?: string } = {}) {
   const { data, error } = await supabase.from("dm_messages")
-    .insert({ thread_id: threadId, user_id: userId, body: body.trim() || null, photo_path: photoPath, reply_to: replyTo })
+    .insert({ thread_id: threadId, user_id: userId, body: body.trim() || null, photo_path: photoPath, reply_to: replyTo, ...extra })
     .select(FIELDS).single();
   if (error) throw new Error(error.message.includes("row-level security") ? "You can only message drivers in your crew." : error.message);
   return data as DmMessage;

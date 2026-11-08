@@ -7,7 +7,7 @@ export type Club = {
   name: string; vehicle_kind: string | null; members: number;
   description?: string | null; city?: string | null; emoji?: string | null; color?: string | null;
   is_private?: boolean; invite_code?: string | null; created_by?: string | null;
-  rules?: string | null; pinned_message_id?: string | null;
+  rules?: string | null; pinned_message_id?: string | null; photo_path?: string | null;
 };
 export type ClubMember = {
   user_id: string; role: "member" | "admin"; joined_at: string;
@@ -19,6 +19,7 @@ export type ClubDraft = {
 export type ClubMessage = {
   id: string; club_id: string; user_id: string; body: string | null; photo_path: string | null;
   reply_to: string | null; deleted: boolean; created_at: string;
+  gif_url?: string | null; sticker?: string | null;
   profiles?: { display_name: string; car_model: string | null; avatar_path?: string | null } | null;
 };
 export type MyClub = Club & { last?: ClubMessage | null; unread: number; muted: boolean };
@@ -27,7 +28,7 @@ const slug = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,
 export const brandClubId = (make: string) => `brand:${slug(make)}`;
 export const modelClubId = (m: Pick<Model, "id">) => `model:${m.id}`;
 
-const MSG_FIELDS = "id,club_id,user_id,body,photo_path,reply_to,deleted,created_at,profiles!club_messages_user_id_fkey(display_name,car_model,avatar_path)";
+const MSG_FIELDS = "id,club_id,user_id,body,photo_path,gif_url,sticker,reply_to,deleted,created_at,profiles!club_messages_user_id_fkey(display_name,car_model,avatar_path)";
 
 export async function fetchClubs(): Promise<Club[]> {
   if (!isConfigured) return [];
@@ -91,9 +92,10 @@ export async function fetchMessage(id: string): Promise<ClubMessage | null> {
   return (data as any) ?? null;
 }
 
-export async function sendMessage(clubId: string, userId: string, body: string | null, photoPath: string | null, replyTo: string | null) {
+export async function sendMessage(clubId: string, userId: string, body: string | null, photoPath: string | null, replyTo: string | null,
+  extra: { gif_url?: string; sticker?: string } = {}) {
   const { data, error } = await supabase.from("club_messages")
-    .insert({ club_id: clubId, user_id: userId, body: body?.trim() || null, photo_path: photoPath, reply_to: replyTo })
+    .insert({ club_id: clubId, user_id: userId, body: body?.trim() || null, photo_path: photoPath, reply_to: replyTo, ...extra })
     .select(MSG_FIELDS).single();
   if (error) {
     // Say what really happened: a database step not yet run looks very different from bad signal.
@@ -241,4 +243,10 @@ export type InfoStats = { members: number; msgs_week: number; active_week: numbe
 export async function fetchInfoStats(clubId: string): Promise<InfoStats | null> {
   const { data } = await supabase.rpc("club_info_stats", { c: clubId });
   return (data as InfoStats) ?? null;
+}
+
+/** Admins: set (or clear with null) the club's photo. */
+export async function setClubPhoto(clubId: string, path: string | null) {
+  const { error } = await supabase.rpc("set_club_photo", { c: clubId, p: path ?? "" });
+  if (error) throw new Error(error.message);
 }

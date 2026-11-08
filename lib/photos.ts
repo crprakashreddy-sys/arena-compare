@@ -10,3 +10,12 @@ export async function pickAndUploadPhoto(): Promise<string | null> {
   const out = await img.saveAsync({ format: SaveFormat.JPEG, compress: 0.7, base64: true });
   return uploadSnap(out.base64!);
 }
+
+/** Square photo for a profile or club picture: the driver crops it, we shrink it to 640 px. */
+export async function pickSquarePhoto(): Promise<string | null> {
+  const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], allowsEditing: true, aspect: [1, 1], quality: 1 });
+  if (res.canceled || !res.assets?.[0]) return null;
+  const img = await ImageManipulator.manipulate(res.assets[0].uri).resize({ width: 640 }).renderAsync();
+  const out = await img.saveAsync({ format: SaveFormat.JPEG, compress: 0.8, base64: true });
+  return uploadSnap(out.base64!);
+}

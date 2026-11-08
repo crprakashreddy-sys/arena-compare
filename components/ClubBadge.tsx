@@ -1,5 +1,7 @@
 import React from "react";
 import { Text, View } from "react-native";
+import { Image } from "expo-image";
+import { snapUrl } from "../lib/supabase";
 import { Ionicons } from "./SFIcon";
 import { networkById } from "../lib/networks";
 import type { Club } from "../lib/clubs";
@@ -9,7 +11,10 @@ const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
 
 /** Round club avatar: emoji on the club's colour for driver-made clubs, brand colour and initials otherwise. */
-export function ClubBadge({ c, size }: { c: Pick<Club, "make" | "kind" | "emoji" | "color">; size: number }) {
+export function ClubBadge({ c, size }: { c: Pick<Club, "make" | "kind" | "emoji" | "color"> & { photo_path?: string | null }; size: number }) {
+  if (c.photo_path) {
+    return <Image source={{ uri: snapUrl(c.photo_path) }} style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: "#1A1A1A" }} contentFit="cover" transition={150} />;
+  }
   if (c.kind === "custom") {
     return (
       <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: c.color || LEMON, alignItems: "center", justifyContent: "center" }}>
