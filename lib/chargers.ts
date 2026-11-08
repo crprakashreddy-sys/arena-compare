@@ -32,6 +32,7 @@ export async function fetchChargers(lat: number, lng: number, radiusKm = 15): Pr
   }
 
   const result = merged.filter((c) => isCommercial(c.name, c.address, c.network));
+  if (!result.length && radiusKm < 50) return fetchChargers(lat, lng, 50);
   result.forEach(cacheCharger);
   return result;
 }
