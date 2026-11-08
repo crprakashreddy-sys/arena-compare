@@ -472,8 +472,13 @@ export default function MapScreen() {
         <Glass style={[styles.range, { bottom: sheetH + 12 + tabSpace }]}>
           <Pressable onPress={() => setShowRange((v) => !v)} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
             accessibilityLabel={showRange ? "Hide range ring" : "Show range ring"}>
-            <View style={{ width: 12, height: 12, borderRadius: 6, borderWidth: 2, borderColor: "#FCE38A", backgroundColor: showRange ? "rgba(255,214,10,0.3)" : "transparent" }} />
-            <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontVariant: ["tabular-nums"] }}>≈{Math.round(reachKm(vehicle))} km</Text>
+            <View style={{ width: 26, height: 26, borderRadius: 13, alignItems: "center", justifyContent: "center", backgroundColor: showRange ? "#FCE38A" : t.surface }}>
+              <Icon name="road" size={15} color="#1A1A1A" />
+            </View>
+            <View>
+              <Text style={{ color: t.text, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontVariant: ["tabular-nums"], fontSize: 15, lineHeight: 17 }}>{Math.round(reachKm(vehicle))} km</Text>
+              <Text style={{ color: t.muted, fontSize: 10, fontWeight: "700", lineHeight: 12 }}>range left</Text>
+            </View>
           </Pressable>
           <BatterySlider value={vehicle.batteryPct ?? 60} onChange={(v) => updateVehicle(vehicle.key, { batteryPct: v })} />
         </Glass>
@@ -694,7 +699,7 @@ const styles = StyleSheet.create({
     elevation: 4, shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 6,
   },
   range: {
-    position: "absolute", left: 12, flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 12, height: 40, borderRadius: 20,
+    position: "absolute", left: 12, flexDirection: "row", alignItems: "center", gap: 10, paddingLeft: 7, paddingRight: 12, height: 44, borderRadius: 22,
     shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 4,
   },
   best: { flexDirection: "row", alignItems: "center", gap: 10, marginHorizontal: 12, marginBottom: 4, padding: 10, borderRadius: 14 },

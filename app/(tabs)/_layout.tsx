@@ -6,6 +6,20 @@ import { useGarage } from "../../lib/vehicles";
 import { syncVehicleKind } from "../../lib/community";
 import { onDmRead, subscribeInbox, unreadDms } from "../../lib/dms";
 
+// Colourful tab icons (drawn for zingd), shown in their own colours instead of one flat tint.
+// The softer "-off" version marks the tabs you're not on.
+const ICONS = {
+  map: { default: require("../../assets/tabs/map-off.png"), selected: require("../../assets/tabs/map.png") },
+  zings: { default: require("../../assets/tabs/zings-off.png"), selected: require("../../assets/tabs/zings.png") },
+  clubs: { default: require("../../assets/tabs/clubs-off.png"), selected: require("../../assets/tabs/clubs.png") },
+  you: { default: require("../../assets/tabs/you-off.png"), selected: require("../../assets/tabs/you.png") },
+};
+function TabIcon({ name, md }: { name: keyof typeof ICONS; md: string }) {
+  return Platform.OS === "ios"
+    ? <NativeTabs.Trigger.Icon src={ICONS[name]} renderingMode="original" />
+    : <NativeTabs.Trigger.Icon md={md as any} />;
+}
+
 const INK_OR_WHITE = Platform.OS === "ios" ? DynamicColorIOS({ light: "#1A1A1A", dark: "#FFFFFF" }) : "#1A1A1A";
 const LABEL = Platform.OS === "ios" ? DynamicColorIOS({ light: "#6B6B6B", dark: "#A0A0A0" }) : "#6B6B6B";
 
@@ -39,20 +53,20 @@ export default function TabsLayout() {
     <NativeTabs minimizeBehavior="onScrollDown" tintColor={INK_OR_WHITE}
       labelStyle={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 10.5, color: LABEL }}>
       <NativeTabs.Trigger name="index">
-        <NativeTabs.Trigger.Icon sf={{ default: "map", selected: "map.fill" }} md="map" />
+        <TabIcon name="map" md="map" />
         <NativeTabs.Trigger.Label>Map</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="feed">
-        <NativeTabs.Trigger.Icon sf={{ default: "bolt", selected: "bolt.fill" }} md="bolt" />
+        <TabIcon name="zings" md="bolt" />
         <NativeTabs.Trigger.Label>Zings</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="clubs">
-        <NativeTabs.Trigger.Icon sf={{ default: "person.2", selected: "person.2.fill" }} md="groups" />
+        <TabIcon name="clubs" md="groups" />
         <NativeTabs.Trigger.Label>Clubs</NativeTabs.Trigger.Label>
         {dm > 0 && <NativeTabs.Trigger.Badge>{dm > 9 ? "9+" : String(dm)}</NativeTabs.Trigger.Badge>}
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
-        <NativeTabs.Trigger.Icon sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }} md="account_circle" />
+        <TabIcon name="you" md="account_circle" />
         <NativeTabs.Trigger.Label>You</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
     </NativeTabs>
