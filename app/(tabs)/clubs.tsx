@@ -12,6 +12,7 @@ import { ClubBadge } from "../../components/ClubBadge";
 import { clubSuits, useMode } from "../../lib/mode";
 import { ModeSwitch } from "../../components/ModeSwitch";
 import { Icon } from "../../components/Icon";
+import { NotifyCard } from "../../components/NotifyCard";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -79,6 +80,7 @@ export default function Clubs() {
         </Pressable>
       </View>
       <View style={{ paddingHorizontal: 16, paddingTop: 14 }}><ModeSwitch /></View>
+      <NotifyCard />
       {session && (
         <Pressable onPress={askCode} style={{ paddingHorizontal: 16, paddingTop: 10 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}><Icon name="key" size={15} color={t.muted} /><Text style={{ color: t.muted, fontWeight: "700" }}>Have an invite code?</Text></View>

@@ -7,6 +7,7 @@ import { IntroLoader } from "../components/IntroLoader";
 import { Onboarding } from "../components/Onboarding";
 import { useTheme } from "../lib/theme";
 import { SpaceGrotesk_700Bold, useFonts } from "@expo-google-fonts/space-grotesk";
+import { usePush } from "../lib/push";
 
 export default function RootLayout() {
   const t = useTheme();
@@ -57,6 +58,7 @@ export default function RootLayout() {
 
 /** Opening animation, shown until the sign-in check finishes. */
 function Intro({ fontsReady }: { fontsReady: boolean }) {
-  const { loading } = useAuth();
+  const { loading, session } = useAuth();
+  usePush(session?.user.id);
   return <IntroLoader ready={!loading && fontsReady} fontsReady={fontsReady} />;
 }

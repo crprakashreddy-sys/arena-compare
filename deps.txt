@@ -19,3 +19,4 @@ react-native-gesture-handler
 @react-native-async-storage/async-storage
 @expo/vector-icons
 @react-native-google-signin/google-signin
+expo-notifications

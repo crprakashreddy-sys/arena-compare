@@ -38,6 +38,7 @@ const config: ExpoConfig = {
   },
   plugins: [
     "expo-router",
+    ["expo-notifications", { color: "#FCE38A" }],
     // Google Maps inside the iPhone app. Needs EXPO_PUBLIC_GOOGLE_MAPS_IOS_KEY; without it iPhone uses Apple Maps.
     ...(process.env.EXPO_PUBLIC_GOOGLE_MAPS_IOS_KEY
       ? [["react-native-maps", { iosGoogleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_IOS_KEY }] as [string, any]]

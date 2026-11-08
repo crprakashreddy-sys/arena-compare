@@ -16,6 +16,7 @@ import { pickAndUploadPhoto } from "../../lib/photos";
 import { ClubBadge } from "../../components/ClubBadge";
 import { useSessions } from "../../lib/sessions";
 import { Icon, IconTile } from "../../components/Icon";
+import { NotifyCard, NotifySettings } from "../../components/NotifyCard";
 
 const GUIDELINES_URL = "https://crprakashreddy-sys.github.io/zingd/terms.html";
 const PRIVACY_URL = "https://crprakashreddy-sys.github.io/zingd/privacy.html";
@@ -202,6 +203,12 @@ export default function You() {
           </Pressable>
         ))}
       </View>
+
+      <Text style={[styles.h, { color: t.muted, paddingHorizontal: 16, marginBottom: 8, marginTop: 6 }]}>Notifications</Text>
+      <NotifyCard />
+      <View style={{ height: 8 }} />
+      <NotifySettings />
+      <View style={{ height: 16 }} />
 
       <View style={[styles.section, { borderTopColor: t.line, gap: 0 }]}>
         {[
