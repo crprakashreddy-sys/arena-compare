@@ -13,7 +13,7 @@ import { useTheme } from "../../lib/theme";
 import { snapUrl, supabase } from "../../lib/supabase";
 import { blockUser, isBlocked, report, uploadSnap } from "../../lib/community";
 import {
-  deleteMessage, fetchMessage, fetchMessages, isMember, joinClub, leaveClub, markRead, sendMessage, setMuted, subscribeClub,
+  deleteMessage, fetchMessage, fetchMessages, joinClub, leaveClub, markRead, myRole, sendMessage, setMuted, subscribeClub,
   type Club, type ClubMessage,
 } from "../../lib/clubs";
 import { ClubBadge } from "../../components/ClubBadge";
@@ -51,13 +51,14 @@ export default function ClubChat() {
   const [reply, setReply] = useState<ClubMessage | null>(null);
   const [sending, setSending] = useState(false);
   const [muted, setMutedState] = useState(false);
+  const [admin, setAdmin] = useState(false);
 
   const byId = useMemo(() => new Map(msgs.map((m) => [m.id, m])), [msgs]);
 
   useEffect(() => {
     supabase.from("club_stats").select("*").eq("id", clubId).maybeSingle().then(({ data }) => setClub(data as any));
     if (!me) { setMember(false); setLoading(false); return; }
-    isMember(clubId, me).then(setMember);
+    myRole(clubId, me).then((r) => { setMember(!!r); setAdmin(r === "admin"); });
     supabase.from("club_members").select("muted").eq("club_id", clubId).eq("user_id", me).maybeSingle()
       .then(({ data }) => setMutedState(!!data?.muted));
   }, [clubId, me]);
@@ -122,11 +123,15 @@ export default function ClubChat() {
     catch (e: any) { Alert.alert("Couldn't join", e.message); }
   };
 
-  const menu = () => sheet(club?.name ?? "Club", [muted ? "Unmute" : "Mute", "Leave club"], 1, async (i) => {
-    if (!me) return;
-    if (i === 0) { await setMuted(clubId, me, !muted); setMutedState(!muted); }
-    if (i === 1) { await leaveClub(clubId, me); router.back(); }
-  });
+  const menu = () => {
+    const opts = [
+      { label: "Members & invite", run: () => router.push(`/club-members/${encodeURIComponent(clubId)}`) },
+      ...(admin && club?.kind === "custom" ? [{ label: "Edit club", run: () => router.push({ pathname: "/club-edit", params: { id: clubId } }) }] : []),
+      { label: muted ? "Unmute" : "Mute", run: async () => { if (me) { await setMuted(clubId, me, !muted); setMutedState(!muted); } } },
+      { label: "Leave club", run: async () => { if (me) { await leaveClub(clubId, me); router.back(); } } },
+    ];
+    sheet(club?.name ?? "Club", opts.map((o) => o.label), opts.length - 1, (i) => opts[i].run());
+  };
 
   const longPress = (m: ClubMessage) => {
     if (m.deleted) return;
@@ -145,8 +150,25 @@ export default function ClubChat() {
       });
       return;
     }
+    if (admin) {
+      sheet(name, ["Reply", "Remove message (admin)", "Report", `Block ${name}`], 1, (i) => {
+        if (i === 0) setReply(m);
+        else if (i === 1) {
+          deleteMessage(m.id);
+          setMsgs((c) => c.map((x) => (x.id === m.id ? { ...x, deleted: true, body: null, photo_path: null } : x)));
+        } else otherActions(m, name, i - 1);
+      });
+      return;
+    }
     sheet(name, ["Reply", "Report", `Block ${name}`], 2, (i) => {
       if (i === 0) setReply(m);
+      else otherActions(m, name, i);
+    });
+  };
+
+  const otherActions = (m: ClubMessage, name: string, i: number) => {
+    {
+      if (i === 0) return;
       else if (i === 1) Alert.alert("Why are you reporting this?", undefined, [
         ...REASONS.map((r) => ({
           text: r,
@@ -160,19 +182,20 @@ export default function ClubChat() {
         { text: "Cancel", style: "cancel" },
         { text: "Block", style: "destructive", onPress: async () => { await blockUser(m.user_id); setMsgs((c) => c.filter((x) => x.user_id !== m.user_id)); } },
       ]);
-    });
+    }
   };
 
   const header = (
     <Stack.Screen options={{
       headerTitle: () => (
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 8, maxWidth: 240 }}>
+        <Pressable onPress={() => member && router.push(`/club-members/${encodeURIComponent(clubId)}`)}
+          style={{ flexDirection: "row", alignItems: "center", gap: 8, maxWidth: 240 }}>
           {club && <ClubBadge c={club} size={30} />}
           <View style={{ flexShrink: 1 }}>
             <Text style={{ color: t.text, fontWeight: "800", fontSize: 15 }} numberOfLines={1}>{club?.name ?? "Club"}</Text>
             {club && <Text style={{ color: t.muted, fontSize: 11.5 }}>{club.members} members{muted ? " · muted" : ""}</Text>}
           </View>
-        </View>
+        </Pressable>
       ),
       headerRight: () => member ? (
         <Pressable onPress={menu} hitSlop={10}><Ionicons name="ellipsis-horizontal-circle" size={26} color={t.text} /></Pressable>
@@ -186,7 +209,9 @@ export default function ClubChat() {
         {header}
         {club && <ClubBadge c={club} size={84} />}
         <Text style={{ color: t.text, fontSize: 24, fontWeight: "900", textAlign: "center" }}>{club?.name}</Text>
-        <Text style={{ color: t.muted, textAlign: "center" }}>{club?.members ?? 0} owners swapping fixes, charging tips and drive plans.</Text>
+        <Text style={{ color: t.muted, textAlign: "center", lineHeight: 20 }}>
+          {club?.description || `${club?.members ?? 0} drivers swapping fixes, charging tips and drive plans.`}
+        </Text>
         <Pressable onPress={join} style={s.bigBtn}><Text style={s.bigBtnText}>{me ? "Join the club" : "Sign in to join"}</Text></Pressable>
       </View>
     );

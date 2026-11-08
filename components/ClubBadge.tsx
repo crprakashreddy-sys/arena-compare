@@ -7,8 +7,15 @@ import type { Club } from "../lib/clubs";
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
 
-/** Round club avatar: brand colour when we know it, initials of the make. */
-export function ClubBadge({ c, size }: { c: Pick<Club, "make" | "kind">; size: number }) {
+/** Round club avatar: emoji on the club's colour for driver-made clubs, brand colour and initials otherwise. */
+export function ClubBadge({ c, size }: { c: Pick<Club, "make" | "kind" | "emoji" | "color">; size: number }) {
+  if (c.kind === "custom") {
+    return (
+      <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: c.color || LEMON, alignItems: "center", justifyContent: "center" }}>
+        <Text style={{ fontSize: size * 0.5 }}>{c.emoji || "⚡"}</Text>
+      </View>
+    );
+  }
   const net = networkById(c.make.toLowerCase().replace("tata", "tataev"));
   const bg = net.id !== "other" ? net.color : INK;
   return (
@@ -22,4 +29,3 @@ export function ClubBadge({ c, size }: { c: Pick<Club, "make" | "kind">; size: n
     </View>
   );
 }
-

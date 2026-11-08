@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../../lib/auth";
 import { useTheme } from "../../lib/theme";
 import { useGarage } from "../../lib/vehicles";
-import { autoJoinFor, fetchClubs, fetchMyClubs, joinClub, type Club, type MyClub } from "../../lib/clubs";
+import { autoJoinFor, fetchClubs, fetchMyClubs, joinClub, joinWithCode, type Club, type MyClub } from "../../lib/clubs";
 import { timeAgo } from "../../lib/geo";
 import { ClubBadge } from "../../components/ClubBadge";
 
@@ -41,8 +41,18 @@ export default function Clubs() {
     const s = q.trim().toLowerCase();
     return all.filter((c) => !mineIds.has(c.id) && (!s || c.name.toLowerCase().includes(s)));
   }, [all, mineIds, q]);
+  const community = discover.filter((c) => c.kind === "custom");
   const brands = discover.filter((c) => c.kind === "brand");
   const models = discover.filter((c) => c.kind === "model");
+
+  const askCode = () => {
+    if (Platform.OS !== "ios") return Alert.alert("Invite codes", "Joining with a code is coming to Android soon.");
+    Alert.prompt("Join with a code", "Ask the club admin for their 6-letter code.", async (code) => {
+      if (!code?.trim()) return;
+      try { const id = await joinWithCode(code); router.push(`/club/${encodeURIComponent(id)}`); }
+      catch (e: any) { Alert.alert("Couldn't join", e.message); }
+    });
+  };
 
   const join = async (c: Club) => {
     if (!session) return router.push("/login");
@@ -53,10 +63,21 @@ export default function Clubs() {
   return (
     <ScrollView style={{ flex: 1, backgroundColor: t.bg }} contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: 40 }}
       refreshControl={<RefreshControl refreshing={false} onRefresh={load} />} keyboardShouldPersistTaps="handled">
-      <View style={{ paddingHorizontal: 16 }}>
-        <Text style={[s.h1, { color: t.text }]}>Clubs</Text>
-        <Text style={{ color: t.muted, marginTop: 2 }}>Owners of your EV. Fixes, tips, drives and meetups.</Text>
+      <View style={{ paddingHorizontal: 16, flexDirection: "row", alignItems: "flex-start", gap: 12 }}>
+        <View style={{ flex: 1 }}>
+          <Text style={[s.h1, { color: t.text }]}>Clubs</Text>
+          <Text style={{ color: t.muted, marginTop: 2 }}>Your EV crew. Fixes, tips, drives and meetups.</Text>
+        </View>
+        <Pressable onPress={() => (session ? router.push("/club-edit") : router.push("/login"))} style={s.newBtn} accessibilityLabel="Start a club">
+          <Ionicons name="add" size={18} color={LEMON} />
+          <Text style={s.newBtnText}>New</Text>
+        </Pressable>
       </View>
+      {session && (
+        <Pressable onPress={askCode} style={{ paddingHorizontal: 16, paddingTop: 10 }}>
+          <Text style={{ color: t.muted, fontWeight: "700" }}>🔑 Have an invite code?</Text>
+        </Pressable>
+      )}
 
       {!session && (
         <View style={[s.hero, { marginTop: 16 }]}>
@@ -101,6 +122,27 @@ export default function Clubs() {
             <TextInput value={q} onChangeText={setQ} placeholder="Search Nexon, Ather, BYD…" placeholderTextColor={t.faint}
               style={{ flex: 1, color: t.text, fontSize: 15 }} />
           </View>
+          {!!community.length && (
+            <>
+              <Text style={[s.h3, { color: t.muted }]}>STARTED BY DRIVERS</Text>
+              <View style={{ paddingHorizontal: 16, gap: 10 }}>
+                {community.map((c) => (
+                  <Pressable key={c.id} onPress={() => router.push(`/club/${encodeURIComponent(c.id)}`)} style={[s.community, { backgroundColor: t.surface }]}>
+                    <ClubBadge c={c} size={48} />
+                    <View style={{ flex: 1, minWidth: 0 }}>
+                      <Text style={{ color: t.text, fontWeight: "800", fontSize: 15.5 }} numberOfLines={1}>{c.name}</Text>
+                      {!!c.description && <Text style={{ color: t.muted, fontSize: 13 }} numberOfLines={2}>{c.description}</Text>}
+                      <Text style={{ color: t.faint, fontSize: 12, marginTop: 2 }}>{[c.city, `${c.members} members`].filter(Boolean).join(" · ")}</Text>
+                    </View>
+                    <Pressable onPress={() => join(c)} style={[s.join, { backgroundColor: t.bg }]}>
+                      <Text style={{ color: t.text, fontWeight: "800" }}>Join</Text>
+                    </Pressable>
+                  </Pressable>
+                ))}
+              </View>
+              <Text style={[s.h3, { color: t.muted }]}>BRANDS & MODELS</Text>
+            </>
+          )}
           {!!brands.length && (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingHorizontal: 16, paddingVertical: 12 }}>
               {brands.map((c) => <BrandCard key={c.id} c={c} onJoin={() => join(c)} />)}
@@ -165,6 +207,10 @@ function BrandCard({ c, onJoin }: { c: Club; onJoin: () => void }) {
 
 const s = StyleSheet.create({
   h1: { fontSize: 32, fontWeight: "900", letterSpacing: -1 },
+  h3: { fontSize: 12, fontWeight: "800", letterSpacing: 0.6, paddingHorizontal: 16, marginTop: 16, marginBottom: 8 },
+  newBtn: { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: INK, paddingHorizontal: 14, height: 38, borderRadius: 999, marginTop: 6 },
+  newBtnText: { color: LEMON, fontWeight: "800" },
+  community: { flexDirection: "row", alignItems: "center", gap: 12, padding: 12, borderRadius: 18 },
   h2: { fontSize: 18, fontWeight: "800", marginTop: 24, marginBottom: 10, paddingHorizontal: 16 },
   hero: { marginHorizontal: 16, padding: 18, borderRadius: 20, backgroundColor: LEMON, gap: 6 },
   heroTitle: { fontSize: 20, fontWeight: "900", color: INK, marginTop: 4 },

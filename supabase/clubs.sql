@@ -1,19 +1,32 @@
--- zappd Clubs: brand and model communities with live group chat.
--- Run this once in Supabase → SQL Editor → New query → paste → Run.
+-- zappd Clubs: brand, model and driver-made communities with live group chat.
+-- Safe to run more than once. Supabase → SQL Editor → New query → paste → Run.
 
 create table if not exists public.clubs (
-  id text primary key,                         -- 'brand:tata' or 'model:tata-nexon-ev-45'
-  kind text not null check (kind in ('brand', 'model')),
+  id text primary key,                         -- 'brand:tata', 'model:tata-nexon-ev-45' or 'u-…' for driver-made
+  kind text not null,
   make text not null,
   model_id text,
   name text not null,
   vehicle_kind text,
   created_at timestamptz not null default now()
 );
+alter table public.clubs add column if not exists description text;
+alter table public.clubs add column if not exists city text;
+alter table public.clubs add column if not exists emoji text;
+alter table public.clubs add column if not exists color text;
+alter table public.clubs add column if not exists is_private boolean not null default false;
+alter table public.clubs add column if not exists invite_code text;
+alter table public.clubs add column if not exists created_by uuid references public.profiles(id) on delete set null;
+alter table public.clubs drop constraint if exists clubs_kind_check;
+alter table public.clubs add constraint clubs_kind_check check (kind in ('brand', 'model', 'custom'));
+alter table public.clubs drop constraint if exists clubs_text_check;
+alter table public.clubs add constraint clubs_text_check check (
+  char_length(name) between 3 and 50 and char_length(coalesce(description, '')) <= 400 and char_length(coalesce(city, '')) <= 40);
+create unique index if not exists clubs_invite_code on public.clubs (invite_code) where invite_code is not null;
 
 create table if not exists public.club_members (
   club_id text not null references public.clubs(id) on delete cascade,
-  user_id uuid not null references auth.users(id) on delete cascade,
+  user_id uuid not null references public.profiles(id) on delete cascade,
   role text not null default 'member' check (role in ('member', 'admin')),
   muted boolean not null default false,
   last_read_at timestamptz not null default now(),
@@ -25,7 +38,7 @@ create index if not exists club_members_user on public.club_members (user_id);
 create table if not exists public.club_messages (
   id uuid primary key default gen_random_uuid(),
   club_id text not null references public.clubs(id) on delete cascade,
-  user_id uuid not null references auth.users(id) on delete cascade,
+  user_id uuid not null references public.profiles(id) on delete cascade,
   body text check (char_length(body) <= 2000),
   photo_path text,
   reply_to uuid references public.club_messages(id) on delete set null,
@@ -36,38 +49,121 @@ create table if not exists public.club_messages (
 );
 create index if not exists club_messages_club_time on public.club_messages (club_id, created_at desc);
 
+-- Point members and messages at profiles so the app can show names (fixes an earlier version).
+alter table public.club_members drop constraint if exists club_members_user_id_fkey;
+alter table public.club_members add constraint club_members_user_id_fkey foreign key (user_id) references public.profiles(id) on delete cascade;
+alter table public.club_messages drop constraint if exists club_messages_user_id_fkey;
+alter table public.club_messages add constraint club_messages_user_id_fkey foreign key (user_id) references public.profiles(id) on delete cascade;
+
+-- Helpers that look at memberships without tripping over row security.
+create or replace function public.is_club_member(c text) returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.club_members where club_id = c and user_id = auth.uid())
+$$;
+create or replace function public.is_club_admin(c text) returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.club_members where club_id = c and user_id = auth.uid() and role = 'admin')
+$$;
+
 alter table public.clubs enable row level security;
 alter table public.club_members enable row level security;
 alter table public.club_messages enable row level security;
 
+-- Clubs: everyone sees public ones; private ones only their members. Drivers make and edit their own.
 drop policy if exists "read clubs" on public.clubs;
-create policy "read clubs" on public.clubs for select using (true);
+create policy "read clubs" on public.clubs for select using (not is_private or public.is_club_member(id));
+drop policy if exists "create club" on public.clubs;
+create policy "create club" on public.clubs for insert to authenticated with check (kind = 'custom' and created_by = auth.uid());
+drop policy if exists "admins edit club" on public.clubs;
+create policy "admins edit club" on public.clubs for update to authenticated
+  using (kind = 'custom' and public.is_club_admin(id)) with check (kind = 'custom');
+drop policy if exists "creator deletes club" on public.clubs;
+create policy "creator deletes club" on public.clubs for delete to authenticated using (kind = 'custom' and created_by = auth.uid());
 
+-- Up to 5 clubs per driver, a fresh invite code, and the creator becomes admin.
+create or replace function public.club_before_insert() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if new.kind = 'custom' then
+    if (select count(*) from public.clubs where created_by = new.created_by) >= 5 then
+      raise exception 'You can run up to 5 clubs.';
+    end if;
+    new.invite_code := upper(substr(md5(random()::text || clock_timestamp()::text), 1, 6));
+  end if;
+  return new;
+end $$;
+drop trigger if exists clubs_before_insert on public.clubs;
+create trigger clubs_before_insert before insert on public.clubs for each row execute function public.club_before_insert();
+
+create or replace function public.club_after_insert() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if new.kind = 'custom' and new.created_by is not null then
+    insert into public.club_members (club_id, user_id, role) values (new.id, new.created_by, 'admin') on conflict do nothing;
+  end if;
+  return new;
+end $$;
+drop trigger if exists clubs_after_insert on public.clubs;
+create trigger clubs_after_insert after insert on public.clubs for each row execute function public.club_after_insert();
+
+-- Members: anyone can see who's in a public club; you join public clubs yourself, private ones with a code.
 drop policy if exists "read members" on public.club_members;
-create policy "read members" on public.club_members for select using (true);
+create policy "read members" on public.club_members for select using (
+  exists (select 1 from public.clubs c where c.id = club_id and (not c.is_private or public.is_club_member(c.id))));
 drop policy if exists "join club" on public.club_members;
-create policy "join club" on public.club_members for insert to authenticated with check (user_id = auth.uid() and role = 'member');
+create policy "join club" on public.club_members for insert to authenticated with check (
+  user_id = auth.uid() and role = 'member'
+  and exists (select 1 from public.clubs c where c.id = club_id and not c.is_private));
 drop policy if exists "update own membership" on public.club_members;
-create policy "update own membership" on public.club_members for update to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
+create policy "update own membership" on public.club_members for update to authenticated
+  using (user_id = auth.uid() or public.is_club_admin(club_id))
+  with check (user_id = auth.uid() or public.is_club_admin(club_id));
 drop policy if exists "leave club" on public.club_members;
-create policy "leave club" on public.club_members for delete to authenticated using (user_id = auth.uid());
+create policy "leave club" on public.club_members for delete to authenticated
+  using (user_id = auth.uid() or public.is_club_admin(club_id));
 
--- Only members read and post; your own messages can be edited (to delete them).
+-- You can't promote yourself: only admins change roles.
+create or replace function public.club_role_guard() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if new.role <> old.role and not public.is_club_admin(new.club_id) then
+    raise exception 'Only club admins can change roles.';
+  end if;
+  return new;
+end $$;
+drop trigger if exists club_members_role_guard on public.club_members;
+create trigger club_members_role_guard before update on public.club_members for each row execute function public.club_role_guard();
+
+create or replace function public.join_club_with_code(code text) returns text
+language plpgsql security definer set search_path = public as $$
+declare cid text;
+begin
+  select id into cid from public.clubs where invite_code = upper(trim(code));
+  if cid is null then raise exception 'That invite code didn''t match a club.'; end if;
+  insert into public.club_members (club_id, user_id) values (cid, auth.uid()) on conflict do nothing;
+  return cid;
+end $$;
+grant execute on function public.join_club_with_code(text) to authenticated;
+
+-- Messages: members read and post; you delete yours, admins can remove any.
 drop policy if exists "members read messages" on public.club_messages;
 create policy "members read messages" on public.club_messages for select to authenticated using (
-  not hidden and exists (select 1 from public.club_members m where m.club_id = club_messages.club_id and m.user_id = auth.uid()));
+  not hidden and public.is_club_member(club_id));
 drop policy if exists "members post" on public.club_messages;
 create policy "members post" on public.club_messages for insert to authenticated with check (
-  user_id = auth.uid() and exists (select 1 from public.club_members m where m.club_id = club_messages.club_id and m.user_id = auth.uid()));
+  user_id = auth.uid() and public.is_club_member(club_id));
 drop policy if exists "delete own message" on public.club_messages;
-create policy "delete own message" on public.club_messages for update to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
+create policy "delete own message" on public.club_messages for update to authenticated
+  using (user_id = auth.uid() or public.is_club_admin(club_id))
+  with check (user_id = auth.uid() or public.is_club_admin(club_id));
 
 -- Club list with member counts.
-create or replace view public.club_stats with (security_invoker = on) as
-  select c.*, (select count(*) from public.club_members m where m.club_id = c.id) as members
+drop view if exists public.club_stats;
+create view public.club_stats with (security_invoker = on) as
+  select c.*, (select count(*) from public.club_members m where m.club_id = c.id)::int as members
   from public.clubs c;
 
--- Reports can now point at chat messages; 3 reports hide one.
+-- Reports can point at chat messages; 3 reports hide one.
 alter table public.reports drop constraint if exists reports_target_kind_check;
 alter table public.reports add constraint reports_target_kind_check
   check (target_kind in ('checkin', 'review', 'food_tip', 'user', 'club_message'));

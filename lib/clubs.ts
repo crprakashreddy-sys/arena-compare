@@ -3,8 +3,17 @@ import { isBlocked } from "./community";
 import type { Model } from "./vehicles";
 
 export type Club = {
-  id: string; kind: "brand" | "model"; make: string; model_id: string | null;
+  id: string; kind: "brand" | "model" | "custom"; make: string; model_id: string | null;
   name: string; vehicle_kind: string | null; members: number;
+  description?: string | null; city?: string | null; emoji?: string | null; color?: string | null;
+  is_private?: boolean; invite_code?: string | null; created_by?: string | null;
+};
+export type ClubMember = {
+  user_id: string; role: "member" | "admin"; joined_at: string;
+  profiles?: { display_name: string; car_model: string | null } | null;
+};
+export type ClubDraft = {
+  name: string; description: string; city: string; emoji: string; color: string; is_private: boolean;
 };
 export type ClubMessage = {
   id: string; club_id: string; user_id: string; body: string | null; photo_path: string | null;
@@ -104,3 +113,63 @@ export function subscribeClub(clubId: string, onNew: (id: string) => void, onCha
     .subscribe();
   return () => { supabase.removeChannel(ch); };
 }
+
+// ───────── Driver-made clubs ─────────
+
+export async function createClub(d: ClubDraft, userId: string): Promise<string> {
+  const id = `u-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+  const { error } = await supabase.from("clubs").insert({
+    id, kind: "custom", make: "community", name: d.name.trim(), description: d.description.trim() || null,
+    city: d.city.trim() || null, emoji: d.emoji, color: d.color, is_private: d.is_private, created_by: userId,
+  });
+  if (error) throw new Error(error.message.includes("up to 5") ? "You can run up to 5 clubs." : error.message.includes("clubs_text_check") ? "Use a name of 3 to 50 characters." : error.message);
+  return id;
+}
+
+export async function updateClub(id: string, d: ClubDraft) {
+  const { error } = await supabase.from("clubs").update({
+    name: d.name.trim(), description: d.description.trim() || null, city: d.city.trim() || null,
+    emoji: d.emoji, color: d.color, is_private: d.is_private,
+  }).eq("id", id);
+  if (error) throw new Error(error.message.includes("clubs_text_check") ? "Use a name of 3 to 50 characters." : error.message);
+}
+
+export async function deleteClub(id: string) {
+  const { error } = await supabase.from("clubs").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+export async function fetchClub(id: string): Promise<Club | null> {
+  const { data } = await supabase.from("club_stats").select("*").eq("id", id).maybeSingle();
+  return (data as any) ?? null;
+}
+
+export async function myRole(clubId: string, userId: string): Promise<"admin" | "member" | null> {
+  const { data } = await supabase.from("club_members").select("role").eq("club_id", clubId).eq("user_id", userId).maybeSingle();
+  return (data?.role as any) ?? null;
+}
+
+export async function fetchMembers(clubId: string): Promise<ClubMember[]> {
+  const { data } = await supabase.from("club_members").select("user_id,role,joined_at,profiles(display_name,car_model)")
+    .eq("club_id", clubId).order("role").order("joined_at").limit(500);
+  return ((data ?? []) as any as ClubMember[]).filter((m) => !isBlocked(m.user_id));
+}
+
+export async function setRole(clubId: string, userId: string, role: "member" | "admin") {
+  const { error } = await supabase.from("club_members").update({ role }).eq("club_id", clubId).eq("user_id", userId);
+  if (error) throw new Error(error.message);
+}
+
+export async function removeMember(clubId: string, userId: string) {
+  const { error } = await supabase.from("club_members").delete().eq("club_id", clubId).eq("user_id", userId);
+  if (error) throw new Error(error.message);
+}
+
+export async function joinWithCode(code: string): Promise<string> {
+  const { data, error } = await supabase.rpc("join_club_with_code", { code });
+  if (error) throw new Error(error.message.includes("didn't match") || error.message.includes("didn''t") ? "That invite code didn't match a club." : error.message);
+  return data as string;
+}
+
+export const CLUB_EMOJIS = ["⚡", "🚗", "🛵", "🏍️", "🔋", "🛣️", "🏔️", "🌊", "☕", "🍛", "📸", "🔧", "🏙️", "🌙", "🎉", "🤝"];
+export const CLUB_COLORS = ["#FCE38A", "#1A1A1A", "#B8E0D2", "#F6C6C7", "#C9B8FF", "#A9DDF3", "#FFC371", "#9AD28A"];
