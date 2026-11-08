@@ -24,6 +24,7 @@ import VehicleFit from "../../components/VehicleFit";
 import { Confetti } from "../../components/Confetti";
 import { startSession, useSessions } from "../../lib/sessions";
 import { openNetworkApp } from "../../lib/networks";
+import { fetchSpeedStats, type SpeedStats } from "../../lib/charging";
 import type { ScorePart } from "../../lib/types";
 import { MAP_PROVIDER, openDirections, zappdStyle } from "../../lib/maps";
 import { Icon } from "../../components/Icon";
@@ -50,6 +51,7 @@ export default function ChargerPage() {
   const [tipName, setTipName] = useState("");
   const [tipNote, setTipNote] = useState("");
   const [issues, setIssues] = useState<{ key: string; label: string; count: number; lastAt: string }[]>([]);
+  const [speeds, setSpeeds] = useState<SpeedStats>({});
   const { active: charging } = useSessions();
 
   const loadCommunity = useCallback(async () => {
@@ -62,6 +64,7 @@ export default function ChargerPage() {
   }, [chargerId]);
 
   useEffect(() => {
+    fetchSpeedStats(chargerId).then(setSpeeds).catch(() => {});
     getCharger(chargerId).then((x) => {
       setC(x);
       if (x) nearbyFood(x.lat, x.lng).then(setFood);
@@ -110,6 +113,12 @@ export default function ChargerPage() {
             <View style={{ flex: 1, gap: 3 }}>
               <Text style={{ color: t.text, fontSize: 22, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.6 }}>{c.name}</Text>
               <Text style={{ color: t.muted }}>{[n.name, speedLabel(c), c.address].filter(Boolean).join(" · ")}</Text>
+              {(speeds.dc || speeds.ac) && (
+                <Text style={{ color: t.text, fontWeight: "700", marginTop: 4 }}>
+                  ⚡ Drivers really get {[speeds.dc && `~${Math.round(speeds.dc.typical_kw)} kW DC`, speeds.ac && `~${Math.round(speeds.ac.typical_kw)} kW AC`].filter(Boolean).join(" · ")}
+                  <Text style={{ color: t.muted, fontWeight: "500" }}>{`  (${(speeds.dc?.charges ?? 0) + (speeds.ac?.charges ?? 0)} charges)`}</Text>
+                </Text>
+              )}
               {!!c.connectors?.length && <Text style={{ color: t.muted, fontSize: 13 }}>{c.connectors.join(", ")}</Text>}
               {c.id.startsWith("c-") && (
                 <View style={{ flexDirection: "row", alignSelf: "flex-start", alignItems: "center", gap: 5, backgroundColor: "#FCE38A", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, marginTop: 4 }}>

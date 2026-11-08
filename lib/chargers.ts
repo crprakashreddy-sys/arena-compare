@@ -26,6 +26,7 @@ export async function fetchChargers(lat: number, lng: number, radiusKm = 15): Pr
     if (near) {
       if (near.powerKW == null && c.powerKW != null) near.powerKW = c.powerKW;
       if (!near.connectors?.length && c.connectors?.length) near.connectors = c.connectors;
+      if (!near.guns?.length && c.guns?.length) near.guns = c.guns;
       continue;
     }
     merged.push(c);
@@ -111,6 +112,7 @@ async function fetchOCM(lat: number, lng: number, radiusKm: number, id?: string,
         address: [a.AddressLine1, a.Town, a.StateOrProvince].filter(Boolean).join(", "),
         powerKW: power,
         connectors: types.map((t) => t.replace(" (Socket Only)", "")),
+        guns: conns.filter((c) => c.ConnectionType?.Title).map((c) => ({ type: String(c.ConnectionType.Title).replace(" (Socket Only)", ""), kw: c.PowerKW ?? null })),
         speed: (fast ? "dc" : power ? "ac" : "unknown") as Speed,
         source: "ocm" as const,
       };

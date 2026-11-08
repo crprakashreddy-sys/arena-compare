@@ -1,9 +1,10 @@
-import React, { useEffect, useRef } from "react";
-import { Alert, Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Alert, Animated, Easing, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "./SFIcon";
 import { Glass } from "./Glass";
-import { liveState, setTarget, stopCharge, useTicker } from "../lib/charging";
+import { correctPct, liveState, setTarget, stopCharge, useTicker } from "../lib/charging";
+import { useAuth } from "../lib/auth";
 import { fmtMinutes } from "../lib/vehicles";
 import { successHaptic, tapHaptic } from "../lib/motion";
 import type { Session } from "../lib/sessions";
@@ -54,7 +55,17 @@ export function confirmStop(s: Session) {
  */
 export function ChargingCard({ s, compact }: { s: Session; compact?: boolean }) {
   useTicker(compact ? 30000 : 10000);
+  const { profile } = useAuth();
+  const [fixing, setFixing] = useState(false);
+  const [val, setVal] = useState("");
   const st = liveState(s);
+  const saveFix = async () => {
+    const n = parseInt(val, 10);
+    if (!(n >= 1 && n <= 100)) return Alert.alert("Type the % your car shows", "A number from 1 to 100.");
+    const measured = await correctPct(s, n, profile?.car_model);
+    setFixing(false); setVal(""); successHaptic();
+    if (measured) Alert.alert("Estimate updated", `You're really getting about ${Math.round(measured)} kW here. Thanks, this helps the next driver too.`);
+  };
   const pct = Math.round(st.pct);
 
   if (compact) {
@@ -102,6 +113,21 @@ export function ChargingCard({ s, compact }: { s: Session; compact?: boolean }) 
           <Text style={{ color: INK, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Stop</Text>
         </Pressable>
       </View>
+      {fixing ? (
+        <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
+          <TextInput value={val} onChangeText={setVal} keyboardType="number-pad" maxLength={3} autoFocus placeholder="e.g. 54"
+            placeholderTextColor="#6B737A" style={styles.fixInput} onSubmitEditing={saveFix} />
+          <Text style={{ color: "#fff", fontWeight: "800", fontSize: 18 }}>%</Text>
+          <Pressable onPress={saveFix} style={[styles.fixBtn, { backgroundColor: LEMON }]}><Text style={{ color: INK, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Update</Text></Pressable>
+          <Pressable onPress={() => setFixing(false)} hitSlop={8}><Ionicons name="close-circle" size={24} color="#7E868D" /></Pressable>
+        </View>
+      ) : (
+        <Pressable onPress={() => { tapHaptic(); setFixing(true); }} style={styles.fixRow}>
+          <Ionicons name="speedometer-outline" size={16} color={LEMON} />
+          <Text style={{ color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>My car says __%</Text>
+          <Text style={{ color: "#7E868D", fontSize: 12 }}>{st.checked ? `checked · ${Math.round(s.measuredKW ?? s.kw ?? 0)} kW real` : "makes the estimate exact"}</Text>
+        </Pressable>
+      )}
       <Text style={styles.foot}>Worked out from your starting %, your car's battery and this charger's speed. You'll get a ping 5 minutes before {st.target}%.</Text>
     </View>
   );
@@ -121,5 +147,8 @@ const styles = StyleSheet.create({
   goal: { height: 40, paddingHorizontal: 14, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.1)", alignItems: "center", justifyContent: "center" },
   goalText: { color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
   stop: { flex: 1, height: 40, borderRadius: 20, backgroundColor: "#fff", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 },
+  fixRow: { flexDirection: "row", alignItems: "center", gap: 8, paddingVertical: 6 },
+  fixInput: { width: 76, height: 44, borderRadius: 14, backgroundColor: "rgba(255,255,255,0.1)", color: "#fff", fontSize: 22, fontWeight: "800", textAlign: "center" },
+  fixBtn: { height: 44, paddingHorizontal: 18, borderRadius: 22, alignItems: "center", justifyContent: "center" },
   foot: { color: "#7E868D", fontSize: 11.5, lineHeight: 16 },
 });

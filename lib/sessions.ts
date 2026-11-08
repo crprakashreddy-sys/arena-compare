@@ -22,6 +22,10 @@ export type Session = {
   lat?: number; lng?: number;
   notifId?: string | null;
   auto?: boolean;       // started from the "are you charging?" prompt
+  gun?: "dc" | "ac";
+  calPct?: number;      // last % the driver read off the car
+  calAt?: string;       // when they read it
+  measuredKW?: number;  // real speed worked out from that reading
 };
 
 type Store = { sessions: Session[] };

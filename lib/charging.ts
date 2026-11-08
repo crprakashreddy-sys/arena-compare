@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import * as Notifications from "expo-notifications";
 import type { Charger } from "./types";
-import { usablePowerKW, type Model } from "./vehicles";
+import { plugsOf, usablePowerKW, type Model, type Plug } from "./vehicles";
+import { supabase } from "./supabase";
 import { finishSession, startSession, updateSession, type Session } from "./sessions";
 import { distanceM } from "./geo";
 
@@ -17,9 +18,9 @@ function rates(s: Pick<Session, "kw" | "slowKW">) {
   return { fast: kw * EFF_FAST, slow: (s.slowKW ?? kw * 0.35) * EFF_SLOW };
 }
 
-/** Battery % after `minutes` on the charger. */
-export function pctAfter(s: Session, minutes: number): number {
-  const start = s.startPct ?? 20, cap = s.capKWh ?? 40;
+/** Battery % after `minutes`, counting from `from` % (defaults to the starting %). */
+export function pctAfter(s: Session, minutes: number, from?: number): number {
+  const start = from ?? s.startPct ?? 20, cap = s.capKWh ?? 40;
   const r = rates(s);
   let pct = start, left = minutes / 60;
   if (pct < 80) {
@@ -30,31 +31,107 @@ export function pctAfter(s: Session, minutes: number): number {
   return Math.min(100, pct + (left * r.slow / cap) * 100);
 }
 
-/** Minutes from the start until the battery reaches `to` %. */
-export function minutesTo(s: Session, to: number): number {
-  const start = s.startPct ?? 20, cap = s.capKWh ?? 40;
+/** Minutes to go from `from` % (defaults to the starting %) to `to` %. */
+export function minutesTo(s: Session, to: number, from?: number): number {
+  const start = from ?? s.startPct ?? 20, cap = s.capKWh ?? 40;
   if (to <= start) return 0;
   const r = rates(s);
   const fastPart = Math.max(0, Math.min(to, 80) - start), slowPart = Math.max(0, to - Math.max(start, 80));
   return Math.round(((fastPart / 100) * cap / r.fast + (slowPart / 100) * cap / r.slow) * 60);
 }
 
+/** Where the estimate counts from: the driver's last reading off the car, else the start. */
+function baseline(s: Session) {
+  return s.calAt && s.calPct != null
+    ? { at: new Date(s.calAt).getTime(), pct: s.calPct }
+    : { at: new Date(s.startedAt).getTime(), pct: s.startPct ?? 20 };
+}
+
 export function liveState(s: Session, now = Date.now()) {
-  const mins = (now - new Date(s.startedAt).getTime()) / 60000;
-  const pct = pctAfter(s, mins);
+  const b = baseline(s);
+  const mins = (now - b.at) / 60000;
+  const pct = pctAfter(s, mins, b.pct);
   const target = s.targetPct ?? 80;
-  const total = minutesTo(s, target);
-  const doneAt = new Date(new Date(s.startedAt).getTime() + total * 60000);
+  const total = minutesTo(s, target, b.pct);
+  const doneAt = new Date(b.at + total * 60000);
   const addedKWh = ((pct - (s.startPct ?? 20)) / 100) * (s.capKWh ?? 40);
-  return { pct, target, mins, minsLeft: Math.max(0, Math.round(total - mins)), doneAt, addedKWh, reached: pct >= target - 0.5 };
+  return { pct, target, mins, minsLeft: Math.max(0, Math.round(total - mins)), doneAt, addedKWh, reached: pct >= target - 0.5, checked: !!s.calAt };
+}
+
+// ───────── Which gun, and how fast it really is ─────────
+
+const DC_PLUGS: Plug[] = ["ccs2", "chademo", "gbt", "bharat_dc", "leccs", "ola"];
+
+export type Gun = { key: string; label: string; kind: "dc" | "ac"; kw: number; listedKW: number | null; crowd?: number };
+
+/** The guns at this charger your car can use, with the power it will actually take from each. */
+export function gunsFor(c: Charger, v: Model | null, stats: SpeedStats = {}): Gun[] {
+  const out: Gun[] = [];
+  const seen = new Set<string>();
+  const add = (type: string, listed: number | null) => {
+    const plug = plugsOf({ ...c, connectors: [type], guns: undefined } as Charger)[0];
+    if (!plug) return;
+    if (v && !v.plugs.includes(plug)) return;
+    const kind: "dc" | "ac" = DC_PLUGS.includes(plug) && plug !== "leccs" ? "dc" : plug === "leccs" && (listed ?? 0) > 3.3 ? "dc" : "ac";
+    const guess = listed ?? (kind === "dc" ? (c.speed === "dc" && c.powerKW ? c.powerKW : 30) : plug === "ac15a" ? 3.3 : 7.4);
+    const carMax = v ? (kind === "dc" ? v.maxDcKW || v.maxAcKW : v.maxAcKW || 3.3) : guess;
+    const crowd = stats[kind]?.typical_kw;
+    const kw = Math.max(1, Math.min(crowd ?? guess, carMax));
+    const short = type.replace(/\(.*?\)/g, "").replace(/IEC 62196-?2? ?/i, "").replace(/Type 2.*/i, "Type 2").trim().slice(0, 18) || (kind === "dc" ? "DC" : "AC");
+    const key = `${short}-${Math.round(guess)}`;
+    if (seen.has(key)) return; seen.add(key);
+    out.push({ key, label: `${short} · ${Math.round(guess)} kW`, kind, kw, listedKW: listed, crowd });
+  };
+  if (c.guns?.length) c.guns.forEach((g) => add(g.type, g.kw));
+  else (c.connectors ?? []).forEach((t) => add(t, null));
+  return out.sort((a, b) => b.kw - a.kw);
+}
+
+export type SpeedStats = Partial<Record<"dc" | "ac", { typical_kw: number; charges: number }>>;
+
+/** What drivers have really measured at this charger (last 90 days). */
+export async function fetchSpeedStats(chargerId: string): Promise<SpeedStats> {
+  const { data } = await supabase.from("charger_speed_stats").select("kind,typical_kw,charges").eq("charger_id", chargerId);
+  const out: SpeedStats = {};
+  (data ?? []).forEach((r: any) => { out[r.kind as "dc" | "ac"] = { typical_kw: Number(r.typical_kw), charges: r.charges }; });
+  return out;
+}
+
+/**
+ * "My car says 54%": re-anchor the estimate on the real reading, work out the true speed,
+ * re-time the alert, and share that speed so the next driver's estimate starts closer.
+ */
+export async function correctPct(s: Session, pctNow: number, carModel?: string | null) {
+  const b = baseline(s);
+  const hours = (Date.now() - b.at) / 3600e3;
+  const cap = s.capKWh ?? 40;
+  let patch: Partial<Session> = { calPct: pctNow, calAt: new Date().toISOString() };
+  const gained = pctNow - b.pct;
+  // Only learn a speed from a fair sample: 8+ minutes, 3+ %, mostly below the 80% slow-down.
+  if (hours >= 8 / 60 && gained >= 3 && b.pct < 78) {
+    const batteryKW = ((gained / 100) * cap) / hours;
+    const chargerKW = Math.round((batteryKW / EFF_FAST) * 10) / 10;
+    const ratio = chargerKW / (s.kw ?? chargerKW);
+    patch = { ...patch, kw: chargerKW, slowKW: (s.slowKW ?? chargerKW * 0.35) * ratio, measuredKW: chargerKW };
+    if (s.chargerId) {
+      supabase.from("charge_speeds").insert({ charger_id: s.chargerId, kind: s.gun ?? (chargerKW > 22 ? "dc" : "ac"), kw: chargerKW, car_model: carModel ?? null })
+        .then(() => {}, () => {});
+    }
+  }
+  const next = { ...s, ...patch };
+  if (s.notifId) Notifications.cancelScheduledNotificationAsync(s.notifId).catch(() => {});
+  updateSession(s.id, { ...patch, notifId: await scheduleDone(next) });
+  return patch.measuredKW ?? null;
 }
 
 /** Start a tracked charge with a live estimate and a "nearly done" alert. */
-export async function startCharge(c: Charger, v: Model | null, startPct: number, targetPct: number, auto = false) {
-  const kw = v ? usablePowerKW(c, v) : (c.powerKW ?? 7);
-  const slowKW = v ? Math.max(kw * 0.35, Math.min(kw, v.maxAcKW || kw)) : kw * 0.35;
+export async function startCharge(c: Charger, v: Model | null, startPct: number, targetPct: number, gun?: Gun | null, auto = false) {
+  const kw = gun?.kw ?? (v ? usablePowerKW(c, v) : (c.powerKW ?? 7));
+  const kind = gun?.kind ?? (kw > 22 ? "dc" : "ac");
+  // DC tapers hard above 80%; AC barely slows.
+  const slowKW = kind === "dc" ? Math.max(kw * 0.35, Math.min(kw, v?.maxAcKW || kw)) : kw * 0.85;
   const s = startSession({ id: c.id, name: c.name, network: c.network }, startPct, {
-    kw, slowKW, capKWh: v?.batteryKWh ?? 40, targetPct, lat: c.lat, lng: c.lng, auto,
+    kw, slowKW, capKWh: v?.batteryKWh ?? 40, targetPct, lat: c.lat, lng: c.lng, auto, gun: kind,
   });
   const notifId = await scheduleDone(s);
   updateSession(s.id, { notifId });
@@ -69,7 +146,9 @@ async function scheduleDone(s: Session): Promise<string | null> {
       if (!asked.granted) return null;
     }
     const target = s.targetPct ?? 80;
-    const secs = Math.max(60, (minutesTo(s, target) - 5) * 60); // 5 minutes early so you can walk back
+    const left = liveState(s).minsLeft;
+    if (left <= 1) return null;
+    const secs = Math.max(60, (left - 5) * 60); // 5 minutes early so you can walk back
     return await Notifications.scheduleNotificationAsync({
       content: { title: `Almost ${target}% ⚡`, body: `${s.chargerName}: about 5 minutes to go. Time to head back.`, data: { url: "/log" }, sound: true },
       trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: Math.round(secs) },

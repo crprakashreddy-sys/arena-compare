@@ -10,6 +10,7 @@ export type Charger = {
   address?: string | null;
   powerKW?: number | null;
   connectors?: string[];
+  guns?: { type: string; kw: number | null }[];  // each connector and its power, when known
   speed: Speed;
   source: "ocm" | "seed" | "community";
 };

@@ -34,7 +34,7 @@ const SF: Record<string, string> = {
   bicycle: "bicycle", "stop-circle": "stop.circle.fill", "card-outline": "creditcard", calendar_clear: "calendar", "information-circle": "info.circle.fill", "information-circle-outline": "info.circle",
   "time-outline": "clock", time: "clock.fill", "settings-outline": "gearshape", settings: "gearshape.fill",
   "log-out-outline": "rectangle.portrait.and.arrow.right", "mail-outline": "envelope", "shield-checkmark": "checkmark.shield.fill",
-  "battery-charging": "battery.100.bolt", "speedometer-outline": "speedometer", speedometer: "speedometer",
+  "battery-charging": "battery.100.bolt", "speedometer-outline": "gauge.with.dots.needle.67percent", speedometer: "speedometer",
   "eye-outline": "eye", "eye-off-outline": "eye.slash", "copy-outline": "doc.on.doc", "link-outline": "link", "cash-outline": "indianrupeesign.circle",
 };
 
