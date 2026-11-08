@@ -46,17 +46,20 @@ export default function ZingCamera() {
   const [grid, setGrid] = useState(false);
   const [zoom, setZoom] = useState(0);
   // Lenses: 0.5× uses the real ultra-wide camera; 2× and 2.5× zoom the main camera.
-  const [lenses, setLenses] = useState<string[]>([]);
+  // Each lens: id = the type to select (e.g. AVCaptureDeviceTypeBuiltInUltraWideCamera), name = "Back Ultra Wide Camera".
+  const [lenses, setLensesRaw] = useState<{ id: string; name: string }[]>([]);
+  const setLenses = (raw: any[]) => setLensesRaw(raw.map((l: any) => typeof l === "string"
+    ? { id: l, name: l } : { id: String(l?.deviceType ?? l?.id ?? l?.localizedName ?? ""), name: String(l?.localizedName ?? l?.deviceType ?? "") }).filter((l) => l.id));
+  const findLens = (re: RegExp, not?: RegExp) => lenses.find((l) => re.test(`${l.id} ${l.name}`) && !(not && not.test(`${l.id} ${l.name}`)))?.id;
   const [ultra, setUltra] = useState(false);
   // Real ultra-wide lens, or the iPhone's combined "Dual Wide"/"Triple" camera (which starts at 0.5×).
-  const ULTRA = lenses.find((l) => /ultra ?wide/i.test(l)) ?? lenses.find((l) => /dual ?wide|triple/i.test(l));
-  const WIDE = lenses.find((l) => /builtInWideAngleCamera/i.test(l)) ?? lenses.find((l) => /^back camera$/i.test(l))
-    ?? lenses.find((l) => /wide/i.test(l) && !/ultra|dual|triple/i.test(l))
-    ?? lenses.find((l) => !/ultra|tele|front|dual|triple/i.test(l));
+  const ULTRA = findLens(/ultra ?wide/i) ?? findLens(/dual ?wide|triple/i);
+  const WIDE = findLens(/wide ?angle/i, /ultra|dual|triple|front/i) ?? findLens(/back camera/i, /ultra|dual|triple|tele/i)
+    ?? findLens(/./, /ultra|tele|front|dual|triple/i);
   const canUltra = facing === "back" && (!!ULTRA || Platform.OS === "ios");
   // Ask the camera which lenses this iPhone has (the change event alone doesn't always fire).
   const readLenses = useCallback(async () => {
-    try { const l = await cam.current?.getAvailableLensesAsync(); if (l?.length) setLenses(l); } catch {}
+    try { const l: any[] | undefined = await cam.current?.getAvailableLensesAsync(); if (l?.length) setLenses(l); } catch {}
   }, []);
   useEffect(() => { const id = setTimeout(readLenses, 600); return () => clearTimeout(id); }, [facing, readLenses]);
   const onUltra = canUltra && ultra;
@@ -69,7 +72,7 @@ export default function ZingCamera() {
       if (!ULTRA) {
         readLenses();
         return Alert.alert("0.5× isn't ready yet", lenses.length
-          ? `Your iPhone reported these cameras:\n${lenses.join("\n")}\n\nSend this screenshot to support so we can enable 0.5×.`
+          ? `Your iPhone reported these cameras:\n${lenses.map((l) => l.name || l.id).join("\n")}\n\nSend this screenshot to support so we can enable 0.5×.`
           : "The camera didn't report its lenses. This usually works in the App Store version; in Expo Go it can be blocked.");
       }
       setUltra(true); setZoom(0); return;
@@ -214,7 +217,7 @@ export default function ZingCamera() {
           {focused && active && (
             <CameraView ref={cam} style={StyleSheet.absoluteFill} facing={facing} mode={mode} zoom={onUltra ? 0 : zoom}
               selectedLens={facing === "back" ? (onUltra ? ULTRA : WIDE) : undefined}
-              onAvailableLensesChanged={(e) => { if (e.lenses?.length) setLenses(e.lenses); }}
+              onAvailableLensesChanged={(e: any) => { if (e?.lenses?.length) setLenses(e.lenses); }}
               onCameraReady={readLenses}
               flash={facing === "back" ? flash : "off"} enableTorch={facing === "back" && flash === "on" && recording} mirror={facing === "front"} />
           )}
@@ -287,7 +290,7 @@ export default function ZingCamera() {
       {/* Looks carousel + shutter */}
       <View style={[s.bottom, { bottom: tabSpace + 8 }]} pointerEvents="box-none">
         {/* Zoom stops, iPhone-camera style */}
-        <Pressable onLongPress={() => Alert.alert("Camera lenses", lenses.length ? lenses.join("\n") : "None reported by the camera")} delayLongPress={600}>
+        <Pressable onLongPress={() => Alert.alert("Camera lenses", lenses.length ? lenses.map((l) => `${l.name}\n${l.id}`).join("\n\n") : "None reported by the camera")} delayLongPress={600}>
         <Glass style={s.zoomBar}>
           {stops.map((f) => {
             if (f === 0.5 && recording) return null;
