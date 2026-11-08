@@ -12,7 +12,7 @@ const config: ExpoConfig = {
   orientation: "portrait",
   icon: "./assets/icon.png",
   userInterfaceStyle: "automatic",
-  splash: { image: "./assets/icon.png", resizeMode: "contain", backgroundColor: "#0B2440" },
+  splash: { image: "./assets/splash-icon.png", resizeMode: "contain", backgroundColor: "#FFD60A" },
   ios: {
     bundleIdentifier: IOS_BUNDLE_ID,
     supportsTablet: false,
@@ -29,7 +29,7 @@ const config: ExpoConfig = {
   },
   android: {
     package: ANDROID_PACKAGE,
-    adaptiveIcon: { foregroundImage: "./assets/icon.png", backgroundColor: "#0B2440" },
+    adaptiveIcon: { foregroundImage: "./assets/adaptive-icon.png", backgroundColor: "#FFD60A" },
     permissions: ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "CAMERA"],
     config: {
       googleMaps: { apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_KEY ?? "" },
@@ -37,6 +37,10 @@ const config: ExpoConfig = {
   },
   plugins: [
     "expo-router",
+    [
+      "expo-splash-screen",
+      { image: "./assets/splash-icon.png", imageWidth: 180, resizeMode: "contain", backgroundColor: "#FFD60A" },
+    ],
     "expo-apple-authentication",
     [
       "@react-native-google-signin/google-signin",
