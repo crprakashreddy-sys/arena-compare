@@ -15,6 +15,7 @@ const MAP = {
   cafe: ["ion", "cafe"], road: ["mci", "road-variant"], sparkles: ["ion", "sparkles"], mountain: ["mci", "image-filter-hdr"],
   city: ["mci", "city-variant"], moon: ["ion", "moon"], food: ["ion", "restaurant"], people: ["ion", "people"],
   battery: ["mci", "battery-charging-high"], station: ["mci", "ev-station"], water: ["ion", "water"], trophy: ["ion", "trophy"],
+  lock: ["ion", "lock-closed"], send: ["ion", "paper-plane"], mail: ["ion", "chatbubble-ellipses"],
   heart: ["ion", "heart"], music: ["ion", "musical-notes"], leaf: ["ion", "leaf"], rocket: ["ion", "rocket"],
 } as const;
 export type IconName = keyof typeof MAP;

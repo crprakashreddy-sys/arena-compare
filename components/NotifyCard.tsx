@@ -29,6 +29,7 @@ export function NotifyCard() {
 }
 
 const ROWS: { key: keyof NotifyPrefs; label: string; sub: string }[] = [
+  { key: "notify_dms", label: "Messages", sub: "Direct messages from your crew" },
   { key: "notify_clubs", label: "Club messages", sub: "New messages in your clubs (mute single clubs inside the club)" },
   { key: "notify_replies", label: "Replies", sub: "When someone answers your issue" },
   { key: "notify_events", label: "Events", sub: "New drives and meetups, and a reminder 1 hour before" },

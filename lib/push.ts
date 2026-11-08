@@ -46,9 +46,9 @@ export function usePush(userId?: string | null) {
   }, []);
 }
 
-export type NotifyPrefs = { notify_clubs: boolean; notify_replies: boolean; notify_events: boolean; notify_crew: boolean };
+export type NotifyPrefs = { notify_clubs: boolean; notify_replies: boolean; notify_events: boolean; notify_crew: boolean; notify_dms: boolean };
 export async function fetchNotifyPrefs(userId: string): Promise<NotifyPrefs | null> {
-  const { data, error } = await supabase.from("profiles").select("notify_clubs,notify_replies,notify_events,notify_crew").eq("id", userId).maybeSingle();
+  const { data, error } = await supabase.from("profiles").select("notify_clubs,notify_replies,notify_events,notify_crew,notify_dms").eq("id", userId).maybeSingle();
   return error ? null : (data as any);
 }
 export async function saveNotifyPref(userId: string, key: keyof NotifyPrefs, on: boolean) {

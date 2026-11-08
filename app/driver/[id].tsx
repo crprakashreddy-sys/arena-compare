@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import {
@@ -13,6 +13,7 @@ import { useAuth, canPost } from "../../lib/auth";
 import { Avatar, Button, VerifiedBadge } from "../../components/ui";
 import { openSafetyMenu } from "../../components/SafetyMenu";
 import type { ConnectionState, Profile } from "../../lib/types";
+import { startDm } from "../../lib/dms";
 
 export default function DriverProfile() {
   const t = useTheme();
@@ -49,6 +50,12 @@ export default function DriverProfile() {
     await load();
     setBusy(false);
   };
+  const message = async () => {
+    setBusy(true);
+    try { const tid = await startDm(userId); router.push(`/dm/${tid}`); }
+    catch (e: any) { Alert.alert("Can't message yet", e.message); }
+    setBusy(false);
+  };
   const label = { none: "Connect", sent: "Request sent · Cancel", received: "Accept request", connected: "Connected · Remove" }[state];
 
   return (
@@ -71,7 +78,8 @@ export default function DriverProfile() {
           </View>
           {!isMe && (
             <>
-              <Button title={label} kind={state === "none" || state === "received" ? "primary" : "secondary"} busy={busy} onPress={act} style={{ alignSelf: "stretch", marginTop: 10 }} />
+              {state === "connected" && <Button title="Message" busy={busy} onPress={message} style={{ alignSelf: "stretch", marginTop: 10 }} />}
+              <Button title={label} kind={state === "none" || state === "received" ? "primary" : "secondary"} busy={busy && state !== "connected"} onPress={act} style={{ alignSelf: "stretch", marginTop: state === "connected" ? 8 : 10 }} />
               <Pressable onPress={() => openSafetyMenu({ kind: "user", targetId: userId, userId, userName: p.display_name, onDone: () => router.back() })} style={{ padding: 10 }}>
                 <Text style={{ color: t.muted }}>Report or block</Text>
               </Pressable>

@@ -39,6 +39,8 @@ export default function RootLayout() {
           <Stack.Screen name="log" options={{ title: "Charging log" }} />
           <Stack.Screen name="savings" options={{ title: "Savings" }} />
           <Stack.Screen name="club/[id]" options={{ title: "Club" }} />
+          <Stack.Screen name="messages" options={{ title: "Messages" }} />
+          <Stack.Screen name="dm/[id]" options={{ title: "" }} />
           <Stack.Screen name="club-edit" options={{ title: "New club", presentation: "modal" }} />
           <Stack.Screen name="club-members/[id]" options={{ title: "Members" }} />
           <Stack.Screen name="issue/[id]" options={{ title: "Issue" }} />

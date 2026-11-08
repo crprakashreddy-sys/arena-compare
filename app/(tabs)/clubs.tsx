@@ -13,6 +13,7 @@ import { clubSuits, useMode } from "../../lib/mode";
 import { ModeSwitch } from "../../components/ModeSwitch";
 import { Icon } from "../../components/Icon";
 import { NotifyCard } from "../../components/NotifyCard";
+import { unreadDms } from "../../lib/dms";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -29,6 +30,7 @@ export default function Clubs() {
   const [busy, setBusy] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [mode] = useMode();
+  const [dmUnread, setDmUnread] = useState(0);
 
   const load = useCallback(async () => {
     setErr(null);
@@ -36,6 +38,7 @@ export default function Clubs() {
       if (session) await autoJoinFor(vehicles, session.user.id).catch(() => {});
       const [a, m] = await Promise.all([fetchClubs(), session ? fetchMyClubs(session.user.id) : Promise.resolve([])]);
       setAll(a); setMine(m);
+      if (session) unreadDms().then(setDmUnread).catch(() => {});
     } catch (e: any) { setErr(e.message); }
     setBusy(false);
   }, [session, vehicles]);
@@ -74,6 +77,12 @@ export default function Clubs() {
           <Text style={[s.h1, { color: t.text }]}>Clubs</Text>
           <Text style={{ color: t.muted, marginTop: 2 }}>Your EV crew. Fixes, tips, drives and meetups.</Text>
         </View>
+        {session && (
+          <Pressable onPress={() => router.push("/messages")} style={[s.dmBtn, { backgroundColor: t.surface }]} accessibilityLabel="Messages">
+            <Ionicons name="chatbubble-ellipses" size={19} color={t.text} />
+            {dmUnread > 0 && <View style={s.dmDot}><Text style={s.dmDotText}>{dmUnread > 9 ? "9+" : dmUnread}</Text></View>}
+          </Pressable>
+        )}
         <Pressable onPress={() => (session ? router.push("/club-edit") : router.push("/login"))} style={s.newBtn} accessibilityLabel="Start a club">
           <Ionicons name="add" size={18} color={ON_CTA} />
           <Text style={s.newBtnText}>New</Text>
@@ -217,6 +226,9 @@ const s = StyleSheet.create({
   h1: { fontSize: 32, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -1 },
   h3: { fontSize: 12, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: 0.6, paddingHorizontal: 16, marginTop: 16, marginBottom: 8 },
   newBtn: { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: CTA, paddingHorizontal: 14, height: 38, borderRadius: 999, marginTop: 6 },
+  dmBtn: { width: 38, height: 38, borderRadius: 19, alignItems: "center", justifyContent: "center", marginTop: 6 },
+  dmDot: { position: "absolute", top: -3, right: -3, minWidth: 18, height: 18, borderRadius: 9, paddingHorizontal: 4, backgroundColor: "#FF3B5C", alignItems: "center", justifyContent: "center" },
+  dmDotText: { color: "#fff", fontSize: 10.5, fontWeight: "800" },
   newBtnText: { color: ON_CTA, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
   community: { flexDirection: "row", alignItems: "center", gap: 12, padding: 12, borderRadius: 18 },
   h2: { fontSize: 18, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", marginTop: 24, marginBottom: 10, paddingHorizontal: 16 },
