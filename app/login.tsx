@@ -111,7 +111,10 @@ export default function Login() {
       car_model: car.trim() || null,
       city: city.trim() || null,
     });
-    if (error) { setBusy(false); return fail("Profile didn't save", error); }
+    if (error && (error as any).code === "23505") {
+      // Already have a profile (the app just couldn't load it a moment ago): update it instead.
+      await supabase.from("profiles").update({ display_name: name.trim(), car_model: car.trim() || null, city: city.trim() || null }).eq("id", session.user.id);
+    } else if (error) { setBusy(false); return fail("Profile didn't save", error); }
     if (reg) {
       try { await verifyVehicle(reg); } catch (e: any) { Alert.alert("Vehicle number not saved", e.message); }
     }

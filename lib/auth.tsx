@@ -27,9 +27,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loadProfile = useCallback(async (s: Session | null) => {
     if (!s) { setProfile(null); return; }
-    const { data } = await supabase.from("profiles").select("id,display_name,car_model,city,vehicle_verified,avatar_path,bio").eq("id", s.user.id).maybeSingle();
-    setProfile((data as Profile) ?? null);
-    loadBlocks();
+    // A network blip or a token refresh can fail the read. Retry, and never treat
+    // "couldn't load" as "no profile", or a returning driver gets sent back to sign-up.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const { data, error } = await supabase.from("profiles").select("id,display_name,car_model,city,vehicle_verified,avatar_path,bio").eq("id", s.user.id).maybeSingle();
+      if (!error) { setProfile((data as Profile) ?? null); loadBlocks(); return; }
+      await new Promise((r) => setTimeout(r, 800 * (attempt + 1)));
+    }
   }, []);
 
   useEffect(() => {
