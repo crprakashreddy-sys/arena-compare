@@ -168,6 +168,9 @@ export function removeVehicle(key: string) {
   const vehicles = garage.vehicles.filter((v) => v.key !== key);
   save({ vehicles, activeKey: garage.activeKey === key ? vehicles[0]?.key ?? null : garage.activeKey });
 }
+/** The garage as it is right now (outside React). */
+export const getGarage = () => garage;
+
 export function setActiveVehicle(key: string) {
   save({ ...garage, activeKey: key });
 }

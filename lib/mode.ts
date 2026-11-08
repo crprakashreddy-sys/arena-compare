@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CATALOG, plugsOf, useGarage } from "./vehicles";
+import { CATALOG, getGarage, plugsOf, setActiveVehicle, useGarage } from "./vehicles";
 import type { Charger } from "./types";
 
 /** Which world the app shows: cars and their chargers, or 2-wheelers and theirs. */
@@ -19,6 +19,15 @@ export function setMode(m: Mode) {
   mode = m; chosen = true;
   subs.forEach((f) => f(m));
   AsyncStorage.setItem(KEY, m).catch(() => {});
+  // Drivers with both a car and a 2-wheeler: switching sides also switches the vehicle in use,
+  // so "Fits", range and charging times are for the right one.
+  const g = getGarage();
+  const active = g.vehicles.find((v) => v.key === g.activeKey);
+  const isKind = (k: string) => (m === "car" ? k === "car" : k !== "car");
+  if (active && !isKind(active.kind)) {
+    const other = g.vehicles.find((v) => isKind(v.kind));
+    if (other) { lastVehicle = other.key; setActiveVehicle(other.key); }
+  }
 }
 
 /** The current mode. Until the driver picks one, it follows the vehicle they're driving. */

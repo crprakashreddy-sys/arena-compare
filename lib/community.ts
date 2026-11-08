@@ -378,14 +378,14 @@ export async function fetchLeaderboard(city?: string | null, limit = 20, mode?: 
     const { data: kinds, error } = await supabase.from("profiles").select("id,vehicle_kind").in("id", rows.map((r) => r.user_id));
     if (!error) {
       const k = new Map((kinds ?? []).map((p: any) => [p.id, p.vehicle_kind ?? "car"]));
-      rows = rows.filter((r) => (k.get(r.user_id) ?? "car") === mode);
+      rows = rows.filter((r) => { const v = k.get(r.user_id) ?? "car"; return v === mode || v === "both"; });
     }
   }
   return rows.slice(0, limit);
 }
 
 /** Remember whether this driver rides a car or a 2-wheeler, for the separate leaderboards. */
-export async function syncVehicleKind(userId: string, kind: "car" | "two") {
+export async function syncVehicleKind(userId: string, kind: "car" | "two" | "both") {
   await supabase.from("profiles").update({ vehicle_kind: kind }).eq("id", userId);
 }
 

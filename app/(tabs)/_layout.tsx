@@ -10,11 +10,12 @@ import { useTheme } from "../../lib/theme";
 export default function TabsLayout() {
   const t = useTheme();
   const { profile } = useAuth();
-  const { active } = useGarage();
-  // Keep the profile's car / 2-wheeler flag in step with the vehicle being driven, for the leaderboards.
+  const { vehicles } = useGarage();
+  // Keep the profile's car / 2-wheeler / both flag in step with the garage, for the leaderboards.
+  const hasCar = vehicles.some((v) => v.kind === "car"), hasTwo = vehicles.some((v) => v.kind !== "car");
   useEffect(() => {
-    if (profile && active) syncVehicleKind(profile.id, active.kind === "car" ? "car" : "two").catch(() => {});
-  }, [profile?.id, active?.key]);
+    if (profile && (hasCar || hasTwo)) syncVehicleKind(profile.id, hasCar && hasTwo ? "both" : hasCar ? "car" : "two").catch(() => {});
+  }, [profile?.id, hasCar, hasTwo]);
   return (
     <Tabs
       screenOptions={{
