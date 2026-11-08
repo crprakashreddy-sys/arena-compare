@@ -60,7 +60,7 @@ export default function ClubChat() {
   const [admin, setAdmin] = useState(false);
   const [tab, setTab] = useState<"chat" | "issues" | "events">("chat");
   const [reactions, setReactions] = useState<ReactionMap>({});
-  const [menu, setMenu] = useState<ClubMessage | null>(null);
+  const [msgMenu, setMsgMenu] = useState<ClubMessage | null>(null);
   const [pinned, setPinned] = useState<ClubMessage | null>(null);
 
   const byId = useMemo(() => new Map(msgs.map((m) => [m.id, m])), [msgs]);
@@ -152,7 +152,7 @@ export default function ClubChat() {
     sheet(club?.name ?? "Club", opts.map((o) => o.label), opts.length - 1, (i) => opts[i].run());
   };
 
-  const longPress = (m: ClubMessage) => { if (!m.deleted) setMenu(m); };
+  const longPress = (m: ClubMessage) => { if (!m.deleted) setMsgMenu(m); };
 
   // Pinned message banner.
   useEffect(() => {
@@ -287,9 +287,9 @@ export default function ClubChat() {
           </View>
         </Pressable>
       )}
-      <MessageMenu visible={!!menu} onClose={() => setMenu(null)} mine={menu?.user_id === me}
-        preview={menu ? (menu.body ?? "Photo") : ""} picked={menu ? [...myReacts(menu.id)] : []}
-        onReact={(r) => menu && react(menu.id, r)} actions={menu ? menuActions(menu) : []} />
+      <MessageMenu visible={!!msgMenu} onClose={() => setMsgMenu(null)} mine={msgMenu?.user_id === me}
+        preview={msgMenu ? (msgMenu.body ?? "Photo") : ""} picked={msgMenu ? [...myReacts(msgMenu.id)] : []}
+        onReact={(r) => msgMenu && react(msgMenu.id, r)} actions={msgMenu ? menuActions(msgMenu) : []} />
       {loading || member === null ? <ActivityIndicator style={{ flex: 1 }} color={t.muted} /> : (
         <FlatList
           inverted
