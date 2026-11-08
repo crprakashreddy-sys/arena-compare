@@ -52,8 +52,12 @@ export const QUIZ: { q: string; answers: Answer[] }[] = [
     { text: "It's the future and I'm early", emoji: "🚀", gives: { tech_geek: 3 } },
   ] },
   { q: "Your road-trip playlist is…", answers: [
-    { text: "Old Bollywood singalongs", emoji: "🎤", gives: { road_tripper: 2, social_charger: 1 } },
+    { text: "Regional mass songs, full volume", emoji: "🔥", gives: { thrill_seeker: 2, road_tripper: 1 } },
+    { text: "Folk songs from back home", emoji: "🪕", gives: { road_tripper: 2, social_charger: 1 } },
+    { text: "Motivational tracks, beast mode", emoji: "💪", gives: { thrill_seeker: 1, range_master: 2 } },
+    { text: "Old Bollywood singalongs", emoji: "🎤", gives: { social_charger: 2, road_tripper: 1 } },
     { text: "Lo-fi beats, late at night", emoji: "🎧", gives: { night_cruiser: 3 } },
+    { text: "My ex's favourites. Still trying to forget 🙃", emoji: "💔", gives: { night_cruiser: 2, city_glider: 1 } },
     { text: "EV podcasts, honestly", emoji: "🎙️", gives: { tech_geek: 2, eco_warrior: 1 } },
     { text: "Silence. Just the road.", emoji: "🤫", gives: { city_glider: 2, range_master: 1 } },
   ] },
