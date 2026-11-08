@@ -27,7 +27,7 @@ const slug = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,
 export const brandClubId = (make: string) => `brand:${slug(make)}`;
 export const modelClubId = (m: Pick<Model, "id">) => `model:${m.id}`;
 
-const MSG_FIELDS = "id,club_id,user_id,body,photo_path,reply_to,deleted,created_at,profiles(display_name,car_model,avatar_path)";
+const MSG_FIELDS = "id,club_id,user_id,body,photo_path,reply_to,deleted,created_at,profiles!club_messages_user_id_fkey(display_name,car_model,avatar_path)";
 
 export async function fetchClubs(): Promise<Club[]> {
   if (!isConfigured) return [];

@@ -77,7 +77,7 @@ export async function setSolvedFlag(postId: string, solved: boolean) {
 }
 
 export async function fetchReplies(postId: string, me?: string): Promise<Reply[]> {
-  const { data } = await supabase.from("club_replies").select("id,post_id,user_id,body,photo_path,deleted,created_at,profiles(display_name,car_model,avatar_path)")
+  const { data } = await supabase.from("club_replies").select("id,post_id,user_id,body,photo_path,deleted,created_at,profiles!club_replies_user_id_fkey(display_name,car_model,avatar_path)")
     .eq("post_id", postId).order("created_at");
   const rows = ((data ?? []) as any[]).filter((r) => !isBlocked(r.user_id));
   const ids = rows.map((r) => r.id);

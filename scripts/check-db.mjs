@@ -37,6 +37,11 @@ const TABLES = [
   ["club_reactions", "message_id,user_id,emoji", "clubs_plus.sql"],
 ];
 // [function, safe dummy arguments, SQL file]. Called signed-out, so they do nothing.
+// Joins the app makes. "More than one relationship" here breaks loading names on messages.
+const EMBEDS = [
+  ["club_messages", "id,profiles!club_messages_user_id_fkey(display_name)", "clubs.sql"],
+  ["club_replies", "id,profiles!club_replies_user_id_fkey(display_name)", "issues.sql"],
+];
 const FUNCS = [
   ["start_dm", { other: "00000000-0000-0000-0000-000000000000" }, "dms.sql"],
   ["mark_dm_read", { t: "00000000-0000-0000-0000-000000000000" }, "dms.sql"],
@@ -60,6 +65,12 @@ for (const [table, cols, file] of TABLES) {
   const b = await r.json().catch(() => ({}));
   const msg = String(b.message ?? r.status);
   if (/does not exist|Could not find|PGRST205|PGRST204|42703|42P01/.test(msg + (b.code ?? ""))) note(file, `${table}: ${msg.replace(/\s+/g, " ").slice(0, 90)}`);
+}
+for (const [table, sel, file] of EMBEDS) {
+  const r = await check(`${table}?select=${sel}&limit=0`);
+  if (!r || r.ok) continue;
+  const b = await r.json().catch(() => ({}));
+  note(file, `${table}: ${String(b.message ?? r.status).slice(0, 90)}`);
 }
 for (const [fn, args, file] of FUNCS) {
   const r = await check(`rpc/${fn}`, { method: "POST", body: JSON.stringify(args) });
