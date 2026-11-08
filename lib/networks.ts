@@ -21,7 +21,7 @@ export const NETWORKS: Network[] = [
   // Statiq charger that happens to sit at a showroom keeps its network.
   { id: "tataev", name: "Tata.ev chargers", short: "Tata.ev", color: "#1B3B6F", keywords: ["tata.ev", "tata ev", "tata motors", "tata passenger electric"], oem: true },
   { id: "mahindra", name: "Mahindra charging", short: "Mahindra", color: "#C8102E", keywords: ["mahindra", "charge_in", "chargein"], oem: true },
-  { id: "maruti", name: "Maruti Suzuki e for Me charging", short: "Maruti Suzuki", color: "#1D3E8A", keywords: ["maruti", "nexa", "e for me"], oem: true },
+  { id: "maruti", name: "Maruti Suzuki charging", short: "Maruti Suzuki", color: "#1D3E8A", keywords: ["maruti", "nexa", "e for me"], oem: true },
   { id: "hyundai", name: "Hyundai charging", short: "Hyundai", color: "#002C5F", keywords: ["hyundai"], oem: true },
   { id: "mg", name: "MG charging", short: "MG", color: "#8B0000", keywords: ["mg motor", "jsw mg", "morris garages", "mg charge", "mg showroom"], oem: true },
   { id: "kia", name: "Kia charging", short: "Kia", color: "#05141F", keywords: ["kia "], oem: true },
