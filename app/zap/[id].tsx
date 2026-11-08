@@ -150,6 +150,12 @@ export default function DropZap() {
         headerStyle: { backgroundColor: DARK },
         headerTitleStyle: { color: "#fff" },
         headerTintColor: "#fff",
+        // Full-screen modal: always give a way out.
+        headerLeft: () => (
+          <Pressable onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))} hitSlop={12} accessibilityLabel="Close" style={styles.closeBtn}>
+            <Ionicons name="close" size={20} color="#fff" />
+          </Pressable>
+        ),
         headerRight: () =>
           charger ? (
             <Pressable onPress={post} disabled={posting} style={styles.dropBtn} accessibilityRole="button">
@@ -319,6 +325,7 @@ const styles = StyleSheet.create({
   shoot: { height: 220, borderRadius: 18, backgroundColor: YELLOW, alignItems: "center", justifyContent: "center", gap: 6 },
   secondary: { height: 48, borderRadius: 12, borderWidth: 1, borderColor: "#3A424A", flexDirection: "row", gap: 8, alignItems: "center", justifyContent: "center" },
   issue: { height: 36, paddingHorizontal: 12, borderRadius: 18, borderWidth: 1, borderColor: "#3A424A", justifyContent: "center" },
+  closeBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: "#1E242A", alignItems: "center", justifyContent: "center" },
   kind: { flexDirection: "row", gap: 6, marginHorizontal: 16, padding: 4, borderRadius: 18, backgroundColor: "#151A1F" },
   kindBtn: { flex: 1, height: 40, borderRadius: 14, flexDirection: "row", gap: 6, alignItems: "center", justifyContent: "center" },
   pill: { flexDirection: "row", alignItems: "center", gap: 6, height: 40, paddingHorizontal: 14, borderRadius: 20, backgroundColor: "#151A1F", flexShrink: 1 },
