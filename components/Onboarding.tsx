@@ -43,13 +43,13 @@ function Pages() {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         scrollEventThrottle={16}
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { x } } }], { useNativeDriver: true })}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { x } } }], { useNativeDriver: false })}
         onMomentumScrollEnd={(e) => setPage(Math.round(e.nativeEvent.contentOffset.x / width))}
       >
         <Slide width={width} title={"Find chargers\nthat actually work."} body="Live status from drivers who were just there. No more driving to a dead charger.">
           <Polaroid src={require("../assets/intro/z1.jpg")} caption="Tata Power · Banjara Hills" tilt={-6} />
-          <Badge style={{ top: 18, right: 22 }} dot="#1FAE5B" text="Working · 4 min ago" />
-          <Badge style={{ bottom: 26, left: 18 }} dot="#F2A93B" text="Busy · 2 in queue" />
+          <Badge style={{ top: 22, right: 8 }} dot="#1FAE5B" text="Working · 4 min ago" />
+          <Badge style={{ top: 150, left: 4 }} dot="#F2A93B" text="Busy · 2 in queue" />
         </Slide>
 
         <Slide width={width} title={"Drop a Zap.\nStack points."} body="Snap the charger, tag how it went. The closer you are when you post, the bigger your Zap Score.">
@@ -58,7 +58,7 @@ function Pages() {
             <Ionicons name="flash" size={16} color={LEMON} />
             <Text style={s.scoreText}>+42</Text>
           </View>
-          <Badge style={{ bottom: 26, left: 14 }} icon="location" text="At the charger = 2× points" />
+          <Badge style={{ top: 160, left: 2 }} icon="location" text="At the charger = 2× points" />
         </Slide>
 
         <PickRide width={width} />
