@@ -34,6 +34,7 @@ export default function RootLayout() {
           <Stack.Screen name="trip" options={{ title: "Plan a trip" }} />
           <Stack.Screen name="log" options={{ title: "Charging log" }} />
           <Stack.Screen name="savings" options={{ title: "Savings" }} />
+          <Stack.Screen name="add-charger" options={{ title: "Add a charger", presentation: "modal" }} />
           <Stack.Screen name="login" options={{ title: "Join zappd", presentation: "modal" }} />
         </Stack>
         <Onboarding />

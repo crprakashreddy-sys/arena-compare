@@ -128,6 +128,12 @@ export default function ChargerPage() {
               <Text style={{ color: t.text, fontSize: 22, fontWeight: "800" }}>{c.name}</Text>
               <Text style={{ color: t.muted }}>{[n.name, speedLabel(c), c.address].filter(Boolean).join(" · ")}</Text>
               {!!c.connectors?.length && <Text style={{ color: t.muted, fontSize: 13 }}>{c.connectors.join(", ")}</Text>}
+              {c.id.startsWith("c-") && (
+                <View style={{ flexDirection: "row", alignSelf: "flex-start", alignItems: "center", gap: 5, backgroundColor: "#FCE38A", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, marginTop: 4 }}>
+                  <Ionicons name="people" size={13} color="#1A1A1A" />
+                  <Text style={{ color: "#1A1A1A", fontSize: 12, fontWeight: "800" }}>Added by drivers · zap it to confirm</Text>
+                </View>
+              )}
               {n.oem && (
                 <View style={{ flexDirection: "row", gap: 6, alignItems: "flex-start", marginTop: 4 }}>
                   <Ionicons name="car-sport-outline" size={14} color={t.muted} />

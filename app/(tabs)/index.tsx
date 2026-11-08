@@ -6,7 +6,7 @@ import * as Location from "expo-location";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { fetchChargers, isFast, speedLabel } from "../../lib/chargers";
+import { fetchChargers, isFast, onChargersChanged, speedLabel } from "../../lib/chargers";
 import { useOnboarded } from "../../lib/onboarding";
 import { fetchLiveStatus, fetchRatings, fetchSnaps, fetchZapBubbles } from "../../lib/community";
 import { isConfigured, snapUrl } from "../../lib/supabase";
@@ -105,6 +105,14 @@ export default function MapScreen() {
     }
     return true;
   }, [load]);
+  // A driver added a charger: reload the area so it appears.
+  const lastLoadRef = useRef(lastLoad);
+  lastLoadRef.current = lastLoad;
+  useEffect(() => onChargersChanged(() => {
+    const l = lastLoadRef.current;
+    if (l) load(l.lat, l.lng);
+  }), [load]);
+
   // Wait for the welcome screens so the location prompt comes after we've explained why.
   const onboarded = useOnboarded();
   useEffect(() => {
@@ -208,6 +216,8 @@ export default function MapScreen() {
     }
   };
 
+  const addHere = (p: { lat: number; lng: number }) =>
+    router.push({ pathname: "/add-charger", params: { lat: String(p.lat), lng: String(p.lng) } });
   const openCharger = (c: Charger) => router.push(`/charger/${encodeURIComponent(c.id)}`);
   const openPeek = (c: Charger) => {
     setPeek(c);
@@ -500,6 +510,19 @@ export default function MapScreen() {
         <FlatList
           data={shown}
           keyExtractor={(x) => x.c.id}
+          ListEmptyComponent={loading || !from ? null : (
+            <EmptyState
+              hiddenCount={chargers.length - shown.length}
+              onClear={() => { setFastOnly(false); setWorkingOnly(false); setFitsOnly(false); setHidden(new Set()); }}
+              onAdd={() => addHere(from)}
+            />
+          )}
+          ListFooterComponent={shown.length && from ? (
+            <Pressable onPress={() => addHere(from)} style={[styles.addRow, { borderTopColor: t.line }]}>
+              <Ionicons name="add-circle-outline" size={20} color={t.muted} />
+              <Text style={{ color: t.muted, fontWeight: "600" }}>Missing a charger? Add it</Text>
+            </Pressable>
+          ) : null}
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
           renderItem={({ item: { c, d } }) => {
             const n = networkById(c.network);
@@ -530,7 +553,40 @@ export default function MapScreen() {
   );
 }
 
+/** What the list shows when there's nothing to show: either filters hide everything, or the area has no data yet. */
+function EmptyState({ hiddenCount, onClear, onAdd }: { hiddenCount: number; onClear: () => void; onAdd: () => void }) {
+  const t = useTheme();
+  if (hiddenCount > 0) {
+    return (
+      <View style={styles.empty}>
+        <View style={[styles.emptyIcon, { backgroundColor: t.surface }]}><Ionicons name="funnel" size={30} color={t.text} /></View>
+        <Text style={[styles.emptyTitle, { color: t.text }]}>Your filters hide {hiddenCount} charger{hiddenCount === 1 ? "" : "s"}</Text>
+        <Pressable onPress={onClear} style={styles.emptyBtn}><Text style={styles.emptyBtnText}>Show all chargers</Text></Pressable>
+      </View>
+    );
+  }
+  return (
+    <View style={styles.empty}>
+      <View style={[styles.emptyIcon, { backgroundColor: "#FCE38A" }]}><Ionicons name="flash-off" size={32} color="#1A1A1A" /></View>
+      <Text style={[styles.emptyTitle, { color: t.text }]}>No chargers listed here yet</Text>
+      <Text style={{ color: t.muted, textAlign: "center", lineHeight: 20, maxWidth: 300 }}>
+        The public map doesn't cover this area. Know one nearby? Add it and be the first to zap it.
+      </Text>
+      <Pressable onPress={onAdd} style={styles.emptyBtn}>
+        <Ionicons name="add-circle" size={18} color="#FCE38A" />
+        <Text style={styles.emptyBtnText}>Add a charger here</Text>
+      </Pressable>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  empty: { alignItems: "center", paddingVertical: 22, gap: 10 },
+  emptyIcon: { width: 72, height: 72, borderRadius: 36, alignItems: "center", justifyContent: "center", marginBottom: 4 },
+  emptyTitle: { fontSize: 17, fontWeight: "800", textAlign: "center" },
+  emptyBtn: { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: "#1A1A1A", paddingHorizontal: 20, height: 48, borderRadius: 999, marginTop: 6 },
+  emptyBtnText: { color: "#FCE38A", fontWeight: "800", fontSize: 15 },
+  addRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 16, borderTopWidth: StyleSheet.hairlineWidth },
   search: {
     flex: 1, flexDirection: "row", alignItems: "center", gap: 8, height: 48, borderRadius: 24, paddingHorizontal: 14,
     shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 4,

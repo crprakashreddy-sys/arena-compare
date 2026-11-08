@@ -170,3 +170,47 @@ export async function fetchChargersAlong(polyline: string, distanceKm = 5): Prom
   out.forEach(cacheCharger);
   return out;
 }
+
+// ───────── Drivers adding missing chargers ─────────
+
+const changed = new Set<() => void>();
+/** Run `fn` whenever a driver adds a charger, so the map can refresh. Returns an unsubscribe. */
+export function onChargersChanged(fn: () => void) {
+  changed.add(fn);
+  return () => { changed.delete(fn); };
+}
+
+export type NewCharger = {
+  name: string; network: string; lat: number; lng: number; address?: string;
+  speed: Speed; powerKW?: number | null; connectors: string[];
+};
+
+/** Save a charger a driver added. Throws a readable message if it can't be saved. */
+export async function addCommunityCharger(input: NewCharger, userId: string): Promise<Charger> {
+  const id = `c-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+  const { error } = await supabase.from("chargers").insert({
+    id,
+    name: input.name.trim(),
+    network: input.network,
+    lat: input.lat,
+    lng: input.lng,
+    address: input.address?.trim() || null,
+    power_kw: input.powerKW ?? null,
+    connectors: input.connectors,
+    speed: input.speed,
+    source: "community",
+    created_by: userId,
+  });
+  if (error) throw new Error(error.message);
+  const c: Charger = { id, name: input.name.trim(), network: input.network, lat: input.lat, lng: input.lng,
+    address: input.address?.trim() || null, powerKW: input.powerKW ?? null, connectors: input.connectors, speed: input.speed, source: "community" };
+  cacheCharger(c);
+  changed.forEach((f) => f());
+  return c;
+}
+
+/** Chargers already listed within `m` metres of a point, to catch duplicates before adding. */
+export async function chargersNear(lat: number, lng: number, m = 80): Promise<Charger[]> {
+  const list = await fetchChargers(lat, lng, 1).catch(() => [] as Charger[]);
+  return list.filter((c) => distanceM(lat, lng, c.lat, c.lng) <= m);
+}
