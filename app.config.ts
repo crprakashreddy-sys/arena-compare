@@ -56,6 +56,8 @@ const config: ExpoConfig = {
     ],
   ],
   experiments: { typedRoutes: false },
+  owner: "zappd",
+  extra: { eas: { projectId: "7e92c868-f3a8-479f-9d57-e6f44a3a02c1" } },
 };
 
 export default config;
