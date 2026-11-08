@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Alert, KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "../components/SFIcon";
 import * as AppleAuthentication from "expo-apple-authentication";
 // Google sign-in needs a native build; in Expo Go it isn't available, so load it only if present.
 let GoogleSignin: any = null;

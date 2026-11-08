@@ -1,6 +1,6 @@
 import React from "react";
 import { Text, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "./SFIcon";
 import { networkById } from "../lib/networks";
 import type { Club } from "../lib/clubs";
 import { Icon, clubIconName } from "./Icon";

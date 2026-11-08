@@ -5,7 +5,7 @@ import {
   RoundedRect, Text as SkText, matchFont, useCanvasRef, useImage, vec,
 } from "@shopify/react-native-skia";
 import { Directions, Gesture, GestureDetector } from "react-native-gesture-handler";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "./SFIcon";
 import { BLOOM_MATRIX, LOOKS, lookById, toolsFor, type CinemaTools } from "../lib/filters";
 import { STATUS_LABEL } from "../lib/theme";
 import type { Status } from "../lib/types";

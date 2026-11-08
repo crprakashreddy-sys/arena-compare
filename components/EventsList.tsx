@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { router, useFocusEffect } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "./SFIcon";
 import { useTheme, CTA, ON_CTA } from "../lib/theme";
 import { fetchClubEvents, kindOf, type ClubEvent } from "../lib/events";
 import { Icon, IconTile } from "./Icon";

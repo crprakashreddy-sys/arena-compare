@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { Stack, router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "../components/SFIcon";
 import { fetchLeaderboard, type LeaderRow } from "../lib/community";
 import { useMode } from "../lib/mode";
 import { ModeSwitch } from "../components/ModeSwitch";

@@ -3,7 +3,7 @@ import { ActivityIndicator, Alert, Linking, Platform, Pressable, ScrollView, Sty
 import MapView, { Marker } from "react-native-maps";
 import { Image } from "expo-image";
 import { Stack, router, useFocusEffect, useLocalSearchParams } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "../../components/SFIcon";
 import { getCharger, speedLabel } from "../../lib/chargers";
 import {
   FACILITIES, NEGATIVE_TAGS, addFoodTip, fetchFacilities, fetchIssues, fetchFoodTips, fetchLiveStatus, fetchRating, fetchReviews,

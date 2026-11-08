@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Share, StyleSheet, Text, View, useColorScheme } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "../../components/SFIcon";
 import { useTheme, CTA, ON_CTA } from "../../lib/theme";
 import { useAuth } from "../../lib/auth";
 import { report } from "../../lib/community";

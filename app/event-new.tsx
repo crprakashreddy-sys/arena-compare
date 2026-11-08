@@ -3,7 +3,7 @@ import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, Sc
 import MapView, { type Region } from "react-native-maps";
 import * as Location from "expo-location";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "../components/SFIcon";
 import { useTheme, CTA, ON_CTA } from "../lib/theme";
 import { useAuth } from "../lib/auth";
 import { EVENT_KINDS, createEvent, type EventKind } from "../lib/events";

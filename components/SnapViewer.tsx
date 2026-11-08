@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Pressable, Text, View, useWindowDimensions } from "react-native";
 import { Image } from "expo-image";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "./SFIcon";
 import { router } from "expo-router";
 import { snapUrl } from "../lib/supabase";
 import { timeAgo } from "../lib/geo";

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Alert, FlatList, Pressable, Share, StyleSheet, Text, View } from "react-native";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "../../components/SFIcon";
 import { useTheme, CTA, ON_CTA } from "../../lib/theme";
 import { useAuth } from "../../lib/auth";
 import { fetchClub, fetchMembers, myRole, removeMember, setRole, type Club, type ClubMember } from "../../lib/clubs";

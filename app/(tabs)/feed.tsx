@@ -4,7 +4,7 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 import * as Location from "expo-location";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "../../components/SFIcon";
 import { fetchFeed } from "../../lib/community";
 import { suits, useMode } from "../../lib/mode";
 import { ModeSwitch } from "../../components/ModeSwitch";
@@ -14,6 +14,9 @@ import { STATUS_LABEL } from "../../lib/theme";
 import { ScoreChip } from "../../components/ZapScore";
 import SnapViewer from "../../components/SnapViewer";
 import type { Checkin } from "../../lib/types";
+import { Glass } from "../../components/Glass";
+import { useTabSpace } from "../../lib/tabspace";
+import { tapHaptic } from "../../lib/motion";
 
 const BG = "#0B1117";
 const STATUS_STYLE = {
@@ -25,6 +28,7 @@ const STATUS_STYLE = {
 /** Zings near you: a dark, full-bleed feed of live charger photos from the last 24 hours. */
 export default function ZapsFeed() {
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabSpace();
   const { width } = useWindowDimensions();
   const [zaps, setZaps] = useState<Checkin[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +62,7 @@ export default function ZapsFeed() {
       <FlatList
         data={shownZ}
         keyExtractor={(z) => z.id}
-        contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 24, paddingTop: insets.top + 12, gap: 14 }}
+        contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: tabSpace + 90, paddingTop: insets.top + 12, gap: 14 }}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={() => load()} tintColor="#FCE38A" />}
         ListHeaderComponent={
           <View style={{ paddingHorizontal: 4, paddingBottom: 6 }}>
@@ -124,12 +128,21 @@ export default function ZapsFeed() {
           );
         }}
       />
+      <Pressable onPress={() => { tapHaptic(); router.push("/zap/nearest"); }} accessibilityLabel="Drop a zing"
+        style={({ pressed }) => ({ position: "absolute", right: 16, bottom: tabSpace + 14, transform: [{ scale: pressed ? 0.93 : 1 }] })}>
+        <Glass style={styles.fab} tint="#FCE38A" interactive>
+          <Ionicons name="camera" size={22} color="#1A1A1A" />
+          <Text style={{ color: "#1A1A1A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 16 }}>Drop a zing</Text>
+        </Glass>
+      </Pressable>
       {viewer !== null && <SnapViewer snaps={shownZ} start={viewer} onClose={() => setViewer(null)} onChanged={() => load()} />}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  fab: { flexDirection: "row", alignItems: "center", gap: 8, height: 56, paddingHorizontal: 22, borderRadius: 28,
+    shadowColor: "#FCE38A", shadowOpacity: 0.45, shadowRadius: 14, shadowOffset: { width: 0, height: 4 }, elevation: 8 },
   board: { flexDirection: "row", alignItems: "center", gap: 12, marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: "#151E26" },
   card: { borderRadius: 20, overflow: "hidden", backgroundColor: "#151C23" },
   note: { position: "absolute", left: 14, right: 14, bottom: 14, color: "#fff", fontSize: 15, lineHeight: 21, textShadowColor: "rgba(0,0,0,0.8)", textShadowRadius: 8 },

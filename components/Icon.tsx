@@ -1,5 +1,6 @@
 import React from "react";
-import { View, type ColorValue, type ViewStyle } from "react-native";
+import { Platform, View, type ColorValue, type ViewStyle } from "react-native";
+import { SymbolView, type SFSymbol } from "expo-symbols";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 /**
@@ -20,8 +21,26 @@ const MAP = {
 } as const;
 export type IconName = keyof typeof MAP;
 
+/** Apple's SF Symbol for each icon, used on iPhone. Missing ones fall back to the vector set. */
+const SF: Partial<Record<IconName, string>> = {
+  bolt: "bolt.fill", car: "bolt.car.fill", two: "scooter", camera: "camera.fill", photo: "photo.fill", star: "star.fill",
+  check: "checkmark.circle.fill", key: "key.fill", chat: "bubble.left.and.bubble.right.fill", calendar: "calendar",
+  wrench: "wrench.and.screwdriver.fill", pin: "mappin.circle.fill", shuffle: "shuffle", glasses: "eyeglasses", beard: "mustache.fill",
+  palette: "paintpalette.fill", sprout: "leaf.fill", flame: "flame.fill", crown: "crown.fill", cafe: "cup.and.saucer.fill",
+  road: "road.lanes", sparkles: "sparkles", mountain: "mountain.2.fill", city: "building.2.fill", moon: "moon.stars.fill",
+  food: "fork.knife", people: "person.2.fill", battery: "battery.100.bolt", station: "ev.charger.fill", water: "drop.fill",
+  trophy: "trophy.fill", lock: "lock.fill", send: "paperplane.fill", mail: "ellipsis.bubble.fill", heart: "heart.fill",
+  music: "music.note", leaf: "leaf.fill",
+};
+
 export function Icon({ name, size = 18, color = "#1A1A1A" }: { name: IconName; size?: number; color?: ColorValue }) {
   const [fam, glyph] = MAP[name] ?? MAP.bolt;
+  const sf = Platform.OS === "ios" ? SF[name] : undefined;
+  if (sf) {
+    const fb = fam === "mci" ? <MaterialCommunityIcons name={glyph as any} size={size} color={color as any} /> : <Ionicons name={glyph as any} size={size} color={color as any} />;
+    return <SymbolView name={sf as SFSymbol} size={size * 0.92} tintColor={color as any} weight="semibold" type="hierarchical"
+      style={{ width: size, height: size }} fallback={fb} />;
+  }
   return fam === "mci"
     ? <MaterialCommunityIcons name={glyph as any} size={size} color={color as any} />
     : <Ionicons name={glyph as any} size={size} color={color as any} />;

@@ -3,7 +3,7 @@ import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, Sc
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "../../components/SFIcon";
 import PhotoEditor, { type EditorHandle } from "../../components/PhotoEditor";
 import { ensureChargerSaved, fetchChargers, getCharger, speedLabel, isFast } from "../../lib/chargers";
 import { ISSUES, postCheckin, uploadSnap, type IssueKey } from "../../lib/community";

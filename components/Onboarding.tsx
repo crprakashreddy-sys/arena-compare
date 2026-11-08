@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Animated, Image as RNImage, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "./SFIcon";
 import * as Location from "expo-location";
 import { CATALOG, addVehicle, useGarage, type VehicleKind } from "../lib/vehicles";
 import { finishOnboarding, useOnboarded } from "../lib/onboarding";

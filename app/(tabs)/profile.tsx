@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router, useFocusEffect } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "../../components/SFIcon";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../lib/auth";
@@ -18,6 +18,7 @@ import { useSessions } from "../../lib/sessions";
 import { Icon, IconTile } from "../../components/Icon";
 import { NotifyCard, NotifySettings } from "../../components/NotifyCard";
 import { unreadDms } from "../../lib/dms";
+import { useTabSpace } from "../../lib/tabspace";
 
 const GUIDELINES_URL = "https://crprakashreddy-sys.github.io/zingd/terms.html";
 const PRIVACY_URL = "https://crprakashreddy-sys.github.io/zingd/privacy.html";
@@ -25,6 +26,7 @@ const PRIVACY_URL = "https://crprakashreddy-sys.github.io/zingd/privacy.html";
 export default function You() {
   const t = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabSpace();
   const { session, profile, signOut, refreshProfile } = useAuth();
   const [points, setPoints] = useState(0);
   const [stats, setStats] = useState({ zaps: 0, reviews: 0 });
@@ -88,7 +90,7 @@ export default function You() {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+    <ScrollView contentContainerStyle={{ paddingBottom: tabSpace + 28 }}>
       {/* Hero */}
       <View style={[styles.hero, { paddingTop: insets.top + 18 }]}>
         <Pressable onPress={changePhoto} accessibilityLabel="Change profile photo">

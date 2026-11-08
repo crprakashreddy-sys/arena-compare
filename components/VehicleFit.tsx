@@ -1,7 +1,7 @@
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "./SFIcon";
 import { useTheme } from "../lib/theme";
 import { PLUG_LABEL, chargeMinutes, fitFor, fmtMinutes, plugsOf, usablePowerKW, useGarage, vehicleName } from "../lib/vehicles";
 import type { Charger } from "../lib/types";

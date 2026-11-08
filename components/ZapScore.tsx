@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { successHaptic } from "../lib/motion";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "./SFIcon";
 import { FRESH_BONUS, PHOTO_BONUS, TIERS, formatMetres, scoreTone, tierFor } from "../lib/zapscore";
 import type { ScorePart } from "../lib/types";
 

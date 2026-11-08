@@ -3,7 +3,7 @@ import { ActivityIndicator, Keyboard, Linking, Pressable, ScrollView, StyleSheet
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { Stack, router } from "expo-router";
 import * as Location from "expo-location";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "../components/SFIcon";
 import { useTheme } from "../lib/theme";
 import { searchPlaces, type PlaceHit } from "../lib/places";
 import { planTrip, mapsUrl, type Plan } from "../lib/trip";

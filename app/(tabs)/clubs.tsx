@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { router, useFocusEffect } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "../../components/SFIcon";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../../lib/auth";
 import { useTheme, CTA, ON_CTA } from "../../lib/theme";
@@ -14,6 +14,7 @@ import { ModeSwitch } from "../../components/ModeSwitch";
 import { Icon } from "../../components/Icon";
 import { NotifyCard } from "../../components/NotifyCard";
 import { unreadDms } from "../../lib/dms";
+import { useTabSpace } from "../../lib/tabspace";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -31,6 +32,7 @@ export default function Clubs() {
   const [err, setErr] = useState<string | null>(null);
   const [mode] = useMode();
   const [dmUnread, setDmUnread] = useState(0);
+  const tabSpace = useTabSpace();
 
   const load = useCallback(async () => {
     setErr(null);
@@ -70,7 +72,7 @@ export default function Clubs() {
   };
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: t.bg }} contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: 40 }}
+    <ScrollView style={{ flex: 1, backgroundColor: t.bg }} contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: tabSpace + 28 }}
       refreshControl={<RefreshControl refreshing={false} onRefresh={load} />} keyboardShouldPersistTaps="handled">
       <View style={{ paddingHorizontal: 16, flexDirection: "row", alignItems: "flex-start", gap: 12 }}>
         <View style={{ flex: 1 }}>

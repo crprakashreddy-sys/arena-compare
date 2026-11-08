@@ -81,8 +81,13 @@ export async function deleteDm(id: string) {
   await supabase.from("dm_messages").update({ deleted: true, body: null, photo_path: null }).eq("id", id);
 }
 
+const readListeners = new Set<() => void>();
+/** Fires after I read a chat, so unread badges refresh straight away. */
+export function onDmRead(fn: () => void) { readListeners.add(fn); return () => { readListeners.delete(fn); }; }
+
 export async function markDmRead(threadId: string) {
   await supabase.rpc("mark_dm_read", { t: threadId });
+  readListeners.forEach((f) => f());
 }
 
 export function subscribeDm(threadId: string, onNew: (id: string) => void, onChange: (id: string) => void, onThread?: (row: any) => void) {

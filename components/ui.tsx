@@ -1,6 +1,6 @@
 import React from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View, type ViewStyle } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "./SFIcon";
 import { Image } from "expo-image";
 import { snapUrl } from "../lib/supabase";
 import { tapHaptic } from "../lib/motion";

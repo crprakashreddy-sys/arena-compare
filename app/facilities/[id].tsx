@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "../../components/SFIcon";
 import { ensureChargerSaved, getCharger } from "../../lib/chargers";
 import { FACILITIES, fetchMyFacilityVotes, saveFacilityVotes } from "../../lib/community";
 import { useTheme } from "../../lib/theme";

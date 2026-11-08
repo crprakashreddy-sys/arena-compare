@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { router, useFocusEffect } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "./SFIcon";
 import { useTheme, CTA, ON_CTA } from "../lib/theme";
 import { timeAgo } from "../lib/geo";
 import { ISSUE_TAGS, fetchIssues, tagLabel, type Issue } from "../lib/issues";

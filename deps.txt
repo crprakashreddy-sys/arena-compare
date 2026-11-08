@@ -20,3 +20,5 @@ react-native-gesture-handler
 @expo/vector-icons
 @react-native-google-signin/google-signin
 expo-notifications
+expo-glass-effect
+expo-symbols

@@ -5,7 +5,7 @@ import MapView, { Circle, Marker, type Region } from "react-native-maps";
 import * as Location from "expo-location";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "../../components/SFIcon";
 import { fetchChargers, isFast, onChargersChanged, speedLabel } from "../../lib/chargers";
 import { useOnboarded } from "../../lib/onboarding";
 import { suits, useMode } from "../../lib/mode";
@@ -28,6 +28,9 @@ import type { Charger, Checkin, LiveStatus } from "../../lib/types";
 import { chargeMinutes, fitFor, fmtMinutes, reachKm, updateVehicle, usablePowerKW, useGarage } from "../../lib/vehicles";
 import { NIGHT_STYLE } from "../../lib/mapStyle";
 import { Icon } from "../../components/Icon";
+import { Glass } from "../../components/Glass";
+import { useTabSpace } from "../../lib/tabspace";
+import { tapHaptic } from "../../lib/motion";
 
 const INDIA: Region = { latitude: 21.5, longitude: 79, latitudeDelta: 24, longitudeDelta: 24 };
 const MAP_TYPES = ["standard", "hybrid", "satellite"] as const;
@@ -35,6 +38,7 @@ const MAP_TYPES = ["standard", "hybrid", "satellite"] as const;
 export default function MapScreen() {
   const t = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabSpace();
   const mapRef = useRef<MapView>(null);
 
   const [me, setMe] = useState<{ lat: number; lng: number } | null>(null);
@@ -328,7 +332,7 @@ export default function MapScreen() {
           </View>
         )}
         <View style={{ flexDirection: "row", gap: 8 }}>
-          <View style={[styles.search, { backgroundColor: t.bg }]}>
+          <Glass style={styles.search} interactive>
             <Ionicons name="search" size={18} color={t.muted} />
             <TextInput
               value={query}
@@ -345,21 +349,24 @@ export default function MapScreen() {
                 <Ionicons name="close-circle" size={18} color={t.muted} />
               </Pressable>
             ) : null}
-          </View>
+          </Glass>
           <Pressable
             onPress={() => setMapType(MAP_TYPES[(MAP_TYPES.indexOf(mapType) + 1) % MAP_TYPES.length])}
-            style={[styles.round, { backgroundColor: t.bg }]}
             accessibilityLabel={`Map type: ${mapType}`}
           >
-            <Ionicons name={mapType === "standard" ? "map-outline" : "earth"} size={20} color={t.text} />
+            <Glass style={styles.round} interactive>
+              <Ionicons name={mapType === "standard" ? "map-outline" : "earth"} size={20} color={t.text} />
+            </Glass>
           </Pressable>
-          <Pressable onPress={() => router.push("/trip")} style={[styles.round, { backgroundColor: t.accent }]} accessibilityLabel="Plan a trip">
-            <Ionicons name="git-branch-outline" size={20} color={t.onAccent} />
+          <Pressable onPress={() => router.push("/trip")} accessibilityLabel="Plan a trip">
+            <Glass style={styles.round} tint={t.accent} interactive>
+              <Ionicons name="git-branch-outline" size={20} color={t.onAccent} />
+            </Glass>
           </Pressable>
         </View>
 
         {hits.length > 0 ? (
-          <View style={[styles.card, { backgroundColor: t.bg }]}>
+          <Glass style={styles.card}>
             {hits.map((h, i) => (
               <Pressable key={h.id + i} onPress={() => pickPlace(h)}
                 style={[styles.hit, i > 0 && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: t.line }]}>
@@ -370,7 +377,7 @@ export default function MapScreen() {
                 </View>
               </Pressable>
             ))}
-          </View>
+          </Glass>
         ) : (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingRight: 12, alignItems: "center" }}>
             <ModeSwitch compact />
@@ -393,9 +400,11 @@ export default function MapScreen() {
 
         {showSearchArea && hits.length === 0 && region && (
           <Pressable onPress={() => load(region.latitude, region.longitude, Math.max(5, Math.min(30, region.latitudeDelta * 55)))}
-            style={[styles.pill, { backgroundColor: t.bg }]}>
-            <Ionicons name="refresh" size={15} color={t.accent} />
-            <Text style={{ color: t.accent, fontWeight: "600" }}>Search this area</Text>
+            style={{ alignSelf: "center" }}>
+            <Glass style={styles.pill} interactive>
+              <Ionicons name="refresh" size={15} color={t.text} />
+              <Text style={{ color: t.text, fontWeight: "700", fontFamily: "SpaceGrotesk_700Bold" }}>Search this area</Text>
+            </Glass>
           </Pressable>
         )}
       </View>
@@ -403,32 +412,46 @@ export default function MapScreen() {
       {/* 3D tilt */}
       <Pressable
         onPress={() => { const next = !tilted; setTilted(next); mapRef.current?.animateCamera({ pitch: next ? 55 : 0 }, { duration: 500 }); }}
-        style={[styles.round, { backgroundColor: tilted ? t.accent : t.bg, position: "absolute", right: 12, bottom: (peek ? 300 : sheetH + 12) + 56 }]}
+        style={{ position: "absolute", right: 12, bottom: (peek ? 300 : sheetH + 12 + 64) + 56 + tabSpace }}
         accessibilityLabel={tilted ? "Flat map" : "3D map"}
       >
-        <Text style={{ color: tilted ? t.bg : t.text, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 14 }}>3D</Text>
+        <Glass style={styles.round} tint={tilted ? t.accent : undefined} interactive>
+          <Text style={{ color: tilted ? t.onAccent : t.text, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 14 }}>3D</Text>
+        </Glass>
       </Pressable>
 
       {/* Range on the battery left */}
       {vehicle && me && !peek && (
-        <View style={[styles.range, { backgroundColor: t.bg, bottom: sheetH + 12 }]}>
+        <Glass style={[styles.range, { bottom: sheetH + 12 + tabSpace }]}>
           <Pressable onPress={() => setShowRange((v) => !v)} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
             accessibilityLabel={showRange ? "Hide range ring" : "Show range ring"}>
             <View style={{ width: 12, height: 12, borderRadius: 6, borderWidth: 2, borderColor: "#FCE38A", backgroundColor: showRange ? "rgba(255,214,10,0.3)" : "transparent" }} />
             <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontVariant: ["tabular-nums"] }}>≈{Math.round(reachKm(vehicle))} km</Text>
           </Pressable>
           <BatterySlider value={vehicle.batteryPct ?? 60} onChange={(v) => updateVehicle(vehicle.key, { batteryPct: v })} />
-        </View>
+        </Glass>
       )}
 
       {/* Locate me */}
       <Pressable
         onPress={() => (me ? clearSearch() : startLocation())}
-        style={[styles.round, { backgroundColor: t.bg, position: "absolute", right: 12, bottom: peek ? 300 : sheetH + 12 }]}
+        style={{ position: "absolute", right: 12, bottom: (peek ? 300 : sheetH + 12 + 64) + tabSpace }}
         accessibilityLabel="Go to my location"
       >
-        <Ionicons name="locate" size={21} color={t.accent} />
+        <Glass style={styles.round} interactive>
+          <Ionicons name="locate" size={21} color={t.text} />
+        </Glass>
       </Pressable>
+
+      {/* Drop a zing: the app's main action, always one thumb away */}
+      {!peek && (
+        <Pressable onPress={() => { tapHaptic(); router.push("/zap/nearest"); }} accessibilityLabel="Drop a zing"
+          style={({ pressed }) => [{ position: "absolute", right: 8, bottom: sheetH + 8 + tabSpace, transform: [{ scale: pressed ? 0.92 : 1 }] }]}>
+          <Glass style={styles.fab} tint="#FCE38A" interactive>
+            <Ionicons name="camera" size={25} color="#1A1A1A" />
+          </Glass>
+        </Pressable>
+      )}
 
       {/* Preview card for a tapped charger, with zings from the latest visits */}
       {peek && (() => {
@@ -437,7 +460,7 @@ export default function MapScreen() {
         const sc = st ? statusColors(t)[st.status] : null;
         const d = from ? distanceM(from.lat, from.lng, peek.lat, peek.lng) : null;
         return (
-          <View style={[styles.peek, { backgroundColor: t.bg }]}>
+          <Glass style={[styles.peek, { bottom: tabSpace + 8 }]}>
             <View style={{ flexDirection: "row", gap: 10, alignItems: "flex-start" }}>
               <View style={{ flex: 1, gap: 2 }}>
                 <Text style={{ color: t.text, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }} numberOfLines={2}>{peek.name}</Text>
@@ -479,14 +502,14 @@ export default function MapScreen() {
                 <Text style={{ color: t.onAccent, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Open charger</Text>
               </Pressable>
             </View>
-          </View>
+          </Glass>
         );
       })()}
 
       {viewer && <SnapViewer snaps={viewer.list} start={viewer.start} onClose={() => setViewer(null)} />}
 
       {/* Station list */}
-      <View style={[styles.sheet, { backgroundColor: t.bg, height: sheetH, display: peek ? "none" : "flex" }]}>
+      <Glass style={[styles.sheet, { bottom: tabSpace + 6, height: sheetH, display: peek ? "none" : "flex" }]}>
         <GestureDetector gesture={sheetPan}>
         <View>
         <Pressable onPress={() => { springNext(); setSheet((v) => (v === 2 ? 0 : ((v + 1) as 1 | 2))); }} style={{ alignItems: "center", paddingVertical: 10 }}
@@ -567,7 +590,7 @@ export default function MapScreen() {
             );
           }}
         />
-      </View>
+      </Glass>
     </View>
   );
 }
@@ -628,8 +651,12 @@ const styles = StyleSheet.create({
     shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 4,
   },
   best: { flexDirection: "row", alignItems: "center", gap: 10, marginHorizontal: 12, marginBottom: 4, padding: 10, borderRadius: 14 },
+  fab: {
+    width: 56, height: 56, borderRadius: 28, alignItems: "center", justifyContent: "center",
+    shadowColor: "#FCE38A", shadowOpacity: 0.6, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 8,
+  },
   sheet: {
-    position: "absolute", left: 0, right: 0, bottom: 0, borderTopLeftRadius: 18, borderTopRightRadius: 18,
+    position: "absolute", left: 8, right: 8, bottom: 0, borderRadius: 28, overflow: "hidden",
     elevation: 10, shadowColor: "#000", shadowOpacity: 0.18, shadowRadius: 10,
   },
   row: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 11, borderTopWidth: StyleSheet.hairlineWidth },

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Stack, router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "../components/SFIcon";
 import { useTheme } from "../lib/theme";
 import { networkById } from "../lib/networks";
 import { addPastSession, deleteSession, finishSession, monthTotals, rupees, useSessions, type Session } from "../lib/sessions";
