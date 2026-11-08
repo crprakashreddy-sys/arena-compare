@@ -20,6 +20,9 @@ function rng(seed: number) {
 }
 // How each tag reads inside a sentence.
 const PHRASE: Record<string, string> = {
+  "Regional mass songs": "mass songs on full volume", "Folk": "folk songs", "Motivational": "motivational tracks", "Old Bollywood": "old Bollywood",
+  "Devotional": "devotional songs", "Punjabi beats": "Punjabi beats", "Lo-fi": "lo-fi", "Desi hip-hop": "desi hip-hop", "English pop": "English pop",
+  "Classical": "classical music", "My ex's favourites (still trying to forget)": "my ex's playlist (still working on it)",
   "Cricket fan": "cricket", "Football fan": "football", "Pet parent": "my pets", "Family first": "family time", "Giving back": "giving back",
   "Art & design": "art & design", "Max range": "chasing max range", "EV tech": "EV tech", "Mods & accessories": "car mods", "Car photography": "car photography",
   "Solar at home": "solar", "Pets on board": "road trips with my dog", "Driving playlists": "a good playlist", "Highway food": "highway food",

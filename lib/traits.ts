@@ -25,6 +25,16 @@ export const LIFESTYLE: Trait[] = [
   { id: "spiritual", label: "Spiritual", emoji: "🕉️" }, { id: "art", label: "Art & design", emoji: "🎨" }, { id: "outdoors", label: "Outdoors", emoji: "🏕️" },
   { id: "family", label: "Family first", emoji: "👨‍👩‍👧" }, { id: "comedy", label: "Comedy", emoji: "😂" }, { id: "volunteering", label: "Giving back", emoji: "🤝" },
 ];
-const ALL = [...SCALES.flatMap((s) => s.options), ...LIFESTYLE];
+/** What's playing in the car. Pick up to 3. */
+export const MUSIC: Trait[] = [
+  { id: "music_mass", label: "Regional mass songs", emoji: "🔥" }, { id: "music_folk", label: "Folk", emoji: "🪕" },
+  { id: "music_motivational", label: "Motivational", emoji: "💪" }, { id: "music_retro", label: "Old Bollywood", emoji: "🎙️" },
+  { id: "music_devotional", label: "Devotional", emoji: "🙏" }, { id: "music_punjabi", label: "Punjabi beats", emoji: "🥁" },
+  { id: "music_lofi", label: "Lo-fi", emoji: "🎧" }, { id: "music_hiphop", label: "Desi hip-hop", emoji: "🎤" },
+  { id: "music_english", label: "English pop", emoji: "🎶" }, { id: "music_carnatic", label: "Classical", emoji: "🎻" },
+  { id: "music_ex", label: "My ex's favourites (still trying to forget)", emoji: "🙃" },
+];
+export const MAX_MUSIC = 3;
+const ALL = [...SCALES.flatMap((s) => s.options), ...LIFESTYLE, ...MUSIC];
 export const traitById = (id: string) => ALL.find((t) => t.id === id);
 export const MAX_LIFESTYLE = 6;

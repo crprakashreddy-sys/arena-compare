@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Alert, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { INTERESTS, PROMPTS, type Prompt } from "../lib/interests";
-import { LIFESTYLE, MAX_LIFESTYLE, SCALES } from "../lib/traits";
+import { LIFESTYLE, MAX_LIFESTYLE, MAX_MUSIC, MUSIC, SCALES } from "../lib/traits";
 import { TONES, draftBio, type Tone } from "../lib/bioDraft";
 import { tickHaptic } from "../lib/motion";
 import { CTA, ON_CTA } from "../lib/theme";
@@ -32,6 +32,8 @@ export default function EditProfile() {
     setTraits((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur.filter((x) => !ids.includes(x)), id]));
   };
   const lifestyleCount = traits.filter((x) => LIFESTYLE.some((l) => l.id === x)).length;
+  const musicCount = traits.filter((x) => MUSIC.some((m) => m.id === x)).length;
+  const toggleMusic = (id: string) => { tickHaptic(); setTraits((cur) => cur.includes(id) ? cur.filter((x) => x !== id) : musicCount >= MAX_MUSIC ? cur : [...cur, id]); };
   const toggleLife = (id: string) => { tickHaptic(); setTraits((cur) => cur.includes(id) ? cur.filter((x) => x !== id) : lifestyleCount >= MAX_LIFESTYLE ? cur : [...cur, id]); };
   const toggle = (id: string) => { tickHaptic(); setInterests((cur) => cur.includes(id) ? cur.filter((x) => x !== id) : cur.length >= 6 ? cur : [...cur, id]); };
   const pickPrompt = () => {
@@ -114,6 +116,18 @@ export default function EditProfile() {
           return (
             <Pressable key={l.id} onPress={() => toggleLife(l.id)} style={{ flexDirection: "row", alignItems: "center", gap: 6, height: 38, paddingHorizontal: 12, borderRadius: 19, backgroundColor: on ? CTA : t.surface }}>
               <Text>{l.emoji}</Text><Text style={{ color: on ? ON_CTA : t.text, fontWeight: "700", fontSize: 13.5 }}>{l.label}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <Text style={{ color: t.muted, fontWeight: "600", fontSize: 13 }}>On your car playlist ({musicCount}/{MAX_MUSIC})</Text>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+        {MUSIC.map((m) => {
+          const on = traits.includes(m.id);
+          return (
+            <Pressable key={m.id} onPress={() => toggleMusic(m.id)} style={{ flexDirection: "row", alignItems: "center", gap: 6, height: 38, paddingHorizontal: 12, borderRadius: 19, backgroundColor: on ? CTA : t.surface }}>
+              <Text>{m.emoji}</Text><Text style={{ color: on ? ON_CTA : t.text, fontWeight: "700", fontSize: 13.5 }}>{m.label}</Text>
             </Pressable>
           );
         })}

@@ -29,7 +29,7 @@ export default function AvatarMaker() {
 
   const svg = useMemo(() => { try { return Skia.SVG.MakeFromString(avatarSvg(o)); } catch { return null; } }, [o]);
   const set = (p: Partial<AvatarOpts>) => setO((v) => ({ ...v, ...p }));
-  const clip = useMemo(() => { const p = Skia.Path.Make(); p.addCircle(SIZE / 2, SIZE / 2, SIZE / 2); return p; }, []);
+  const clip = useMemo(() => Skia.RRectXY(Skia.XYWHRect(0, 0, SIZE, SIZE), SIZE / 2, SIZE / 2), []);
 
   const save = async () => {
     if (!profile) return router.push("/login");
