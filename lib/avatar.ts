@@ -6,6 +6,8 @@ export type CarShape = "suv" | "boxy" | "compact" | "coupe" | "crossover" | "hat
 export type AvatarOpts = {
   skin: number; hair: number; hairColor: number; eyes: number; mouth: number;
   glasses: boolean; beard: boolean; shirt: number; bg: number; car: CarShape; carColor: number;
+  /** Exact colours picked up from your selfie / car photo (override the swatches). */
+  skinHex?: string | null; hairHex?: string | null; carHex?: string | null;
 };
 
 export const SKINS = ["#FDDBB4", "#F1C27D", "#E0AC69", "#C68642", "#A0673C", "#7A4A2A"];
@@ -143,7 +145,7 @@ function car(shape: CarShape, col: string) {
 
 /** The finished cartoon as an SVG string, 512 × 512. */
 export function avatarSvg(o: AvatarOpts): string {
-  const skin = SKINS[o.skin], hair = HAIR_COLORS[o.hairColor], shirt = SHIRTS[o.shirt], bg = BGS[o.bg];
+  const skin = o.skinHex ?? SKINS[o.skin], hair = o.hairHex ?? HAIR_COLORS[o.hairColor], shirt = SHIRTS[o.shirt], bg = BGS[o.bg];
   const skinDark = shade(skin, 0.82), skinLight = shade(skin, 1.08), hairDark = shade(hair, 0.7), hairLight = shade(hair, 1.35);
   const dark = o.bg === BGS.length - 1;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
@@ -178,6 +180,6 @@ export function avatarSvg(o: AvatarOpts): string {
   ${hairFront(o.hair, hair)}
   </g>
   <ellipse cx="256" cy="466" rx="220" ry="16" fill="#000" opacity="0.18"/>
-  ${car(o.car, CAR_COLORS[o.carColor])}
+  ${car(o.car, o.carHex ?? CAR_COLORS[o.carColor])}
 </svg>`;
 }

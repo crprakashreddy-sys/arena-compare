@@ -11,6 +11,9 @@ import {
   BGS, CAR_COLORS, CAR_SHAPES, HAIR_COLORS, HAIR_STYLES, SHIRTS, SKINS, avatarSvg, randomAvatar, shapeFor, type AvatarOpts,
 } from "../lib/avatar";
 import { Icon, type IconName } from "../components/Icon";
+import * as ImagePicker from "expo-image-picker";
+import { avatarFromSelfie, carColourFromPhoto } from "../lib/selfieAvatar";
+import { successHaptic, tapHaptic } from "../lib/motion";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -24,6 +27,35 @@ export default function AvatarMaker() {
   const { active } = useGarage();
   const [o, setO] = useState<AvatarOpts>(() => ({ ...randomAvatar(shapeFor(active)), bg: 0 }));
   const [busy, setBusy] = useState(false);
+  const [reading, setReading] = useState<null | "face" | "car">(null);
+  const [tune, setTune] = useState(false);
+  const [fromSelfie, setFromSelfie] = useState(false);
+
+  // One tap: snap a selfie, we read your skin tone, hair colour, hair length and beard.
+  const snapSelfie = async () => {
+    tapHaptic();
+    const perm = await ImagePicker.requestCameraPermissionsAsync();
+    if (!perm.granted) return Alert.alert("Camera is off", "Allow camera access in Settings to make your cartoon from a selfie.");
+    const res = await ImagePicker.launchCameraAsync({ cameraType: ImagePicker.CameraType.front, allowsEditing: true, aspect: [1, 1], quality: 0.8 });
+    if (res.canceled || !res.assets?.[0]) return;
+    setReading("face");
+    try {
+      const got = await avatarFromSelfie(res.assets[0].uri);
+      setO((v) => ({ ...v, ...got, bg: v.bg }));
+      setFromSelfie(true); successHaptic();
+    } catch (e: any) { Alert.alert("Couldn't read the selfie", e?.message ?? "Try again in better light."); }
+    setReading(null);
+  };
+  // Optional: a photo of your car so the cartoon car is your exact paint colour.
+  const pickCarPhoto = async () => {
+    tapHaptic();
+    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], quality: 0.8 });
+    if (res.canceled || !res.assets?.[0]) return;
+    setReading("car");
+    try { const carHex = await carColourFromPhoto(res.assets[0].uri); setO((v) => ({ ...v, carHex })); successHaptic(); }
+    catch { Alert.alert("Couldn't read that photo", "Try one where the car fills most of the frame."); }
+    setReading(null);
+  };
   const [rideKind, setRideKind] = useState<"car" | "two">(() => (TWO_SHAPES.has(o.car) ? "two" : "car"));
   const ref = useCanvasRef();
 
@@ -62,15 +94,34 @@ export default function AvatarMaker() {
               </Group>
             </Canvas>
           </View>
-          <Pressable onPress={() => setO({ ...randomAvatar(o.car), carColor: o.carColor })} style={styles.dice}>
-            <Icon name="shuffle" size={17} color={ON_CTA} />
-            <Text style={{ color: ON_CTA, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Surprise me</Text>
+          <Pressable onPress={snapSelfie} disabled={!!reading} style={[styles.dice, { paddingHorizontal: 22 }]}>
+            {reading === "face" ? <ActivityIndicator color={ON_CTA} /> : <Ionicons name="camera" size={18} color={ON_CTA} />}
+            <Text style={{ color: ON_CTA, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{fromSelfie ? "Retake selfie" : "Make it from my selfie"}</Text>
           </Pressable>
+          <Text style={{ color: t.muted, fontSize: 12.5, textAlign: "center", paddingHorizontal: 30 }}>
+            {fromSelfie ? "Got your skin tone, hair and beard ✓" : "Snap a selfie and crop so your face fills the square. We match your skin, hair and beard. The photo never leaves your phone."}
+          </Text>
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            <Pressable onPress={pickCarPhoto} disabled={!!reading} style={[styles.ghostBtn, { borderColor: t.line }]}>
+              {reading === "car" ? <ActivityIndicator color={t.text} /> : <Ionicons name="car-sport" size={16} color={t.text} />}
+              <Text style={{ color: t.text, fontWeight: "700", fontSize: 13 }}>{o.carHex ? "Car colour matched ✓" : active ? `Match my ${active.model.split(" ").slice(0, 2).join(" ")}'s colour` : "Match my car's colour"}</Text>
+            </Pressable>
+            <Pressable onPress={() => setO({ ...randomAvatar(o.car), carColor: o.carColor, carHex: o.carHex })} style={[styles.ghostBtn, { borderColor: t.line }]}>
+              <Icon name="shuffle" size={15} color={t.text} />
+            </Pressable>
+          </View>
         </View>
 
-        <Row label="Skin" t={t}>{SKINS.map((c, i) => <Dot key={c} color={c} on={o.skin === i} onPress={() => set({ skin: i })} />)}</Row>
+        <Pressable onPress={() => setTune((v) => !v)} style={[styles.tuneRow, { borderColor: t.line }]}>
+          <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", flex: 1 }}>Fine-tune</Text>
+          <Text style={{ color: t.muted, fontSize: 12.5 }}>{tune ? "Hide" : "Optional"}</Text>
+          <Ionicons name={tune ? "chevron-up" : "chevron-down"} size={18} color={t.muted} />
+        </Pressable>
+        {tune && (<>
+
+        <Row label="Skin" t={t}>{SKINS.map((c, i) => <Dot key={c} color={c} on={!o.skinHex && o.skin === i} onPress={() => set({ skin: i, skinHex: null })} />)}</Row>
         <Row label="Hair" t={t}>{HAIR_STYLES.map((h, i) => <Pill key={h} label={h} on={o.hair === i} onPress={() => set({ hair: i })} t={t} />)}</Row>
-        <Row label="Hair colour" t={t}>{HAIR_COLORS.map((c, i) => <Dot key={c} color={c} on={o.hairColor === i} onPress={() => set({ hairColor: i })} />)}</Row>
+        <Row label="Hair colour" t={t}>{HAIR_COLORS.map((c, i) => <Dot key={c} color={c} on={!o.hairHex && o.hairColor === i} onPress={() => set({ hairColor: i, hairHex: null })} />)}</Row>
         <Row label="Eyes" t={t}>{["Classic", "Happy", "Wide"].map((h, i) => <Pill key={h} label={h} on={o.eyes === i} onPress={() => set({ eyes: i })} t={t} />)}</Row>
         <Row label="Smile" t={t}>{["Smile", "Big grin", "Chill"].map((h, i) => <Pill key={h} label={h} on={o.mouth === i} onPress={() => set({ mouth: i })} t={t} />)}</Row>
         <View style={[styles.toggles, { borderColor: t.line }]}>
@@ -89,7 +140,8 @@ export default function AvatarMaker() {
         </View>
         <Row label="" t={t}>{CAR_SHAPES.filter((c) => (rideKind === "two") === TWO_SHAPES.has(c.key))
           .map((c) => <Pill key={c.key} label={c.label} on={o.car === c.key} onPress={() => set({ car: c.key })} t={t} />)}</Row>
-        <Row label="Ride colour" t={t}>{CAR_COLORS.map((c, i) => <Dot key={c} color={c} on={o.carColor === i} onPress={() => set({ carColor: i })} />)}</Row>
+        <Row label="Ride colour" t={t}>{CAR_COLORS.map((c, i) => <Dot key={c} color={c} on={!o.carHex && o.carColor === i} onPress={() => set({ carColor: i, carHex: null })} />)}</Row>
+        </>)}
         <Row label="Background" t={t}>{BGS.map((c, i) => <Dot key={c} color={c} on={o.bg === i} onPress={() => set({ bg: i })} />)}</Row>
       </ScrollView>
 
@@ -136,6 +188,8 @@ function Toggle({ label, icon, value, onChange, t }: { label: string; icon: Icon
 }
 
 const styles = StyleSheet.create({
+  ghostBtn: { flexDirection: "row", alignItems: "center", gap: 6, height: 38, paddingHorizontal: 14, borderRadius: 19, borderWidth: 1 },
+  tuneRow: { flexDirection: "row", alignItems: "center", gap: 8, marginHorizontal: 16, marginTop: 8, paddingVertical: 14, borderTopWidth: StyleSheet.hairlineWidth, borderBottomWidth: StyleSheet.hairlineWidth },
   ring: { padding: 6, borderRadius: SIZE, backgroundColor: INK },
   dice: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: CTA, paddingHorizontal: 18, height: 42, borderRadius: 999 },
   dot: { width: 42, height: 42, borderRadius: 21, borderWidth: 3, alignItems: "center", justifyContent: "center" },
