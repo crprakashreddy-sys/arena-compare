@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Alert, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { INTERESTS, PROMPTS, type Prompt } from "../lib/interests";
+import { LIFESTYLE, MAX_LIFESTYLE, SCALES } from "../lib/traits";
 import { tickHaptic } from "../lib/motion";
 import { CTA, ON_CTA } from "../lib/theme";
 import { router } from "expo-router";
@@ -21,6 +22,14 @@ export default function EditProfile() {
   const [busy, setBusy] = useState(false);
   const [interests, setInterests] = useState<string[]>(profile?.interests ?? []);
   const [prompts, setPrompts] = useState<Prompt[]>(profile?.prompts ?? []);
+  const [traits, setTraits] = useState<string[]>(profile?.traits ?? []);
+  const pickScale = (key: string, id: string) => {
+    tickHaptic();
+    const ids = SCALES.find((x) => x.key === key)!.options.map((o) => o.id);
+    setTraits((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur.filter((x) => !ids.includes(x)), id]));
+  };
+  const lifestyleCount = traits.filter((x) => LIFESTYLE.some((l) => l.id === x)).length;
+  const toggleLife = (id: string) => { tickHaptic(); setTraits((cur) => cur.includes(id) ? cur.filter((x) => x !== id) : lifestyleCount >= MAX_LIFESTYLE ? cur : [...cur, id]); };
   const toggle = (id: string) => { tickHaptic(); setInterests((cur) => cur.includes(id) ? cur.filter((x) => x !== id) : cur.length >= 6 ? cur : [...cur, id]); };
   const pickPrompt = () => {
     const left = PROMPTS.filter((q) => !prompts.some((p) => p.q === q));
@@ -38,6 +47,7 @@ export default function EditProfile() {
       .eq("id", profile.id);
     if (error) { setBusy(false); return Alert.alert("Profile didn't save", "Try again in a moment."); }
     // Interests and prompts are saved separately, so profile basics still save if that database step isn't run yet.
+    await supabase.from("profiles").update({ traits }).eq("id", profile.id);
     await supabase.from("profiles").update({
       interests, prompts: prompts.filter((p) => p.a.trim()).map((p) => ({ q: p.q, a: p.a.trim().slice(0, 90) })),
     }).eq("id", profile.id);
@@ -64,7 +74,35 @@ export default function EditProfile() {
       <Text style={{ color: t.muted, fontWeight: "600" }}>Bio ({160 - bio.length} left)</Text>
       <TextInput value={bio} onChangeText={setBio} placeholder="Weekend road-tripper. Nexon EV since 2023. Chai at every charger."
         placeholderTextColor={t.faint} multiline maxLength={160} style={[input, { height: 84, paddingTop: 12, textAlignVertical: "top" }]} />
-      <Text style={{ color: t.muted, fontWeight: "600", marginTop: 6 }}>What you're into ({interests.length}/6)</Text>
+      <Text style={{ color: t.text, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 18, marginTop: 8 }}>Your vibe</Text>
+      {SCALES.map((sc) => (
+        <View key={sc.key} style={{ gap: 6 }}>
+          <Text style={{ color: t.muted, fontWeight: "600", fontSize: 13 }}>{sc.title}</Text>
+          <View style={{ flexDirection: "row", gap: 6, padding: 4, borderRadius: 16, backgroundColor: t.surface }}>
+            {sc.options.map((o) => {
+              const on = traits.includes(o.id);
+              return (
+                <Pressable key={o.id} onPress={() => pickScale(sc.key, o.id)} style={{ flex: 1, height: 40, borderRadius: 12, flexDirection: "row", gap: 5, alignItems: "center", justifyContent: "center", backgroundColor: on ? CTA : "transparent" }}>
+                  <Text>{o.emoji}</Text><Text style={{ color: on ? ON_CTA : t.text, fontWeight: "800", fontSize: 13 }}>{o.label}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+      ))}
+      <Text style={{ color: t.muted, fontWeight: "600", fontSize: 13 }}>Off the road you're into ({lifestyleCount}/{MAX_LIFESTYLE})</Text>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+        {LIFESTYLE.map((l) => {
+          const on = traits.includes(l.id);
+          return (
+            <Pressable key={l.id} onPress={() => toggleLife(l.id)} style={{ flexDirection: "row", alignItems: "center", gap: 6, height: 38, paddingHorizontal: 12, borderRadius: 19, backgroundColor: on ? CTA : t.surface }}>
+              <Text>{l.emoji}</Text><Text style={{ color: on ? ON_CTA : t.text, fontWeight: "700", fontSize: 13.5 }}>{l.label}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <Text style={{ color: t.muted, fontWeight: "600", marginTop: 6 }}>Your EV life ({interests.length}/6)</Text>
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
         {INTERESTS.map((i) => {
           const on = interests.includes(i.id);

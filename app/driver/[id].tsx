@@ -16,6 +16,7 @@ import type { ConnectionState, Profile } from "../../lib/types";
 import { startDm } from "../../lib/dms";
 import { interestById } from "../../lib/interests";
 import { PersonalityBadge } from "../../components/PersonalityBadge";
+import { traitById } from "../../lib/traits";
 
 export default function DriverProfile() {
   const t = useTheme();
@@ -71,6 +72,15 @@ export default function DriverProfile() {
           {!!p.bio && <Text style={{ color: t.text, textAlign: "center", lineHeight: 20, marginTop: 4, paddingHorizontal: 12 }}>{p.bio}</Text>}
           <VerifiedBadge verified={p.vehicle_verified} />
           {!!p.personality && <View style={{ marginTop: 8 }}><PersonalityBadge id={p.personality} size="md" /></View>}
+          {!!p.traits?.length && (
+            <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 6, marginTop: 8 }}>
+              {p.traits.map((id) => traitById(id)).filter(Boolean).map((tr) => (
+                <View key={tr!.id} style={{ flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, borderWidth: 1.5, borderColor: t.line }}>
+                  <Text style={{ fontSize: 12 }}>{tr!.emoji}</Text><Text style={{ color: t.text, fontWeight: "700", fontSize: 12.5 }}>{tr!.label}</Text>
+                </View>
+              ))}
+            </View>
+          )}
           {!!p.interests?.length && (
             <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 6, marginTop: 8 }}>
               {p.interests.map((id) => interestById(id)).filter(Boolean).map((i) => (

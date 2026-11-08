@@ -535,7 +535,7 @@ export async function fetchIntroZaps(limit = 5): Promise<{ photo: string; name: 
 export type Suggestion = {
   id: string; display_name: string; car_model: string | null; city: string | null; avatar_path: string | null; bio: string | null;
   vehicle_verified: boolean; shared_clubs: number; score: number; reason: string | null;
-  interests?: string[]; prompts?: { q: string; a: string }[]; shared_interests?: string[]; personality?: string | null;
+  interests?: string[]; prompts?: { q: string; a: string }[]; shared_interests?: string[]; personality?: string | null; traits?: string[]; shared_traits?: string[];
 };
 export async function fetchSuggestions(limit = 20): Promise<Suggestion[]> {
   const { data, error } = await supabase.rpc("driver_suggestions", { lim: limit });
@@ -544,12 +544,20 @@ export async function fetchSuggestions(limit = 20): Promise<Suggestion[]> {
   // Add EV personalities (and nudge people with the same one up the deck).
   if (list.length) {
     const [{ data: ps }, { data: u }] = await Promise.all([
-      supabase.from("profiles").select("id,personality").in("id", list.map((x) => x.id)),
+      supabase.from("profiles").select("*").in("id", list.map((x) => x.id)),
       supabase.auth.getUser(),
     ]);
-    const map = new Map((ps ?? []).map((p: any) => [p.id, p.personality]));
-    const mine = u.user ? (await supabase.from("profiles").select("personality").eq("id", u.user.id).maybeSingle()).data?.personality : null;
-    list.forEach((x) => { x.personality = map.get(x.id) ?? null; if (mine && x.personality === mine) { x.score += 2; x.reason = [x.reason, "Same EV personality"].filter(Boolean).join(" · "); } });
+    const map = new Map((ps ?? []).map((p: any) => [p.id, p]));
+    const meRow: any = u.user ? (await supabase.from("profiles").select("*").eq("id", u.user.id).maybeSingle()).data : null;
+    const myTraits = new Set<string>(meRow?.traits ?? []);
+    list.forEach((x) => {
+      const row: any = map.get(x.id) ?? {};
+      x.personality = row.personality ?? null;
+      x.traits = row.traits ?? [];
+      x.shared_traits = (x.traits ?? []).filter((t) => myTraits.has(t));
+      if (meRow?.personality && x.personality === meRow.personality) { x.score += 2; x.reason = [x.reason, "Same EV personality"].filter(Boolean).join(" · "); }
+      x.score += Math.min(3, x.shared_traits.length);
+    });
     list.sort((a, b) => b.score - a.score);
   }
   return list;

@@ -3,6 +3,7 @@ import { Animated, Dimensions, Modal, Pressable, StyleSheet, Text, TextInput, Vi
 import { useAuth } from "../lib/auth";
 import { interestById, openers } from "../lib/interests";
 import { PersonalityBadge } from "./PersonalityBadge";
+import { traitById } from "../lib/traits";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
@@ -140,6 +141,14 @@ function Card({ p, onOpen }: { p: Suggestion; onOpen?: () => void }) {
           {!!p.city && <View style={s.chip}><Icon name="pin" size={13} color={INK} /><Text style={s.chipText}>{p.city}</Text></View>}
         </View>
         {!!p.reason && <Text style={s.reason} numberOfLines={1}>✨ {p.reason}</Text>}
+        {!!p.shared_traits?.length && (
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 5 }}>
+            <Text style={{ color: "#8A7A3A", fontSize: 11.5, fontWeight: "800", alignSelf: "center" }}>YOU'RE BOTH</Text>
+            {p.shared_traits.slice(0, 3).map((id) => traitById(id)).filter(Boolean).map((tr) => (
+              <View key={tr!.id} style={[s.chip, { backgroundColor: "#FFF3C4" }]}><Text style={{ fontSize: 12 }}>{tr!.emoji}</Text><Text style={s.chipText}>{tr!.label}</Text></View>
+            ))}
+          </View>
+        )}
         {!!p.shared_interests?.length && (
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 5 }}>
             {p.shared_interests.slice(0, 3).map((id) => interestById(id)).filter(Boolean).map((i) => (

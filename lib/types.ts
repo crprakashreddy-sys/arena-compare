@@ -25,6 +25,7 @@ export type Profile = {
   bio?: string | null;
   interests?: string[];
   personality?: string | null;
+  traits?: string[];
   prompts?: { q: string; a: string }[];
 };
 
