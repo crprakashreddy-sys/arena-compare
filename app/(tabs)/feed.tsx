@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Animated, AppState, Easing, Linking, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, Alert, Animated, AppState, Easing, Linking, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { CameraView, useCameraPermissions, useMicrophonePermissions, type CameraType } from "expo-camera";
 import { Gesture, GestureDetector, Directions } from "react-native-gesture-handler";
 import * as ImagePicker from "expo-image-picker";
@@ -50,8 +50,14 @@ export default function ZingCamera() {
   const [ultra, setUltra] = useState(false);
   const ULTRA = lenses.find((l) => /ultra ?wide/i.test(l));
   const WIDE = lenses.find((l) => /builtInWideAngleCamera/i.test(l)) ?? lenses.find((l) => /^back camera$/i.test(l))
-    ?? lenses.find((l) => /wide/i.test(l) && !/ultra|dual|triple/i.test(l));
-  const canUltra = facing === "back" && !!ULTRA && !!WIDE;
+    ?? lenses.find((l) => /wide/i.test(l) && !/ultra|dual|triple/i.test(l))
+    ?? lenses.find((l) => !/ultra|tele|front|dual|triple/i.test(l));
+  const canUltra = facing === "back" && !!ULTRA;
+  // Ask the camera which lenses this iPhone has (the change event alone doesn't always fire).
+  const readLenses = useCallback(async () => {
+    try { const l = await cam.current?.getAvailableLensesAsync(); if (l?.length) setLenses(l); } catch {}
+  }, []);
+  useEffect(() => { const id = setTimeout(readLenses, 600); return () => clearTimeout(id); }, [facing, readLenses]);
   const onUltra = canUltra && ultra;
   const factor = onUltra ? 0.5 : 1 + zoom * 9;
   const stops = [...(canUltra ? [0.5] : []), 1, 2, 2.5];
@@ -199,7 +205,8 @@ export default function ZingCamera() {
           {focused && active && (
             <CameraView ref={cam} style={StyleSheet.absoluteFill} facing={facing} mode={mode} zoom={onUltra ? 0 : zoom}
               selectedLens={facing === "back" ? (onUltra ? ULTRA : WIDE) : undefined}
-              onAvailableLensesChanged={(e) => setLenses(e.lenses ?? [])}
+              onAvailableLensesChanged={(e) => { if (e.lenses?.length) setLenses(e.lenses); }}
+              onCameraReady={readLenses}
               flash={facing === "back" ? flash : "off"} enableTorch={facing === "back" && flash === "on" && recording} mirror={facing === "front"} />
           )}
           <VideoLook look={look.id} width={W} height={H} />
@@ -271,6 +278,7 @@ export default function ZingCamera() {
       {/* Looks carousel + shutter */}
       <View style={[s.bottom, { bottom: tabSpace + 8 }]} pointerEvents="box-none">
         {/* Zoom stops, iPhone-camera style */}
+        <Pressable onLongPress={() => Alert.alert("Camera lenses", lenses.length ? lenses.join("\n") : "None reported by the camera")} delayLongPress={600}>
         <Glass style={s.zoomBar}>
           {stops.map((f) => {
             if (f === 0.5 && recording) return null;
@@ -284,6 +292,7 @@ export default function ZingCamera() {
             );
           })}
         </Glass>
+        </Pressable>
         {!recording && (
           <View style={s.looks}>
             {LOOKS.map((l, i) => Math.abs(i - lookIdx) <= 3 ? (
