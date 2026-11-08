@@ -14,7 +14,7 @@ export const ISSUE_TAGS = [
 export type IssueTag = (typeof ISSUE_TAGS)[number]["key"];
 export const tagLabel = (k: string) => ISSUE_TAGS.find((t) => t.key === k)?.label ?? k;
 
-type Author = { display_name: string; car_model: string | null } | null;
+type Author = { display_name: string; car_model: string | null; avatar_path?: string | null } | null;
 export type Issue = {
   id: string; club_id: string; user_id: string; title: string; body: string | null; photo_path: string | null;
   tags: string[]; solved: boolean; solution_id: string | null; deleted: boolean; created_at: string;
@@ -29,8 +29,8 @@ export type Reply = {
 async function withAuthors<T extends { user_id: string }>(rows: T[]): Promise<(T & { profiles: Author })[]> {
   const ids = [...new Set(rows.map((r) => r.user_id))];
   if (!ids.length) return rows as any;
-  const { data } = await supabase.from("profiles").select("id,display_name,car_model").in("id", ids);
-  const by = new Map((data ?? []).map((p: any) => [p.id, { display_name: p.display_name, car_model: p.car_model }]));
+  const { data } = await supabase.from("profiles").select("id,display_name,car_model,avatar_path").in("id", ids);
+  const by = new Map((data ?? []).map((p: any) => [p.id, { display_name: p.display_name, car_model: p.car_model, avatar_path: p.avatar_path }]));
   return rows.map((r) => ({ ...r, profiles: by.get(r.user_id) ?? null }));
 }
 
@@ -77,7 +77,7 @@ export async function setSolvedFlag(postId: string, solved: boolean) {
 }
 
 export async function fetchReplies(postId: string, me?: string): Promise<Reply[]> {
-  const { data } = await supabase.from("club_replies").select("id,post_id,user_id,body,photo_path,deleted,created_at,profiles(display_name,car_model)")
+  const { data } = await supabase.from("club_replies").select("id,post_id,user_id,body,photo_path,deleted,created_at,profiles(display_name,car_model,avatar_path)")
     .eq("post_id", postId).order("created_at");
   const rows = ((data ?? []) as any[]).filter((r) => !isBlocked(r.user_id));
   const ids = rows.map((r) => r.id);

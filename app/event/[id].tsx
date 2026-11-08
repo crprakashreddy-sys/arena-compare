@@ -113,7 +113,7 @@ export default function EventDetail() {
             <View style={{ gap: 10 }}>
               {going.map((r) => (
                 <Pressable key={r.user_id} onPress={() => router.push(`/driver/${r.user_id}`)} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-                  <Avatar name={r.profiles?.display_name ?? "?"} size={36} />
+                  <Avatar name={r.profiles?.display_name ?? "?"} photo={r.profiles?.avatar_path} size={36} />
                   <View style={{ flex: 1 }}>
                     <Text style={{ color: t.text, fontWeight: "700" }}>{r.profiles?.display_name ?? "Driver"}{r.user_id === e.user_id ? "  · host" : ""}</Text>
                     {!!r.profiles?.car_model && <Text style={{ color: t.muted, fontSize: 13 }}>{r.profiles.car_model}</Text>}

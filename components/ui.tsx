@@ -1,6 +1,8 @@
 import React from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View, type ViewStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+import { snapUrl } from "../lib/supabase";
 import { STATUS_LABEL, statusColors, useTheme } from "../lib/theme";
 import { networkById } from "../lib/networks";
 import { timeAgo } from "../lib/geo";
@@ -130,9 +132,12 @@ export function ClusterPin({ count, working }: { count: number; working: number 
   );
 }
 
-export function Avatar({ name, size = 34 }: { name: string; size?: number }) {
+export function Avatar({ name, size = 34, photo }: { name: string; size?: number; photo?: string | null }) {
   const t = useTheme();
   const initials = name.split(/\s+/).map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
+  if (photo) {
+    return <Image source={{ uri: snapUrl(photo) }} style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: t.accentSoft }} contentFit="cover" transition={150} />;
+  }
   return (
     <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: t.accentSoft, alignItems: "center", justifyContent: "center" }}>
       <Text style={{ color: t.accent, fontWeight: "700", fontSize: size * 0.38 }}>{initials || "?"}</Text>

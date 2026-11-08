@@ -56,9 +56,10 @@ export default function DriverProfile() {
       <Stack.Screen options={{ title: p.display_name }} />
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
         <View style={{ alignItems: "center", gap: 6, padding: 24 }}>
-          <Avatar name={p.display_name} size={92} />
+          <Avatar name={p.display_name} photo={p.avatar_path} size={92} />
           <Text style={{ color: t.text, fontSize: 24, fontWeight: "800", marginTop: 6 }}>{p.display_name}</Text>
           <Text style={{ color: t.muted }}>{[p.car_model, p.city].filter(Boolean).join(" · ")}</Text>
+          {!!p.bio && <Text style={{ color: t.text, textAlign: "center", lineHeight: 20, marginTop: 4, paddingHorizontal: 12 }}>{p.bio}</Text>}
           <VerifiedBadge verified={p.vehicle_verified} />
           <View style={{ flexDirection: "row", gap: 8, marginTop: 12, alignSelf: "stretch" }}>
             {[[String(points), "Zing Score"], [String(conns), "Connections"], [badgeFor(points), "Badge"]].map(([v, l]) => (

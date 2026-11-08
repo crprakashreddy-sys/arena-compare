@@ -14,6 +14,7 @@ export default function EditProfile() {
   const [car, setCar] = useState(profile?.car_model ?? "");
   const [city, setCity] = useState(profile?.city ?? "");
   const [plate, setPlate] = useState("");
+  const [bio, setBio] = useState(profile?.bio ?? "");
   const [busy, setBusy] = useState(false);
 
   const save = async () => {
@@ -23,7 +24,7 @@ export default function EditProfile() {
     if (reg && !PLATE_RE.test(reg)) return Alert.alert("Check the vehicle number", "Use the format TS09EV1234, or leave it empty.");
     setBusy(true);
     const { error } = await supabase.from("profiles")
-      .update({ display_name: name.trim(), car_model: car.trim() || null, city: city.trim() || null })
+      .update({ display_name: name.trim(), car_model: car.trim() || null, city: city.trim() || null, bio: bio.trim() || null })
       .eq("id", profile.id);
     if (error) { setBusy(false); return Alert.alert("Profile didn't save", "Try again in a moment."); }
     if (reg) {
@@ -46,6 +47,9 @@ export default function EditProfile() {
     <ScrollView contentContainerStyle={{ padding: 20, gap: 10 }} keyboardShouldPersistTaps="handled">
       <Text style={{ color: t.muted, fontWeight: "600" }}>Name</Text>
       <TextInput value={name} onChangeText={setName} style={input} maxLength={40} />
+      <Text style={{ color: t.muted, fontWeight: "600" }}>Bio ({160 - bio.length} left)</Text>
+      <TextInput value={bio} onChangeText={setBio} placeholder="Weekend road-tripper. Nexon EV since 2023. Chai at every charger."
+        placeholderTextColor={t.faint} multiline maxLength={160} style={[input, { height: 84, paddingTop: 12, textAlignVertical: "top" }]} />
       <Text style={{ color: t.muted, fontWeight: "600" }}>Your EV</Text>
       <TextInput value={car} onChangeText={setCar} placeholder="Tata Nexon EV" placeholderTextColor={t.faint} style={input} maxLength={40} />
       <Text style={{ color: t.muted, fontWeight: "600" }}>City</Text>

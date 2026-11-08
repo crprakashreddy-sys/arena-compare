@@ -19,7 +19,7 @@ export type ClubEvent = {
   club_name: string; club_kind: "brand" | "model" | "custom"; club_make: string; club_emoji: string | null; club_color: string | null;
   going: number; interested: number;
 };
-export type Rsvp = { user_id: string; status: "going" | "interested"; profiles?: { display_name: string; car_model: string | null } | null };
+export type Rsvp = { user_id: string; status: "going" | "interested"; profiles?: { display_name: string; car_model: string | null; avatar_path?: string | null } | null };
 export type EventDraft = {
   title: string; description: string; kind: EventKind; starts_at: Date; place_name: string;
   lat: number; lng: number; destination: string; max_people: number | null;
@@ -66,7 +66,7 @@ export async function cancelEvent(id: string, cancelled = true) {
 }
 
 export async function fetchRsvps(eventId: string): Promise<Rsvp[]> {
-  const { data } = await supabase.from("club_event_rsvps").select("user_id,status,profiles(display_name,car_model)")
+  const { data } = await supabase.from("club_event_rsvps").select("user_id,status,profiles(display_name,car_model,avatar_path)")
     .eq("event_id", eventId).order("created_at");
   return ((data ?? []) as any as Rsvp[]).filter((r) => !isBlocked(r.user_id));
 }

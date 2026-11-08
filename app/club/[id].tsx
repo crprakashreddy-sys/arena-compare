@@ -305,7 +305,7 @@ function Bubble({ m, mine, showName, replyTo, onLongPress }: {
   const pad = m.photo_path ? { paddingHorizontal: 8 } : null;
   return (
     <View style={{ flexDirection: "row", justifyContent: mine ? "flex-end" : "flex-start", gap: 6, marginTop: showName ? 8 : 0 }}>
-      {!mine && <View style={{ width: 30 }}>{showName && <Avatar name={name} size={30} />}</View>}
+      {!mine && <View style={{ width: 30 }}>{showName && <Avatar name={name} photo={m.profiles?.avatar_path} size={30} />}</View>}
       <Pressable onLongPress={onLongPress} delayLongPress={280}
         style={[s.bubble, mine ? s.mine : [s.theirs, { backgroundColor: t.bg }], m.photo_path ? { padding: 4 } : null]}>
         {!mine && showName && (

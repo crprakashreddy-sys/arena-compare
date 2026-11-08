@@ -10,7 +10,7 @@ export type Club = {
 };
 export type ClubMember = {
   user_id: string; role: "member" | "admin"; joined_at: string;
-  profiles?: { display_name: string; car_model: string | null } | null;
+  profiles?: { display_name: string; car_model: string | null; avatar_path?: string | null } | null;
 };
 export type ClubDraft = {
   name: string; description: string; city: string; emoji: string; color: string; is_private: boolean;
@@ -18,7 +18,7 @@ export type ClubDraft = {
 export type ClubMessage = {
   id: string; club_id: string; user_id: string; body: string | null; photo_path: string | null;
   reply_to: string | null; deleted: boolean; created_at: string;
-  profiles?: { display_name: string; car_model: string | null } | null;
+  profiles?: { display_name: string; car_model: string | null; avatar_path?: string | null } | null;
 };
 export type MyClub = Club & { last?: ClubMessage | null; unread: number; muted: boolean };
 
@@ -26,7 +26,7 @@ const slug = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,
 export const brandClubId = (make: string) => `brand:${slug(make)}`;
 export const modelClubId = (m: Pick<Model, "id">) => `model:${m.id}`;
 
-const MSG_FIELDS = "id,club_id,user_id,body,photo_path,reply_to,deleted,created_at,profiles(display_name,car_model)";
+const MSG_FIELDS = "id,club_id,user_id,body,photo_path,reply_to,deleted,created_at,profiles(display_name,car_model,avatar_path)";
 
 export async function fetchClubs(): Promise<Club[]> {
   if (!isConfigured) return [];
@@ -150,7 +150,7 @@ export async function myRole(clubId: string, userId: string): Promise<"admin" | 
 }
 
 export async function fetchMembers(clubId: string): Promise<ClubMember[]> {
-  const { data } = await supabase.from("club_members").select("user_id,role,joined_at,profiles(display_name,car_model)")
+  const { data } = await supabase.from("club_members").select("user_id,role,joined_at,profiles(display_name,car_model,avatar_path)")
     .eq("club_id", clubId).order("role").order("joined_at").limit(500);
   return ((data ?? []) as any as ClubMember[]).filter((m) => !isBlocked(m.user_id));
 }

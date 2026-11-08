@@ -76,7 +76,7 @@ export default function ClubMembers() {
         ) : null}
         renderItem={({ item: m }) => (
           <Pressable onPress={() => act(m)} style={[s.row, { borderTopColor: t.line }]}>
-            <Avatar name={m.profiles?.display_name ?? "?"} size={40} />
+            <Avatar name={m.profiles?.display_name ?? "?"} photo={m.profiles?.avatar_path} size={40} />
             <View style={{ flex: 1 }}>
               <Text style={{ color: t.text, fontWeight: "700" }}>{m.profiles?.display_name ?? "Driver"}{m.user_id === me ? " (you)" : ""}</Text>
               {!!m.profiles?.car_model && <Text style={{ color: t.muted, fontSize: 13 }}>{m.profiles.car_model}</Text>}

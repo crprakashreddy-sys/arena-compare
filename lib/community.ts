@@ -52,7 +52,7 @@ export async function fetchLiveStatus(chargerIds: string[]): Promise<Record<stri
 }
 
 // ───────── Snaps and check-ins ─────────
-const CHECKIN_FIELDS = "id,charger_id,user_id,status,note,photo_path,created_at,expires_at,distance_m,zap_score,score_breakdown,issue,profiles(display_name,car_model)";
+const CHECKIN_FIELDS = "id,charger_id,user_id,status,note,photo_path,created_at,expires_at,distance_m,zap_score,score_breakdown,issue,profiles(display_name,car_model,avatar_path)";
 
 export async function fetchSnaps(chargerId: string): Promise<Checkin[]> {
   const { data } = await supabase
@@ -228,7 +228,7 @@ export async function fetchReviews(chargerId: string): Promise<Review[]> {
   const { data: u } = await supabase.auth.getUser();
   const { data } = await supabase
     .from("reviews")
-    .select("id,charger_id,user_id,rating,tags,body,created_at,profiles(display_name,car_model),review_votes(user_id)")
+    .select("id,charger_id,user_id,rating,tags,body,created_at,profiles(display_name,car_model,avatar_path),review_votes(user_id)")
     .eq("charger_id", chargerId)
     .order("created_at", { ascending: false })
     .limit(50);
@@ -343,11 +343,26 @@ export async function fetchPoints(userId: string) {
 }
 
 /** Badge from lifetime points. One on-site photo zing is about 120 to 145 points. */
+export const BADGES = [
+  { min: 0, name: "New zinger", emoji: "🌱" },
+  { min: 600, name: "Regular", emoji: "⚡" },
+  { min: 3000, name: "Top zinger", emoji: "🔥" },
+  { min: 10000, name: "Charging legend", emoji: "👑" },
+];
 export function badgeFor(points: number) {
-  if (points >= 10000) return "Charging legend";
-  if (points >= 3000) return "Top zapper";
-  if (points >= 600) return "Regular";
-  return "New zapper";
+  return [...BADGES].reverse().find((b) => points >= b.min)!.name;
+}
+/** Current badge, the next one, and how far along the way (0–1). */
+export function badgeProgress(points: number) {
+  const i = BADGES.findIndex((b, k) => points >= b.min && (k === BADGES.length - 1 || points < BADGES[k + 1].min));
+  const cur = BADGES[i], next = BADGES[i + 1] ?? null;
+  return { cur, next, pct: next ? (points - cur.min) / (next.min - cur.min) : 1 };
+}
+
+/** Save a new profile photo or bio. */
+export async function updateProfileExtras(userId: string, patch: { avatar_path?: string | null; bio?: string | null }) {
+  const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
+  if (error) throw new Error(error.message.includes("column") ? "Run supabase/profile.sql in Supabase first." : "Couldn't save. Try again.");
 }
 
 export type LeaderRow = { user_id: string; display_name: string; car_model: string | null; city: string | null; vehicle_verified: boolean; week_score: number; week_zaps: number };
@@ -364,7 +379,7 @@ export async function fetchLeaderboard(city?: string | null, limit = 20): Promis
 export async function fetchProfile(userId: string) {
   const { data } = await supabase
     .from("profiles")
-    .select("id,display_name,car_model,city,vehicle_verified,created_at")
+    .select("id,display_name,car_model,city,vehicle_verified,created_at,avatar_path,bio")
     .eq("id", userId)
     .maybeSingle();
   return data as (import("./types").Profile & { created_at: string }) | null;
@@ -413,7 +428,7 @@ export async function removeConnection(otherId: string) {
     .or(`and(requester_id.eq.${me},addressee_id.eq.${otherId}),and(requester_id.eq.${otherId},addressee_id.eq.${me})`);
 }
 
-export type DriverLite = { id: string; display_name: string; car_model: string | null; vehicle_verified: boolean };
+export type DriverLite = { id: string; display_name: string; car_model: string | null; vehicle_verified: boolean; avatar_path?: string | null };
 
 export async function fetchMyNetwork() {
   const { data: u } = await supabase.auth.getUser();
@@ -421,7 +436,7 @@ export async function fetchMyNetwork() {
   const me = u.user.id;
   const { data } = await supabase
     .from("connections")
-    .select("requester_id,addressee_id,status,requester:profiles!connections_requester_id_fkey(id,display_name,car_model,vehicle_verified),addressee:profiles!connections_addressee_id_fkey(id,display_name,car_model,vehicle_verified)")
+    .select("requester_id,addressee_id,status,requester:profiles!connections_requester_id_fkey(id,display_name,car_model,vehicle_verified,avatar_path),addressee:profiles!connections_addressee_id_fkey(id,display_name,car_model,vehicle_verified,avatar_path)")
     .or(`requester_id.eq.${me},addressee_id.eq.${me}`);
   const requests: DriverLite[] = [];
   const connections: DriverLite[] = [];

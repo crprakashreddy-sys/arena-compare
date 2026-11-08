@@ -27,7 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loadProfile = useCallback(async (s: Session | null) => {
     if (!s) { setProfile(null); return; }
-    const { data } = await supabase.from("profiles").select("id,display_name,car_model,city,vehicle_verified").eq("id", s.user.id).maybeSingle();
+    const { data } = await supabase.from("profiles").select("id,display_name,car_model,city,vehicle_verified,avatar_path,bio").eq("id", s.user.id).maybeSingle();
     setProfile((data as Profile) ?? null);
     loadBlocks();
   }, []);

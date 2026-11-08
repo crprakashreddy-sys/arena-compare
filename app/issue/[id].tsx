@@ -135,7 +135,7 @@ export default function IssueDetail() {
         )}
         <Text style={{ color: t.text, fontSize: 22, fontWeight: "900", lineHeight: 28 }}>{issue.title}</Text>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <Avatar name={issue.profiles?.display_name ?? "?"} size={28} />
+          <Avatar name={issue.profiles?.display_name ?? "?"} photo={issue.profiles?.avatar_path} size={28} />
           <Text style={{ color: t.muted, flex: 1 }} numberOfLines={1}>
             {issue.profiles?.display_name ?? "Driver"}{issue.profiles?.car_model ? ` · ${issue.profiles.car_model}` : ""} · {timeAgo(issue.created_at)}
           </Text>
@@ -165,7 +165,7 @@ export default function IssueDetail() {
               style={[s.reply, { backgroundColor: fix ? "#FFF6D1" : t.surface, borderColor: fix ? "#E8C64A" : "transparent" }]}>
               {fix && <View style={s.fixTag}><Ionicons name="checkmark-circle" size={14} color={INK} /><Text style={{ color: INK, fontWeight: "800", fontSize: 12 }}>The fix</Text></View>}
               <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                <Avatar name={r.profiles?.display_name ?? "?"} size={26} />
+                <Avatar name={r.profiles?.display_name ?? "?"} photo={r.profiles?.avatar_path} size={26} />
                 <Text style={{ color: fix ? INK : t.text, fontWeight: "800", flex: 1 }} numberOfLines={1}>
                   {r.profiles?.display_name ?? "Driver"}<Text style={{ color: fix ? "#5a5a5a" : t.muted, fontWeight: "500" }}>{r.profiles?.car_model ? ` · ${r.profiles.car_model}` : ""}</Text>
                 </Text>

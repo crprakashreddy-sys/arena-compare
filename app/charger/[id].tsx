@@ -242,7 +242,7 @@ export default function ChargerPage() {
             const name = r.profiles?.display_name ?? "Driver";
             return (
               <View key={r.id} style={{ flexDirection: "row", gap: 10 }}>
-                <Pressable onPress={() => router.push(`/driver/${r.user_id}`)}><Avatar name={name} /></Pressable>
+                <Pressable onPress={() => router.push(`/driver/${r.user_id}`)}><Avatar name={name} photo={r.profiles?.avatar_path} /></Pressable>
                 <View style={{ flex: 1, gap: 3 }}>
                   <Text style={{ color: t.text }}>
                     <Text style={{ fontWeight: "700" }}>{name}</Text>

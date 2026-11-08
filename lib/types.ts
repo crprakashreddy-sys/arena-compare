@@ -20,6 +20,8 @@ export type Profile = {
   car_model: string | null;
   city: string | null;
   vehicle_verified: boolean;
+  avatar_path?: string | null;
+  bio?: string | null;
 };
 
 export type ConnectionState = "none" | "sent" | "received" | "connected";
@@ -39,7 +41,7 @@ export type Checkin = {
   issue?: string | null;
   zap_score?: number;
   score_breakdown?: ScorePart[];
-  profiles?: { display_name: string; car_model: string | null } | null;
+  profiles?: { display_name: string; car_model: string | null; avatar_path?: string | null } | null;
   chargers?: { name: string; lat: number; lng: number; network: string } | null;
 };
 
@@ -51,7 +53,7 @@ export type Review = {
   tags: string[];
   body: string | null;
   created_at: string;
-  profiles?: { display_name: string; car_model: string | null } | null;
+  profiles?: { display_name: string; car_model: string | null; avatar_path?: string | null } | null;
   helpful: number;
   votedByMe: boolean;
 };
