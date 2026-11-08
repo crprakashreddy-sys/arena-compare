@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AppState, DynamicColorIOS, Platform } from "react-native";
 import { NativeTabs } from "expo-router/native-tabs";
+import Constants, { ExecutionEnvironment } from "expo-constants";
 import { useAuth } from "../../lib/auth";
 import { useGarage } from "../../lib/vehicles";
 import { syncVehicleKind } from "../../lib/community";
@@ -14,10 +15,20 @@ const ICONS = {
   clubs: { default: require("../../assets/tabs/clubs-off.png"), selected: require("../../assets/tabs/clubs.png") },
   you: { default: require("../../assets/tabs/you-off.png"), selected: require("../../assets/tabs/you.png") },
 };
+// Expo Go streams images from your computer, and the native tab bar can't show those, so in
+// Expo Go we use Apple's SF Symbols; the real App Store build bundles the colourful icons.
+const IN_EXPO_GO = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+const SF = {
+  map: { default: "map", selected: "map.fill" },
+  zings: { default: "bolt", selected: "bolt.fill" },
+  clubs: { default: "person.2", selected: "person.2.fill" },
+  you: { default: "person.crop.circle", selected: "person.crop.circle.fill" },
+} as const;
 function TabIcon({ name, md }: { name: keyof typeof ICONS; md: string }) {
-  return Platform.OS === "ios"
-    ? <NativeTabs.Trigger.Icon src={ICONS[name]} renderingMode="original" />
-    : <NativeTabs.Trigger.Icon md={md as any} />;
+  if (Platform.OS !== "ios") return <NativeTabs.Trigger.Icon md={md as any} />;
+  return IN_EXPO_GO
+    ? <NativeTabs.Trigger.Icon sf={SF[name] as any} />
+    : <NativeTabs.Trigger.Icon src={ICONS[name]} renderingMode="original" />;
 }
 
 const INK_OR_WHITE = Platform.OS === "ios" ? DynamicColorIOS({ light: "#1A1A1A", dark: "#FFFFFF" }) : "#1A1A1A";
