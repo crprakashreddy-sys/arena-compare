@@ -101,25 +101,7 @@ export default function ChargerPage() {
     <>
       <Stack.Screen options={{ title: n.short, headerTransparent: false }} />
       <ScrollView style={{ backgroundColor: t.bg }} contentContainerStyle={{ paddingBottom: 40 }}>
-        <View style={{ height: 190 }}>
-          <MapView
-            provider={MAP_PROVIDER}
-            customMapStyle={zappdStyle(scheme)}
-            style={StyleSheet.absoluteFill}
-            mapType="hybrid"
-            pointerEvents="none"
-            scrollEnabled={false}
-            zoomEnabled={false}
-            rotateEnabled={false}
-            pitchEnabled={false}
-            toolbarEnabled={false}
-            initialRegion={{ latitude: c.lat, longitude: c.lng, latitudeDelta: 0.006, longitudeDelta: 0.006 }}
-          >
-            <Marker key={live?.status ?? "none"} coordinate={{ latitude: c.lat, longitude: c.lng }} tracksViewChanges={false}>
-              <Pin network={c.network} status={live?.status} selected />
-            </Marker>
-          </MapView>
-        </View>
+        <Hero charger={c} live={live} zings={zaps} onOpen={(i) => setViewer(i)} scheme={scheme} />
 
         <View style={{ padding: 16, gap: 12 }}>
           <View style={{ flexDirection: "row", gap: 12 }}>
@@ -331,3 +313,78 @@ const styles = StyleSheet.create({
 function safeParts(raw?: string): ScorePart[] {
   try { const v = JSON.parse(raw ?? "[]"); return Array.isArray(v) ? v : []; } catch { return []; }
 }
+
+const STATUS_STYLE = {
+  working: { bg: "#1FAE5B", label: "Working" },
+  busy: { bg: "#F2A93B", label: "Busy" },
+  broken: { bg: "#E5483D", label: "Not working" },
+} as const;
+
+/**
+ * Top of the charger page: the newest zing photo, full width, with the live status on it.
+ * Falls back to a map of the spot when nobody has posted a photo in the last 24 hours.
+ */
+function Hero({ charger, live, zings, onOpen, scheme }: {
+  charger: Charger; live?: LiveStatus; zings: Checkin[]; onOpen: (i: number) => void; scheme: "light" | "dark" | null | undefined;
+}) {
+  const idx = zings.findIndex((z) => !!z.photo_path);
+  const z = idx >= 0 ? zings[idx] : null;
+  const st = live ? STATUS_STYLE[live.status] : null;
+  const badge = (
+    <View style={[heroS.badge, { backgroundColor: st ? st.bg : "rgba(26,26,26,0.75)" }]}>
+      <View style={heroS.dot} />
+      <Text style={heroS.badgeText}>{st ? `${st.label} · ${timeAgo(live!.lastAt)}` : "No reports yet"}</Text>
+    </View>
+  );
+  if (!z) {
+    return (
+      <View style={{ height: 220 }}>
+        <MapView provider={MAP_PROVIDER} customMapStyle={zappdStyle(scheme)} style={StyleSheet.absoluteFill}
+          mapType={MAP_PROVIDER ? "standard" : "mutedStandard"} pointerEvents="none" scrollEnabled={false} zoomEnabled={false}
+          rotateEnabled={false} pitchEnabled={false} toolbarEnabled={false}
+          initialRegion={{ latitude: charger.lat, longitude: charger.lng, latitudeDelta: 0.005, longitudeDelta: 0.005 }}>
+          <Marker key={live?.status ?? "none"} coordinate={{ latitude: charger.lat, longitude: charger.lng }} tracksViewChanges={false}>
+            <Pin network={charger.network} status={live?.status} selected />
+          </Marker>
+        </MapView>
+        <View style={heroS.topRow}>{badge}</View>
+        <View style={heroS.nudge}><Text style={heroS.nudgeText}>📸 No photo in the last 24 h. Be the first to zing it.</Text></View>
+      </View>
+    );
+  }
+  const name = z.profiles?.display_name ?? "a driver";
+  return (
+    <Pressable onPress={() => onOpen(idx)} style={{ height: 320, backgroundColor: "#111" }} accessibilityLabel={`Latest zing by ${name}. Tap to view all.`}>
+      <Image source={{ uri: snapUrl(z.photo_path!) }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+      <View style={heroS.shadeTop} />
+      <View style={heroS.shadeBottom} />
+      <View style={heroS.topRow}>{badge}</View>
+      <View style={heroS.bottomRow}>
+        <Avatar name={name} photo={z.profiles?.avatar_path} size={34} />
+        <View style={{ flex: 1 }}>
+          <Text style={heroS.by} numberOfLines={1}>Zinged by {name}</Text>
+          <Text style={heroS.when}>{timeAgo(z.created_at)}{z.zap_score ? ` · ⚡ ${z.zap_score}` : ""}</Text>
+        </View>
+        <View style={heroS.count}>
+          <Ionicons name="images" size={14} color="#1A1A1A" />
+          <Text style={{ color: "#1A1A1A", fontWeight: "800", fontSize: 13 }}>{zings.length} {zings.length === 1 ? "zing" : "zings"}</Text>
+        </View>
+      </View>
+    </Pressable>
+  );
+}
+
+const heroS = StyleSheet.create({
+  topRow: { position: "absolute", top: 12, left: 12, right: 12, flexDirection: "row" },
+  badge: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999 },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#fff" },
+  badgeText: { color: "#fff", fontWeight: "800", fontSize: 13 },
+  shadeTop: { position: "absolute", top: 0, left: 0, right: 0, height: 70, backgroundColor: "rgba(0,0,0,0.18)" },
+  shadeBottom: { position: "absolute", bottom: 0, left: 0, right: 0, height: 96, backgroundColor: "rgba(0,0,0,0.5)" },
+  bottomRow: { position: "absolute", left: 14, right: 14, bottom: 14, flexDirection: "row", alignItems: "center", gap: 10 },
+  by: { color: "#fff", fontWeight: "800", fontSize: 15 },
+  when: { color: "rgba(255,255,255,0.8)", fontSize: 12.5, marginTop: 1 },
+  count: { flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "#FCE38A", paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999 },
+  nudge: { position: "absolute", left: 12, right: 12, bottom: 12, backgroundColor: "rgba(26,26,26,0.85)", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12 },
+  nudgeText: { color: "#fff", fontWeight: "700", fontSize: 13 },
+});
