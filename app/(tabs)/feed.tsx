@@ -103,6 +103,12 @@ export default function ZapsFeed() {
               <Pressable onPress={() => setViewer(index)} accessibilityLabel={`Zing by ${name} at ${z.chargers?.name ?? "a charger"}`}>
                 {z.photo_path && (
                   <Image source={{ uri: snapUrl(z.photo_path) }} style={{ width: cardW, height: Math.min(cardW * 4 / 3, 520) }} contentFit="cover" transition={200} />
+                  {(z.video_path || z.music) && (
+                    <View style={{ position: "absolute", top: 12, right: 12, flexDirection: "row", gap: 6 }}>
+                      {!!z.video_path && <View style={styles.mediaBadge}><Ionicons name="play" size={13} color="#fff" /><Text style={styles.mediaText}>Video</Text></View>}
+                      {!!z.music && <View style={styles.mediaBadge}><Ionicons name="musical-note" size={13} color="#FCE38A" /></View>}
+                    </View>
+                  )}
                 )}
                 <View style={{ position: "absolute", top: 10, left: 10 }}>
                   <ScoreChip points={z.zap_score} distanceM={z.distance_m} />
@@ -141,6 +147,8 @@ export default function ZapsFeed() {
 }
 
 const styles = StyleSheet.create({
+  mediaBadge: { flexDirection: "row", alignItems: "center", gap: 4, height: 28, paddingHorizontal: 9, borderRadius: 14, backgroundColor: "rgba(0,0,0,0.55)" },
+  mediaText: { color: "#fff", fontWeight: "800", fontSize: 12 },
   fab: { flexDirection: "row", alignItems: "center", gap: 8, height: 56, paddingHorizontal: 22, borderRadius: 28,
     shadowColor: "#FCE38A", shadowOpacity: 0.45, shadowRadius: 14, shadowOffset: { width: 0, height: 4 }, elevation: 8 },
   board: { flexDirection: "row", alignItems: "center", gap: 12, marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: "#151E26" },

@@ -40,6 +40,7 @@ const TABLES = [
   ["clubs", "photo_path", "gifs.sql"],
   ["checkins", "keep", "zings_plus.sql"],
   ["profiles", "interests,prompts", "bumble.sql"],
+  ["checkins", "media,video_path,music,audience", "zing_video.sql"],
   ["connections", "note", "bumble.sql"],
   ["zing_views", "checkin_id,viewer_id", "zings_plus.sql"],
   ["zing_reactions", "checkin_id,user_id,emoji", "zings_plus.sql"],
@@ -90,7 +91,7 @@ for (const [fn, args, file] of FUNCS) {
 
 if (networkErr) { console.log(`   ⚠️  Couldn't reach Supabase (${networkErr}). Check your internet.`); process.exit(0); }
 if (!missing.size) { console.log("   ✅ Database matches the app."); process.exit(0); }
-const order = ["schema.sql", "profile.sql", "clubs.sql", "issues.sql", "events.sql", "notifications.sql", "dms.sql", "speeds.sql", "clubs_plus.sql", "crew.sql", "gifs.sql", "zings_plus.sql", "bumble.sql"];
+const order = ["schema.sql", "profile.sql", "clubs.sql", "issues.sql", "events.sql", "notifications.sql", "dms.sql", "speeds.sql", "clubs_plus.sql", "crew.sql", "gifs.sql", "zings_plus.sql", "bumble.sql", "zing_video.sql"];
 const files = [...missing.keys()].sort((a, b) => order.indexOf(a) - order.indexOf(b));
 console.log("   ❌ Your database is missing parts the app needs:");
 for (const f of files) { console.log(`      • supabase/${f}`); missing.get(f).slice(0, 3).forEach((w) => console.log(`          ${w}`)); }

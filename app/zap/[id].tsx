@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, Dimensions, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
@@ -12,6 +12,15 @@ import { distanceM, fmtDistance } from "../../lib/geo";
 import type { Charger, Status } from "../../lib/types";
 import { getZapFix, metresTo, type ZapFix } from "../../lib/zapscore";
 import { ScoreMeter } from "../../components/ZapScore";
+import { useVideoPlayer, VideoView } from "expo-video";
+import * as VideoThumbnails from "expo-video-thumbnails";
+import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
+import { uploadVideo } from "../../lib/community";
+import { LOOKS } from "../../lib/filters";
+import { trackById } from "../../lib/music";
+import { MusicPicker } from "../../components/MusicPicker";
+import { VideoLook } from "../../components/VideoLook";
+import { tickHaptic } from "../../lib/motion";
 
 const DARK = "#07090B";
 const YELLOW = "#FCE38A";
@@ -28,6 +37,11 @@ export default function DropZap() {
   const [status, setStatus] = useState<Status>("working");
   const [note, setNote] = useState("");
   const [keep, setKeep] = useState(false);
+  const [kind, setKind] = useState<"photo" | "video">("photo");
+  const [videoLook, setVideoLook] = useState("cinema");
+  const [music, setMusic] = useState<string | null>(null);
+  const [musicOpen, setMusicOpen] = useState(false);
+  const [audience, setAudience] = useState<"public" | "crew">("public");
   const [issue, setIssue] = useState<IssueKey | null>(null);
   const [posting, setPosting] = useState(false);
   const editor = useRef<EditorHandle | null>(null);
@@ -83,7 +97,10 @@ export default function DropZap() {
   }, [id]);
 
   const shoot = async (fromCamera: boolean) => {
-    const opts: ImagePicker.ImagePickerOptions = { mediaTypes: ["images"], quality: 0.92, allowsEditing: true, aspect: [3, 4] };
+    // Video zings: up to 10 seconds, trimmed in the native editor. The camera has its own flash and lens controls.
+    const opts: ImagePicker.ImagePickerOptions = kind === "video"
+      ? { mediaTypes: ["videos"], videoMaxDuration: 10, allowsEditing: true, videoQuality: ImagePicker.UIImagePickerControllerQualityType.Medium }
+      : { mediaTypes: ["images"], quality: 0.92, allowsEditing: true, aspect: [3, 4] };
     if (fromCamera) {
       const p = await ImagePicker.requestCameraPermissionsAsync();
       if (!p.granted) return Alert.alert("Camera is off", "Allow camera access for zingd in Settings, or choose a photo instead.");
@@ -99,13 +116,22 @@ export default function DropZap() {
     try {
       await ensureChargerSaved(charger);
       let path: string | null = null;
-      if (uri) {
+      let videoPath: string | null = null;
+      if (uri && kind === "video") {
+        // Cover image for the feed, map and stories, then the video itself.
+        const th = await VideoThumbnails.getThumbnailAsync(uri, { time: 400, quality: 0.8 });
+        const img = await ImageManipulator.manipulate(th.uri).resize({ width: 900 }).renderAsync();
+        const out = await img.saveAsync({ format: SaveFormat.JPEG, compress: 0.75, base64: true });
+        path = await uploadSnap(out.base64!);
+        videoPath = await uploadVideo(uri);
+      } else if (uri) {
         const b64 = editor.current?.exportJpeg();
         if (!b64) throw new Error("Your photo isn't ready yet. Wait a second and try again.");
         path = await uploadSnap(b64);
       }
       const latest = (await getZapFix()) ?? fix;
-      const result = await postCheckin(charger.id, status, note, path, editor.current?.lookId(), latest, issue, keep);
+      const result = await postCheckin(charger.id, status, note, path, kind === "video" ? videoLook : editor.current?.lookId(), latest, issue, keep,
+        { media: kind, video_path: videoPath, music, audience });
       router.replace({
         pathname: "/charger/[id]",
         params: { id: charger.id, posted: "1", score: String(result.zap_score), parts: JSON.stringify(result.score_breakdown) },
@@ -201,7 +227,19 @@ export default function DropZap() {
               </View>
             )}
 
-            {uri ? (
+            {!uri && (
+              <View style={styles.kind}>
+                {(["photo", "video"] as const).map((k) => (
+                  <Pressable key={k} onPress={() => { tickHaptic(); setKind(k); }} style={[styles.kindBtn, kind === k && { backgroundColor: YELLOW }]}>
+                    <Ionicons name={k === "photo" ? "camera" : "videocam"} size={16} color={kind === k ? "#1A1A1A" : "#fff"} />
+                    <Text style={{ color: kind === k ? "#1A1A1A" : "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{k === "photo" ? "Photo" : "Video · 10s"}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            )}
+            {uri && kind === "video" ? (
+              <VideoZingPreview uri={uri} look={videoLook} onLook={setVideoLook} />
+            ) : uri ? (
               <PhotoEditor
                 uri={uri}
                 status={status}
@@ -214,7 +252,7 @@ export default function DropZap() {
               <View style={{ marginHorizontal: 16, gap: 10 }}>
                 <Pressable onPress={() => shoot(true)} style={styles.shoot}>
                   <Ionicons name="camera" size={40} color="#1A1A1A" />
-                  <Text style={{ color: "#1A1A1A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 17 }}>Take a zing</Text>
+                  <Text style={{ color: "#1A1A1A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 17 }}>{kind === "video" ? "Record a zing" : "Take a zing"}</Text>
                   <Text style={{ color: "#3C3410", fontSize: 13 }}>Show the screen, the queue or the spot</Text>
                 </Pressable>
                 <Pressable onPress={() => shoot(false)} style={styles.secondary}>
@@ -236,6 +274,21 @@ export default function DropZap() {
               style={styles.note}
               multiline
             />
+            {/* Soundtrack and who sees it */}
+            <View style={{ flexDirection: "row", gap: 8, marginHorizontal: 16 }}>
+              <Pressable onPress={() => setMusicOpen(true)} style={[styles.pill, music && { backgroundColor: YELLOW }]}>
+                <Ionicons name="musical-note" size={16} color={music ? "#1A1A1A" : "#fff"} />
+                <Text style={{ color: music ? "#1A1A1A" : "#fff", fontWeight: "800" }} numberOfLines={1}>{trackById(music)?.title ?? "Add music"}</Text>
+              </Pressable>
+              {(["public", "crew"] as const).map((a) => (
+                <Pressable key={a} onPress={() => { tickHaptic(); setAudience(a); }} style={[styles.pill, audience === a && { backgroundColor: "#fff" }]}>
+                  <Ionicons name={a === "public" ? "globe" : "people"} size={15} color={audience === a ? "#1A1A1A" : "#fff"} />
+                  <Text style={{ color: audience === a ? "#1A1A1A" : "#fff", fontWeight: "800" }}>{a === "public" ? "Public" : "Crew only"}</Text>
+                </Pressable>
+              ))}
+            </View>
+            <MusicPicker visible={musicOpen} value={music} onClose={() => setMusicOpen(false)} onPick={setMusic} />
+
             {/* Snapchat-style: gone in 24 hours, or keep it on your profile and the charger's gallery */}
             <View style={styles.life}>
               {([[false, "⏱  24 hours", "On the live map, then only in your Memories"], [true, "♾  Keep", "Stays on your profile and the charger page"]] as const).map(([k, label, sub]) => (
@@ -266,7 +319,32 @@ const styles = StyleSheet.create({
   shoot: { height: 220, borderRadius: 18, backgroundColor: YELLOW, alignItems: "center", justifyContent: "center", gap: 6 },
   secondary: { height: 48, borderRadius: 12, borderWidth: 1, borderColor: "#3A424A", flexDirection: "row", gap: 8, alignItems: "center", justifyContent: "center" },
   issue: { height: 36, paddingHorizontal: 12, borderRadius: 18, borderWidth: 1, borderColor: "#3A424A", justifyContent: "center" },
+  kind: { flexDirection: "row", gap: 6, marginHorizontal: 16, padding: 4, borderRadius: 18, backgroundColor: "#151A1F" },
+  kindBtn: { flex: 1, height: 40, borderRadius: 14, flexDirection: "row", gap: 6, alignItems: "center", justifyContent: "center" },
+  pill: { flexDirection: "row", alignItems: "center", gap: 6, height: 40, paddingHorizontal: 14, borderRadius: 20, backgroundColor: "#151A1F", flexShrink: 1 },
   life: { flexDirection: "row", gap: 8, marginHorizontal: 16, padding: 4, borderRadius: 18, backgroundColor: "#151A1F" },
   lifeOpt: { flex: 1, alignItems: "center", gap: 2, paddingVertical: 10, paddingHorizontal: 8, borderRadius: 14 },
   note: { marginHorizontal: 16, minHeight: 52, borderRadius: 12, backgroundColor: "#151A1F", color: "#fff", padding: 14, fontSize: 15 },
 });
+
+/** Video zing preview: loops silently with the chosen look on top; swipe through looks below. */
+function VideoZingPreview({ uri, look, onLook }: { uri: string; look: string; onLook: (id: string) => void }) {
+  const W = Dimensions.get("window").width - 32, H = Math.round(W * 4 / 3);
+  const player = useVideoPlayer(uri, (p) => { p.loop = true; p.muted = true; p.play(); });
+  return (
+    <View style={{ gap: 10 }}>
+      <View style={{ marginHorizontal: 16, width: W, height: H, borderRadius: 16, overflow: "hidden", backgroundColor: "#000" }}>
+        <VideoView player={player} style={{ width: W, height: H }} contentFit="cover" nativeControls={false} />
+        <VideoLook look={look} width={W} height={H} />
+      </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 16 }}>
+        {LOOKS.map((l) => (
+          <Pressable key={l.id} onPress={() => { tickHaptic(); onLook(l.id); }}
+            style={{ height: 36, paddingHorizontal: 14, borderRadius: 18, justifyContent: "center", backgroundColor: look === l.id ? YELLOW : "#151A1F" }}>
+            <Text style={{ color: look === l.id ? "#1A1A1A" : "#fff", fontWeight: "800" }}>{l.name}</Text>
+          </Pressable>
+        ))}
+      </ScrollView>
+    </View>
+  );
+}

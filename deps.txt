@@ -23,3 +23,6 @@ expo-notifications
 expo-glass-effect
 expo-symbols
 expo-clipboard
+expo-audio
+expo-video
+expo-video-thumbnails

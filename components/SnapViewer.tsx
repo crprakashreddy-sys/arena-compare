@@ -15,8 +15,12 @@ import { ScoreChip } from "./ZapScore";
 import { Avatar } from "./ui";
 import { successHaptic, tapHaptic, tickHaptic } from "../lib/motion";
 import type { Checkin } from "../lib/types";
+import { useVideoPlayer, VideoView } from "expo-video";
+import { useAudioPlayer, setAudioModeAsync } from "expo-audio";
+import { trackById } from "../lib/music";
+import { VideoLook } from "./VideoLook";
 
-const SHOW_MS = 5000;
+const PHOTO_MS = 5000, VIDEO_MS = 10000;
 
 /**
  * Full-screen zing stories, Snapchat-style: each plays for 5 seconds with a moving progress bar;
@@ -40,12 +44,16 @@ export default function SnapViewer({ snaps, start, onClose, onChanged }: {
   const prog = useRef(new Animated.Value(0)).current;
   const anim = useRef<Animated.CompositeAnimation | null>(null);
   const paused = useRef(false);
+  const video = useVideoPlayer(null, (p) => { p.loop = false; });
+  const song = useAudioPlayer(null);
+  const showMs = s?.video_path ? VIDEO_MS : PHOTO_MS;
+  useEffect(() => { setAudioModeAsync({ playsInSilentMode: true }).catch(() => {}); return () => { try { song.pause(); video.pause(); } catch {} }; }, []);
 
   const next = () => (i < snaps.length - 1 ? setI(i + 1) : onClose());
   const run = (from = 0) => {
     anim.current?.stop();
     prog.setValue(from);
-    anim.current = Animated.timing(prog, { toValue: 1, duration: SHOW_MS * (1 - from), easing: Easing.linear, useNativeDriver: false });
+    anim.current = Animated.timing(prog, { toValue: 1, duration: showMs * (1 - from), easing: Easing.linear, useNativeDriver: false });
     anim.current.start(({ finished }) => { if (finished && !paused.current) next(); });
   };
 
@@ -55,14 +63,23 @@ export default function SnapViewer({ snaps, start, onClose, onChanged }: {
     markZingViewed(s, me);
     zingReactions(s.id).then(setReacts).catch(() => setReacts([]));
     if (me === s.user_id) zingViewers(s.id).then(setViews).catch(() => {});
+    // Video plays its own sound unless the zing has a soundtrack; the soundtrack plays for photos too.
+    try {
+      if (s.video_path) { video.replace({ uri: snapUrl(s.video_path) }); video.muted = !!s.music; video.play(); } else video.pause();
+      const t = trackById(s.music);
+      if (t) { song.replace(t.source); song.seekTo(0); song.play(); } else song.pause();
+    } catch {}
     run(0);
     return () => anim.current?.stop();
   }, [i]);
 
   if (!s) return null;
   const name = s.profiles?.display_name ?? "Driver";
-  const pause = () => { paused.current = true; anim.current?.stop(); };
-  const resume = () => { paused.current = false; prog.stopAnimation((v) => run(v)); };
+  const pause = () => { paused.current = true; anim.current?.stop(); try { video.pause(); song.pause(); } catch {} };
+  const resume = () => {
+    paused.current = false; prog.stopAnimation((v) => run(v));
+    try { if (s.video_path) video.play(); if (s.music) song.play(); } catch {}
+  };
 
   const react = (e: ZingReaction) => {
     if (!me) return router.push("/login");
@@ -82,7 +99,18 @@ export default function SnapViewer({ snaps, start, onClose, onChanged }: {
   return (
     <Modal visible animationType="fade" onRequestClose={onClose} statusBarTranslucent>
       <View style={{ flex: 1, backgroundColor: "#000" }}>
-        {s.photo_path && <Image source={{ uri: snapUrl(s.photo_path) }} style={{ width, height }} contentFit="contain" transition={150} />}
+        {s.video_path ? (
+          <View style={{ width, height }}>
+            <VideoView player={video} style={{ width, height }} contentFit="contain" nativeControls={false} />
+            <VideoLook look={s.look} width={width} height={height} />
+          </View>
+        ) : s.photo_path && <Image source={{ uri: snapUrl(s.photo_path) }} style={{ width, height }} contentFit="contain" transition={150} />}
+        {!!trackById(s.music) && (
+          <View style={{ position: "absolute", top: 150, left: 16, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(0,0,0,0.45)", paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999 }}>
+            <Ionicons name="musical-note" size={13} color="#FCE38A" />
+            <Text style={{ color: "#fff", fontSize: 12.5, fontWeight: "700" }}>{trackById(s.music)!.title} · zingd originals</Text>
+          </View>
+        )}
 
         {/* Tap zones: left = back, right = next, hold anywhere = pause */}
         <Pressable style={{ position: "absolute", left: 0, top: 140, bottom: 170, width: width * 0.33 }}

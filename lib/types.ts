@@ -44,6 +44,11 @@ export type Checkin = {
   issue?: string | null;
   zap_score?: number;
   keep?: boolean;
+  media?: "photo" | "video";
+  video_path?: string | null;
+  music?: string | null;
+  audience?: "public" | "crew";
+  look?: string | null;
   score_breakdown?: ScorePart[];
   profiles?: { display_name: string; car_model: string | null; avatar_path?: string | null } | null;
   chargers?: { name: string; lat: number; lng: number; network: string; connectors?: string[] } | null;

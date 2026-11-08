@@ -52,7 +52,7 @@ export async function fetchLiveStatus(chargerIds: string[]): Promise<Record<stri
 }
 
 // ───────── Snaps and check-ins ─────────
-const CHECKIN_FIELDS = "id,charger_id,user_id,status,note,photo_path,created_at,expires_at,keep,distance_m,zap_score,score_breakdown,issue,profiles(display_name,car_model,avatar_path)";
+const CHECKIN_FIELDS = "id,charger_id,user_id,status,note,photo_path,created_at,expires_at,keep,media,video_path,music,audience,look,distance_m,zap_score,score_breakdown,issue,profiles(display_name,car_model,avatar_path)";
 
 export async function fetchSnaps(chargerId: string): Promise<Checkin[]> {
   const { data } = await supabase
@@ -130,6 +130,7 @@ export async function fetchIssues(chargerId: string) {
 
 export async function postCheckin(
   chargerId: string, status: Status, note: string, photoPath: string | null, look?: string, fix?: ZapFix | null, issue?: IssueKey | null, keep = false,
+  extra: { media?: "photo" | "video"; video_path?: string | null; music?: string | null; audience?: "public" | "crew" } = {},
 ): Promise<{ zap_score: number; score_breakdown: ScorePart[]; distance_m: number | null }> {
   const { data: u } = await supabase.auth.getUser();
   if (!u.user) throw new Error("Sign in to drop a zing.");
@@ -146,6 +147,9 @@ export async function postCheckin(
     taken_mocked: fix?.mocked ?? null,
     issue: status === "working" ? null : issue ?? null,
     ...(keep ? { keep: true } : {}),
+    ...(extra.media === "video" ? { media: "video", video_path: extra.video_path } : {}),
+    ...(extra.music ? { music: extra.music } : {}),
+    ...(extra.audience === "crew" ? { audience: "crew" } : {}),
   }).select("zap_score,score_breakdown,distance_m").single();
   if (error) throw new Error("Your zing didn't post. Try again.");
   return {
@@ -155,8 +159,22 @@ export async function postCheckin(
   };
 }
 
+/** Upload a short video zing (mp4 or mov) to the zing bucket. Returns its storage path. */
+export async function uploadVideo(uri: string): Promise<string> {
+  const { data: u } = await supabase.auth.getUser();
+  if (!u.user) throw new Error("Sign in to drop a zing.");
+  const mov = /\.mov$/i.test(uri);
+  const buf = await (await fetch(uri)).arrayBuffer();
+  if (buf.byteLength > 15 * 1024 * 1024) throw new Error("That video is too big. Keep zings under 10 seconds.");
+  const path = `${u.user.id}/${Date.now()}.${mov ? "mov" : "mp4"}`;
+  const { error } = await supabase.storage.from("snaps").upload(path, buf, { contentType: mov ? "video/quicktime" : "video/mp4" });
+  if (error) throw new Error(error.message.includes("mime") ? "Videos need a quick database update (run sh update.sh)." : "Your video didn't upload. Try again.");
+  return path;
+}
+
 export async function deleteCheckin(c: Checkin) {
   if (c.photo_path) await supabase.storage.from("snaps").remove([c.photo_path]);
+  if (c.video_path) await supabase.storage.from("snaps").remove([c.video_path]);
   await supabase.from("checkins").delete().eq("id", c.id);
 }
 
