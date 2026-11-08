@@ -134,6 +134,13 @@ function Card({ p, onOpen }: { p: Suggestion; onOpen?: () => void }) {
         {p.vehicle_verified && <View style={s.verified}><Ionicons name="checkmark-circle" size={14} color={INK} /><Text style={s.verifiedText}>Verified owner</Text></View>}
       </View>
       <View style={{ padding: 16, gap: 6 }}>
+        {(p.same_car || p.same_personality) && (
+          <View style={s.match}>
+            <Text style={s.matchText}>
+              {p.same_car && p.same_personality ? "⚡ Twin match · same car & same vibe" : p.same_car ? "🚗 Same car as you" : "🧬 Same EV personality as you"}
+            </Text>
+          </View>
+        )}
         <Text style={s.name} numberOfLines={1}>{p.display_name}</Text>
         {!!p.personality && <PersonalityBadge id={p.personality} />}
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
@@ -177,6 +184,8 @@ const s = StyleSheet.create({
   chip: { flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "#F3F1EA", paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999 },
   chipText: { color: INK, fontWeight: "700", fontSize: 12.5 },
   reason: { color: "#6B5A00", fontWeight: "700", fontSize: 13 },
+  match: { alignSelf: "flex-start", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, backgroundColor: "#1A1A1A" },
+  matchText: { color: "#FCE38A", fontWeight: "800", fontSize: 12 },
   bio: { color: "#555", fontSize: 13.5, lineHeight: 19 },
   stamp: { position: "absolute", top: 22, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10, borderWidth: 3, backgroundColor: "rgba(255,255,255,0.85)" },
   like: { left: 18, borderColor: "#2FBF71", transform: [{ rotate: "-12deg" }] },

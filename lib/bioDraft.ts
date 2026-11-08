@@ -45,7 +45,7 @@ export function draftBio(p: Input, tone: Tone, seed = Date.now(), avoid?: string
   const ints = (p.interests ?? []).map(interestById).filter(Boolean) as { label: string; emoji: string }[];
   const all = [...vibes, ...ints];
   const has = (l: string) => all.some((x) => x.label === l);
-  const likes = [...vibes.filter((v) => !["Introvert", "Ambivert", "Extrovert", "Early bird", "Night owl", "Planner", "Spontaneous", "Chill", "Go-getter"].includes(v.label)), ...ints];
+  const likes = [...vibes.filter((v) => !v.label.startsWith("My ex") && !["Introvert", "Ambivert", "Extrovert", "Early bird", "Night owl", "Planner", "Spontaneous", "Chill", "Go-getter"].includes(v.label)), ...ints];
   const two = likes.sort(() => r() - 0.5).slice(0, 2);
   const one = two[0] ? phrase(two[0].label) : null;
   const like = two.length ? two.map((x) => phrase(x.label)).join(" & ") : null;

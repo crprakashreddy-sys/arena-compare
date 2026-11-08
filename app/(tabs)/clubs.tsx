@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import * as Location from "expo-location";
@@ -9,7 +9,8 @@ import { useTheme, CTA, ON_CTA } from "../../lib/theme";
 import { useGarage } from "../../lib/vehicles";
 import { activityLine, autoJoinFor, fetchActivity, fetchClubs, fetchMyClubs, joinClub, joinWithCode, type Activity, type Club, type MyClub } from "../../lib/clubs";
 import { fetchInbox, fetchZingStreaks, type DmThread } from "../../lib/dms";
-import { acceptRequest, fetchFeed, fetchMyNetwork, fetchSuggestions, removeConnection, type DriverLite, type Suggestion } from "../../lib/community";
+import { acceptRequest, fetchFeed, fetchMyNetwork, fetchSuggestions, removeConnection, type DriverLite, type MatchKind, type Suggestion } from "../../lib/community";
+import { personalityById } from "../../lib/personality";
 import { successHaptic } from "../../lib/motion";
 import { timeAgo } from "../../lib/geo";
 import { networkById } from "../../lib/networks";
@@ -53,6 +54,15 @@ export default function Clubs() {
   const [act, setAct] = useState<Record<string, Activity>>({});
   const [zaps, setZaps] = useState<Checkin[]>([]);
   const [people, setPeople] = useState<Suggestion[]>([]);
+  const [matchKind, setMatchKind] = useState<MatchKind>("all");
+  const matchRef = useRef<MatchKind>("all");
+  const [matchBusy, setMatchBusy] = useState(false);
+  const myType = personalityById(profile?.personality);
+  const pickMatch = (k: MatchKind) => {
+    if (k === matchKind) return;
+    setMatchKind(k); matchRef.current = k; setMatchBusy(true);
+    fetchSuggestions(20, k).then(setPeople).catch(() => setPeople([])).finally(() => setMatchBusy(false));
+  };
   const [requests, setRequests] = useState<DriverLite[]>([]);
   const [viewer, setViewer] = useState<Checkin[] | null>(null);
   const [q, setQ] = useState("");
@@ -77,7 +87,7 @@ export default function Clubs() {
       setAll(a); setMine(m); setDms(d);
       fetchActivity().then(setAct).catch(() => {});
       if (signedIn) fetchZingStreaks().then(setStreaks).catch(() => {});
-      if (signedIn) { fetchSuggestions(20).then(setPeople).catch(() => {}); fetchMyNetwork().then((n) => setRequests(n.requests)).catch(() => {}); }
+      if (signedIn) { fetchSuggestions(20, matchRef.current).then(setPeople).catch(() => {}); fetchMyNetwork().then((n) => setRequests(n.requests)).catch(() => {}); }
       loadStories();
     } catch (e: any) { setErr(e.message); }
     setBusy(false);
@@ -248,7 +258,7 @@ export default function Clubs() {
         )}
 
         {/* Drivers like you */}
-        {signedIn && people.length > 0 && (
+        {signedIn && (people.length > 0 || matchKind !== "all") && (
           <>
             <View style={s.sectionHead}>
               <View style={{ flex: 1 }}>
@@ -256,7 +266,40 @@ export default function Clubs() {
                 <Text style={{ color: t.muted, fontSize: 13 }}>Swipe right to connect, left to pass</Text>
               </View>
             </View>
-            <DriverDeck people={people} onEmpty={() => setPeople([])} />
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 16, paddingBottom: 10 }}>
+              {([
+                ["all", "✨ For you"],
+                ["car", profile?.car_model ? `🚗 ${profile.car_model.split(" ").slice(0, 2).join(" ")} owners` : "🚗 Same car"],
+                ["personality", myType ? `${myType.emoji} ${myType.name}s` : "🧬 Same personality"],
+                ["both", "⚡ Twins"],
+              ] as [MatchKind, string][]).map(([k, label]) => {
+                const on = matchKind === k;
+                return (
+                  <Pressable key={k} onPress={() => {
+                    if (k === "personality" && !myType) return router.push("/personality");
+                    if (k === "car" && !profile?.car_model) return router.push("/edit-profile");
+                    pickMatch(k);
+                  }} style={[s.matchChip, { backgroundColor: on ? t.text : t.surface }]}>
+                    <Text style={{ color: on ? t.bg : t.text, fontWeight: "800", fontSize: 13 }}>{label}</Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+            {matchBusy ? (
+              <ActivityIndicator style={{ marginVertical: 30 }} color={t.text} />
+            ) : people.length ? (
+              <DriverDeck key={matchKind} people={people} onEmpty={() => setPeople([])} />
+            ) : (
+              <View style={[s.matchEmpty, { backgroundColor: t.surface }]}>
+                <Text style={{ fontSize: 30 }}>{matchKind === "car" ? "🚗" : matchKind === "personality" ? myType?.emoji ?? "🧬" : "⚡"}</Text>
+                <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 16, textAlign: "center" }}>
+                  {matchKind === "car" ? `No new ${profile?.car_model ?? "same-car"} owners yet` : matchKind === "personality" ? `No new ${myType?.name ?? "matching"}s yet` : "No twins yet"}
+                </Text>
+                <Text style={{ color: t.muted, textAlign: "center", lineHeight: 19 }}>
+                  You've met everyone here so far. Invite a friend who drives one, or check back after the weekend drives.
+                </Text>
+              </View>
+            )}
           </>
         )}
 
@@ -380,6 +423,8 @@ function tint(c: Pick<Club, "kind" | "make" | "color">) {
 }
 
 const s = StyleSheet.create({
+  matchChip: { height: 36, paddingHorizontal: 14, borderRadius: 18, alignItems: "center", justifyContent: "center" },
+  matchEmpty: { marginHorizontal: 16, borderRadius: 20, padding: 22, alignItems: "center", gap: 6 },
   header: { flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 16, paddingBottom: 8 },
   h1: { flex: 1, fontSize: 34, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -1.2 },
   h2: { fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.5 },
