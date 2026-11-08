@@ -112,7 +112,7 @@ export default function DriverProfile() {
                 {z.photo_path ? <Image source={{ uri: snapUrl(z.photo_path) }} style={StyleSheet.absoluteFill} contentFit="cover" /> : null}
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ color: t.text, fontWeight: "600" }} numberOfLines={1}>{z.chargers?.name ?? "Charger"}</Text>
+                <Text style={{ color: t.text, fontWeight: "600" }} numberOfLines={1}>{z.chargers?.name ?? z.place_name ?? "Charger"}</Text>
                 <Text style={{ color: t.muted, fontSize: 12.5 }}>{STATUS_LABEL[z.status as keyof typeof STATUS_LABEL]} · {timeAgo(z.created_at)}</Text>
               </View>
             </Pressable>

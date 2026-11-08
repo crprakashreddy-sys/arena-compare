@@ -100,7 +100,7 @@ export default function ZapsFeed() {
           const sc = STATUS_STYLE[z.status];
           return (
             <View style={styles.card}>
-              <Pressable onPress={() => setViewer(index)} accessibilityLabel={`Zing by ${name} at ${z.chargers?.name ?? "a charger"}`}>
+              <Pressable onPress={() => setViewer(index)} accessibilityLabel={`Zing by ${name} at ${z.chargers?.name ?? z.place_name ?? "a charger"}`}>
                 {z.photo_path && (
                   <Image source={{ uri: snapUrl(z.photo_path) }} style={{ width: cardW, height: Math.min(cardW * 4 / 3, 520) }} contentFit="cover" transition={200} />
                 )}
@@ -126,9 +126,10 @@ export default function ZapsFeed() {
                     <Text style={{ fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{name}</Text>
                     <Text style={{ color: "#A9B3BC" }}> · {timeAgo(z.created_at)}</Text>
                   </Text>
-                  <Text style={{ color: "#A9B3BC", fontSize: 13 }} numberOfLines={1}>{z.chargers?.name ?? "Charger"}</Text>
+                  <Text style={{ color: "#A9B3BC", fontSize: 13 }} numberOfLines={1}>{z.chargers?.name ?? z.place_name ?? "Charger"}</Text>
                 </Pressable>
-                <Text style={[styles.status, { color: sc.fg, backgroundColor: sc.bg }]}>{STATUS_LABEL[z.status].split(" ")[0]}</Text>
+                {z.charger_id ? <Text style={[styles.status, { color: sc.fg, backgroundColor: sc.bg }]}>{STATUS_LABEL[z.status].split(" ")[0]}</Text>
+                  : <Text style={[styles.status, { color: "#FCE38A", backgroundColor: "#2A2610" }]}>📍 Place</Text>}
               </View>
             </View>
           );

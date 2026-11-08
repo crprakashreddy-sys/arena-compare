@@ -20,8 +20,11 @@ function Grade({ look, amount, adj }: { look: Look; amount: number; adj: Adjust 
 import { STATUS_LABEL } from "../lib/theme";
 import type { Status } from "../lib/types";
 
-type StickerKind = "status" | "battery" | "speed" | "charger" | "time" | "waited" | "car";
-type Sticker = { kind: StickerKind; x: number; y: number };
+import { EMOJI_STICKERS, buildSticker, firstStyle, hitSticker, stylesFor, type InfoKind, type Sticker } from "./editor/stickers";
+import { ZING_STICKERS, StickerView } from "./ZingStickers";
+import { successHaptic, tapHaptic } from "../lib/motion";
+type StickerKind = InfoKind;
+const ACCENT: Record<StickerKind, string> = { status: "#137F4E", battery: "#1A73E8", speed: "#111111", charger: "#FF5A4E", time: "#111111", waited: "#E08A00", car: "#7B5CFF" };
 
 const STATUS_COLOR: Record<Status, string> = { working: "#137F4E", busy: "#B86E00", broken: "#C5221F" };
 const YELLOW = "#FCE38A";
@@ -61,12 +64,23 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
   const [battery, setBattery] = useState(80);
   const [waited, setWaited] = useState(10);
   const [blurs, setBlurs] = useState<{ x: number; y: number }[]>([]);
+  const mk = (kind: Sticker["kind"], x: number, y: number, scale = 1): Sticker => ({ key: `${kind}-${Math.random().toString(36).slice(2, 7)}`, kind, style: firstStyle(kind), x, y, scale, rot: 0 });
   const [stickers, setStickers] = useState<Sticker[]>([
-    { kind: "status", x: 16, y: Math.round(H * 0.12) },
-    ...(speedText ? [{ kind: "speed" as const, x: 16, y: Math.round(H * 0.84) }] : []),
+    mk("status", W * 0.34, H * 0.13, 0.85),
+    ...(speedText ? [mk("speed", W * 0.72, H * 0.88, 0.7)] : []),
   ]);
-  const dragging = useRef<number | null>(null);
-  const dragOffset = useRef({ dx: 0, dy: 0 });
+  // Gesture state: which sticker is being handled, where the finger grabbed it, and the pinch/rotate start.
+  const active = useRef<number | null>(null);
+  const grab = useRef({ dx: 0, dy: 0 });
+  const base = useRef({ scale: 1, rot: 0 });
+  const busy = useRef({ pan: false, pinch: false, rotate: false });
+  // Once every finger is off, forget the sticker so swipes change looks again.
+  const release = (which: "pan" | "pinch" | "rotate") => {
+    busy.current[which] = false;
+    if (!busy.current.pan && !busy.current.pinch && !busy.current.rotate) setTimeout(() => { active.current = null; }, 0);
+  };
+  const [dragY, setDragY] = useState<number | null>(null); // finger height while dragging (for the bin)
+  const binY = H - 46;
   const now = useMemo(() => new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }), []);
 
   const pickLook = (id: string) => {
@@ -76,59 +90,78 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
     setTools(toolsFor(lookById(id)));
   };
 
-  const label = (k: StickerKind): { text: string; bg: string; big: boolean } => {
+  const textFor = (k: StickerKind): string => {
     switch (k) {
-      case "status": return { text: STATUS_LABEL[status].toUpperCase(), bg: STATUS_COLOR[status], big: true };
-      case "battery": return { text: `${battery}% CHARGED`, bg: "#1A73E8", big: true };
-      case "speed": return { text: speedText ?? "DC FAST", bg: "#111111", big: false };
-      case "charger": return { text: chargerName.slice(0, 30), bg: "#111111", big: false };
-      case "time": return { text: now, bg: "#111111", big: false };
-      case "waited": return { text: waited === 0 ? "NO WAIT" : `WAITED ${waited} MIN`, bg: "#B86E00", big: false };
-      case "car": return { text: (carModel ?? "My EV").slice(0, 24), bg: "#5B3FB8", big: false };
+      case "status": return STATUS_LABEL[status];
+      case "battery": return `${battery}% CHARGED`;
+      case "speed": return speedText ?? "DC FAST";
+      case "charger": return chargerName.slice(0, 30);
+      case "time": return now;
+      case "waited": return waited === 0 ? "NO WAIT" : `WAITED ${waited} MIN`;
+      case "car": return (carModel ?? "My EV").slice(0, 24);
     }
   };
-
-  const box = (s: Sticker) => {
-    const l = label(s.kind);
-    const f = l.big ? fontBig : fontSmall;
-    return { ...l, f, w: f.getTextWidth(l.text) + 26, h: l.big ? 40 : 32 };
-  };
+  const accentFor = (k: Sticker["kind"]) => (k === "status" ? STATUS_COLOR[status] : (ACCENT as any)[k] ?? "#111");
+  const built = useMemo(() => stickers.map((st) => buildSticker(st, st.kind.includes(":") ? "" : textFor(st.kind as StickerKind), accentFor(st.kind))),
+    [stickers, status, battery, waited, chargerName, carModel, speedText, now]);
 
   const hit = (x: number, y: number) => {
     for (let i = stickers.length - 1; i >= 0; i--) {
-      const s = stickers[i];
-      const b = box(s);
-      if (x >= s.x && x <= s.x + b.w && y >= s.y && y <= s.y + b.h) return i;
+      const b = built[i]; if (b && hitSticker(stickers[i], b, x, y)) return i;
     }
     return null;
   };
+  const update = (i: number, patch: Partial<Sticker>) => setStickers((prev) => prev.map((st, j) => (j === i ? { ...st, ...patch } : st)));
+  const toFront = (i: number) => { setStickers((prev) => [...prev.filter((_, j) => j !== i), prev[i]]); return stickers.length - 1; };
 
-  // Dragging only starts when the finger lands on a sticker, so swipes still change looks.
+  // Drag a sticker; drop it on the bin at the bottom to remove it.
   const pan = Gesture.Pan()
     .runOnJS(true)
     .manualActivation(true)
     .onTouchesDown((e, manager) => {
       const t0 = e.allTouches[0];
       const i = t0 ? hit(t0.x, t0.y) : null;
-      dragging.current = i;
       if (i != null && t0) {
-        dragOffset.current = { dx: t0.x - stickers[i].x, dy: t0.y - stickers[i].y };
+        const top = toFront(i);
+        active.current = top; busy.current.pan = true;
+        grab.current = { dx: t0.x - stickers[i].x, dy: t0.y - stickers[i].y };
         manager.activate();
-      } else manager.fail();
+      } else if (e.allTouches.length < 2) manager.fail();
     })
     .onUpdate((e) => {
-      const i = dragging.current;
-      if (i == null) return;
-      const b = box(stickers[i]);
-      const nx = Math.max(0, Math.min(W - b.w, e.x - dragOffset.current.dx));
-      const ny = Math.max(0, Math.min(H - b.h, e.y - dragOffset.current.dy));
-      setStickers((prev) => prev.map((s, j) => (j === i ? { ...s, x: nx, y: ny } : s)));
+      const i = active.current; if (i == null) return;
+      update(i, { x: e.x - grab.current.dx, y: e.y - grab.current.dy });
+      const near = e.y > binY - 40;
+      if (near !== (dragY != null && dragY > binY - 40)) tickHaptic();
+      setDragY(e.y);
     })
-    .onFinalize(() => { dragging.current = null; });
+    .onEnd((e) => {
+      const i = active.current;
+      if (i != null && e.y > binY - 40 && Math.abs(e.x - W / 2) < 70) { successHaptic(); setStickers((prev) => prev.filter((_, j) => j !== i)); }
+      else if (i != null) {
+        // Keep it on the photo.
+        setStickers((prev) => prev.map((st, j) => (j === i ? { ...st, x: Math.max(20, Math.min(W - 20, st.x)), y: Math.max(20, Math.min(H - 20, st.y)) } : st)));
+      }
+    })
+    .onFinalize(() => { setDragY(null); release("pan"); });
+
+  // Pinch to resize and twist to rotate the sticker under your fingers (or the last one you touched).
+  const pinch = Gesture.Pinch().runOnJS(true)
+    .onStart((e) => {
+      busy.current.pinch = true;
+      if (active.current == null) active.current = hit(e.focalX, e.focalY);
+      const i = active.current; if (i != null) base.current = { ...base.current, scale: stickers[i].scale };
+    })
+    .onUpdate((e) => { const i = active.current; if (i != null) update(i, { scale: Math.max(0.35, Math.min(4, base.current.scale * e.scale)) }); })
+    .onFinalize(() => release("pinch"));
+  const rotate = Gesture.Rotation().runOnJS(true)
+    .onStart(() => { busy.current.rotate = true; const i = active.current; if (i != null) base.current = { ...base.current, rot: stickers[i].rot }; })
+    .onUpdate((e) => { const i = active.current; if (i != null) update(i, { rot: base.current.rot + e.rotation }); })
+    .onFinalize(() => release("rotate"));
 
   // Swipe left or right on the photo to change looks, like a camera app.
   const stepLook = (dir: 1 | -1) => {
-    if (dragging.current != null) return;
+    if (active.current != null) return;
     const i = LOOKS.findIndex((l) => l.id === lookId);
     pickLook(LOOKS[Math.max(0, Math.min(LOOKS.length - 1, i + dir))].id);
   };
@@ -136,11 +169,23 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
   const swipeRight = Gesture.Fling().runOnJS(true).direction(Directions.RIGHT).onEnd(() => stepLook(-1));
   const swipe = Gesture.Simultaneous(swipeLeft, swipeRight);
 
+  // Tap a sticker to change its look (pill → glass → script…); tap the photo to blur in Blur mode.
   const tap = Gesture.Tap()
     .runOnJS(true)
-    .onEnd((e) => { if (mode === "blur") setBlurs((b) => [...b, { x: e.x, y: e.y }]); });
+    .onEnd((e) => {
+      const i = hit(e.x, e.y);
+      if (i != null) {
+        const st = stickers[i]; const opts = stylesFor(st.kind);
+        if (opts.length > 1) { tapHaptic(); update(i, { style: opts[(opts.indexOf(st.style) + 1) % opts.length] }); }
+        return;
+      }
+      if (mode === "blur") setBlurs((b) => [...b, { x: e.x, y: e.y }]);
+    });
 
-  const gesture = Gesture.Race(pan, Gesture.Exclusive(swipe, tap));
+  const gesture = Gesture.Race(
+    Gesture.Simultaneous(pan, pinch, rotate),
+    Gesture.Exclusive(swipe, tap),
+  );
 
   editorRef.current = {
     exportJpeg: () => {
@@ -150,12 +195,15 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
     lookId: () => lookId,
   };
 
-  const toggleSticker = (k: StickerKind) =>
+  const toggleSticker = (k: StickerKind) => {
+    tapHaptic();
     setStickers((prev) =>
       prev.some((s) => s.kind === k)
         ? prev.filter((s) => s.kind !== k)
-        : [...prev, { kind: k, x: 16 + (prev.length % 3) * 18, y: Math.round(H * 0.12) + 48 * prev.length }],
+        : [...prev, mk(k, W / 2 + ((prev.length % 3) - 1) * 24, H * (0.3 + 0.12 * (prev.length % 4)), k === "time" || k === "battery" ? 0.8 : 0.85)],
     );
+  };
+  const addSticker = (k: Sticker["kind"]) => { tapHaptic(); setStickers((prev) => [...prev, mk(k, W / 2, H / 2, k.startsWith("e:") ? 1 : 0.9)]); };
 
   const fit = useMemo(() => {
     if (!image) return { x: 0, y: 0, w: W, h: H };
@@ -234,15 +282,12 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
                 <Rect x={0} y={H - bar} width={W} height={bar} color="#000" />
               </>
             )}
-            {stickers.map((s, i) => {
-              const b = box(s);
-              return (
-                <Group key={`${s.kind}-${i}`}>
-                  <RoundedRect x={s.x} y={s.y} width={b.w} height={b.h} r={b.h / 2} color={b.bg} opacity={0.94} />
-                  <SkText x={s.x + 13} y={s.y + (b.big ? 28 : 22)} text={b.text} font={b.f} color="white" />
-                </Group>
-              );
-            })}
+            {stickers.map((st, i) => built[i] ? (
+              <Group key={st.key} transform={[{ translateX: st.x }, { translateY: st.y }, { rotate: st.rot }, { scale: st.scale }]}
+                opacity={dragY != null && active.current === i && dragY > binY - 40 ? 0.45 : 1}>
+                {built[i]!.draw}
+              </Group>
+            ) : null)}
             {mode === "blur" && blurs.map((b, i) => (
               <Circle key={`r${i}`} cx={b.x} cy={b.y} r={34} color="rgba(255,255,255,0.6)" style="stroke" strokeWidth={1.5} />
             ))}
@@ -251,6 +296,11 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
           <View pointerEvents="none" style={StyleSheet.absoluteFill}>
             <LookTitle key={lookId} text={look.name.toUpperCase()} width={W} height={H} />
           </View>
+          {dragY != null && (
+            <View pointerEvents="none" style={[styles.bin, { top: binY - 26, left: W / 2 - 26 }, dragY > binY - 40 && styles.binHot]}>
+              <Ionicons name="trash-outline" size={22} color="#fff" />
+            </View>
+          )}
         </View>
       </GestureDetector>
 
@@ -265,7 +315,7 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
         ))}
       </View>
 
-      <View style={{ height: 160, width: "100%" }}>
+      <View style={{ height: mode === "stickers" ? 230 : 160, width: "100%" }}>
         {mode === "looks" && (
           <>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingHorizontal: 16 }}>
@@ -342,7 +392,8 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
         )}
 
         {mode === "stickers" && (
-          <View style={{ paddingHorizontal: 16, gap: 10 }}>
+          <ScrollView style={{ maxHeight: 220 }} contentContainerStyle={{ paddingHorizontal: 16, gap: 10, paddingBottom: 6 }} nestedScrollEnabled>
+            <Text style={styles.hint}>Tap a sticker to change its style · pinch to resize · twist to rotate · drag to 🗑 to remove</Text>
             <View style={styles.wrap}>
               {STICKER_OPTIONS.map((o) => {
                 const on = stickers.some((s) => s.kind === o.kind);
@@ -363,7 +414,23 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
                 <Stepper label="Waited" value={`${waited} min`} onMinus={() => setWaited((w) => Math.max(0, w - 5))} onPlus={() => setWaited((w) => Math.min(180, w + 5))} />
               )}
             </View>
-          </View>
+            <Text style={styles.sub}>zingd pack</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 4 }}>
+              {ZING_STICKERS.map((z) => (
+                <Pressable key={z.id} onPress={() => addSticker(`z:${z.id}`)} style={({ pressed }) => [{ transform: [{ scale: pressed ? 0.9 : 1 }] }]}>
+                  <StickerView id={z.id} size={74} />
+                </Pressable>
+              ))}
+            </ScrollView>
+            <Text style={styles.sub}>Emoji</Text>
+            <View style={styles.wrap}>
+              {EMOJI_STICKERS.map((e) => (
+                <Pressable key={e} onPress={() => addSticker(`e:${e}`)} style={({ pressed }) => [styles.emoji, pressed && { transform: [{ scale: 1.2 }] }]}>
+                  <Text style={{ fontSize: 28 }}>{e}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </ScrollView>
         )}
 
         {mode === "blur" && (
@@ -412,6 +479,11 @@ function Stepper({ label, value, onMinus, onPlus }: { label: string; value: stri
 }
 
 const styles = StyleSheet.create({
+  bin: { position: "absolute", width: 52, height: 52, borderRadius: 26, backgroundColor: "rgba(0,0,0,0.55)", borderWidth: 2, borderColor: "rgba(255,255,255,0.8)", alignItems: "center", justifyContent: "center" },
+  binHot: { backgroundColor: "#E5483D", transform: [{ scale: 1.25 }] },
+  hint: { color: "#8A949D", fontSize: 12, lineHeight: 16 },
+  sub: { color: "#C4CCD3", fontSize: 12.5, fontWeight: "800", letterSpacing: 0.4, marginTop: 4 },
+  emoji: { width: 48, height: 48, borderRadius: 14, backgroundColor: "#1A1F24", alignItems: "center", justifyContent: "center" },
   tabs: { flexDirection: "row", borderRadius: 12, padding: 4, gap: 4, backgroundColor: "#1A1F24", marginHorizontal: 16, alignSelf: "stretch" },
   tab: { flex: 1, alignItems: "center", paddingVertical: 9, borderRadius: 9, minWidth: 0 },
   wrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },

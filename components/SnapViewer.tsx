@@ -133,7 +133,7 @@ export default function SnapViewer({ snaps, start, onClose, onChanged }: {
               <View style={{ flexShrink: 1 }}>
                 <Text style={{ color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 15 }}>{name}</Text>
                 <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: 12.5 }} numberOfLines={1}>
-                  {[STATUS_LABEL[s.status], issueLabel(s.issue), timeAgo(s.created_at), kept ? "♾ kept" : live ? "⏱ 24h" : "memory"].filter(Boolean).join(" · ")}
+                  {[s.charger_id ? STATUS_LABEL[s.status] : `📍 ${s.place_name ?? "Somewhere"}`, issueLabel(s.issue), timeAgo(s.created_at), kept ? "♾ kept" : live ? "⏱ 24h" : "memory"].filter(Boolean).join(" · ")}
                 </Text>
               </View>
             </Pressable>

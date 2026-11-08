@@ -52,7 +52,7 @@ export async function fetchLiveStatus(chargerIds: string[]): Promise<Record<stri
 }
 
 // ───────── Snaps and check-ins ─────────
-const CHECKIN_FIELDS = "id,charger_id,user_id,status,note,photo_path,created_at,expires_at,keep,media,video_path,music,audience,look,distance_m,zap_score,score_breakdown,issue,profiles(display_name,car_model,avatar_path)";
+const CHECKIN_FIELDS = "id,charger_id,user_id,status,note,photo_path,created_at,expires_at,keep,media,video_path,music,audience,look,place_name,place_lat,place_lng,distance_m,zap_score,score_breakdown,issue,profiles(display_name,car_model,avatar_path)";
 
 export async function fetchSnaps(chargerId: string): Promise<Checkin[]> {
   const { data } = await supabase
@@ -77,8 +77,24 @@ export async function fetchFeed(lat: number, lng: number, km = 25): Promise<Chec
     .gte("chargers.lng", b.minLng).lte("chargers.lng", b.maxLng)
     .order("created_at", { ascending: false })
     .limit(60);
-  return visible((data ?? []) as any);
+  // Zings tagged at other places (cafés, viewpoints, meetups) nearby.
+  const { data: places } = await supabase
+    .from("checkins")
+    .select(CHECKIN_FIELDS)
+    .is("charger_id", null)
+    .not("photo_path", "is", null)
+    .gt("expires_at", new Date().toISOString())
+    .gte("place_lat", b.minLat).lte("place_lat", b.maxLat)
+    .gte("place_lng", b.minLng).lte("place_lng", b.maxLng)
+    .order("created_at", { ascending: false })
+    .limit(30)
+    .then((r) => r, () => ({ data: [] as any[] }));
+  const all = [...(data ?? []), ...((places as any[]) ?? [])].sort((a: any, b2: any) => b2.created_at.localeCompare(a.created_at));
+  return visible(all as any);
 }
+
+/** Where a zing was: the charger's name, or the place it was tagged at. */
+export const zingPlace = (z: { chargers?: { name: string } | null; place_name?: string | null }) => z.chargers?.name ?? z.place_name ?? "Charger";
 
 /** Upload an edited JPEG (base64) to the viewer's own folder and return its storage path. */
 export async function uploadSnap(base64Jpeg: string): Promise<string> {
@@ -129,8 +145,8 @@ export async function fetchIssues(chargerId: string) {
 }
 
 export async function postCheckin(
-  chargerId: string, status: Status, note: string, photoPath: string | null, look?: string, fix?: ZapFix | null, issue?: IssueKey | null, keep = false,
-  extra: { media?: "photo" | "video"; video_path?: string | null; music?: string | null; audience?: "public" | "crew" } = {},
+  chargerId: string | null, status: Status, note: string, photoPath: string | null, look?: string, fix?: ZapFix | null, issue?: IssueKey | null, keep = false,
+  extra: { media?: "photo" | "video"; video_path?: string | null; music?: string | null; audience?: "public" | "crew"; place?: { name: string; lat: number; lng: number } | null } = {},
 ): Promise<{ zap_score: number; score_breakdown: ScorePart[]; distance_m: number | null }> {
   const { data: u } = await supabase.auth.getUser();
   if (!u.user) throw new Error("Sign in to drop a zing.");
@@ -150,6 +166,7 @@ export async function postCheckin(
     ...(extra.media === "video" ? { media: "video", video_path: extra.video_path } : {}),
     ...(extra.music ? { music: extra.music } : {}),
     ...(extra.audience === "crew" ? { audience: "crew" } : {}),
+    ...(extra.place ? { place_name: extra.place.name.slice(0, 80), place_lat: extra.place.lat, place_lng: extra.place.lng } : {}),
   }).select("zap_score,score_breakdown,distance_m").single();
   if (error) throw new Error("Your zing didn't post. Try again.");
   return {
@@ -202,7 +219,7 @@ export async function fetchZapBubbles(chargerIds: string[]): Promise<Record<stri
 export async function fetchUserZaps(userId: string) {
   const { data } = await supabase
     .from("checkins")
-    .select("id,charger_id,status,photo_path,created_at,expires_at,keep,zap_score,distance_m,chargers(name)")
+    .select("id,charger_id,status,photo_path,created_at,expires_at,keep,zap_score,distance_m,place_name,chargers(name)")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(20);

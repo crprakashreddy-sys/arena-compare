@@ -100,7 +100,7 @@ export default function Memories() {
                   <View style={s.badges}>
                     {m.keep ? <Text style={s.badge}>♾</Text> : live ? <Text style={[s.badge, { backgroundColor: "#2FBF71" }]}>LIVE</Text> : null}
                   </View>
-                  <Text style={s.place} numberOfLines={1}>{m.chargers?.name ?? ""}</Text>
+                  <Text style={s.place} numberOfLines={1}>{m.chargers?.name ?? m.place_name ?? ""}</Text>
                 </Pressable>
               );
             })}

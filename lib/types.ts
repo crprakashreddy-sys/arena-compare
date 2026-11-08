@@ -49,6 +49,9 @@ export type Checkin = {
   music?: string | null;
   audience?: "public" | "crew";
   look?: string | null;
+  place_name?: string | null;
+  place_lat?: number | null;
+  place_lng?: number | null;
   score_breakdown?: ScorePart[];
   profiles?: { display_name: string; car_model: string | null; avatar_path?: string | null } | null;
   chargers?: { name: string; lat: number; lng: number; network: string; connectors?: string[] } | null;

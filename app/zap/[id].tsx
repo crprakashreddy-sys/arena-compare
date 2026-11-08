@@ -21,6 +21,7 @@ import { trackById } from "../../lib/music";
 import { MusicPicker } from "../../components/MusicPicker";
 import { VideoLook } from "../../components/VideoLook";
 import { tickHaptic } from "../../lib/motion";
+import { searchPlaces, type PlaceHit } from "../../lib/places";
 
 const DARK = "#07090B";
 const YELLOW = "#FCE38A";
@@ -42,6 +43,12 @@ export default function DropZap() {
   const [music, setMusic] = useState<string | null>(null);
   const [musicOpen, setMusicOpen] = useState(false);
   const [audience, setAudience] = useState<"public" | "crew">("public");
+  // Somewhere that isn't a charger: a highway café, a viewpoint, a meetup spot.
+  const [place, setPlace] = useState<{ name: string; lat: number; lng: number } | null>(null);
+  const [placeQ, setPlaceQ] = useState("");
+  const [placeHits, setPlaceHits] = useState<PlaceHit[]>([]);
+  const [here, setHere] = useState<{ lat: number; lng: number; name: string } | null>(null);
+  const where = charger?.name ?? place?.name ?? null;
   const [issue, setIssue] = useState<IssueKey | null>(null);
   const [posting, setPosting] = useState(false);
   const editor = useRef<EditorHandle | null>(null);
@@ -72,7 +79,7 @@ export default function DropZap() {
     else Alert.alert("Location is off", "Allow location for zingd in Settings to earn full Zing Score.");
   };
 
-  const distance = fix && charger ? metresTo(fix, charger.lat, charger.lng) : null;
+  const distance = fix && charger ? metresTo(fix, charger.lat, charger.lng) : fix && place ? metresTo(fix, place.lat, place.lng) : null;
 
   useEffect(() => {
     (async () => {
@@ -96,6 +103,20 @@ export default function DropZap() {
     })();
   }, [id]);
 
+  useEffect(() => {
+    if (!choosing || placeQ.trim().length < 2) { setPlaceHits([]); return; }
+    const t = setTimeout(() => searchPlaces(placeQ, fix ?? undefined).then(setPlaceHits).catch(() => {}), 300);
+    return () => clearTimeout(t);
+  }, [placeQ, choosing]);
+  useEffect(() => {
+    if (!choosing || here || !fix) return;
+    Location.reverseGeocodeAsync({ latitude: fix.lat, longitude: fix.lng }).then((r) => {
+      const a = r[0]; const name = [a?.name, a?.district ?? a?.subregion].filter(Boolean).join(", ") || "Where I am";
+      setHere({ lat: fix.lat, lng: fix.lng, name: name.slice(0, 80) });
+    }).catch(() => setHere({ lat: fix.lat, lng: fix.lng, name: "Where I am" }));
+  }, [choosing, fix?.lat]);
+  const pickPlace = (p: { name: string; lat: number; lng: number }) => { tickHaptic(); setPlace(p); setCharger(null); setChoosing(false); setPlaceQ(""); };
+
   const shoot = async (fromCamera: boolean) => {
     // Video zings: up to 10 seconds, trimmed in the native editor. The camera has its own flash and lens controls.
     const opts: ImagePicker.ImagePickerOptions = kind === "video"
@@ -110,11 +131,11 @@ export default function DropZap() {
   };
 
   const post = async () => {
-    if (!charger) return;
+    if (!charger && !place) return;
     if (!canPost(auth)) { router.push("/login"); return; }
     setPosting(true);
     try {
-      await ensureChargerSaved(charger);
+      if (charger) await ensureChargerSaved(charger);
       let path: string | null = null;
       let videoPath: string | null = null;
       if (uri && kind === "video") {
@@ -130,8 +151,13 @@ export default function DropZap() {
         path = await uploadSnap(b64);
       }
       const latest = (await getZapFix()) ?? fix;
-      const result = await postCheckin(charger.id, status, note, path, kind === "video" ? videoLook : editor.current?.lookId(), latest, issue, keep,
-        { media: kind, video_path: videoPath, music, audience });
+      const result = await postCheckin(charger?.id ?? null, charger ? status : "working", note, path, kind === "video" ? videoLook : editor.current?.lookId(), latest, charger ? issue : null, keep,
+        { media: kind, video_path: videoPath, music, audience, place: charger ? null : place });
+      if (!charger) {
+        Alert.alert("Zing dropped ⚡", `+${result.zap_score} Zing Score at ${place!.name}.`);
+        router.replace("/(tabs)/feed");
+        return;
+      }
       router.replace({
         pathname: "/charger/[id]",
         params: { id: charger.id, posted: "1", score: String(result.zap_score), parts: JSON.stringify(result.score_breakdown) },
@@ -157,7 +183,7 @@ export default function DropZap() {
           </Pressable>
         ),
         headerRight: () =>
-          charger ? (
+          charger || place ? (
             <Pressable onPress={post} disabled={posting} style={styles.dropBtn} accessibilityRole="button">
               {posting ? <ActivityIndicator color="#1A1A1A" /> : <Text style={{ color: "#1A1A1A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Drop it</Text>}
             </Pressable>
@@ -183,9 +209,9 @@ export default function DropZap() {
         <Pressable onPress={() => setChoosing((c) => !c)} style={styles.at}>
           <Ionicons name="flash" size={16} color={YELLOW} />
           <Text style={{ color: "#fff", flex: 1, fontWeight: "700" }} numberOfLines={1}>
-            {charger ? `At ${charger.name}` : "Choose the charger you're at"}
+            {where ? `${place ? "📍 " : ""}At ${where}` : "Where are you?"}
           </Text>
-          <Text style={{ color: YELLOW, fontWeight: "700" }}>{charger ? "Change" : "Choose"}</Text>
+          <Text style={{ color: YELLOW, fontWeight: "700" }}>{where ? "Change" : "Choose"}</Text>
         </Pressable>
 
         {choosing && (
@@ -193,8 +219,9 @@ export default function DropZap() {
             {nearby.length === 0 && (
               <Text style={{ color: "#A3ADB6", padding: 14 }}>No chargers found near you. Open a charger from the map and drop your zing from there.</Text>
             )}
+            <Text style={styles.groupH}>⚡ EV CHARGERS NEAR YOU</Text>
             {nearby.map(({ c, d }) => (
-              <Pressable key={c.id} onPress={() => { setCharger(c); setChoosing(false); }} style={styles.choice}>
+              <Pressable key={c.id} onPress={() => { setCharger(c); setPlace(null); setChoosing(false); }} style={styles.choice}>
                 <View style={{ flex: 1 }}>
                   <Text style={{ color: "#fff", fontWeight: "600" }} numberOfLines={1}>{c.name}</Text>
                   <Text style={{ color: "#A3ADB6", fontSize: 12.5 }}>{speedLabel(c)}</Text>
@@ -202,23 +229,46 @@ export default function DropZap() {
                 <Text style={{ color: "#fff", fontVariant: ["tabular-nums"] }}>{fmtDistance(d)}</Text>
               </Pressable>
             ))}
+            <Text style={styles.groupH}>📍 SOMEWHERE ELSE</Text>
+            {here && (
+              <Pressable onPress={() => pickPlace(here)} style={styles.choice}>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ color: "#fff", fontWeight: "600" }} numberOfLines={1}>Right here</Text>
+                  <Text style={{ color: "#A3ADB6", fontSize: 12.5 }} numberOfLines={1}>{here.name}</Text>
+                </View>
+                <Ionicons name="navigate" size={16} color={YELLOW} />
+              </Pressable>
+            )}
+            <View style={styles.placeSearch}>
+              <Ionicons name="search" size={16} color="#8A949D" />
+              <TextInput value={placeQ} onChangeText={setPlaceQ} placeholder="Café, viewpoint, meetup spot…" placeholderTextColor="#6E7882"
+                style={{ flex: 1, color: "#fff", fontSize: 15 }} autoCorrect={false} />
+            </View>
+            {placeHits.map((h) => (
+              <Pressable key={h.id} onPress={() => pickPlace({ name: h.title, lat: h.lat, lng: h.lng })} style={styles.choice}>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ color: "#fff", fontWeight: "600" }} numberOfLines={1}>{h.title}</Text>
+                  {!!h.subtitle && <Text style={{ color: "#A3ADB6", fontSize: 12.5 }} numberOfLines={1}>{h.subtitle}</Text>}
+                </View>
+              </Pressable>
+            ))}
           </View>
         )}
 
-        {charger && (
+        {(charger || place) && (
           <>
             <ScoreMeter distanceM={distance} accuracy={fix?.accuracy ?? null} mocked={fix?.mocked ?? false}
               hasPhoto={!!uri} locationOff={locOff} onEnableLocation={enableLocation} />
-            <View style={{ flexDirection: "row", gap: 8, paddingHorizontal: 16 }} accessibilityRole="radiogroup">
+            {charger && <View style={{ flexDirection: "row", gap: 8, paddingHorizontal: 16 }} accessibilityRole="radiogroup">
               {([["working", "Working", "#137F4E"], ["busy", "Busy", "#B86E00"], ["broken", "Not working", "#C5221F"]] as const).map(([k, label, col]) => (
                 <Pressable key={k} onPress={() => setStatus(k)} accessibilityRole="radio" accessibilityState={{ selected: status === k }}
                   style={[styles.status, status === k ? { backgroundColor: col, borderColor: col } : null]}>
                   <Text style={{ color: "#fff", fontWeight: "700" }}>{label}</Text>
                 </Pressable>
               ))}
-            </View>
+            </View>}
 
-            {status !== "working" && (
+            {charger && status !== "working" && (
               <View style={{ paddingHorizontal: 16, gap: 8 }}>
                 <Text style={{ color: "#A3ADB6", fontSize: 13, fontWeight: "600" }}>What's wrong? (optional)</Text>
                 <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
@@ -249,8 +299,8 @@ export default function DropZap() {
               <PhotoEditor
                 uri={uri}
                 status={status}
-                chargerName={charger.name}
-                speedText={isFast(charger) ? speedLabel(charger).toUpperCase() : null}
+                chargerName={where ?? ""}
+                speedText={charger && isFast(charger) ? speedLabel(charger).toUpperCase() : null}
                 carModel={auth.profile?.car_model ?? null}
                 editorRef={editor}
               />
@@ -320,6 +370,8 @@ const styles = StyleSheet.create({
   fill: { flex: 1, backgroundColor: DARK },
   dropBtn: { backgroundColor: YELLOW, paddingHorizontal: 16, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
   at: { flexDirection: "row", alignItems: "center", gap: 8, marginHorizontal: 16, marginTop: 12, padding: 12, borderRadius: 12, backgroundColor: "#151A1F" },
+  groupH: { color: "#8A949D", fontSize: 11.5, fontWeight: "800", letterSpacing: 0.8, paddingHorizontal: 14, paddingTop: 12, paddingBottom: 4 },
+  placeSearch: { flexDirection: "row", alignItems: "center", gap: 8, marginHorizontal: 12, marginVertical: 8, height: 42, borderRadius: 21, paddingHorizontal: 12, backgroundColor: "#0B0F12" },
   choice: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: "#2A3037" },
   status: { flex: 1, height: 42, borderRadius: 12, borderWidth: 1, borderColor: "#3A424A", alignItems: "center", justifyContent: "center" },
   shoot: { height: 220, borderRadius: 18, backgroundColor: YELLOW, alignItems: "center", justifyContent: "center", gap: 6 },
