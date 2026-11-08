@@ -19,6 +19,7 @@ import {
 import { ClubBadge } from "../../components/ClubBadge";
 import { Avatar } from "../../components/ui";
 import { IssuesBoard } from "../../components/IssuesBoard";
+import { EventsList } from "../../components/EventsList";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -53,7 +54,7 @@ export default function ClubChat() {
   const [sending, setSending] = useState(false);
   const [muted, setMutedState] = useState(false);
   const [admin, setAdmin] = useState(false);
-  const [tab, setTab] = useState<"chat" | "issues">("chat");
+  const [tab, setTab] = useState<"chat" | "issues" | "events">("chat");
 
   const byId = useMemo(() => new Map(msgs.map((m) => [m.id, m])), [msgs]);
 
@@ -221,21 +222,21 @@ export default function ClubChat() {
 
   const tabs = (
     <View style={[s.tabs, { backgroundColor: t.bg, borderBottomColor: t.line }]}>
-      {(["chat", "issues"] as const).map((k) => (
+      {(["chat", "issues", "events"] as const).map((k) => (
         <Pressable key={k} onPress={() => setTab(k)} style={[s.tab, tab === k && { backgroundColor: INK }]}>
-          <Ionicons name={k === "chat" ? "chatbubbles" : "construct"} size={15} color={tab === k ? LEMON : t.muted} />
-          <Text style={{ color: tab === k ? LEMON : t.muted, fontWeight: "800" }}>{k === "chat" ? "Chat" : "Issues & fixes"}</Text>
+          <Ionicons name={k === "chat" ? "chatbubbles" : k === "issues" ? "construct" : "calendar"} size={15} color={tab === k ? LEMON : t.muted} />
+          <Text style={{ color: tab === k ? LEMON : t.muted, fontWeight: "800" }}>{k === "chat" ? "Chat" : k === "issues" ? "Issues" : "Events"}</Text>
         </Pressable>
       ))}
     </View>
   );
 
-  if (tab === "issues" && member) {
+  if (tab !== "chat" && member) {
     return (
       <View style={{ flex: 1, backgroundColor: t.bg }}>
         {header}
         {tabs}
-        <IssuesBoard clubId={clubId} />
+        {tab === "issues" ? <IssuesBoard clubId={clubId} /> : <EventsList clubId={clubId} />}
       </View>
     );
   }

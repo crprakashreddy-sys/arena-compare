@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { fetchChargers, isFast, onChargersChanged, speedLabel } from "../../lib/chargers";
 import { useOnboarded } from "../../lib/onboarding";
+import { fetchEventsNear, kindOf, type ClubEvent } from "../../lib/events";
 import { fetchLiveStatus, fetchRatings, fetchSnaps, fetchZapBubbles } from "../../lib/community";
 import { isConfigured, snapUrl } from "../../lib/supabase";
 import { timeAgo } from "../../lib/geo";
@@ -71,8 +72,10 @@ export default function MapScreen() {
   const [searching, setSearching] = useState(false);
   const picked = useRef<string | null>(null);
 
+  const [events, setEvents] = useState<ClubEvent[]>([]);
   const load = useCallback(async (lat: number, lng: number, km = 15) => {
     setLoading(true);
+    fetchEventsNear(lat, lng).then(setEvents).catch(() => {});
     setLastLoad({ lat, lng });
     const list = await fetchChargers(lat, lng, km);
     setChargers(list);
@@ -255,6 +258,17 @@ export default function MapScreen() {
         {origin && (
           <Marker coordinate={{ latitude: origin.lat, longitude: origin.lng }} pinColor="red" title={origin.label} />
         )}
+        {events.map((ev) => (
+          <Marker key={`ev-${ev.id}`} coordinate={{ latitude: ev.lat, longitude: ev.lng }} tracksViewChanges={false}
+            onPress={() => router.push(`/event/${ev.id}`)}>
+            <View style={styles.eventPin}>
+              <Text style={{ fontSize: 15 }}>{kindOf(ev.kind).emoji}</Text>
+              <Text style={styles.eventPinText} numberOfLines={1}>
+                {new Date(ev.starts_at).toLocaleDateString([], { day: "numeric", month: "short" })}
+              </Text>
+            </View>
+          </Marker>
+        ))}
         {me && vehicle && showRange && (
           <Circle center={{ latitude: me.lat, longitude: me.lng }} radius={reachKm(vehicle) * 1000}
             strokeColor="rgba(255,214,10,0.9)" strokeWidth={2} fillColor="rgba(255,214,10,0.08)" />
@@ -581,6 +595,9 @@ function EmptyState({ hiddenCount, onClear, onAdd }: { hiddenCount: number; onCl
 }
 
 const styles = StyleSheet.create({
+  eventPin: { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: "#FCE38A", borderWidth: 2, borderColor: "#1A1A1A",
+    paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999 },
+  eventPinText: { color: "#1A1A1A", fontWeight: "800", fontSize: 12 },
   empty: { alignItems: "center", paddingVertical: 22, gap: 10 },
   emptyIcon: { width: 72, height: 72, borderRadius: 36, alignItems: "center", justifyContent: "center", marginBottom: 4 },
   emptyTitle: { fontSize: 17, fontWeight: "800", textAlign: "center" },
