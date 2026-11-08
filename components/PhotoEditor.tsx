@@ -42,11 +42,11 @@ type Props = {
   chargerName: string;
   speedText: string | null;
   carModel: string | null;
-  editorRef: React.MutableRefObject<EditorHandle | null>;
+  editorRef: React.MutableRefObject<EditorHandle | null>; initialLook?: string | null;
 };
 
 /** The zing editor: cinematic looks, cinema tools, EV stickers and privacy blur, rendered with Skia. */
-export default function PhotoEditor({ uri, status, chargerName, speedText, carModel, editorRef }: Props) {
+export default function PhotoEditor({ uri, status, chargerName, speedText, carModel, editorRef, initialLook }: Props) {
   const { width: screenW, height: screenH } = useWindowDimensions();
   const W = Math.min(screenW - 24, 480, Math.round((screenH * 0.52 * 3) / 4));
   const H = Math.round((W * 4) / 3);
@@ -54,7 +54,7 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
   const image = useImage(uri);
   const canvasRef = useCanvasRef();
 
-  const [lookId, setLookId] = useState("cinema");
+  const [lookId, setLookId] = useState(initialLook ?? "cinema");
   const look = lookById(lookId);
   const [tools, setTools] = useState<CinemaTools>(toolsFor(look));
   const [mode, setMode] = useState<"looks" | "adjust" | "cinema" | "stickers" | "blur">("looks");

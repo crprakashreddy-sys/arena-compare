@@ -10,8 +10,8 @@ import { IconTile } from "../components/Icon";
 import { successHaptic, tapHaptic } from "../lib/motion";
 import { timeAgo } from "../lib/geo";
 
-const START = "zappd://drive?state=start";
-const END = "zappd://drive?state=end";
+const START = "zingd://drive?state=start";
+const END = "zingd://drive?state=end";
 
 /**
  * One-time setup: two iPhone Shortcuts automations tell zingd when you get in and out of your EV
@@ -36,8 +36,8 @@ export default function AutoDetect() {
   );
   const Link = ({ url, label }: { url: string; label: string }) => (
     <Pressable onPress={() => copy(url)} style={[s.link, { backgroundColor: t.bg, borderColor: copied === url ? "#2FBF71" : t.line }]}>
-      <Text style={{ color: t.text, fontFamily: "Menlo", fontSize: 12.5, flex: 1 }} numberOfLines={1}>{url}</Text>
-      <Text style={{ color: copied === url ? "#2FBF71" : t.text, fontWeight: "800" }}>{copied === url ? "Copied ✓" : `Copy ${label}`}</Text>
+      <Ionicons name={copied === url ? "checkmark-circle" : "copy-outline"} size={18} color={copied === url ? "#2FBF71" : t.text} />
+      <Text style={{ color: copied === url ? "#2FBF71" : t.text, fontWeight: "800", flex: 1 }}>{copied === url ? "Copied, now paste it in Shortcuts" : `Copy the “${label}” link`}</Text>
     </Pressable>
   );
 
@@ -66,11 +66,11 @@ export default function AutoDetect() {
       </Step>
       <Step n={2} title={`Pick your car${v ? ` (${vehicleName(v)})` : ""}`} body="Choose your car's Bluetooth name, tick “Is Connected”, and set it to Run Immediately.">
       </Step>
-      <Step n={3} title="Add “Open URLs” and paste this" body="Tap New Blank Automation → Add Action → search “Open URLs” → paste:">
-        <Link url={START} label="start" />
+      <Step n={3} title="Add “Open URLs”, paste the link" body="Tap New Blank Automation → Add Action → search “Open URLs”, then paste:">
+        <Link url={START} label="got in" />
       </Step>
       <Step n={4} title="Repeat for when you get out" body="Make a second automation: same Bluetooth device, tick “Is Disconnected”, Run Immediately, Open URLs:">
-        <Link url={END} label="end" />
+        <Link url={END} label="got out" />
       </Step>
 
       <Text style={[s.h, { color: t.text, marginTop: 6 }]}>Try it</Text>

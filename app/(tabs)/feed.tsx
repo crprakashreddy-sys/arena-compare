@@ -1,162 +1,308 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View, useWindowDimensions } from "react-native";
-import { Image } from "expo-image";
-import { router } from "expo-router";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { ActivityIndicator, Animated, AppState, Easing, Linking, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { CameraView, useCameraPermissions, useMicrophonePermissions, type CameraType } from "expo-camera";
+import { Gesture, GestureDetector, Directions } from "react-native-gesture-handler";
+import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
+import { Image } from "expo-image";
+import { router, useFocusEffect } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "../../components/SFIcon";
-import { fetchFeed } from "../../lib/community";
-import { suits, useMode } from "../../lib/mode";
-import { ModeSwitch } from "../../components/ModeSwitch";
-import { snapUrl } from "../../lib/supabase";
-import { timeAgo } from "../../lib/geo";
-import { STATUS_LABEL } from "../../lib/theme";
-import { ScoreChip } from "../../components/ZapScore";
-import SnapViewer from "../../components/SnapViewer";
-import type { Checkin } from "../../lib/types";
 import { Glass } from "../../components/Glass";
+import { VideoLook } from "../../components/VideoLook";
+import { LOOKS } from "../../lib/filters";
+import { fetchChargers } from "../../lib/chargers";
+import { fetchFeed, fetchMemories } from "../../lib/community";
+import { distanceM, fmtDistance } from "../../lib/geo";
+import { snapUrl } from "../../lib/supabase";
+import { useAuth } from "../../lib/auth";
 import { useTabSpace } from "../../lib/tabspace";
-import { tapHaptic } from "../../lib/motion";
+import { successHaptic, tapHaptic, tickHaptic } from "../../lib/motion";
+import type { Charger, Checkin } from "../../lib/types";
 
-const BG = "#0B1117";
-const STATUS_STYLE = {
-  working: { fg: "#6DD39A", bg: "#173524" },
-  busy: { fg: "#F2B860", bg: "#3A2A10" },
-  broken: { fg: "#F28B82", bg: "#3D1C1A" },
-} as const;
+const LEMON = "#FCE38A";
+const MAX_REC = 10;
+type Flash = "off" | "on" | "auto";
 
-/** Zings near you: a dark, full-bleed feed of live charger photos from the last 24 hours. */
-export default function ZapsFeed() {
+/**
+ * The Zings tab is the camera, like Snapchat: open the app's heart and you're ready to shoot.
+ * Tap to snap, hold to record up to 10 s, swipe for looks, pinch to zoom, double-tap to flip.
+ * The nearest charger is spotted for you; nearby zings and your memories are one tap away.
+ */
+export default function ZingCamera() {
+  const { width: W, height: H } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const tabSpace = useTabSpace();
-  const { width } = useWindowDimensions();
-  const [zaps, setZaps] = useState<Checkin[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [where, setWhere] = useState<{ lat: number; lng: number } | null>(null);
-  const [viewer, setViewer] = useState<number | null>(null);
-  const [mode] = useMode();
-  const shownZ = useMemo(() => zaps.filter((z) => !z.chargers || suits({ connectors: z.chargers.connectors ?? [], network: z.chargers.network }, mode)), [zaps, mode]);
+  const { session } = useAuth();
+  const cam = useRef<CameraView>(null);
+  const [perm, askPerm] = useCameraPermissions();
+  const [mic, askMic] = useMicrophonePermissions();
+  const [focused, setFocused] = useState(true);
+  const [active, setActive] = useState(AppState.currentState === "active");
+  const [facing, setFacing] = useState<CameraType>("back");
+  const [flash, setFlash] = useState<Flash>("off");
+  const [timer, setTimer] = useState<0 | 3 | 10>(0);
+  const [grid, setGrid] = useState(false);
+  const [zoom, setZoom] = useState(0);
+  const [lookIdx, setLookIdx] = useState(LOOKS.findIndex((l) => l.id === "zing"));
+  const [mode, setMode] = useState<"picture" | "video">("picture");
+  const [recording, setRecording] = useState(false);
+  const [count, setCount] = useState<number | null>(null);
+  const [whiteout, setWhiteout] = useState(false);
+  const [near, setNear] = useState<{ c: Charger; d: number } | null>(null);
+  const [nearby, setNearby] = useState<Checkin[]>([]);
+  const [last, setLast] = useState<string | null>(null);
+  const prog = useRef(new Animated.Value(0)).current;
+  const lookFlash = useRef(new Animated.Value(0)).current;
+  const holdTimer = useRef<any>(null);
+  const zoomBase = useRef(0);
+  const look = LOOKS[Math.max(0, lookIdx)];
 
-  const load = useCallback(async (p = where) => {
-    if (!p) return;
-    setLoading(true);
-    setZaps(await fetchFeed(p.lat, p.lng, 25));
-    setLoading(false);
-  }, [where]);
+  // Only run the camera while this tab is on screen and the app is open (saves battery).
+  useFocusEffect(useCallback(() => { setFocused(true); return () => setFocused(false); }, []));
+  useEffect(() => { const s = AppState.addEventListener("change", (st) => setActive(st === "active")); return () => s.remove(); }, []);
 
-  useEffect(() => {
+  // Where am I: nearest charger, zings nearby, my last zing.
+  useFocusEffect(useCallback(() => {
     (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") { setLoading(false); return; }
-      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-      const p = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-      setWhere(p);
-      load(p);
+      try {
+        const lp = await Location.getForegroundPermissionsAsync();
+        if (lp.granted) {
+          const p = (await Location.getLastKnownPositionAsync()) ?? (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }));
+          if (p) {
+            const { latitude: lat, longitude: lng } = p.coords;
+            fetchChargers(lat, lng, 5).then((list) => {
+              const best = list.map((c) => ({ c, d: distanceM(lat, lng, c.lat, c.lng) })).sort((a, b) => a.d - b.d)[0];
+              setNear(best ?? null);
+            }).catch(() => {});
+            fetchFeed(lat, lng, 25).then(setNearby).catch(() => {});
+          }
+        }
+        if (session) fetchMemories(session.user.id).then((m) => setLast(m[0]?.photo_path ?? null)).catch(() => {});
+      } catch {}
     })();
-  }, []);
+  }, [session?.user.id]));
 
-  const cardW = width - 24;
+  const go = (uri: string, kind: "photo" | "video") => {
+    successHaptic();
+    router.push({ pathname: "/zap/[id]", params: { id: near && near.d <= 400 ? encodeURIComponent(near.c.id) : "nearest", uri: encodeURIComponent(uri), kind, look: look.id } });
+  };
+
+  const snap = async () => {
+    if (!cam.current) return;
+    if (facing === "front" && flash !== "off") { setWhiteout(true); await new Promise((r) => setTimeout(r, 180)); }
+    try {
+      const pic = await cam.current.takePictureAsync({ quality: 0.92, skipProcessing: false });
+      setWhiteout(false);
+      if (pic?.uri) go(pic.uri, "photo");
+    } catch { setWhiteout(false); }
+  };
+  const withTimer = (fn: () => void) => {
+    if (!timer) return fn();
+    let n = timer; setCount(n);
+    const iv = setInterval(() => { n -= 1; tickHaptic(); if (n <= 0) { clearInterval(iv); setCount(null); fn(); } else setCount(n); }, 1000);
+  };
+
+  // Hold to record: switch to video, fill the ring, stop at 10 s or when you let go.
+  const startRec = async () => {
+    if (!mic?.granted) { const r = await askMic(); if (!r.granted) { /* record silently */ } }
+    setMode("video");
+    await new Promise((r) => setTimeout(r, 350));
+    if (!cam.current) return;
+    setRecording(true); tapHaptic();
+    prog.setValue(0);
+    Animated.timing(prog, { toValue: 1, duration: MAX_REC * 1000, easing: Easing.linear, useNativeDriver: false }).start();
+    try {
+      const v = await cam.current.recordAsync({ maxDuration: MAX_REC });
+      if (v?.uri) go(v.uri, "video");
+    } catch {}
+    setRecording(false); prog.stopAnimation(); prog.setValue(0); setMode("picture");
+  };
+  const stopRec = () => { if (recording) cam.current?.stopRecording(); };
+
+  const onPressIn = () => { holdTimer.current = setTimeout(() => { holdTimer.current = null; startRec(); }, 260); };
+  const onPressOut = () => {
+    if (holdTimer.current) { clearTimeout(holdTimer.current); holdTimer.current = null; withTimer(snap); }
+    else stopRec();
+  };
+
+  const pickFromLibrary = async () => {
+    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images", "videos"], allowsEditing: true, videoMaxDuration: MAX_REC, quality: 0.92 });
+    const a = res.assets?.[0];
+    if (!res.canceled && a) go(a.uri, a.type === "video" ? "video" : "photo");
+  };
+
+  const setLook = (i: number) => {
+    const n = Math.max(0, Math.min(LOOKS.length - 1, i));
+    if (n === lookIdx) return;
+    tickHaptic(); setLookIdx(n);
+    lookFlash.setValue(1);
+    Animated.timing(lookFlash, { toValue: 0, duration: 900, delay: 300, useNativeDriver: true }).start();
+  };
+
+  const flip = () => { tapHaptic(); setFacing((f) => (f === "back" ? "front" : "back")); };
+  const pinch = Gesture.Pinch().runOnJS(true)
+    .onStart(() => { zoomBase.current = zoom; })
+    .onUpdate((e) => setZoom(Math.max(0, Math.min(0.6, zoomBase.current + (e.scale - 1) * 0.25))));
+  const dbl = Gesture.Tap().numberOfTaps(2).runOnJS(true).onEnd(flip);
+  const swipeL = Gesture.Fling().direction(Directions.LEFT).runOnJS(true).onEnd(() => setLook(lookIdx + 1));
+  const swipeR = Gesture.Fling().direction(Directions.RIGHT).runOnJS(true).onEnd(() => setLook(lookIdx - 1));
+  const swipeUp = Gesture.Fling().direction(Directions.UP).runOnJS(true).onEnd(() => router.push("/nearby"));
+  const gestures = Gesture.Race(pinch, dbl, Gesture.Simultaneous(swipeL, swipeR, swipeUp));
+
+  if (!perm) return <View style={{ flex: 1, backgroundColor: "#000" }} />;
+  if (!perm.granted) {
+    return (
+      <View style={[s.permWrap, { paddingTop: insets.top + 40, paddingBottom: tabSpace + 30 }]}>
+        <Text style={{ fontSize: 64 }}>📸</Text>
+        <Text style={s.permTitle}>Your zing camera</Text>
+        <Text style={s.permBody}>Snap the charger, the queue or the view. Tap to shoot, hold to record. Your photos help the next driver.</Text>
+        <Pressable onPress={() => (perm.canAskAgain ? askPerm() : Linking.openSettings())} style={s.permBtn}>
+          <Text style={{ color: "#1A1A1A", fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 17 }}>{perm.canAskAgain ? "Turn on camera" : "Open Settings"}</Text>
+        </Pressable>
+        <Pressable onPress={() => router.push("/nearby")} style={{ padding: 12 }}><Text style={{ color: "#C9CED3", fontWeight: "700" }}>See zings near you instead</Text></Pressable>
+      </View>
+    );
+  }
+
+  const ringR = 38, ringC = 2 * Math.PI * ringR;
+  const faces = [...new Map(nearby.map((z) => [z.user_id, z])).values()].slice(0, 3);
 
   return (
-    <View style={{ flex: 1, backgroundColor: BG }}>
-      <FlatList
-        data={shownZ}
-        keyExtractor={(z) => z.id}
-        contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: tabSpace + 90, paddingTop: insets.top + 12, gap: 14 }}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={() => load()} tintColor="#FCE38A" />}
-        ListHeaderComponent={
-          <View style={{ paddingHorizontal: 4, paddingBottom: 6 }}>
-            <Text style={{ color: "#fff", fontSize: 40, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.5 }}>Zings near you</Text>
-            <View style={{ marginTop: 10, marginBottom: 4 }}><ModeSwitch dark /></View>
-            <Text style={{ color: "#A9B3BC" }}>Live from chargers within 25 km · gone in 24 hours</Text>
-            <Pressable onPress={() => router.push("/leaderboard")} style={styles.board} accessibilityRole="button">
-              <Ionicons name="trophy" size={18} color="#FCE38A" />
-              <View style={{ flex: 1 }}>
-                <Text style={{ color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Zing Score leaderboard</Text>
-                <Text style={{ color: "#A9B3BC", fontSize: 12.5 }}>Zings taken right at the charger score the most</Text>
+    <View style={{ flex: 1, backgroundColor: "#000" }}>
+      <GestureDetector gesture={gestures}>
+        <View style={StyleSheet.absoluteFill}>
+          {focused && active && (
+            <CameraView ref={cam} style={StyleSheet.absoluteFill} facing={facing} mode={mode} zoom={zoom}
+              flash={facing === "back" ? flash : "off"} enableTorch={facing === "back" && flash === "on" && recording} mirror={facing === "front"} />
+          )}
+          <VideoLook look={look.id} width={W} height={H} />
+          {grid && (
+            <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+              {[1, 2].map((k) => <View key={`v${k}`} style={[s.gridV, { left: (W / 3) * k }]} />)}
+              {[1, 2].map((k) => <View key={`h${k}`} style={[s.gridH, { top: (H / 3) * k }]} />)}
+            </View>
+          )}
+        </View>
+      </GestureDetector>
+
+      {/* Look name, flashed when you swipe */}
+      <Animated.View pointerEvents="none" style={[s.lookName, { opacity: lookFlash, top: H * 0.42 }]}>
+        <Text style={s.lookText}>{look.name}</Text>
+      </Animated.View>
+      {count != null && <View pointerEvents="none" style={[StyleSheet.absoluteFill, s.center]}><Text style={s.count}>{count}</Text></View>}
+      {whiteout && <View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: "#FFF9E8" }]} />}
+
+      {/* Top: nearby zings, where you are */}
+      <View style={[s.top, { paddingTop: insets.top + 6 }]} pointerEvents="box-none">
+        <Pressable onPress={() => router.push("/nearby")} accessibilityLabel="Zings near you">
+          <Glass style={s.nearbyPill} interactive>
+            {faces.length > 0 ? (
+              <View style={{ flexDirection: "row" }}>
+                {faces.map((z, i) => (
+                  <View key={z.id} style={[s.face, { marginLeft: i ? -10 : 0, zIndex: 3 - i }]}>
+                    {z.photo_path ? <Image source={{ uri: snapUrl(z.photo_path) }} style={{ width: 26, height: 26 }} contentFit="cover" /> : null}
+                  </View>
+                ))}
               </View>
-              <Ionicons name="chevron-forward" size={18} color="#A9B3BC" />
-            </Pressable>
+            ) : <Ionicons name="flash" size={16} color={LEMON} />}
+            <Text style={s.pillText}>{nearby.length ? `${nearby.length} nearby` : "Nearby"}</Text>
+          </Glass>
+        </Pressable>
+        {near && (
+          <Glass style={s.where}>
+            <Text style={s.whereText} numberOfLines={1}>📍 {near.d <= 400 ? near.c.name : `${near.c.name} · ${fmtDistance(near.d)}`}</Text>
+          </Glass>
+        )}
+      </View>
+
+      {/* Right rail: flip, flash, timer, grid */}
+      <View style={[s.rail, { top: insets.top + 62 }]}>
+        {([
+          [flip, "camera-reverse", "Flip"],
+          [() => { tapHaptic(); setFlash((f) => (f === "off" ? "on" : f === "on" ? "auto" : "off")); }, flash === "off" ? "flash-off" : "flash", flash === "auto" ? "Auto" : flash === "on" ? "On" : "Flash"],
+          [() => { tapHaptic(); setTimer((t) => (t === 0 ? 3 : t === 3 ? 10 : 0)); }, "timer-outline", timer ? `${timer}s` : "Timer"],
+          [() => { tapHaptic(); setGrid((g) => !g); }, "grid-outline", grid ? "Grid on" : "Grid"],
+        ] as const).map(([fn, icon, label]) => (
+          <Pressable key={label} onPress={fn as any} style={s.railBtn} accessibilityLabel={label}>
+            <Glass style={s.railGlass} interactive><Ionicons name={icon as any} size={20} color={(label === "On" || label === "Auto" || /s$/.test(label) || label === "Grid on") ? LEMON : "#fff"} /></Glass>
+            <Text style={s.railLabel}>{label}</Text>
+          </Pressable>
+        ))}
+        {zoom > 0.01 && <Text style={[s.railLabel, { marginTop: 4 }]}>{(1 + zoom * 9).toFixed(1)}×</Text>}
+      </View>
+
+      {/* Looks carousel + shutter */}
+      <View style={[s.bottom, { bottom: tabSpace + 8 }]} pointerEvents="box-none">
+        {!recording && (
+          <View style={s.looks}>
+            {LOOKS.map((l, i) => Math.abs(i - lookIdx) <= 3 ? (
+              <Pressable key={l.id} onPress={() => setLook(i)} style={[s.lookDot, i === lookIdx && s.lookDotOn]}>
+                <Text style={[s.lookDotText, i === lookIdx && { color: "#1A1A1A" }]} numberOfLines={1}>{l.name}</Text>
+              </Pressable>
+            ) : null)}
           </View>
-        }
-        ListEmptyComponent={
-          loading ? null : (
-            <View style={{ alignItems: "center", gap: 10, paddingVertical: 60 }}>
-              <Ionicons name="flash-outline" size={40} color="#FCE38A" />
-              <Text style={{ color: "#fff", fontSize: 17, fontWeight: "700" }}>
-                {where ? "No zings near you today" : "Turn on location to see zings near you"}
-              </Text>
-              <Text style={{ color: "#A9B3BC", textAlign: "center", paddingHorizontal: 30 }}>
-                Drop the first one at your next charge. Your photo helps the next driver.
-              </Text>
-              <Pressable onPress={() => router.push("/zap/nearest")} style={styles.cta}>
-                <Text style={{ color: "#1A1A1A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Drop a zing</Text>
-              </Pressable>
-            </View>
-          )
-        }
-        renderItem={({ item: z, index }) => {
-          const name = z.profiles?.display_name ?? "Driver";
-          const sc = STATUS_STYLE[z.status];
-          return (
-            <View style={styles.card}>
-              <Pressable onPress={() => setViewer(index)} accessibilityLabel={`Zing by ${name} at ${z.chargers?.name ?? z.place_name ?? "a charger"}`}>
-                {z.photo_path && (
-                  <Image source={{ uri: snapUrl(z.photo_path) }} style={{ width: cardW, height: Math.min(cardW * 4 / 3, 520) }} contentFit="cover" transition={200} />
-                )}
-                  {(z.video_path || z.music) && (
-                    <View style={{ position: "absolute", top: 12, right: 12, flexDirection: "row", gap: 6 }}>
-                      {!!z.video_path && <View style={styles.mediaBadge}><Ionicons name="play" size={13} color="#fff" /><Text style={styles.mediaText}>Video</Text></View>}
-                      {!!z.music && <View style={styles.mediaBadge}><Ionicons name="musical-note" size={13} color="#FCE38A" /></View>}
-                    </View>
-                  )}
-                <View style={{ position: "absolute", top: 10, left: 10 }}>
-                  <ScoreChip points={z.zap_score} distanceM={z.distance_m} />
-                </View>
-                {!!z.note && (
-                  <Text style={styles.note} numberOfLines={3}>{z.note}</Text>
-                )}
-              </Pressable>
-              <View style={styles.meta}>
-                <Pressable onPress={() => router.push(`/driver/${z.user_id}`)} style={styles.avatar} accessibilityLabel={`${name}'s profile`}>
-                  <Text style={{ color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()}</Text>
-                </Pressable>
-                <Pressable style={{ flex: 1, minWidth: 0 }} onPress={() => router.push(`/charger/${encodeURIComponent(z.charger_id)}`)}>
-                  <Text style={{ color: "#fff" }} numberOfLines={1}>
-                    <Text style={{ fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{name}</Text>
-                    <Text style={{ color: "#A9B3BC" }}> · {timeAgo(z.created_at)}</Text>
-                  </Text>
-                  <Text style={{ color: "#A9B3BC", fontSize: 13 }} numberOfLines={1}>{z.chargers?.name ?? z.place_name ?? "Charger"}</Text>
-                </Pressable>
-                {z.charger_id ? <Text style={[styles.status, { color: sc.fg, backgroundColor: sc.bg }]}>{STATUS_LABEL[z.status].split(" ")[0]}</Text>
-                  : <Text style={[styles.status, { color: "#FCE38A", backgroundColor: "#2A2610" }]}>📍 Place</Text>}
-              </View>
-            </View>
-          );
-        }}
-      />
-      {shownZ.length > 0 && <Pressable onPress={() => { tapHaptic(); router.push("/zap/nearest"); }} accessibilityLabel="Drop a zing"
-        style={({ pressed }) => ({ position: "absolute", right: 16, bottom: tabSpace + 14, transform: [{ scale: pressed ? 0.93 : 1 }] })}>
-        <Glass style={styles.fab} tint="#FCE38A" interactive>
-          <Ionicons name="camera" size={22} color="#1A1A1A" />
-          <Text style={{ color: "#1A1A1A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 16 }}>Drop a zing</Text>
-        </Glass>
-      </Pressable>}
-      {viewer !== null && <SnapViewer snaps={shownZ} start={viewer} onClose={() => setViewer(null)} onChanged={() => load()} />}
+        )}
+        <View style={s.shutterRow}>
+          <Pressable onPress={() => router.push(session ? "/memories" : "/login")} style={s.side} accessibilityLabel="Memories">
+            {last ? <Image source={{ uri: snapUrl(last) }} style={s.memThumb} contentFit="cover" /> : <Glass style={s.sideGlass}><Ionicons name="albums-outline" size={22} color="#fff" /></Glass>}
+          </Pressable>
+
+          <Pressable onPressIn={onPressIn} onPressOut={onPressOut} accessibilityLabel="Tap to snap, hold to record" style={s.shutterWrap}>
+            <View style={[s.shutterRing, recording && { borderColor: "rgba(255,59,48,0.35)", transform: [{ scale: 1.18 }] }]} />
+            {recording && (
+              <Animated.View style={[s.recFill, { transform: [{ scale: 1.18 }], opacity: prog.interpolate({ inputRange: [0, 1], outputRange: [0.5, 1] }) }]}>
+                <Animated.View style={{ position: "absolute", left: 0, bottom: 0, right: 0, backgroundColor: "#FF3B30",
+                  height: prog.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] }) }} />
+              </Animated.View>
+            )}
+            <View style={[s.shutterCore, recording && { backgroundColor: "#FF3B30", width: 34, height: 34, borderRadius: 10 }]} />
+          </Pressable>
+
+          <Pressable onPress={pickFromLibrary} style={s.side} accessibilityLabel="Choose from photos">
+            <Glass style={s.sideGlass}><Ionicons name="images-outline" size={22} color="#fff" /></Glass>
+          </Pressable>
+        </View>
+        <Text style={s.hint}>{recording ? "Recording · let go to stop" : "Tap to snap · hold to record · swipe for looks"}</Text>
+      </View>
+      {!focused && <View style={[StyleSheet.absoluteFill, s.center]}><ActivityIndicator color="#fff" /></View>}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  mediaBadge: { flexDirection: "row", alignItems: "center", gap: 4, height: 28, paddingHorizontal: 9, borderRadius: 14, backgroundColor: "rgba(0,0,0,0.55)" },
-  mediaText: { color: "#fff", fontWeight: "800", fontSize: 12 },
-  fab: { flexDirection: "row", alignItems: "center", gap: 8, height: 56, paddingHorizontal: 22, borderRadius: 28,
-    shadowColor: "#FCE38A", shadowOpacity: 0.45, shadowRadius: 14, shadowOffset: { width: 0, height: 4 }, elevation: 8 },
-  board: { flexDirection: "row", alignItems: "center", gap: 12, marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: "#151E26" },
-  card: { borderRadius: 20, overflow: "hidden", backgroundColor: "#151C23" },
-  note: { position: "absolute", left: 14, right: 14, bottom: 14, color: "#fff", fontSize: 15, lineHeight: 21, textShadowColor: "rgba(0,0,0,0.8)", textShadowRadius: 8 },
-  meta: { flexDirection: "row", alignItems: "center", gap: 10, padding: 12 },
-  avatar: { width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: "#FCE38A", backgroundColor: "#1F2A35", alignItems: "center", justifyContent: "center" },
-  status: { fontSize: 12, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", paddingHorizontal: 9, paddingVertical: 5, borderRadius: 10, overflow: "hidden" },
-  cta: { marginTop: 8, backgroundColor: "#FCE38A", paddingHorizontal: 22, height: 46, borderRadius: 23, alignItems: "center", justifyContent: "center" },
+const s = StyleSheet.create({
+  center: { alignItems: "center", justifyContent: "center" },
+  permWrap: { flex: 1, backgroundColor: "#0B0E11", alignItems: "center", justifyContent: "center", gap: 14, paddingHorizontal: 30 },
+  permTitle: { color: "#fff", fontSize: 28, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold" },
+  permBody: { color: "#A9B3BC", textAlign: "center", lineHeight: 22, fontSize: 15.5 },
+  permBtn: { backgroundColor: LEMON, height: 56, paddingHorizontal: 28, borderRadius: 28, justifyContent: "center", marginTop: 8 },
+  top: { position: "absolute", left: 0, right: 0, top: 0, flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 14 },
+  nearbyPill: { flexDirection: "row", alignItems: "center", gap: 8, height: 42, paddingHorizontal: 10, borderRadius: 21, backgroundColor: "rgba(0,0,0,0.45)" },
+  face: { width: 28, height: 28, borderRadius: 14, borderWidth: 2, borderColor: LEMON, overflow: "hidden", backgroundColor: "#222" },
+  pillText: { color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
+  where: { flexShrink: 1, height: 36, paddingHorizontal: 12, borderRadius: 18, justifyContent: "center", backgroundColor: "rgba(0,0,0,0.45)" },
+  whereText: { color: "#fff", fontWeight: "700", fontSize: 13 },
+  rail: { position: "absolute", right: 10, alignItems: "center", gap: 12 },
+  railBtn: { alignItems: "center", gap: 3 },
+  railGlass: { width: 42, height: 42, borderRadius: 21, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.4)" },
+  railLabel: { color: "#fff", fontSize: 10.5, fontWeight: "700", textShadowColor: "rgba(0,0,0,0.6)", textShadowRadius: 3 },
+  gridV: { position: "absolute", top: 0, bottom: 0, width: StyleSheet.hairlineWidth, backgroundColor: "rgba(255,255,255,0.45)" },
+  gridH: { position: "absolute", left: 0, right: 0, height: StyleSheet.hairlineWidth, backgroundColor: "rgba(255,255,255,0.45)" },
+  lookName: { position: "absolute", left: 0, right: 0, alignItems: "center" },
+  lookText: { color: "#fff", fontSize: 30, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: 1, textShadowColor: "rgba(0,0,0,0.5)", textShadowRadius: 8 },
+  count: { color: "#fff", fontSize: 140, fontWeight: "200", textShadowColor: "rgba(0,0,0,0.4)", textShadowRadius: 10 },
+  bottom: { position: "absolute", left: 0, right: 0, alignItems: "center", gap: 10 },
+  looks: { flexDirection: "row", gap: 6, paddingHorizontal: 12 },
+  lookDot: { height: 30, paddingHorizontal: 11, borderRadius: 15, backgroundColor: "rgba(0,0,0,0.38)", justifyContent: "center", maxWidth: 110 },
+  lookDotOn: { backgroundColor: LEMON },
+  lookDotText: { color: "#fff", fontWeight: "800", fontSize: 12.5 },
+  shutterRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "100%", paddingHorizontal: 34 },
+  side: { width: 50, height: 50, alignItems: "center", justifyContent: "center" },
+  sideGlass: { width: 50, height: 50, borderRadius: 16, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.4)" },
+  memThumb: { width: 46, height: 46, borderRadius: 14, borderWidth: 2, borderColor: "#fff" },
+  shutterWrap: { width: 92, height: 92, alignItems: "center", justifyContent: "center" },
+  shutterRing: { position: "absolute", width: 84, height: 84, borderRadius: 42, borderWidth: 5, borderColor: "#fff" },
+  recFill: { position: "absolute", width: 84, height: 84, borderRadius: 42, overflow: "hidden" },
+  shutterCore: { width: 66, height: 66, borderRadius: 33, backgroundColor: LEMON },
+  hint: { color: "rgba(255,255,255,0.85)", fontSize: 12, fontWeight: "600", textShadowColor: "rgba(0,0,0,0.6)", textShadowRadius: 3 },
 });

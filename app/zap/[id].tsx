@@ -28,18 +28,19 @@ const YELLOW = "#FCE38A";
 
 /** Drop a zap: pick the charger (or use the nearest), shoot or choose a photo, grade it, post it. */
 export default function DropZap() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, uri: shot, kind: shotKind, look: shotLook } = useLocalSearchParams<{ id: string; uri?: string; kind?: string; look?: string }>();
   const auth = useAuth();
   const [charger, setCharger] = useState<Charger | null>(null);
   const [nearby, setNearby] = useState<{ c: Charger; d: number }[]>([]);
   const [choosing, setChoosing] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [uri, setUri] = useState<string | null>(null);
+  // Coming from the Zings camera: the photo or video is already taken.
+  const [uri, setUri] = useState<string | null>(shot ? decodeURIComponent(String(shot)) : null);
   const [status, setStatus] = useState<Status>("working");
   const [note, setNote] = useState("");
   const [keep, setKeep] = useState(false);
-  const [kind, setKind] = useState<"photo" | "video">("photo");
-  const [videoLook, setVideoLook] = useState("cinema");
+  const [kind, setKind] = useState<"photo" | "video">(shotKind === "video" ? "video" : "photo");
+  const [videoLook, setVideoLook] = useState(shotLook && shotKind === "video" ? String(shotLook) : "cinema");
   const [music, setMusic] = useState<string | null>(null);
   const [musicOpen, setMusicOpen] = useState(false);
   const [audience, setAudience] = useState<"public" | "crew">("public");
@@ -303,6 +304,7 @@ export default function DropZap() {
                 speedText={charger && isFast(charger) ? speedLabel(charger).toUpperCase() : null}
                 carModel={auth.profile?.car_model ?? null}
                 editorRef={editor}
+                initialLook={shotLook ? String(shotLook) : null}
               />
             ) : (
               <View style={{ marginHorizontal: 16, gap: 10 }}>

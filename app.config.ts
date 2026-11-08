@@ -8,7 +8,7 @@ const config: ExpoConfig = {
   name: "zingd",
   slug: "zappd",
   version: "1.0.0",
-  scheme: "zappd",
+  scheme: ["zingd", "zappd"],
   orientation: "portrait",
   icon: "./assets/icon.png",
   userInterfaceStyle: "automatic",
@@ -41,6 +41,8 @@ const config: ExpoConfig = {
   plugins: [
     "expo-router",
     ["expo-notifications", { color: "#FCE38A" }],
+    // The Zings camera.
+    ["expo-camera", { cameraPermission: "zingd uses the camera so you can snap or record zings of chargers and drives.", microphonePermission: "zingd records sound with your video zings.", recordAudioAndroid: true }],
     // Zing music and video zings.
     "expo-audio",
     "expo-video",
