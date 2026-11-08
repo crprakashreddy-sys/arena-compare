@@ -25,7 +25,9 @@ const SF = {
   clubs: { default: "person.2", selected: "person.2.fill" },
   you: { default: "person.crop.circle", selected: "person.crop.circle.fill" },
 } as const;
-function TabIcon({ name, md }: { name: keyof typeof ICONS; md: string }) {
+// NativeTabs reads its <Icon> children by type, so this must be called as a function that returns
+// the Icon element itself (a wrapper component would hide it and the tab shows no icon).
+function tabIcon(name: keyof typeof ICONS, md: string) {
   if (Platform.OS !== "ios") return <NativeTabs.Trigger.Icon md={md as any} />;
   return IN_EXPO_GO
     ? <NativeTabs.Trigger.Icon sf={SF[name] as any} />
@@ -70,20 +72,20 @@ export default function TabsLayout() {
     <NativeTabs minimizeBehavior="onScrollDown" tintColor={tint}
       labelStyle={{ fontFamily: "SpaceGrotesk_700Bold", fontSize: 10.5, color: LABEL }}>
       <NativeTabs.Trigger name="index">
-        <TabIcon name="map" md="map" />
+        {tabIcon("map", "map")}
         <NativeTabs.Trigger.Label>Map</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="feed">
-        <TabIcon name="zings" md="bolt" />
+        {tabIcon("zings", "bolt")}
         <NativeTabs.Trigger.Label>Zings</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="clubs">
-        <TabIcon name="clubs" md="groups" />
+        {tabIcon("clubs", "groups")}
         <NativeTabs.Trigger.Label>Clubs</NativeTabs.Trigger.Label>
         {dm > 0 && <NativeTabs.Trigger.Badge>{dm > 9 ? "9+" : String(dm)}</NativeTabs.Trigger.Badge>}
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
-        <TabIcon name="you" md="account_circle" />
+        {tabIcon("you", "account_circle")}
         <NativeTabs.Trigger.Label>You</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
     </NativeTabs>
