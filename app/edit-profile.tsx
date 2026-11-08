@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { Alert, ScrollView, Text, TextInput } from "react-native";
+import { Alert, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { INTERESTS, PROMPTS, type Prompt } from "../lib/interests";
+import { tickHaptic } from "../lib/motion";
+import { CTA, ON_CTA } from "../lib/theme";
 import { router } from "expo-router";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/auth";
@@ -16,6 +19,13 @@ export default function EditProfile() {
   const [plate, setPlate] = useState("");
   const [bio, setBio] = useState(profile?.bio ?? "");
   const [busy, setBusy] = useState(false);
+  const [interests, setInterests] = useState<string[]>(profile?.interests ?? []);
+  const [prompts, setPrompts] = useState<Prompt[]>(profile?.prompts ?? []);
+  const toggle = (id: string) => { tickHaptic(); setInterests((cur) => cur.includes(id) ? cur.filter((x) => x !== id) : cur.length >= 6 ? cur : [...cur, id]); };
+  const pickPrompt = () => {
+    const left = PROMPTS.filter((q) => !prompts.some((p) => p.q === q));
+    Alert.alert("Pick a prompt", undefined, [...left.map((q) => ({ text: q, onPress: () => setPrompts((p) => [...p, { q, a: "" }]) })), { text: "Cancel", style: "cancel" as const }]);
+  };
 
   const save = async () => {
     if (!profile) return;
@@ -27,6 +37,10 @@ export default function EditProfile() {
       .update({ display_name: name.trim(), car_model: car.trim() || null, city: city.trim() || null, bio: bio.trim() || null })
       .eq("id", profile.id);
     if (error) { setBusy(false); return Alert.alert("Profile didn't save", "Try again in a moment."); }
+    // Interests and prompts are saved separately, so profile basics still save if that database step isn't run yet.
+    await supabase.from("profiles").update({
+      interests, prompts: prompts.filter((p) => p.a.trim()).map((p) => ({ q: p.q, a: p.a.trim().slice(0, 90) })),
+    }).eq("id", profile.id);
     if (reg) {
       try {
         const r = await verifyVehicle(reg);
@@ -50,6 +64,36 @@ export default function EditProfile() {
       <Text style={{ color: t.muted, fontWeight: "600" }}>Bio ({160 - bio.length} left)</Text>
       <TextInput value={bio} onChangeText={setBio} placeholder="Weekend road-tripper. Nexon EV since 2023. Chai at every charger."
         placeholderTextColor={t.faint} multiline maxLength={160} style={[input, { height: 84, paddingTop: 12, textAlignVertical: "top" }]} />
+      <Text style={{ color: t.muted, fontWeight: "600", marginTop: 6 }}>What you're into ({interests.length}/6)</Text>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+        {INTERESTS.map((i) => {
+          const on = interests.includes(i.id);
+          return (
+            <Pressable key={i.id} onPress={() => toggle(i.id)} style={{ flexDirection: "row", alignItems: "center", gap: 6, height: 38, paddingHorizontal: 12, borderRadius: 19, backgroundColor: on ? CTA : t.surface }}>
+              <Text>{i.emoji}</Text><Text style={{ color: on ? ON_CTA : t.text, fontWeight: "700", fontSize: 13.5 }}>{i.label}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <Text style={{ color: t.muted, fontWeight: "600", marginTop: 10 }}>Prompts: show your personality ({prompts.length}/3)</Text>
+      {prompts.map((p, k) => (
+        <View key={p.q} style={{ backgroundColor: t.surface, borderRadius: 18, padding: 14, gap: 6 }}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={{ color: t.muted, fontWeight: "800", fontSize: 13, flex: 1 }}>{p.q}</Text>
+            <Pressable onPress={() => setPrompts((all) => all.filter((_, j) => j !== k))} hitSlop={8}><Text style={{ color: t.muted, fontWeight: "700" }}>Remove</Text></Pressable>
+          </View>
+          <TextInput value={p.a} onChangeText={(v) => setPrompts((all) => all.map((x, j) => (j === k ? { ...x, a: v } : x)))}
+            placeholder="Your answer" placeholderTextColor={t.faint} maxLength={90}
+            style={{ color: t.text, fontSize: 18, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }} />
+        </View>
+      ))}
+      {prompts.length < 3 && (
+        <Pressable onPress={pickPrompt} style={{ height: 48, borderRadius: 16, borderWidth: 1.5, borderStyle: "dashed", borderColor: t.line, alignItems: "center", justifyContent: "center" }}>
+          <Text style={{ color: t.text, fontWeight: "800" }}>+ Add a prompt</Text>
+        </Pressable>
+      )}
+
       <Text style={{ color: t.muted, fontWeight: "600" }}>Your EV</Text>
       <TextInput value={car} onChangeText={setCar} placeholder="Tata Nexon EV" placeholderTextColor={t.faint} style={input} maxLength={40} />
       <Text style={{ color: t.muted, fontWeight: "600" }}>City</Text>

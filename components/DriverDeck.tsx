@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, Dimensions, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useAuth } from "../lib/auth";
+import { interestById, openers } from "../lib/interests";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
@@ -22,6 +24,9 @@ export function DriverDeck({ people, onEmpty }: { people: Suggestion[]; onEmpty?
   const [skipped, setSkipped] = useState<Set<string> | null>(null);
   const [gone, setGone] = useState<Set<string>>(new Set());
   const [toast, setToast] = useState<string | null>(null);
+  const [opening, setOpening] = useState<Suggestion | null>(null);
+  const [note, setNote] = useState("");
+  const { profile } = useAuth();
   useEffect(() => { AsyncStorage.getItem(SKIP_KEY).then((v) => setSkipped(new Set(v ? JSON.parse(v) : []))).catch(() => setSkipped(new Set())); }, []);
 
   const deck = skipped ? people.filter((p) => !skipped.has(p.id) && !gone.has(p.id)) : [];
@@ -35,7 +40,8 @@ export function DriverDeck({ people, onEmpty }: { people: Suggestion[]; onEmpty?
     });
     if (like) {
       successHaptic();
-      sendRequest(p.id).then(() => flash(`Request sent to ${p.display_name.split(" ")[0]} ⚡`)).catch((e) => flash(e.message));
+      // Bumble's "opening move": say something with your request (or just send it).
+      setNote(""); setOpening(p);
     } else {
       tickHaptic();
       const next = new Set(skipped ?? []); next.add(p.id); setSkipped(next);
@@ -61,7 +67,7 @@ export function DriverDeck({ people, onEmpty }: { people: Suggestion[]; onEmpty?
 
   return (
     <View style={{ paddingHorizontal: 16 }}>
-      <View style={{ height: 330 }}>
+      <View style={{ height: 390 }}>
         {next && (
           <Animated.View style={[StyleSheet.absoluteFill, { transform: [{ scale: behind }, { translateY: 10 }] }]}>
             <Card p={next} />
@@ -86,6 +92,32 @@ export function DriverDeck({ people, onEmpty }: { people: Suggestion[]; onEmpty?
           <Ionicons name="flash" size={30} color={INK} />
         </Pressable>
       </View>
+      <Modal visible={!!opening} transparent animationType="slide" onRequestClose={() => setOpening(null)}>
+        <Pressable style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)" }} onPress={() => setOpening(null)} />
+        {opening && (
+          <View style={s.sheet}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+              <Avatar name={opening.display_name} photo={opening.avatar_path} size={52} />
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: INK, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 19 }}>Connect with {opening.display_name.split(" ")[0]}</Text>
+                <Text style={{ color: "#666", fontSize: 13 }}>Add an opening move. Requests with a note get answered more.</Text>
+              </View>
+            </View>
+            {openers(opening, profile ?? {}).map((o) => (
+              <Pressable key={o} onPress={() => { tickHaptic(); setNote(o); }} style={[s.opener, note === o && { backgroundColor: LEMON }]}>
+                <Text style={{ color: INK, fontWeight: "600" }}>{o}</Text>
+              </Pressable>
+            ))}
+            <TextInput value={note} onChangeText={setNote} placeholder="Or write your own…" placeholderTextColor="#999" maxLength={140} multiline style={s.noteInput} />
+            <View style={{ flexDirection: "row", gap: 8 }}>
+              <Pressable onPress={() => { const p = opening; setOpening(null); sendRequest(p.id).then(() => flash(`Request sent to ${p.display_name.split(" ")[0]} ⚡`)).catch((e) => flash(e.message)); }}
+                style={[s.sheetBtn, { backgroundColor: "#F3F1EA" }]}><Text style={{ color: INK, fontWeight: "800" }}>Just connect</Text></Pressable>
+              <Pressable onPress={() => { const p = opening; setOpening(null); successHaptic(); sendRequest(p.id, note).then(() => flash(`Sent to ${p.display_name.split(" ")[0]} with your note ⚡`)).catch((e) => flash(e.message)); }}
+                disabled={!note.trim()} style={[s.sheetBtn, { backgroundColor: INK, opacity: note.trim() ? 1 : 0.4 }]}><Text style={{ color: LEMON, fontWeight: "800" }}>Send with note</Text></Pressable>
+            </View>
+          </View>
+        )}
+      </Modal>
       {toast && <View style={s.toast}><Text style={{ color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{toast}</Text></View>}
     </View>
   );
@@ -106,7 +138,16 @@ function Card({ p, onOpen }: { p: Suggestion; onOpen?: () => void }) {
           {!!p.city && <View style={s.chip}><Icon name="pin" size={13} color={INK} /><Text style={s.chipText}>{p.city}</Text></View>}
         </View>
         {!!p.reason && <Text style={s.reason} numberOfLines={1}>✨ {p.reason}</Text>}
-        {!!p.bio && <Text style={s.bio} numberOfLines={2}>{p.bio}</Text>}
+        {!!p.shared_interests?.length && (
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 5 }}>
+            {p.shared_interests.slice(0, 3).map((id) => interestById(id)).filter(Boolean).map((i) => (
+              <View key={i!.id} style={[s.chip, { backgroundColor: LEMON }]}><Text style={{ fontSize: 12 }}>{i!.emoji}</Text><Text style={s.chipText}>{i!.label}</Text></View>
+            ))}
+          </View>
+        )}
+        {p.prompts?.[0] ? (
+          <View style={s.prompt}><Text style={s.promptQ}>{p.prompts[0].q}</Text><Text style={s.promptA} numberOfLines={2}>{p.prompts[0].a}</Text></View>
+        ) : !!p.bio && <Text style={s.bio} numberOfLines={2}>{p.bio}</Text>}
       </View>
     </Pressable>
   );
@@ -115,7 +156,7 @@ function Card({ p, onOpen }: { p: Suggestion; onOpen?: () => void }) {
 const s = StyleSheet.create({
   card: { flex: 1, borderRadius: 28, backgroundColor: "#fff", overflow: "hidden",
     shadowColor: "#000", shadowOpacity: 0.14, shadowRadius: 18, shadowOffset: { width: 0, height: 8 }, elevation: 6 },
-  top: { height: 160, backgroundColor: LEMON, alignItems: "center", justifyContent: "flex-end", overflow: "hidden" },
+  top: { height: 140, backgroundColor: LEMON, alignItems: "center", justifyContent: "flex-end", overflow: "hidden" },
   blobA: { position: "absolute", width: 220, height: 220, borderRadius: 110, backgroundColor: "#FFD45C", top: -110, left: -60 },
   blobB: { position: "absolute", width: 160, height: 160, borderRadius: 80, backgroundColor: "#FFF3C4", bottom: -70, right: -30 },
   avatarRing: { padding: 4, borderRadius: 64, backgroundColor: "#fff", marginBottom: -44 },
@@ -134,5 +175,12 @@ const s = StyleSheet.create({
   round: { width: 62, height: 62, borderRadius: 31, alignItems: "center", justifyContent: "center",
     shadowColor: "#000", shadowOpacity: 0.12, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 4 },
   small: { width: 46, height: 46, borderRadius: 23, backgroundColor: "#F3F1EA", alignItems: "center", justifyContent: "center" },
+  prompt: { backgroundColor: "#F7F5EF", borderRadius: 14, padding: 10, gap: 2 },
+  promptQ: { color: "#8A7A3A", fontSize: 11.5, fontWeight: "800" },
+  promptA: { color: INK, fontSize: 15, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
+  sheet: { backgroundColor: "#fff", borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 20, paddingBottom: 36, gap: 10 },
+  opener: { backgroundColor: "#F3F1EA", borderRadius: 16, padding: 12 },
+  noteInput: { minHeight: 48, borderRadius: 16, borderWidth: 1, borderColor: "#E5E1D6", padding: 12, color: INK, fontSize: 15 },
+  sheetBtn: { flex: 1, height: 50, borderRadius: 25, alignItems: "center", justifyContent: "center" },
   toast: { alignSelf: "center", marginTop: 12, backgroundColor: INK, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 999 },
 });

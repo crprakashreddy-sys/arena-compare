@@ -394,7 +394,7 @@ export async function syncVehicleKind(userId: string, kind: "car" | "two" | "bot
 export async function fetchProfile(userId: string) {
   const { data } = await supabase
     .from("profiles")
-    .select("id,display_name,car_model,city,vehicle_verified,created_at,avatar_path,bio")
+    .select("*")
     .eq("id", userId)
     .maybeSingle();
   return data as (import("./types").Profile & { created_at: string }) | null;
@@ -419,10 +419,10 @@ export async function connectionState(otherId: string): Promise<import("./types"
   return row.requester_id === me ? "sent" : "received";
 }
 
-export async function sendRequest(otherId: string) {
+export async function sendRequest(otherId: string, note?: string | null) {
   const { data: u } = await supabase.auth.getUser();
   if (!u.user) throw new Error("Sign in to connect.");
-  const { error } = await supabase.from("connections").insert({ requester_id: u.user.id, addressee_id: otherId });
+  const { error } = await supabase.from("connections").insert({ requester_id: u.user.id, addressee_id: otherId, ...(note?.trim() ? { note: note.trim().slice(0, 140) } : {}) });
   if (error && !error.message.includes("duplicate")) throw new Error("Your request didn't send. Try again.");
 }
 
@@ -443,7 +443,7 @@ export async function removeConnection(otherId: string) {
     .or(`and(requester_id.eq.${me},addressee_id.eq.${otherId}),and(requester_id.eq.${otherId},addressee_id.eq.${me})`);
 }
 
-export type DriverLite = { id: string; display_name: string; car_model: string | null; vehicle_verified: boolean; avatar_path?: string | null };
+export type DriverLite = { id: string; display_name: string; car_model: string | null; vehicle_verified: boolean; avatar_path?: string | null; note?: string | null };
 
 export async function fetchMyNetwork() {
   const { data: u } = await supabase.auth.getUser();
@@ -451,7 +451,7 @@ export async function fetchMyNetwork() {
   const me = u.user.id;
   const { data } = await supabase
     .from("connections")
-    .select("requester_id,addressee_id,status,requester:profiles!connections_requester_id_fkey(id,display_name,car_model,vehicle_verified,avatar_path),addressee:profiles!connections_addressee_id_fkey(id,display_name,car_model,vehicle_verified,avatar_path)")
+    .select("requester_id,addressee_id,status,note,requester:profiles!connections_requester_id_fkey(id,display_name,car_model,vehicle_verified,avatar_path),addressee:profiles!connections_addressee_id_fkey(id,display_name,car_model,vehicle_verified,avatar_path)")
     .or(`requester_id.eq.${me},addressee_id.eq.${me}`);
   const requests: DriverLite[] = [];
   const connections: DriverLite[] = [];
@@ -459,7 +459,7 @@ export async function fetchMyNetwork() {
     const other = r.requester_id === me ? r.addressee : r.requester;
     if (!other || blockedIds.has(other.id)) continue;
     if (r.status === "accepted") connections.push(other);
-    else if (r.addressee_id === me) requests.push(other);
+    else if (r.addressee_id === me) requests.push({ ...other, note: r.note ?? null });
   }
   return { requests, connections };
 }
@@ -500,6 +500,7 @@ export async function fetchIntroZaps(limit = 5): Promise<{ photo: string; name: 
 export type Suggestion = {
   id: string; display_name: string; car_model: string | null; city: string | null; avatar_path: string | null; bio: string | null;
   vehicle_verified: boolean; shared_clubs: number; score: number; reason: string | null;
+  interests?: string[]; prompts?: { q: string; a: string }[]; shared_interests?: string[];
 };
 export async function fetchSuggestions(limit = 20): Promise<Suggestion[]> {
   const { data, error } = await supabase.rpc("driver_suggestions", { lim: limit });

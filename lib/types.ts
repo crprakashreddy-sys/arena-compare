@@ -23,6 +23,8 @@ export type Profile = {
   vehicle_verified: boolean;
   avatar_path?: string | null;
   bio?: string | null;
+  interests?: string[];
+  prompts?: { q: string; a: string }[];
 };
 
 export type ConnectionState = "none" | "sent" | "received" | "connected";

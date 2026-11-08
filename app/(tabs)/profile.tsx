@@ -189,6 +189,7 @@ export default function You() {
             <View style={{ flex: 1 }}>
               <Text style={{ color: t.text, fontWeight: "700" }}>{d.display_name}</Text>
               <Text style={{ color: t.muted, fontSize: 12.5 }}>{d.car_model ?? "EV driver"}{d.vehicle_verified ? " · Verified EV" : ""}</Text>
+              {!!d.note && <Text style={{ color: t.text, fontSize: 13, fontStyle: "italic" }} numberOfLines={2}>“{d.note}”</Text>}
             </View>
             <Button title="Accept" kind="primary" onPress={async () => { await acceptRequest(d.id); load(); }} style={{ height: 36, paddingHorizontal: 14 }} />
             <Button title="Decline" onPress={async () => { await removeConnection(d.id); load(); }} style={{ height: 36, paddingHorizontal: 12 }} />

@@ -14,6 +14,7 @@ import { Avatar, Button, VerifiedBadge } from "../../components/ui";
 import { openSafetyMenu } from "../../components/SafetyMenu";
 import type { ConnectionState, Profile } from "../../lib/types";
 import { startDm } from "../../lib/dms";
+import { interestById } from "../../lib/interests";
 
 export default function DriverProfile() {
   const t = useTheme();
@@ -68,6 +69,21 @@ export default function DriverProfile() {
           <Text style={{ color: t.muted }}>{[p.car_model, p.city].filter(Boolean).join(" · ")}</Text>
           {!!p.bio && <Text style={{ color: t.text, textAlign: "center", lineHeight: 20, marginTop: 4, paddingHorizontal: 12 }}>{p.bio}</Text>}
           <VerifiedBadge verified={p.vehicle_verified} />
+          {!!p.interests?.length && (
+            <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 6, marginTop: 8 }}>
+              {p.interests.map((id) => interestById(id)).filter(Boolean).map((i) => (
+                <View key={i!.id} style={{ flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, backgroundColor: t.surface }}>
+                  <Text style={{ fontSize: 12 }}>{i!.emoji}</Text><Text style={{ color: t.text, fontWeight: "700", fontSize: 12.5 }}>{i!.label}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+          {(p.prompts ?? []).map((pr) => (
+            <View key={pr.q} style={{ alignSelf: "stretch", backgroundColor: t.surface, borderRadius: 20, padding: 14, gap: 4, marginTop: 8 }}>
+              <Text style={{ color: t.muted, fontWeight: "800", fontSize: 12.5 }}>{pr.q}</Text>
+              <Text style={{ color: t.text, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 19, letterSpacing: -0.3 }}>{pr.a}</Text>
+            </View>
+          ))}
           <View style={{ flexDirection: "row", gap: 8, marginTop: 12, alignSelf: "stretch" }}>
             {[[String(points), "Zing Score"], [String(conns), "Connections"], [badgeFor(points), "Badge"]].map(([v, l]) => (
               <View key={l} style={[styles.stat, { backgroundColor: t.surface }]}>

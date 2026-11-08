@@ -9,14 +9,14 @@ import { useTheme, CTA, ON_CTA } from "../../lib/theme";
 import { useGarage } from "../../lib/vehicles";
 import { activityLine, autoJoinFor, fetchActivity, fetchClubs, fetchMyClubs, joinClub, joinWithCode, type Activity, type Club, type MyClub } from "../../lib/clubs";
 import { fetchInbox, type DmThread } from "../../lib/dms";
-import { fetchFeed, fetchSuggestions, type Suggestion } from "../../lib/community";
+import { acceptRequest, fetchFeed, fetchMyNetwork, fetchSuggestions, removeConnection, type DriverLite, type Suggestion } from "../../lib/community";
+import { successHaptic } from "../../lib/motion";
 import { timeAgo } from "../../lib/geo";
 import { networkById } from "../../lib/networks";
 import { ClubBadge } from "../../components/ClubBadge";
 import { clubSuits, useMode } from "../../lib/mode";
 import { ModeSwitch } from "../../components/ModeSwitch";
 import { Icon } from "../../components/Icon";
-import { NotifyCard } from "../../components/NotifyCard";
 import { Avatar } from "../../components/ui";
 import { StoriesRow, toStories, type Story } from "../../components/StoriesRow";
 import { DriverDeck } from "../../components/DriverDeck";
@@ -52,10 +52,13 @@ export default function Clubs() {
   const [act, setAct] = useState<Record<string, Activity>>({});
   const [zaps, setZaps] = useState<Checkin[]>([]);
   const [people, setPeople] = useState<Suggestion[]>([]);
+  const [requests, setRequests] = useState<DriverLite[]>([]);
   const [viewer, setViewer] = useState<Checkin[] | null>(null);
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
   const [showAll, setShowAll] = useState(false);
+  // Two clean screens instead of one long one: your conversations, and finding new people and clubs.
+  const [view, setView] = useState<"chats" | "discover">("chats");
   const [busy, setBusy] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [mode] = useMode();
@@ -72,7 +75,7 @@ export default function Clubs() {
       ]);
       setAll(a); setMine(m); setDms(d);
       fetchActivity().then(setAct).catch(() => {});
-      if (signedIn) fetchSuggestions(20).then(setPeople).catch(() => {});
+      if (signedIn) { fetchSuggestions(20).then(setPeople).catch(() => {}); fetchMyNetwork().then((n) => setRequests(n.requests)).catch(() => {}); }
       loadStories();
     } catch (e: any) { setErr(e.message); }
     setBusy(false);
@@ -142,6 +145,18 @@ export default function Clubs() {
           </Pressable>
         </View>
 
+        {signedIn && (
+          <View style={[s.seg, { backgroundColor: t.surface }]}>
+            {(["chats", "discover"] as const).map((v) => (
+              <Pressable key={v} onPress={() => { tapHaptic(); setView(v); }} style={[s.segBtn, view === v && { backgroundColor: t.bg, shadowOpacity: 0.08 }]}>
+                <Text style={{ color: view === v ? t.text : t.muted, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>
+                  {v === "chats" ? `Chats${unreadTotal ? `  ${unreadTotal}` : ""}` : `Discover${requests.length ? "  •" : ""}`}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        )}
+        {(!signedIn || view === "chats") && <>
         {/* Stories */}
         {(signedIn || stories.length > 0) && <StoriesRow stories={stories} onOpen={(st: Story) => setViewer(st.zaps)} />}
 
@@ -199,6 +214,37 @@ export default function Clubs() {
           </>
         )}
 
+        </>}
+
+        {(!signedIn || view === "discover") && <>
+        {/* Wants to connect: incoming requests, front and centre (Bumble's Beeline) */}
+        {signedIn && requests.length > 0 && (
+          <>
+            <View style={s.sectionHead}>
+              <Text style={[s.h2, { color: t.text }]}>Wants to connect</Text>
+              <View style={s.pillDark}><Text style={s.pillDarkText}>{requests.length}</Text></View>
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingHorizontal: 16 }}>
+              {requests.map((d) => (
+                <View key={d.id} style={[s.req, { backgroundColor: t.surface }]}>
+                  <Pressable onPress={() => router.push(`/driver/${d.id}`)} style={{ alignItems: "center", gap: 4 }}>
+                    <View style={s.reqRing}><Avatar name={d.display_name} photo={d.avatar_path} size={64} /></View>
+                    <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }} numberOfLines={1}>{d.display_name.split(" ")[0]}</Text>
+                    <Text style={{ color: t.muted, fontSize: 12 }} numberOfLines={1}>{d.car_model ?? "EV driver"}</Text>
+                  </Pressable>
+                  {!!d.note && <Text style={[s.reqNote, { color: t.text, backgroundColor: t.bg }]} numberOfLines={3}>“{d.note}”</Text>}
+                  <View style={{ flexDirection: "row", gap: 6, alignSelf: "stretch" }}>
+                    <Pressable onPress={async () => { tapHaptic(); await removeConnection(d.id); setRequests((r) => r.filter((x) => x.id !== d.id)); }}
+                      style={[s.reqBtn, { backgroundColor: t.bg }]}><Ionicons name="close" size={20} color={t.muted} /></Pressable>
+                    <Pressable onPress={async () => { successHaptic(); await acceptRequest(d.id); setRequests((r) => r.filter((x) => x.id !== d.id)); load(); }}
+                      style={[s.reqBtn, { backgroundColor: CTA, flex: 2 }]}><Ionicons name="flash" size={18} color={ON_CTA} /><Text style={{ color: ON_CTA, fontWeight: "800" }}>Accept</Text></Pressable>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          </>
+        )}
+
         {/* Drivers like you */}
         {signedIn && people.length > 0 && (
           <>
@@ -247,12 +293,13 @@ export default function Clubs() {
           </>
         )}
 
-        {signedIn && (
+        </>}
+
+        {signedIn && view === "discover" && (
           <Pressable onPress={askCode} style={{ paddingHorizontal: 16, paddingTop: 18, alignSelf: "center" }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}><Icon name="key" size={15} color={t.muted} /><Text style={{ color: t.muted, fontWeight: "700" }}>Have an invite code?</Text></View>
           </Pressable>
         )}
-        <NotifyCard />
       </ScrollView>
       {viewer && <SnapViewer snaps={viewer} start={0} onClose={() => setViewer(null)} />}
     </View>
@@ -332,6 +379,8 @@ const s = StyleSheet.create({
   header: { flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 16, paddingBottom: 8 },
   h1: { flex: 1, fontSize: 34, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -1.2 },
   h2: { fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.5 },
+  seg: { flexDirection: "row", marginHorizontal: 16, marginBottom: 8, padding: 4, borderRadius: 16 },
+  segBtn: { flex: 1, height: 38, borderRadius: 12, alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOpacity: 0, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
   sectionHead: { flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 16, marginTop: 24, marginBottom: 10 },
   iconBtn: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   dot: { position: "absolute", top: 6, right: 7, width: 10, height: 10, borderRadius: 5, backgroundColor: "#FF3B5C", borderWidth: 2, borderColor: "#fff" },
@@ -352,6 +401,10 @@ const s = StyleSheet.create({
   tag: { paddingHorizontal: 6, paddingVertical: 1, borderRadius: 6 },
   unread: { minWidth: 22, height: 22, borderRadius: 11, backgroundColor: CTA, alignItems: "center", justifyContent: "center", paddingHorizontal: 6 },
   unreadText: { color: ON_CTA, fontSize: 12, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
+  req: { width: 168, padding: 12, borderRadius: 24, alignItems: "center", gap: 8 },
+  reqRing: { padding: 3, borderRadius: 40, borderWidth: 2.5, borderColor: LEMON },
+  reqNote: { fontSize: 12.5, lineHeight: 17, padding: 8, borderRadius: 12, alignSelf: "stretch", fontStyle: "italic" },
+  reqBtn: { flex: 1, height: 38, borderRadius: 19, flexDirection: "row", gap: 4, alignItems: "center", justifyContent: "center" },
   trend: { width: 140, padding: 12, borderRadius: 22, gap: 6 },
   trendName: { color: INK, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 14.5, letterSpacing: -0.3 },
   trendMeta: { color: INK, opacity: 0.65, fontSize: 12, fontWeight: "700" },
