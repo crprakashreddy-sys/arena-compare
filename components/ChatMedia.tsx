@@ -12,7 +12,7 @@ export function isBare(m: M) {
 }
 
 export function previewOf(m: M) {
-  return m.deleted ? "Message deleted" : m.body ?? (m.zing_id ? "📸 Sent you a zing" : m.sticker ? "Sticker" : m.gif_url ? (gifSize(m.gif_url).sticker ? "Sticker" : "GIF") : "📷 Photo");
+  return m.deleted ? "Message deleted" : m.zing_id && m.body ? `↩︎ ${m.body}` : m.body ?? (m.zing_id ? "📸 Sent you a zing" : m.sticker ? "Sticker" : m.gif_url ? (gifSize(m.gif_url).sticker ? "Sticker" : "GIF") : "📷 Photo");
 }
 
 /** The GIF or sticker inside a message, sized to its real shape before it loads. */

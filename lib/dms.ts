@@ -128,3 +128,24 @@ export async function fetchZingStreaks(): Promise<Record<string, number>> {
   (data ?? []).forEach((r: any) => { if (r.days >= 2) out[r.thread_id] = r.days; });
   return out;
 }
+
+/**
+ * Reply to someone's zing, Snapchat-style. Crew: lands in your chat as the zing plus your message.
+ * Not connected yet: becomes a connect request with your reply as the opening move.
+ */
+export async function replyToZing(zingId: string, ownerId: string, me: string, text: string): Promise<"chat" | "request" | "pending"> {
+  const body = text.trim().slice(0, 500);
+  const { data: ok } = await supabase.rpc("can_dm", { other: ownerId });
+  if (ok) {
+    const tid = await startDm(ownerId);
+    const { error } = await supabase.from("dm_messages").insert({ thread_id: tid, user_id: me, zing_id: zingId, body: body || null });
+    if (error) throw new Error("Your reply didn't send. Try again.");
+    return "chat";
+  }
+  const { error } = await supabase.from("connections").insert({ requester_id: me, addressee_id: ownerId, note: `↩︎ your zing: ${body}`.slice(0, 140) });
+  if (error) {
+    if (error.message.includes("duplicate")) return "pending";
+    throw new Error("Your reply didn't send. Try again.");
+  }
+  return "request";
+}

@@ -283,7 +283,13 @@ function Bubble({ m, mine, tight, replyTo, replyName, onLongPress }: {
     <View style={{ flexDirection: "row", justifyContent: mine ? "flex-end" : "flex-start", marginTop: tight ? 0 : 8 }}>
       {m.zing_id && !m.deleted ? (
         <Pressable onLongPress={onLongPress} delayLongPress={280} style={{ alignItems: mine ? "flex-end" : "flex-start" }}>
-          <ZingTile zingId={m.zing_id} mine={mine} />
+          {!!m.body && <Text style={{ color: t.faint, fontSize: 11.5, fontWeight: "700", marginBottom: 4, marginHorizontal: 6 }}>{mine ? "You replied to their zing" : "Replied to your zing"}</Text>}
+          <ZingTile zingId={m.zing_id} mine={m.body ? true : mine} caption={m.body ? (mine ? "Their zing" : "Your zing") : undefined} />
+          {!!m.body && (
+            <View style={[s.bubble, mine ? s.mine : [s.theirs, { backgroundColor: t.bg }], { marginTop: 4 }]}>
+              <Text style={{ color: mine ? MY_BUBBLE_TEXT : t.text, fontSize: 15.5, lineHeight: 21 }}>{m.body}</Text>
+            </View>
+          )}
           <Text style={[s.time, { color: t.faint, marginHorizontal: 6 }]}>{time}</Text>
         </Pressable>
       ) : isBare(m) ? (

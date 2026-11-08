@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Alert, Animated, Easing, Modal, Pressable, ScrollView, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, Alert, Animated, Easing, Keyboard, Modal, Platform, Pressable, ScrollView, Text, TextInput, View, useWindowDimensions } from "react-native";
+import { replyToZing } from "../lib/dms";
 import { Image } from "expo-image";
 import { Ionicons } from "./SFIcon";
 import { router } from "expo-router";
@@ -41,6 +42,15 @@ export default function SnapViewer({ snaps, start, onClose, onChanged }: {
   const [showViews, setShowViews] = useState(false);
   const [kept, setKept] = useState(!!s?.keep);
   const [burst, setBurst] = useState<string | null>(null);
+  const [reply, setReply] = useState("");
+  const [sending, setSending] = useState(false);
+  const [sentNote, setSentNote] = useState<string | null>(null);
+  const [kb, setKb] = useState(0);
+  useEffect(() => {
+    const show = Keyboard.addListener(Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow", (e) => setKb(e.endCoordinates.height));
+    const hide = Keyboard.addListener(Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide", () => setKb(0));
+    return () => { show.remove(); hide.remove(); };
+  }, []);
   const prog = useRef(new Animated.Value(0)).current;
   const anim = useRef<Animated.CompositeAnimation | null>(null);
   const paused = useRef(false);
@@ -70,6 +80,7 @@ export default function SnapViewer({ snaps, start, onClose, onChanged }: {
       if (t) { song.replace(t.source); song.seekTo(0); song.play(); } else song.pause();
     } catch {}
     run(0);
+    setReply(""); setSentNote(null);
     return () => anim.current?.stop();
   }, [i]);
 
@@ -79,6 +90,19 @@ export default function SnapViewer({ snaps, start, onClose, onChanged }: {
   const resume = () => {
     paused.current = false; prog.stopAnimation((v) => run(v));
     try { if (s.video_path) video.play(); if (s.music) song.play(); } catch {}
+  };
+
+  const sendReply = async () => {
+    const text = reply.trim();
+    if (!text || !me || sending) return;
+    setSending(true);
+    try {
+      const how = await replyToZing(s.id, s.user_id, me, text);
+      successHaptic(); Keyboard.dismiss(); setReply("");
+      setSentNote(how === "chat" ? "Sent ✓ in your chat" : how === "request" ? "Sent with a connect request ✓" : "You've already asked to connect");
+      setTimeout(() => { setSentNote(null); resume(); }, 1600);
+    } catch (e: any) { Alert.alert("Didn't send", e?.message ?? "Try again."); }
+    setSending(false);
   };
 
   const react = (e: ZingReaction) => {
@@ -163,7 +187,7 @@ export default function SnapViewer({ snaps, start, onClose, onChanged }: {
           </View>
         )}
 
-        <View style={{ position: "absolute", bottom: 36, left: 16, right: 16, gap: 12 }}>
+        <View style={{ position: "absolute", bottom: kb ? kb + 10 : 36, left: 16, right: 16, gap: 12 }}>
           {!!s.note && (
             <View style={{ backgroundColor: "rgba(0,0,0,0.55)", borderRadius: 14, padding: 12 }}>
               <Text style={{ color: "#fff", fontSize: 15, lineHeight: 21 }}>{s.note}</Text>
@@ -195,6 +219,25 @@ export default function SnapViewer({ snaps, start, onClose, onChanged }: {
                 );
               })}
             </View>
+          )}
+          {!mine && me && (
+            sentNote ? (
+              <View style={[chip, { alignSelf: "center", backgroundColor: "rgba(252,227,138,0.9)" }]}>
+                <Text style={{ color: "#1A1A1A", fontWeight: "800" }}>{sentNote}</Text>
+              </View>
+            ) : (
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                <TextInput value={reply} onChangeText={setReply} placeholder={`Reply to ${name.split(" ")[0]}…`} placeholderTextColor="rgba(255,255,255,0.65)"
+                  onFocus={pause} onBlur={() => { if (!reply.trim()) resume(); }} maxLength={300} returnKeyType="send" onSubmitEditing={sendReply}
+                  style={{ flex: 1, height: 46, borderRadius: 23, paddingHorizontal: 16, color: "#fff", fontSize: 15, borderWidth: 1.5, borderColor: "rgba(255,255,255,0.55)", backgroundColor: "rgba(0,0,0,0.35)" }} />
+                {!!reply.trim() && (
+                  <Pressable onPress={sendReply} disabled={sending} accessibilityLabel="Send reply"
+                    style={{ width: 46, height: 46, borderRadius: 23, backgroundColor: "#FCE38A", alignItems: "center", justifyContent: "center" }}>
+                    {sending ? <ActivityIndicator color="#1A1A1A" /> : <Ionicons name="arrow-up" size={22} color="#1A1A1A" />}
+                  </Pressable>
+                )}
+              </View>
+            )
           )}
         </View>
 

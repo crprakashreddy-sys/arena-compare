@@ -11,7 +11,7 @@ import { tapHaptic } from "../lib/motion";
  * A zing sent straight into a chat. Shows a soft, blurred teaser until tapped, then opens it
  * full screen in the story viewer. Expired or deleted zings say so instead of breaking.
  */
-export function ZingTile({ zingId, mine }: { zingId: string; mine: boolean }) {
+export function ZingTile({ zingId, mine, caption }: { zingId: string; mine: boolean; caption?: string }) {
   const [z, setZ] = useState<Checkin | null | undefined>(undefined);
   const [open, setOpen] = useState(false);
   const [seen, setSeen] = useState(false);
@@ -47,7 +47,7 @@ export function ZingTile({ zingId, mine }: { zingId: string; mine: boolean }) {
           <View style={st.play}><Text style={{ fontSize: 22 }}>{isVideo ? "▶︎" : "⚡"}</Text></View>
         </View>
         <View style={st.foot}>
-          <Text style={st.label}>{mine ? "You sent a zing" : seen ? "Opened" : isVideo ? "Tap to watch" : "Tap to view"}</Text>
+          <Text style={st.label}>{caption ?? (mine ? "You sent a zing" : seen ? "Opened" : isVideo ? "Tap to watch" : "Tap to view")}</Text>
           {!!z.place_name && <Text style={st.sub} numberOfLines={1}>📍 {z.place_name}</Text>}
         </View>
       </Pressable>
