@@ -344,10 +344,10 @@ export async function fetchPoints(userId: string) {
 
 /** Badge from lifetime points. One on-site photo zing is about 120 to 145 points. */
 export const BADGES = [
-  { min: 0, name: "New zinger", emoji: "🌱" },
-  { min: 600, name: "Regular", emoji: "⚡" },
-  { min: 3000, name: "Top zinger", emoji: "🔥" },
-  { min: 10000, name: "Charging legend", emoji: "👑" },
+  { min: 0, name: "New zinger", icon: "sprout" as const },
+  { min: 600, name: "Regular", icon: "bolt" as const },
+  { min: 3000, name: "Top zinger", icon: "flame" as const },
+  { min: 10000, name: "Charging legend", icon: "crown" as const },
 ];
 export function badgeFor(points: number) {
   return [...BADGES].reverse().find((b) => points >= b.min)!.name;

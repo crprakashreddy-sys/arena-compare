@@ -3,6 +3,7 @@ import { Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { networkById } from "../lib/networks";
 import type { Club } from "../lib/clubs";
+import { Icon, clubIconName } from "./Icon";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -12,7 +13,8 @@ export function ClubBadge({ c, size }: { c: Pick<Club, "make" | "kind" | "emoji"
   if (c.kind === "custom") {
     return (
       <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: c.color || LEMON, alignItems: "center", justifyContent: "center" }}>
-        <Text style={{ fontSize: size * 0.5 }}>{c.emoji || "⚡"}</Text>
+        {clubIconName(c.emoji) ? <Icon name={clubIconName(c.emoji)!} size={size * 0.48} color={INK} />
+          : c.emoji ? <Text style={{ fontSize: size * 0.5 }}>{c.emoji}</Text> : <Icon name="bolt" size={size * 0.48} color={INK} />}
       </View>
     );
   }

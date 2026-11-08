@@ -20,6 +20,7 @@ import { ClubBadge } from "../../components/ClubBadge";
 import { Avatar } from "../../components/ui";
 import { IssuesBoard } from "../../components/IssuesBoard";
 import { EventsList } from "../../components/EventsList";
+import { IconTile } from "../../components/Icon";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -211,7 +212,7 @@ export default function ClubChat() {
       <View style={{ flex: 1, backgroundColor: t.bg, alignItems: "center", justifyContent: "center", padding: 28, gap: 12 }}>
         {header}
         {club && <ClubBadge c={club} size={84} />}
-        <Text style={{ color: t.text, fontSize: 24, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", textAlign: "center" }}>{club?.name}</Text>
+        <Text style={{ color: t.text, fontSize: 24, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", textAlign: "center", letterSpacing: -0.6 }}>{club?.name}</Text>
         <Text style={{ color: t.muted, textAlign: "center", lineHeight: 20 }}>
           {club?.description || `${club?.members ?? 0} drivers swapping fixes, charging tips and drive plans.`}
         </Text>
@@ -256,7 +257,7 @@ export default function ClubChat() {
           contentContainerStyle={{ padding: 12, gap: 4, flexGrow: 1 }}
           ListEmptyComponent={
             <View style={{ alignItems: "center", padding: 30, gap: 8, transform: [{ scaleY: -1 }] }}>
-              <Text style={{ fontSize: 40 }}>👋</Text>
+              <IconTile name="chat" size={64} />
               <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 17 }}>Be the first to say hi</Text>
               <Text style={{ color: t.muted, textAlign: "center" }}>Ask about range, charging, service, accessories, or plan a drive.</Text>
             </View>
@@ -276,7 +277,7 @@ export default function ClubChat() {
           <View style={{ width: 3, alignSelf: "stretch", backgroundColor: CTA, borderRadius: 2 }} />
           <View style={{ flex: 1 }}>
             <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12.5 }}>Replying to {reply.profiles?.display_name ?? "driver"}</Text>
-            <Text style={{ color: t.muted, fontSize: 13 }} numberOfLines={1}>{reply.body ?? "📷 Photo"}</Text>
+            <Text style={{ color: t.muted, fontSize: 13 }} numberOfLines={1}>{reply.body ?? "Photo"}</Text>
           </View>
           <Pressable onPress={() => setReply(null)} hitSlop={10}><Ionicons name="close-circle" size={22} color={t.muted} /></Pressable>
         </View>
@@ -317,7 +318,7 @@ function Bubble({ m, mine, showName, replyTo, onLongPress }: {
           <View style={[s.quote, { backgroundColor: mine ? "rgba(252,227,138,0.15)" : t.surface }]}>
             <Text style={{ color: mine ? ON_CTA : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12 }}>{replyTo.profiles?.display_name ?? "Driver"}</Text>
             <Text style={{ color: mine ? MY_BUBBLE_TEXT : t.muted, fontSize: 12.5 }} numberOfLines={2}>
-              {replyTo.deleted ? "Message deleted" : replyTo.body ?? "📷 Photo"}
+              {replyTo.deleted ? "Message deleted" : replyTo.body ?? "Photo"}
             </Text>
           </View>
         )}

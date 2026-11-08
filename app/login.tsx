@@ -140,7 +140,7 @@ export default function Login() {
               <Text style={{ color: t.text, fontSize: 34, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -1 }}>zingd</Text>
             </View>
             <Text style={{ color: t.accent, fontWeight: "700" }}>been there. zingd it.</Text>
-            <Text style={{ color: t.text, fontSize: 24, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Join India's EV driver community</Text>
+            <Text style={{ color: t.text, fontSize: 24, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.6 }}>Join India's EV driver community</Text>
             <Text style={{ color: t.muted, fontSize: 15, lineHeight: 21 }}>
               Drop zings from chargers, see what is working right now, review stations and connect with other EV drivers.
             </Text>
@@ -184,7 +184,7 @@ export default function Login() {
 
         {step === "profile" && (
           <View style={{ gap: 12 }}>
-            <Text style={{ color: t.text, fontSize: 22, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Set up your driver profile</Text>
+            <Text style={{ color: t.text, fontSize: 22, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.6 }}>Set up your driver profile</Text>
             <Label text="Your name" />
             <TextInput value={name} onChangeText={setName} placeholder="Prakash Reddy" placeholderTextColor={t.faint} style={input} maxLength={40} />
             <Label text="Your EV (optional)" />

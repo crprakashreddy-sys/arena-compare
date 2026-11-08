@@ -10,6 +10,7 @@ import { updateProfileExtras, uploadSnap } from "../lib/community";
 import {
   BGS, CAR_COLORS, CAR_SHAPES, HAIR_COLORS, HAIR_STYLES, SHIRTS, SKINS, avatarSvg, randomAvatar, shapeFor, type AvatarOpts,
 } from "../lib/avatar";
+import { Icon, type IconName } from "../components/Icon";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -57,7 +58,7 @@ export default function AvatarMaker() {
             </Canvas>
           </View>
           <Pressable onPress={() => setO({ ...randomAvatar(o.car), carColor: o.carColor })} style={styles.dice}>
-            <Text style={{ fontSize: 16 }}>🎲</Text>
+            <Icon name="shuffle" size={17} color={ON_CTA} />
             <Text style={{ color: ON_CTA, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Surprise me</Text>
           </Pressable>
         </View>
@@ -68,15 +69,15 @@ export default function AvatarMaker() {
         <Row label="Eyes" t={t}>{["Classic", "Happy", "Wide"].map((h, i) => <Pill key={h} label={h} on={o.eyes === i} onPress={() => set({ eyes: i })} t={t} />)}</Row>
         <Row label="Smile" t={t}>{["Smile", "Big grin", "Chill"].map((h, i) => <Pill key={h} label={h} on={o.mouth === i} onPress={() => set({ mouth: i })} t={t} />)}</Row>
         <View style={[styles.toggles, { borderColor: t.line }]}>
-          <Toggle label="👓 Glasses" value={o.glasses} onChange={(glasses) => set({ glasses })} t={t} />
-          <Toggle label="🧔 Beard" value={o.beard} onChange={(beard) => set({ beard })} t={t} />
+          <Toggle icon="glasses" label="Glasses" value={o.glasses} onChange={(glasses) => set({ glasses })} t={t} />
+          <Toggle icon="beard" label="Beard" value={o.beard} onChange={(beard) => set({ beard })} t={t} />
         </View>
         <Row label="Top" t={t}>{SHIRTS.map((c, i) => <Dot key={c} color={c} on={o.shirt === i} onPress={() => set({ shirt: i })} />)}</Row>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, marginTop: 18 }}>
           <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Your ride</Text>
           <View style={{ flexDirection: "row", gap: 6 }}>
             {(["car", "two"] as const).map((k) => (
-              <Pill key={k} label={k === "car" ? "🚗 Cars" : "🛵 2-wheelers"} on={rideKind === k} t={t}
+              <Pill key={k} label={k === "car" ? "Cars" : "2-wheelers"} on={rideKind === k} t={t}
                 onPress={() => { setRideKind(k); set({ car: k === "car" ? "suv" : "scooter" }); }} />
             ))}
           </View>
@@ -120,10 +121,10 @@ function Pill({ label, on, onPress, t }: { label: string; on: boolean; onPress: 
     </Pressable>
   );
 }
-function Toggle({ label, value, onChange, t }: { label: string; value: boolean; onChange: (v: boolean) => void; t: ReturnType<typeof useTheme> }) {
+function Toggle({ label, icon, value, onChange, t }: { label: string; icon: IconName; value: boolean; onChange: (v: boolean) => void; t: ReturnType<typeof useTheme> }) {
   return (
     <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 14, paddingVertical: 10 }}>
-      <Text style={{ color: t.text, fontWeight: "700" }}>{label}</Text>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}><Icon name={icon} size={18} color={t.text} /><Text style={{ color: t.text, fontWeight: "700" }}>{label}</Text></View>
       <Switch value={value} onValueChange={onChange} />
     </View>
   );

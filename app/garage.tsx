@@ -49,7 +49,7 @@ export default function Garage() {
         </Pressable>
       ) : (
         <View style={{ gap: 10 }}>
-          <Text style={{ color: t.text, fontSize: 20, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{vehicles.length ? "Add a vehicle" : "What do you drive?"}</Text>
+          <Text style={{ color: t.text, fontSize: 20, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.6 }}>{vehicles.length ? "Add a vehicle" : "What do you drive?"}</Text>
           <Text style={{ color: t.muted }}>We'll show chargers that fit it and how long each one takes.</Text>
           <View style={{ flexDirection: "row", gap: 8 }}>
             {(["car", "two"] as const).map((k) => (

@@ -180,7 +180,7 @@ const s = StyleSheet.create({
   badge: { position: "absolute", flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "#FFF", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 999, shadowColor: "#000", shadowOpacity: 0.12, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 4 },
   badgeText: { fontSize: 13, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", color: INK },
   score: { position: "absolute", flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: INK, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 999, transform: [{ rotate: "-6deg" }] },
-  scoreText: { color: LEMON, fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold" },
+  scoreText: { color: LEMON, fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.6 },
   pinCircle: { width: 230, height: 230, borderRadius: 115, backgroundColor: "rgba(26,26,26,0.08)", alignItems: "center", justifyContent: "center" },
   pinInner: { width: 130, height: 130, borderRadius: 65, backgroundColor: INK, alignItems: "center", justifyContent: "center" },
   dots: { flexDirection: "row", justifyContent: "center", gap: 6, marginVertical: 18 },

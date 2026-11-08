@@ -93,7 +93,7 @@ export function ScoreCard({ total, parts, onClose }: { total: number; parts: Sco
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
         <View style={[styles.bolt, { backgroundColor: tone }]}><Ionicons name="flash" size={20} color="#1A1A1A" /></View>
         <View style={{ flex: 1 }}>
-          <Text style={{ color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 26, fontVariant: ["tabular-nums"] }}>+{shown}</Text>
+          <Text style={{ color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 26, fontVariant: ["tabular-nums"], letterSpacing: -0.6 }}>+{shown}</Text>
           <Text style={{ color: "#A3ADB6", fontSize: 12.5 }}>Zing Score · disappears from the map in 24 hours</Text>
         </View>
         {onClose && (
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   meter: { flexDirection: "row", gap: 12, alignItems: "center", marginHorizontal: 16, padding: 14, borderRadius: 14, backgroundColor: "#151A1F" },
   meterTitle: { color: "#fff", fontWeight: "700", fontSize: 14.5 },
   meterSub: { color: "#A3ADB6", fontSize: 12.5, lineHeight: 17 },
-  big: { fontSize: 28, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontVariant: ["tabular-nums"] },
+  big: { fontSize: 28, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontVariant: ["tabular-nums"], letterSpacing: -0.6 },
   track: { height: 8, borderRadius: 4, backgroundColor: "#262D34", overflow: "hidden" },
   bar: { height: 8, borderRadius: 4 },
   tick: { position: "absolute", top: 0, bottom: 0, width: 2, backgroundColor: "#07090B" },

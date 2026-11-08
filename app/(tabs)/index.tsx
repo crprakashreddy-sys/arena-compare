@@ -27,6 +27,7 @@ import { Chip, ClusterPin, Pin } from "../../components/ui";
 import type { Charger, Checkin, LiveStatus } from "../../lib/types";
 import { chargeMinutes, fitFor, fmtMinutes, reachKm, updateVehicle, usablePowerKW, useGarage } from "../../lib/vehicles";
 import { NIGHT_STYLE } from "../../lib/mapStyle";
+import { Icon } from "../../components/Icon";
 
 const INDIA: Region = { latitude: 21.5, longitude: 79, latitudeDelta: 24, longitudeDelta: 24 };
 const MAP_TYPES = ["standard", "hybrid", "satellite"] as const;
@@ -271,7 +272,7 @@ export default function MapScreen() {
           <Marker key={`ev-${ev.id}`} coordinate={{ latitude: ev.lat, longitude: ev.lng }} tracksViewChanges={false}
             onPress={() => router.push(`/event/${ev.id}`)}>
             <View style={styles.eventPin}>
-              <Text style={{ fontSize: 15 }}>{kindOf(ev.kind).emoji}</Text>
+              <Icon name={kindOf(ev.kind).icon} size={14} color="#1A1A1A" />
               <Text style={styles.eventPinText} numberOfLines={1}>
                 {new Date(ev.starts_at).toLocaleDateString([], { day: "numeric", month: "short" })}
               </Text>
@@ -441,7 +442,7 @@ export default function MapScreen() {
               <View style={{ flex: 1, gap: 2 }}>
                 <Text style={{ color: t.text, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }} numberOfLines={2}>{peek.name}</Text>
                 <Text style={{ color: t.muted, fontSize: 13 }} numberOfLines={1}>
-                  {[n.short, d != null ? fmtDistance(d) : null, speedLabel(peek), ratings[peek.id] ? `★ ${ratings[peek.id].toFixed(1)}` : null].filter(Boolean).join(" · ")}
+                  {[n.short, d != null ? fmtDistance(d) : null, speedLabel(peek), ratings[peek.id] ? `${ratings[peek.id].toFixed(1)} ★` : null].filter(Boolean).join(" · ")}
                 </Text>
                 <Text style={{ color: sc ? sc.fg : t.muted, fontWeight: "700", fontSize: 13 }}>
                   {st ? `${STATUS_LABEL[st.status]} · latest ${timeAgo(st.lastAt)}` : "No status reports yet"}
@@ -552,7 +553,7 @@ export default function MapScreen() {
                 <View style={{ flex: 1, minWidth: 0 }}>
                   <Text style={{ color: t.text, fontWeight: "600", fontSize: 15 }} numberOfLines={1}>{c.name}</Text>
                   <Text style={{ color: t.muted, fontSize: 12.5 }} numberOfLines={1}>
-                    {[n.short, speedLabel(c), ratings[c.id] ? `★ ${ratings[c.id].toFixed(1)}` : null].filter(Boolean).join(" · ")}
+                    {[n.short, speedLabel(c), ratings[c.id] ? `${ratings[c.id].toFixed(1)} ★` : null].filter(Boolean).join(" · ")}
                   </Text>
                   <View style={{ flexDirection: "row", gap: 8, marginTop: 2 }}>
                     {st && sc && <Text style={{ color: sc.fg, fontSize: 12, fontWeight: "600" }}>{STATUS_LABEL[st.status]} now</Text>}

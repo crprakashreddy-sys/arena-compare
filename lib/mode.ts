@@ -72,4 +72,4 @@ export function clubSuits(c: { kind: string; make: string; vehicle_kind: string 
   return m === "car" ? CAR_MAKES.has(make) : TWO_MAKES.has(make);
 }
 
-export const MODE_LABEL: Record<Mode, string> = { car: "🚗 Cars", two: "🛵 2-wheelers" };
+export const MODE_LABEL: Record<Mode, string> = { car: "Cars", two: "2-wheelers" };

@@ -57,7 +57,7 @@ export default function DriverProfile() {
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
         <View style={{ alignItems: "center", gap: 6, padding: 24 }}>
           <Avatar name={p.display_name} photo={p.avatar_path} size={92} />
-          <Text style={{ color: t.text, fontSize: 24, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", marginTop: 6 }}>{p.display_name}</Text>
+          <Text style={{ color: t.text, fontSize: 24, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", marginTop: 6, letterSpacing: -0.6 }}>{p.display_name}</Text>
           <Text style={{ color: t.muted }}>{[p.car_model, p.city].filter(Boolean).join(" · ")}</Text>
           {!!p.bio && <Text style={{ color: t.text, textAlign: "center", lineHeight: 20, marginTop: 4, paddingHorizontal: 12 }}>{p.bio}</Text>}
           <VerifiedBadge verified={p.vehicle_verified} />

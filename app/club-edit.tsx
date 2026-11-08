@@ -3,8 +3,9 @@ import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, Sc
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { useTheme, CTA, ON_CTA } from "../lib/theme";
 import { useAuth } from "../lib/auth";
-import { CLUB_COLORS, CLUB_EMOJIS, createClub, deleteClub, fetchClub, updateClub, type ClubDraft } from "../lib/clubs";
+import { CLUB_COLORS, createClub, deleteClub, fetchClub, updateClub, type ClubDraft } from "../lib/clubs";
 import { ClubBadge } from "../components/ClubBadge";
+import { CLUB_ICONS, Icon, clubIconName } from "../components/Icon";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -15,7 +16,7 @@ export default function ClubEdit() {
   const { session, profile } = useAuth();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const editing = !!id;
-  const [d, setD] = useState<ClubDraft>({ name: "", description: "", city: profile?.city ?? "", emoji: "⚡", color: ON_CTA, is_private: false });
+  const [d, setD] = useState<ClubDraft>({ name: "", description: "", city: profile?.city ?? "", emoji: "i:bolt", color: LEMON, is_private: false });
   const [loading, setLoading] = useState(editing);
   const [busy, setBusy] = useState(false);
   const [createdBy, setCreatedBy] = useState<string | null>(null);
@@ -24,7 +25,7 @@ export default function ClubEdit() {
     if (!id) return;
     fetchClub(id).then((c) => {
       if (c) {
-        setD({ name: c.name, description: c.description ?? "", city: c.city ?? "", emoji: c.emoji ?? "⚡", color: c.color ?? LEMON, is_private: !!c.is_private });
+        setD({ name: c.name, description: c.description ?? "", city: c.city ?? "", emoji: c.emoji ?? "i:bolt", color: c.color ?? LEMON, is_private: !!c.is_private });
         setCreatedBy(c.created_by ?? null);
       }
       setLoading(false);
@@ -61,7 +62,7 @@ export default function ClubEdit() {
       <ScrollView contentContainerStyle={{ padding: 16, gap: 18, paddingBottom: 120 }} keyboardShouldPersistTaps="handled">
         <View style={{ alignItems: "center", gap: 10, paddingVertical: 6 }}>
           <ClubBadge c={{ kind: "custom", make: "", emoji: d.emoji, color: d.color }} size={88} />
-          <Text style={{ color: t.text, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 20, textAlign: "center" }} numberOfLines={2}>{d.name || "Your club"}</Text>
+          <Text style={{ color: t.text, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 20, textAlign: "center", letterSpacing: -0.6 }} numberOfLines={2}>{d.name || "Your club"}</Text>
         </View>
 
         <Field label="Club name" t={t}>
@@ -81,9 +82,9 @@ export default function ClubEdit() {
 
         <Field label="Icon" t={t}>
           <View style={s.wrap}>
-            {CLUB_EMOJIS.map((e) => (
+            {CLUB_ICONS.map((n) => `i:${n}`).map((e) => (
               <Pressable key={e} onPress={() => set({ emoji: e })} style={[s.emoji, { backgroundColor: d.emoji === e ? CTA : t.surface }]}>
-                <Text style={{ fontSize: 22 }}>{e}</Text>
+                <Icon name={clubIconName(e)!} size={22} color={d.emoji === e ? ON_CTA : t.text} />
               </Pressable>
             ))}
           </View>

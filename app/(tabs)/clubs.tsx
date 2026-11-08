@@ -11,6 +11,7 @@ import { timeAgo } from "../../lib/geo";
 import { ClubBadge } from "../../components/ClubBadge";
 import { clubSuits, useMode } from "../../lib/mode";
 import { ModeSwitch } from "../../components/ModeSwitch";
+import { Icon } from "../../components/Icon";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -80,7 +81,7 @@ export default function Clubs() {
       <View style={{ paddingHorizontal: 16, paddingTop: 14 }}><ModeSwitch /></View>
       {session && (
         <Pressable onPress={askCode} style={{ paddingHorizontal: 16, paddingTop: 10 }}>
-          <Text style={{ color: t.muted, fontWeight: "700" }}>🔑 Have an invite code?</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}><Icon name="key" size={15} color={t.muted} /><Text style={{ color: t.muted, fontWeight: "700" }}>Have an invite code?</Text></View>
         </Pressable>
       )}
 
@@ -176,8 +177,8 @@ export default function Clubs() {
 function MyClubRow({ c }: { c: MyClub }) {
   const t = useTheme();
   const last = c.last;
-  const preview = !last ? "Say hi to the crew 👋" : last.deleted ? "Message deleted"
-    : `${last.profiles?.display_name?.split(" ")[0] ?? "Someone"}: ${last.body ?? "📷 Photo"}`;
+  const preview = !last ? "Say hi to the crew" : last.deleted ? "Message deleted"
+    : `${last.profiles?.display_name?.split(" ")[0] ?? "Someone"}: ${last.body ?? "Photo"}`;
   return (
     <Pressable onPress={() => router.push(`/club/${encodeURIComponent(c.id)}`)}
       style={({ pressed }) => [s.mine, { backgroundColor: t.surface, opacity: pressed ? 0.8 : 1 }]}>
@@ -218,7 +219,7 @@ const s = StyleSheet.create({
   community: { flexDirection: "row", alignItems: "center", gap: 12, padding: 12, borderRadius: 18 },
   h2: { fontSize: 18, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", marginTop: 24, marginBottom: 10, paddingHorizontal: 16 },
   hero: { marginHorizontal: 16, padding: 18, borderRadius: 20, backgroundColor: LEMON, gap: 6 },
-  heroTitle: { fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", color: INK, marginTop: 4 },
+  heroTitle: { fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", color: INK, marginTop: 4, letterSpacing: -0.6 },
   heroBody: { fontSize: 14.5, color: INK, opacity: 0.75, lineHeight: 20 },
   heroBtn: { alignSelf: "flex-start", backgroundColor: INK, paddingHorizontal: 18, height: 44, borderRadius: 999, justifyContent: "center", marginTop: 8 },
   heroBtnText: { color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },

@@ -26,6 +26,7 @@ import { startSession, useSessions } from "../../lib/sessions";
 import { openNetworkApp } from "../../lib/networks";
 import type { ScorePart } from "../../lib/types";
 import { MAP_PROVIDER, openDirections, zappdStyle } from "../../lib/maps";
+import { Icon } from "../../components/Icon";
 
 export default function ChargerPage() {
   const t = useTheme();
@@ -107,7 +108,7 @@ export default function ChargerPage() {
         <View style={{ padding: 16, gap: 12 }}>
           <View style={{ flexDirection: "row", gap: 12 }}>
             <View style={{ flex: 1, gap: 3 }}>
-              <Text style={{ color: t.text, fontSize: 22, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{c.name}</Text>
+              <Text style={{ color: t.text, fontSize: 22, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.6 }}>{c.name}</Text>
               <Text style={{ color: t.muted }}>{[n.name, speedLabel(c), c.address].filter(Boolean).join(" · ")}</Text>
               {!!c.connectors?.length && <Text style={{ color: t.muted, fontSize: 13 }}>{c.connectors.join(", ")}</Text>}
               {c.id.startsWith("c-") && (
@@ -126,7 +127,7 @@ export default function ChargerPage() {
               )}
             </View>
             <View style={{ alignItems: "flex-end" }}>
-              <Text style={{ color: t.text, fontSize: 20, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{rating.count ? rating.avg.toFixed(1) : "–"}</Text>
+              <Text style={{ color: t.text, fontSize: 20, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.6 }}>{rating.count ? rating.avg.toFixed(1) : "–"}</Text>
               <Stars value={rating.avg} size={12} />
               <Text style={{ color: t.muted, fontSize: 12 }}>{rating.count} review{rating.count === 1 ? "" : "s"}</Text>
             </View>
@@ -350,7 +351,7 @@ function Hero({ charger, live, zings, onOpen, scheme }: {
           </Marker>
         </MapView>
         <View style={heroS.topRow}>{badge}</View>
-        <View style={heroS.nudge}><Text style={heroS.nudgeText}>📸 No photo in the last 24 h. Be the first to zing it.</Text></View>
+        <View style={heroS.nudge}><View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}><Icon name="camera" size={16} color="#FCE38A" /><Text style={heroS.nudgeText}>No photo in the last 24 h. Be the first to zing it.</Text></View></View>
       </View>
     );
   }
@@ -365,7 +366,7 @@ function Hero({ charger, live, zings, onOpen, scheme }: {
         <Avatar name={name} photo={z.profiles?.avatar_path} size={34} />
         <View style={{ flex: 1 }}>
           <Text style={heroS.by} numberOfLines={1}>Zinged by {name}</Text>
-          <Text style={heroS.when}>{timeAgo(z.created_at)}{z.zap_score ? ` · ⚡ ${z.zap_score}` : ""}</Text>
+          <Text style={heroS.when}>{timeAgo(z.created_at)}{z.zap_score ? ` · ${z.zap_score} pts` : ""}</Text>
         </View>
         <View style={heroS.count}>
           <Ionicons name="images" size={14} color="#1A1A1A" />

@@ -4,10 +4,10 @@ import { isBlocked } from "./community";
 import { bbox } from "./geo";
 
 export const EVENT_KINDS = [
-  { key: "meetup", label: "Meetup", emoji: "☕" },
-  { key: "drive", label: "Drive", emoji: "🛣️" },
-  { key: "charging", label: "Charging hangout", emoji: "⚡" },
-  { key: "other", label: "Other", emoji: "🎉" },
+  { key: "meetup", label: "Meetup", icon: "cafe" as const },
+  { key: "drive", label: "Drive", icon: "road" as const },
+  { key: "charging", label: "Charging hangout", icon: "bolt" as const },
+  { key: "other", label: "Other", icon: "sparkles" as const },
 ] as const;
 export type EventKind = (typeof EVENT_KINDS)[number]["key"];
 export const kindOf = (k: string) => EVENT_KINDS.find((x) => x.key === k) ?? EVENT_KINDS[3];

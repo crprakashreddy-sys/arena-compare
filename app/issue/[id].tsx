@@ -16,6 +16,7 @@ import {
 } from "../../lib/issues";
 import { pickAndUploadPhoto } from "../../lib/photos";
 import { Avatar } from "../../components/ui";
+import { Icon } from "../../components/Icon";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -91,7 +92,7 @@ export default function IssueDetail() {
     if (canSolve) {
       opts.push(issue!.solution_id === r.id
         ? { text: "Unmark as the fix", onPress: () => markSolved(issue!.id, null).then(load) }
-        : { text: "✅ Mark as the fix", onPress: () => markSolved(issue!.id, r.id).then(load) });
+        : { text: "Mark as the fix", onPress: () => markSolved(issue!.id, r.id).then(load) });
     }
     if (mine || admin) opts.push({ text: "Delete reply", style: "destructive", onPress: () => deleteReply(r.id).then(load) });
     if (!mine) {
@@ -108,7 +109,7 @@ export default function IssueDetail() {
     const opts: { text: string; style?: "destructive" | "cancel"; onPress?: () => void }[] = [];
     if (canSolve) opts.push(issue.solved
       ? { text: "Mark as not solved", onPress: () => setSolvedFlag(issue.id, false).then(load) }
-      : { text: "✅ Mark as solved", onPress: () => setSolvedFlag(issue.id, true).then(load) });
+      : { text: "Mark as solved", onPress: () => setSolvedFlag(issue.id, true).then(load) });
     if (mine || admin) opts.push({ text: "Delete issue", style: "destructive", onPress: () => deleteIssue(issue.id).then(() => router.back()) });
     if (!mine) opts.push({ text: "Report", onPress: () => reportIt("club_post", issue.id) });
     opts.push({ text: "Cancel", style: "cancel" });
@@ -133,7 +134,7 @@ export default function IssueDetail() {
         {issue.solved && (
           <View style={s.solvedBanner}><Ionicons name="checkmark-circle" size={18} color={INK} /><Text style={{ color: INK, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Solved{issue.solution_id ? " · fix pinned below" : ""}</Text></View>
         )}
-        <Text style={{ color: t.text, fontSize: 22, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", lineHeight: 28 }}>{issue.title}</Text>
+        <Text style={{ color: t.text, fontSize: 22, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", lineHeight: 28, letterSpacing: -0.6 }}>{issue.title}</Text>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <Avatar name={issue.profiles?.display_name ?? "?"} photo={issue.profiles?.avatar_path} size={28} />
           <Text style={{ color: t.muted, flex: 1 }} numberOfLines={1}>
@@ -184,7 +185,7 @@ export default function IssueDetail() {
                 </Pressable>
                 {canSolve && !fix && !r.deleted && (
                   <Pressable onPress={() => markSolved(issue.id, r.id).then(load)} hitSlop={8}>
-                    <Text style={{ color: t.muted, fontWeight: "700", fontSize: 13 }}>✅ Mark as the fix</Text>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}><Icon name="check" size={15} color={t.muted} /><Text style={{ color: t.muted, fontWeight: "700", fontSize: 13 }}>Mark as the fix</Text></View>
                   </Pressable>
                 )}
               </View>

@@ -40,7 +40,7 @@ export default function Leaderboard() {
         ListHeaderComponent={
           <View style={{ gap: 14, marginBottom: 8 }}>
             <View>
-              <Text style={{ color: "#fff", fontSize: 32, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold" }}>This week</Text>
+              <Text style={{ color: "#fff", fontSize: 32, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -1 }}>This week</Text>
               <Text style={{ color: "#A9B3BC" }}>Resets every Monday · {city ? city : "All of India"}</Text>
             </View>
             <ModeSwitch dark />
@@ -111,7 +111,7 @@ function Rule({ left, right }: { left: string; right: string }) {
 const styles = StyleSheet.create({
   tab: { height: 36, paddingHorizontal: 14, borderRadius: 18, borderWidth: 1, borderColor: "#2A3540", justifyContent: "center" },
   row: { flexDirection: "row", alignItems: "center", gap: 12, padding: 12, borderRadius: 14, backgroundColor: "#151E26", borderWidth: 1, borderColor: "transparent" },
-  rank: { width: 26, fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", textAlign: "center", fontVariant: ["tabular-nums"] },
+  rank: { width: 26, fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", textAlign: "center", fontVariant: ["tabular-nums"], letterSpacing: -0.6 },
   rules: { marginTop: 18, gap: 10, padding: 16, borderRadius: 14, backgroundColor: "#151E26" },
   small: { color: "#A9B3BC", fontSize: 12.5, lineHeight: 18, marginTop: 4 },
 });

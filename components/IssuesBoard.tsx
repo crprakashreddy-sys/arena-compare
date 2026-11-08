@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTheme, CTA, ON_CTA } from "../lib/theme";
 import { timeAgo } from "../lib/geo";
 import { ISSUE_TAGS, fetchIssues, tagLabel, type Issue } from "../lib/issues";
+import { IconTile } from "./Icon";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -44,7 +45,7 @@ export function IssuesBoard({ clubId }: { clubId: string }) {
             </View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
               {(["all", "open", "solved"] as const).map((f) => (
-                <Chip key={f} on={filter === f} onPress={() => setFilter(f)} label={f === "all" ? "All" : f === "open" ? "Open" : "✅ Solved"} t={t} />
+                <Chip key={f} on={filter === f} onPress={() => setFilter(f)} label={f === "all" ? "All" : f === "open" ? "Open" : "Solved"} t={t} />
               ))}
               <View style={{ width: 1, backgroundColor: t.line, marginHorizontal: 2 }} />
               {ISSUE_TAGS.map((x) => (
@@ -56,7 +57,7 @@ export function IssuesBoard({ clubId }: { clubId: string }) {
         }
         ListEmptyComponent={busy ? <ActivityIndicator style={{ marginTop: 30 }} color={t.muted} /> : (
           <View style={{ alignItems: "center", padding: 30, gap: 8 }}>
-            <Text style={{ fontSize: 40 }}>🔧</Text>
+            <IconTile name="wrench" size={64} />
             <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 17 }}>{q || tag || filter !== "all" ? "Nothing matches" : "No issues yet"}</Text>
             <Text style={{ color: t.muted, textAlign: "center" }}>Got a problem with your EV? Ask the owners who've been there.</Text>
           </View>

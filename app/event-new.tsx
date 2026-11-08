@@ -8,6 +8,7 @@ import { useTheme, CTA, ON_CTA } from "../lib/theme";
 import { useAuth } from "../lib/auth";
 import { EVENT_KINDS, createEvent, type EventKind } from "../lib/events";
 import { MAP_PROVIDER, zappdStyle } from "../lib/maps";
+import { Icon } from "../components/Icon";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -64,7 +65,7 @@ export default function NewEvent() {
           <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
             {EVENT_KINDS.map((k) => (
               <Pressable key={k.key} onPress={() => setKind(k.key)} style={[s.chip, { backgroundColor: kind === k.key ? CTA : t.surface }]}>
-                <Text style={{ fontSize: 15 }}>{k.emoji}</Text>
+                <Icon name={k.icon} size={16} color={kind === k.key ? ON_CTA : t.text} />
                 <Text style={{ color: kind === k.key ? ON_CTA : t.text, fontWeight: "700" }}>{k.label}</Text>
               </Pressable>
             ))}
@@ -79,7 +80,7 @@ export default function NewEvent() {
             {days.map((d, i) => (
               <Pressable key={i} onPress={() => setDay(i)} style={[s.day, { backgroundColor: day === i ? CTA : t.surface }]}>
                 <Text style={{ color: day === i ? ON_CTA : t.muted, fontSize: 11, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{i === 0 ? "TODAY" : d.toLocaleDateString([], { weekday: "short" }).toUpperCase()}</Text>
-                <Text style={{ color: day === i ? ON_CTA : t.text, fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold" }}>{d.getDate()}</Text>
+                <Text style={{ color: day === i ? ON_CTA : t.text, fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.6 }}>{d.getDate()}</Text>
                 <Text style={{ color: day === i ? ON_CTA : t.muted, fontSize: 11 }}>{d.toLocaleDateString([], { month: "short" })}</Text>
               </Pressable>
             ))}
@@ -103,7 +104,7 @@ export default function NewEvent() {
               <MapView provider={MAP_PROVIDER} customMapStyle={zappdStyle(scheme)} style={StyleSheet.absoluteFill} initialRegion={{ ...spot, latitudeDelta: 0.02, longitudeDelta: 0.02 }}
                 onRegionChangeComplete={(r: Region) => setSpot({ latitude: r.latitude, longitude: r.longitude })} showsUserLocation showsPointsOfInterest={false} />
               <View pointerEvents="none" style={s.pinWrap}>
-                <View style={s.pin}><Text style={{ fontSize: 20 }}>{EVENT_KINDS.find((k) => k.key === kind)?.emoji}</Text></View>
+                <View style={s.pin}><Icon name={EVENT_KINDS.find((k) => k.key === kind)!.icon} size={20} color="#1A1A1A" /></View>
                 <View style={s.pinTip} />
               </View>
               <View style={s.hint}><Text style={s.hintText}>Move the map to set the meeting point</Text></View>

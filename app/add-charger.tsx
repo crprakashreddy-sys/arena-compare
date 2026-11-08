@@ -108,7 +108,7 @@ export default function AddCharger() {
 
           <Field label="Speed" t={t}>
             <View style={{ flexDirection: "row", gap: 8 }}>
-              <Pill label="⚡ DC fast" on={speed === "dc"} onPress={() => { setSpeed("dc"); setPlugs((v) => (v.length ? v : ["CCS2"])); }} t={t} big />
+              <Pill label="DC fast" on={speed === "dc"} onPress={() => { setSpeed("dc"); setPlugs((v) => (v.length ? v : ["CCS2"])); }} t={t} big />
               <Pill label="AC" on={speed === "ac"} onPress={() => setSpeed("ac")} t={t} big />
               <Pill label="Both" on={speed === "dcac"} onPress={() => setSpeed("dcac")} t={t} big />
             </View>

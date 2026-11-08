@@ -95,7 +95,7 @@ function ActiveCard({ s }: { s: Session }) {
         <View style={styles.pulse} />
         <Text style={{ color: "#A3ADB6", fontSize: 13, fontWeight: "600" }}>CHARGING NOW</Text>
       </View>
-      <Text style={{ color: "#fff", fontSize: 40, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontVariant: ["tabular-nums"] }}>
+      <Text style={{ color: "#fff", fontSize: 40, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontVariant: ["tabular-nums"], letterSpacing: -1 }}>
         {hh > 0 ? `${hh}:` : ""}{String(mm).padStart(2, "0")}:{String(ss).padStart(2, "0")}
       </Text>
       <Text style={{ color: "#D8DDE2" }} numberOfLines={1}>{s.chargerName}</Text>

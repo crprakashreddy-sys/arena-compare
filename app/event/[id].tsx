@@ -11,6 +11,7 @@ import { cancelEvent, fetchEvent, fetchRsvps, fmtWhen, kindOf, openDirections, r
 import { Avatar } from "../../components/ui";
 import { ClubBadge } from "../../components/ClubBadge";
 import { MAP_PROVIDER, zappdStyle } from "../../lib/maps";
+import { Icon, IconTile } from "../../components/Icon";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -56,7 +57,7 @@ export default function EventDetail() {
 
   const menu = () => {
     const opts: { text: string; style?: "destructive" | "cancel"; onPress?: () => void }[] = [
-      { text: "Share", onPress: () => Share.share({ message: `${k.emoji} ${e.title}\n${fmtWhen(e.starts_at)}${e.place_name ? `\n📍 ${e.place_name}` : ""}\n\nJoin on zingd ⚡ (${e.club_name})` }) },
+      { text: "Share", onPress: () => Share.share({ message: `${e.title}\n${fmtWhen(e.starts_at)}${e.place_name ? `\nAt ${e.place_name}` : ""}\n\nJoin on zingd (${e.club_name})` }) },
     ];
     if (host || admin) opts.push(e.cancelled
       ? { text: "Un-cancel event", onPress: () => cancelEvent(e.id, false).then(load) }
@@ -75,7 +76,7 @@ export default function EventDetail() {
       }} />
       <ScrollView contentContainerStyle={{ paddingBottom: 140 }}>
         <View style={s.hero}>
-          <Text style={{ fontSize: 44 }}>{k.emoji}</Text>
+          <IconTile name={k.icon} size={72} bg="#1A1A1A" color="#FCE38A" round />
           {e.cancelled && <View style={s.cancelled}><Text style={{ color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>CANCELLED</Text></View>}
           <Text style={s.title}>{e.title}</Text>
           <Text style={s.when}>{fmtWhen(e.starts_at)}</Text>
@@ -92,7 +93,7 @@ export default function EventDetail() {
             <MapView provider={MAP_PROVIDER} customMapStyle={zappdStyle(scheme)} style={{ height: 160 }} pointerEvents="none" scrollEnabled={false} zoomEnabled={false}
               initialRegion={{ latitude: e.lat, longitude: e.lng, latitudeDelta: 0.012, longitudeDelta: 0.012 }}>
               <Marker coordinate={{ latitude: e.lat, longitude: e.lng }} tracksViewChanges={false}>
-                <View style={s.pin}><Text style={{ fontSize: 18 }}>{k.emoji}</Text></View>
+                <View style={s.pin}><Icon name={k.icon} size={18} color="#1A1A1A" /></View>
               </Marker>
             </MapView>
             <View style={{ flexDirection: "row", alignItems: "center", padding: 12, gap: 10 }}>
@@ -132,13 +133,13 @@ export default function EventDetail() {
             style={[s.big, { flex: 2, backgroundColor: mine === "going" ? LEMON : INK, opacity: full ? 0.5 : 1 }]}>
             {busy ? <ActivityIndicator color={mine === "going" ? INK : LEMON} /> : (
               <Text style={{ color: mine === "going" ? INK : LEMON, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 16 }}>
-                {mine === "going" ? "✓ You're in" : full ? "Full" : "I'm in"}
+                {mine === "going" ? "You're in" : full ? "Full" : "I'm in"}
               </Text>
             )}
           </Pressable>
           <Pressable onPress={() => set(mine === "interested" ? null : "interested")} disabled={busy}
             style={[s.big, { flex: 1, backgroundColor: mine === "interested" ? CTA : t.surface }]}>
-            <Text style={{ color: mine === "interested" ? ON_CTA : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{mine === "interested" ? "★ Interested" : "Interested"}</Text>
+            <Text style={{ color: mine === "interested" ? ON_CTA : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{mine === "interested" ? "Interested ✓" : "Interested"}</Text>
           </Pressable>
         </View>
       )}

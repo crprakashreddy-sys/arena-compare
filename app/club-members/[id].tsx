@@ -29,7 +29,7 @@ export default function ClubMembers() {
   useEffect(() => { load(); }, [load]);
 
   const invite = () => club?.invite_code && Share.share({
-    message: `Join "${club.name}" on zingd ⚡\nOpen zingd → Clubs → Have an invite code? → ${club.invite_code}`,
+    message: `Join "${club.name}" on zingd\nOpen zingd → Clubs → Have an invite code? → ${club.invite_code}`,
   });
 
   const act = (m: ClubMember) => {
@@ -55,7 +55,7 @@ export default function ClubMembers() {
         ListHeaderComponent={club ? (
           <View style={{ alignItems: "center", gap: 8, paddingBottom: 16 }}>
             <ClubBadge c={club} size={72} />
-            <Text style={{ color: t.text, fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", textAlign: "center" }}>{club.name}</Text>
+            <Text style={{ color: t.text, fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", textAlign: "center", letterSpacing: -0.6 }}>{club.name}</Text>
             {!!club.description && <Text style={{ color: t.muted, textAlign: "center", lineHeight: 20 }}>{club.description}</Text>}
             <Text style={{ color: t.muted, fontSize: 13 }}>
               {[club.city, `${club.members} members`, club.is_private ? "Invite only" : null].filter(Boolean).join(" · ")}

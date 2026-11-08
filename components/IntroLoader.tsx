@@ -9,7 +9,7 @@ const INK = "#1A1A1A";
 
 /** Illustrated stand-ins, replaced by real community zings once there are some. */
 const STARTERS = [
-  { src: require("../assets/intro/z1.jpg"), name: "night charge ⚡" },
+  { src: require("../assets/intro/z1.jpg"), name: "night charge" },
   { src: require("../assets/intro/z2.jpg"), name: "highway stop" },
   { src: require("../assets/intro/z3.jpg"), name: "chai break · 80%" },
   { src: require("../assets/intro/z4.jpg"), name: "hill route" },

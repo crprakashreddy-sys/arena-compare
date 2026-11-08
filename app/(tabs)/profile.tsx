@@ -15,6 +15,7 @@ import { fetchMyClubs, type MyClub } from "../../lib/clubs";
 import { pickAndUploadPhoto } from "../../lib/photos";
 import { ClubBadge } from "../../components/ClubBadge";
 import { useSessions } from "../../lib/sessions";
+import { Icon, IconTile } from "../../components/Icon";
 
 const GUIDELINES_URL = "https://crprakashreddy-sys.github.io/zingd/terms.html";
 const PRIVACY_URL = "https://crprakashreddy-sys.github.io/zingd/privacy.html";
@@ -43,7 +44,7 @@ export default function You() {
     return (
       <View style={{ flex: 1, padding: 24, paddingTop: insets.top + 40, gap: 14 }}>
         <Ionicons name="flash" size={40} color={t.accent} />
-        <Text style={{ color: t.text, fontSize: 26, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Join the EV crew</Text>
+        <Text style={{ color: t.text, fontSize: 26, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.6 }}>Join the EV crew</Text>
         <Text style={{ color: t.muted, fontSize: 15, lineHeight: 21 }}>
           Sign in to drop zings, review chargers, mark facilities and connect with other drivers. The map works without an account.
         </Text>
@@ -71,8 +72,8 @@ export default function You() {
 
   const prog = badgeProgress(points);
   const changePhoto = () => Alert.alert("Profile photo", undefined, [
-    { text: "🎨 Make my cartoon (with my EV)", onPress: () => router.push("/avatar-maker") },
-    { text: "📷 Choose a photo", onPress: pickPhoto },
+    { text: "Make my cartoon (with my EV)", onPress: () => router.push("/avatar-maker") },
+    { text: "Choose a photo", onPress: pickPhoto },
     { text: "Cancel", style: "cancel" },
   ]);
   const pickPhoto = async () => {
@@ -93,7 +94,10 @@ export default function You() {
           <View style={styles.cam}>{uploading ? <ActivityIndicator size="small" color="#FCE38A" /> : <Ionicons name="camera" size={15} color="#FCE38A" />}</View>
         </Pressable>
         <Text style={styles.name}>{profile.display_name}</Text>
-        <Text style={styles.sub}>{[profile.city, `${prog.cur.emoji} ${prog.cur.name}`].filter(Boolean).join(" · ")}</Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+          {!!profile.city && <Text style={styles.sub}>{profile.city} ·</Text>}
+          <Icon name={prog.cur.icon} size={14} color="#1A1A1A" /><Text style={styles.sub}>{prog.cur.name}</Text>
+        </View>
         <VerifiedBadge verified={profile.vehicle_verified} />
         {profile.bio
           ? <Text style={styles.bio}>{profile.bio}</Text>
@@ -111,7 +115,7 @@ export default function You() {
       {/* Zing Score and badge progress */}
       <Pressable onPress={() => router.push("/leaderboard")} style={[styles.scoreCard, { backgroundColor: t.surface }]}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-          <Text style={{ fontSize: 34 }}>{prog.cur.emoji}</Text>
+          <IconTile name={prog.cur.icon} size={48} bg="#FCE38A" />
           <View style={{ flex: 1 }}>
             <Text style={{ color: t.muted, fontSize: 12, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: 0.5 }}>ZING SCORE</Text>
             <Text style={{ color: t.text, fontSize: 28, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.5 }}>{points.toLocaleString("en-IN")}</Text>
@@ -122,7 +126,7 @@ export default function You() {
           <View style={[styles.barFill, { width: `${Math.max(4, Math.round(prog.pct * 100))}%` }]} />
         </View>
         <Text style={{ color: t.muted, fontSize: 12.5 }}>
-          {prog.next ? `${(prog.next.min - points).toLocaleString("en-IN")} points to ${prog.next.emoji} ${prog.next.name}` : "Top badge. Legend status."}
+          {prog.next ? `${(prog.next.min - points).toLocaleString("en-IN")} points to ${prog.next.name}` : "Top badge. Legend status."}
         </Text>
       </Pressable>
 
@@ -132,7 +136,7 @@ export default function You() {
           <Text style={{ color: "#FCE38A", fontSize: 12, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: 0.5 }}>MY RIDE</Text>
           {active ? (
             <>
-              <Text style={{ color: "#fff", fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", marginTop: 2 }} numberOfLines={1}>{vehicleName(active)}</Text>
+              <Text style={{ color: "#fff", fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", marginTop: 2, letterSpacing: -0.6 }} numberOfLines={1}>{vehicleName(active)}</Text>
               <Text style={{ color: "#B9B9B9", fontSize: 13, marginTop: 2 }}>
                 {active.batteryKWh} kWh · ~{active.rangeKm} km range{active.maxDcKW ? ` · ${active.maxDcKW} kW DC` : ""}
               </Text>
@@ -227,7 +231,7 @@ const styles = StyleSheet.create({
   sub: { color: "#1A1A1A", opacity: 0.7, fontWeight: "700" },
   bio: { color: "#1A1A1A", textAlign: "center", lineHeight: 20, marginTop: 6, maxWidth: 320 },
   statRow: { flexDirection: "row", alignSelf: "stretch", marginTop: 14, backgroundColor: "rgba(255,255,255,0.55)", borderRadius: 18, paddingVertical: 12 },
-  statNum: { color: "#1A1A1A", fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold" },
+  statNum: { color: "#1A1A1A", fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.6 },
   statLbl: { color: "#1A1A1A", opacity: 0.6, fontSize: 12, fontWeight: "700" },
   scoreCard: { margin: 16, marginBottom: 0, padding: 16, borderRadius: 20, gap: 10 },
   bar: { height: 10, borderRadius: 5, overflow: "hidden" },

@@ -171,5 +171,5 @@ export async function joinWithCode(code: string): Promise<string> {
   return data as string;
 }
 
-export const CLUB_EMOJIS = ["⚡", "🚗", "🛵", "🏍️", "🔋", "🛣️", "🏔️", "🌊", "☕", "🍛", "📸", "🔧", "🏙️", "🌙", "🎉", "🤝"];
+
 export const CLUB_COLORS = ["#FCE38A", "#1A1A1A", "#B8E0D2", "#F6C6C7", "#C9B8FF", "#A9DDF3", "#FFC371", "#9AD28A"];
