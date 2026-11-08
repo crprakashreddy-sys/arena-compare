@@ -19,7 +19,7 @@ try {
   });
 } catch { GoogleSignin = null; }
 
-const GUIDELINES_URL = "https://YOUR-SITE/zingd/community-guidelines";
+const GUIDELINES_URL = "https://crprakashreddy-sys.github.io/zingd/terms.html";
 
 export default function Login() {
   const t = useTheme();

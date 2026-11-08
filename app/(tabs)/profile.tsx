@@ -16,8 +16,8 @@ import { pickAndUploadPhoto } from "../../lib/photos";
 import { ClubBadge } from "../../components/ClubBadge";
 import { useSessions } from "../../lib/sessions";
 
-const GUIDELINES_URL = "https://YOUR-SITE/zingd/community-guidelines";
-const PRIVACY_URL = "https://YOUR-SITE/zingd/privacy";
+const GUIDELINES_URL = "https://crprakashreddy-sys.github.io/zingd/terms.html";
+const PRIVACY_URL = "https://crprakashreddy-sys.github.io/zingd/privacy.html";
 
 export default function You() {
   const t = useTheme();
