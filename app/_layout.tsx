@@ -37,6 +37,8 @@ export default function RootLayout() {
           <Stack.Screen name="club/[id]" options={{ title: "Club" }} />
           <Stack.Screen name="club-edit" options={{ title: "New club", presentation: "modal" }} />
           <Stack.Screen name="club-members/[id]" options={{ title: "Members" }} />
+          <Stack.Screen name="issue/[id]" options={{ title: "Issue" }} />
+          <Stack.Screen name="issue-new" options={{ title: "Ask the club", presentation: "modal" }} />
           <Stack.Screen name="add-charger" options={{ title: "Add a charger", presentation: "modal" }} />
           <Stack.Screen name="login" options={{ title: "Join zappd", presentation: "modal" }} />
         </Stack>

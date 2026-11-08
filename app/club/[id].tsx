@@ -18,6 +18,7 @@ import {
 } from "../../lib/clubs";
 import { ClubBadge } from "../../components/ClubBadge";
 import { Avatar } from "../../components/ui";
+import { IssuesBoard } from "../../components/IssuesBoard";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -52,6 +53,7 @@ export default function ClubChat() {
   const [sending, setSending] = useState(false);
   const [muted, setMutedState] = useState(false);
   const [admin, setAdmin] = useState(false);
+  const [tab, setTab] = useState<"chat" | "issues">("chat");
 
   const byId = useMemo(() => new Map(msgs.map((m) => [m.id, m])), [msgs]);
 
@@ -217,10 +219,32 @@ export default function ClubChat() {
     );
   }
 
+  const tabs = (
+    <View style={[s.tabs, { backgroundColor: t.bg, borderBottomColor: t.line }]}>
+      {(["chat", "issues"] as const).map((k) => (
+        <Pressable key={k} onPress={() => setTab(k)} style={[s.tab, tab === k && { backgroundColor: INK }]}>
+          <Ionicons name={k === "chat" ? "chatbubbles" : "construct"} size={15} color={tab === k ? LEMON : t.muted} />
+          <Text style={{ color: tab === k ? LEMON : t.muted, fontWeight: "800" }}>{k === "chat" ? "Chat" : "Issues & fixes"}</Text>
+        </Pressable>
+      ))}
+    </View>
+  );
+
+  if (tab === "issues" && member) {
+    return (
+      <View style={{ flex: 1, backgroundColor: t.bg }}>
+        {header}
+        {tabs}
+        <IssuesBoard clubId={clubId} />
+      </View>
+    );
+  }
+
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: t.surface }} behavior={Platform.OS === "ios" ? "padding" : undefined}
       keyboardVerticalOffset={Platform.OS === "ios" ? insets.top + 44 : 0}>
       {header}
+      {member && tabs}
       {loading || member === null ? <ActivityIndicator style={{ flex: 1 }} color={t.muted} /> : (
         <FlatList
           inverted
@@ -311,6 +335,8 @@ function Bubble({ m, mine, showName, replyTo, onLongPress }: {
 }
 
 const s = StyleSheet.create({
+  tabs: { flexDirection: "row", gap: 8, paddingHorizontal: 12, paddingVertical: 8, borderBottomWidth: StyleSheet.hairlineWidth },
+  tab: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, height: 38, borderRadius: 999 },
   bubble: { maxWidth: "78%", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 18 },
   mine: { backgroundColor: INK, borderBottomRightRadius: 6 },
   theirs: { borderBottomLeftRadius: 6 },
