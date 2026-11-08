@@ -24,6 +24,7 @@ export type Profile = {
   avatar_path?: string | null;
   bio?: string | null;
   interests?: string[];
+  personality?: string | null;
   prompts?: { q: string; a: string }[];
 };
 

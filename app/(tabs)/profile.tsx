@@ -19,6 +19,8 @@ import { Icon, IconTile } from "../../components/Icon";
 import { NotifyCard, NotifySettings } from "../../components/NotifyCard";
 import { unreadDms } from "../../lib/dms";
 import { zingStreak } from "../../lib/community";
+import { personalityById } from "../../lib/personality";
+import { PersonalityBadge } from "../../components/PersonalityBadge";
 import { useTabSpace } from "../../lib/tabspace";
 import { ChargingCard } from "../../components/ChargingCard";
 
@@ -101,6 +103,13 @@ export default function You() {
           <View style={styles.cam}>{uploading ? <ActivityIndicator size="small" color="#FCE38A" /> : <Ionicons name="camera" size={15} color="#FCE38A" />}</View>
         </Pressable>
         <Text style={styles.name}>{profile.display_name}</Text>
+        {profile.personality ? (
+          <Pressable onPress={() => router.push("/personality")} style={{ marginTop: 6 }}><PersonalityBadge id={profile.personality} size="md" /></Pressable>
+        ) : (
+          <Pressable onPress={() => router.push("/personality")} style={{ marginTop: 6, alignSelf: "center", paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, borderWidth: 1.5, borderStyle: "dashed", borderColor: "rgba(26,26,26,0.35)" }}>
+            <Text style={{ color: "#1A1A1A", fontWeight: "800", fontSize: 13 }}>✨ What kind of EV driver are you?</Text>
+          </Pressable>
+        )}
         <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
           {!!profile.city && <Text style={styles.sub}>{profile.city} ·</Text>}
           <Icon name={prog.cur.icon} size={14} color="#1A1A1A" /><Text style={styles.sub}>{prog.cur.name}</Text>
@@ -277,6 +286,7 @@ function Tools() {
   }, [session]));
   const items: [string, string, string, () => void][] = [
     ...(session ? [["chatbubble-ellipses-outline", "Messages", dm ? `${dm} unread` : "Chats with your crew", () => router.push("/messages")] as [string, string, string, () => void]] : []),
+    ...(session ? [["sparkles", "My EV personality", personalityById(me?.personality)?.name ? `${personalityById(me?.personality)!.emoji} ${personalityById(me?.personality)!.name}` : "Take the 1-minute quiz", () => router.push("/personality")] as [string, string, string, () => void]] : []),
     ["car-sport-outline", "Auto-detect my car", "Knows when you're in your EV", () => router.push("/auto-detect")],
     ...(session ? [["albums-outline", "Memories", streak ? `🔥 ${streak}-day streak · all your zings` : "Every zing you've dropped", () => router.push("/memories")] as [string, string, string, () => void]] : []),
     ["car-sport-outline", "My vehicles", active ? vehicleName(active) : "Add your EV", () => router.push("/garage")],

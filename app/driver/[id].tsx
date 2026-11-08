@@ -15,6 +15,7 @@ import { openSafetyMenu } from "../../components/SafetyMenu";
 import type { ConnectionState, Profile } from "../../lib/types";
 import { startDm } from "../../lib/dms";
 import { interestById } from "../../lib/interests";
+import { PersonalityBadge } from "../../components/PersonalityBadge";
 
 export default function DriverProfile() {
   const t = useTheme();
@@ -69,6 +70,7 @@ export default function DriverProfile() {
           <Text style={{ color: t.muted }}>{[p.car_model, p.city].filter(Boolean).join(" · ")}</Text>
           {!!p.bio && <Text style={{ color: t.text, textAlign: "center", lineHeight: 20, marginTop: 4, paddingHorizontal: 12 }}>{p.bio}</Text>}
           <VerifiedBadge verified={p.vehicle_verified} />
+          {!!p.personality && <View style={{ marginTop: 8 }}><PersonalityBadge id={p.personality} size="md" /></View>}
           {!!p.interests?.length && (
             <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 6, marginTop: 8 }}>
               {p.interests.map((id) => interestById(id)).filter(Boolean).map((i) => (

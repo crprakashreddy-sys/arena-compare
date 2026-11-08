@@ -535,12 +535,24 @@ export async function fetchIntroZaps(limit = 5): Promise<{ photo: string; name: 
 export type Suggestion = {
   id: string; display_name: string; car_model: string | null; city: string | null; avatar_path: string | null; bio: string | null;
   vehicle_verified: boolean; shared_clubs: number; score: number; reason: string | null;
-  interests?: string[]; prompts?: { q: string; a: string }[]; shared_interests?: string[];
+  interests?: string[]; prompts?: { q: string; a: string }[]; shared_interests?: string[]; personality?: string | null;
 };
 export async function fetchSuggestions(limit = 20): Promise<Suggestion[]> {
   const { data, error } = await supabase.rpc("driver_suggestions", { lim: limit });
   if (error) return [];
-  return ((data ?? []) as Suggestion[]).filter((s) => !blockedIds.has(s.id));
+  const list = ((data ?? []) as Suggestion[]).filter((s) => !blockedIds.has(s.id));
+  // Add EV personalities (and nudge people with the same one up the deck).
+  if (list.length) {
+    const [{ data: ps }, { data: u }] = await Promise.all([
+      supabase.from("profiles").select("id,personality").in("id", list.map((x) => x.id)),
+      supabase.auth.getUser(),
+    ]);
+    const map = new Map((ps ?? []).map((p: any) => [p.id, p.personality]));
+    const mine = u.user ? (await supabase.from("profiles").select("personality").eq("id", u.user.id).maybeSingle()).data?.personality : null;
+    list.forEach((x) => { x.personality = map.get(x.id) ?? null; if (mine && x.personality === mine) { x.score += 2; x.reason = [x.reason, "Same EV personality"].filter(Boolean).join(" · "); } });
+    list.sort((a, b) => b.score - a.score);
+  }
+  return list;
 }
 
 // ───────── Snapchat-style zings ─────────

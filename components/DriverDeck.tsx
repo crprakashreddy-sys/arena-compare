@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Animated, Dimensions, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useAuth } from "../lib/auth";
 import { interestById, openers } from "../lib/interests";
+import { PersonalityBadge } from "./PersonalityBadge";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
@@ -133,6 +134,7 @@ function Card({ p, onOpen }: { p: Suggestion; onOpen?: () => void }) {
       </View>
       <View style={{ padding: 16, gap: 6 }}>
         <Text style={s.name} numberOfLines={1}>{p.display_name}</Text>
+        {!!p.personality && <PersonalityBadge id={p.personality} />}
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
           {!!p.car_model && <View style={s.chip}><Icon name="car" size={13} color={INK} /><Text style={s.chipText}>{p.car_model}</Text></View>}
           {!!p.city && <View style={s.chip}><Icon name="pin" size={13} color={INK} /><Text style={s.chipText}>{p.city}</Text></View>}

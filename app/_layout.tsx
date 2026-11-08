@@ -44,6 +44,7 @@ export default function RootLayout() {
           <Stack.Screen name="auto-detect" options={{ title: "Auto-detect my car" }} />
           <Stack.Screen name="drive" options={{ headerShown: false, presentation: "transparentModal", animation: "fade" }} />
           <Stack.Screen name="nearby" options={{ headerShown: false, presentation: "modal" }} />
+          <Stack.Screen name="personality" options={{ title: "" }} />
           <Stack.Screen name="memories" options={{ title: "Memories" }} />
           <Stack.Screen name="messages" options={{ title: "Messages" }} />
           <Stack.Screen name="dm/[id]" options={{ title: "" }} />
