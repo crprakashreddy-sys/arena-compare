@@ -41,6 +41,7 @@ export default function RootLayout() {
           <Stack.Screen name="issue-new" options={{ title: "Ask the club", presentation: "modal" }} />
           <Stack.Screen name="event/[id]" options={{ title: "Event" }} />
           <Stack.Screen name="event-new" options={{ title: "Plan an event", presentation: "modal" }} />
+          <Stack.Screen name="avatar-maker" options={{ title: "Make my cartoon", presentation: "modal" }} />
           <Stack.Screen name="add-charger" options={{ title: "Add a charger", presentation: "modal" }} />
           <Stack.Screen name="login" options={{ title: "Join zingd", presentation: "modal" }} />
         </Stack>

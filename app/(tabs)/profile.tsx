@@ -70,7 +70,12 @@ export default function You() {
     ]);
 
   const prog = badgeProgress(points);
-  const changePhoto = async () => {
+  const changePhoto = () => Alert.alert("Profile photo", undefined, [
+    { text: "🎨 Make my cartoon (with my EV)", onPress: () => router.push("/avatar-maker") },
+    { text: "📷 Choose a photo", onPress: pickPhoto },
+    { text: "Cancel", style: "cancel" },
+  ]);
+  const pickPhoto = async () => {
     setUploading(true);
     try {
       const path = await pickAndUploadPhoto();
