@@ -361,7 +361,7 @@ export async function addFoodTip(chargerId: string, name: string, note: string) 
 }
 
 // ───────── Safety ─────────
-export async function report(kind: "checkin" | "review" | "food_tip" | "user" | "club_message" | "club_post" | "club_reply" | "club_event", targetId: string, reason: string) {
+export async function report(kind: "checkin" | "review" | "food_tip" | "user" | "club_message" | "club_post" | "club_reply" | "club_event" | "dm_message", targetId: string, reason: string) {
   const { data: u } = await supabase.auth.getUser();
   if (!u.user) throw new Error("Sign in to report.");
   const { error } = await supabase.from("reports").insert({ reporter_id: u.user.id, target_kind: kind, target_id: targetId, reason });
