@@ -45,6 +45,22 @@ export default function ZingCamera() {
   const [timer, setTimer] = useState<0 | 3 | 10>(0);
   const [grid, setGrid] = useState(false);
   const [zoom, setZoom] = useState(0);
+  // Lenses: 0.5× uses the real ultra-wide camera; 2× and 2.5× zoom the main camera.
+  const [lenses, setLenses] = useState<string[]>([]);
+  const [ultra, setUltra] = useState(false);
+  const ULTRA = lenses.find((l) => /ultra ?wide/i.test(l));
+  const WIDE = lenses.find((l) => /builtInWideAngleCamera/i.test(l)) ?? lenses.find((l) => /^back camera$/i.test(l))
+    ?? lenses.find((l) => /wide/i.test(l) && !/ultra|dual|triple/i.test(l));
+  const canUltra = facing === "back" && !!ULTRA && !!WIDE;
+  const onUltra = canUltra && ultra;
+  const factor = onUltra ? 0.5 : 1 + zoom * 9;
+  const stops = [...(canUltra ? [0.5] : []), 1, 2, 2.5];
+  const litStop = stops.filter((f) => f <= factor + 0.02).pop() ?? 1;
+  const goStop = (f: number) => {
+    tickHaptic();
+    if (f === 0.5) { setUltra(true); setZoom(0); return; }
+    setUltra(false); setZoom((f - 1) / 9);
+  };
   const [lookIdx, setLookIdx] = useState(LOOKS.findIndex((l) => l.id === "zing"));
   const [mode, setMode] = useState<"picture" | "video">("picture");
   const today = todaysChallenge();
@@ -146,7 +162,12 @@ export default function ZingCamera() {
   const flip = () => { tapHaptic(); setFacing((f) => (f === "back" ? "front" : "back")); };
   const pinch = Gesture.Pinch().runOnJS(true)
     .onStart(() => { zoomBase.current = zoom; })
-    .onUpdate((e) => setZoom(Math.max(0, Math.min(0.6, zoomBase.current + (e.scale - 1) * 0.25))));
+    .onUpdate((e) => {
+      // Pinch out past 1× hops to the ultra-wide lens; pinch in from it hops back.
+      if (onUltra) { if (e.scale > 1.35 && !recording) { setUltra(false); setZoom(0); zoomBase.current = 0; } return; }
+      if (canUltra && !recording && zoom < 0.01 && e.scale < 0.7) { tickHaptic(); setUltra(true); return; }
+      setZoom(Math.max(0, Math.min(0.6, zoomBase.current + (e.scale - 1) * 0.25)));
+    });
   const dbl = Gesture.Tap().numberOfTaps(2).runOnJS(true).onEnd(flip);
   const swipeL = Gesture.Fling().direction(Directions.LEFT).runOnJS(true).onEnd(() => setLook(lookIdx + 1));
   const swipeR = Gesture.Fling().direction(Directions.RIGHT).runOnJS(true).onEnd(() => setLook(lookIdx - 1));
@@ -176,7 +197,9 @@ export default function ZingCamera() {
       <GestureDetector gesture={gestures}>
         <View style={StyleSheet.absoluteFill}>
           {focused && active && (
-            <CameraView ref={cam} style={StyleSheet.absoluteFill} facing={facing} mode={mode} zoom={zoom}
+            <CameraView ref={cam} style={StyleSheet.absoluteFill} facing={facing} mode={mode} zoom={onUltra ? 0 : zoom}
+              selectedLens={facing === "back" ? (onUltra ? ULTRA : WIDE) : undefined}
+              onAvailableLensesChanged={(e) => setLenses(e.lenses ?? [])}
               flash={facing === "back" ? flash : "off"} enableTorch={facing === "back" && flash === "on" && recording} mirror={facing === "front"} />
           )}
           <VideoLook look={look.id} width={W} height={H} />
@@ -243,11 +266,24 @@ export default function ZingCamera() {
             <Text style={s.railLabel}>{label}</Text>
           </Pressable>
         ))}
-        {zoom > 0.01 && <Text style={[s.railLabel, { marginTop: 4 }]}>{(1 + zoom * 9).toFixed(1)}×</Text>}
       </View>
 
       {/* Looks carousel + shutter */}
       <View style={[s.bottom, { bottom: tabSpace + 8 }]} pointerEvents="box-none">
+        {/* Zoom stops, iPhone-camera style */}
+        <Glass style={s.zoomBar}>
+          {stops.map((f) => {
+            if (f === 0.5 && recording) return null;
+            const lit = f === litStop;
+            const exact = Math.abs(factor - f) < 0.05;
+            const label = lit ? `${exact ? (f === 0.5 ? ".5" : f) : factor.toFixed(1)}×` : f === 0.5 ? ".5" : String(f);
+            return (
+              <Pressable key={f} onPress={() => goStop(f)} hitSlop={6} accessibilityLabel={`${f}× zoom`} style={[s.zoomStop, lit && s.zoomStopOn]}>
+                <Text style={[s.zoomText, lit && { color: "#1A1A1A", fontSize: 12.5 }]}>{label}</Text>
+              </Pressable>
+            );
+          })}
+        </Glass>
         {!recording && (
           <View style={s.looks}>
             {LOOKS.map((l, i) => Math.abs(i - lookIdx) <= 3 ? (
@@ -317,6 +353,10 @@ const s = StyleSheet.create({
   side: { width: 50, height: 50, alignItems: "center", justifyContent: "center" },
   sideGlass: { width: 50, height: 50, borderRadius: 16, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.4)" },
   memThumb: { width: 46, height: 46, borderRadius: 14, borderWidth: 2, borderColor: "#fff" },
+  zoomBar: { flexDirection: "row", alignItems: "center", gap: 4, padding: 4, borderRadius: 22, backgroundColor: "rgba(0,0,0,0.35)", marginBottom: 10 },
+  zoomStop: { minWidth: 34, height: 34, borderRadius: 17, paddingHorizontal: 6, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.25)" },
+  zoomStopOn: { backgroundColor: LEMON, minWidth: 42 },
+  zoomText: { color: "#fff", fontWeight: "800", fontSize: 11.5 },
   shutterWrap: { width: 92, height: 92, alignItems: "center", justifyContent: "center" },
   shutterRing: { position: "absolute", width: 84, height: 84, borderRadius: 42, borderWidth: 5, borderColor: "#fff" },
   recFill: { position: "absolute", width: 84, height: 84, borderRadius: 42, overflow: "hidden" },

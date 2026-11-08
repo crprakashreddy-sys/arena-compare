@@ -82,6 +82,7 @@ export default function You() {
 
   const prog = badgeProgress(points);
   const changePhoto = () => Alert.alert("Profile photo", undefined, [
+    { text: "Cartoon of my car (from a photo)", onPress: () => router.push("/car-toon") },
     { text: "Make my cartoon (with my EV)", onPress: () => router.push("/avatar-maker") },
     { text: "Choose a photo", onPress: pickPhoto },
     { text: "Cancel", style: "cancel" },
