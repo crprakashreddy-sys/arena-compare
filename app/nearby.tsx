@@ -17,6 +17,7 @@ import type { Checkin } from "../lib/types";
 import { Glass } from "../components/Glass";
 import { useTabSpace } from "../lib/tabspace";
 import { tapHaptic } from "../lib/motion";
+import { challengeById, todaysChallenge } from "../lib/challenges";
 
 const BG = "#0B1117";
 const STATUS_STYLE = {
@@ -36,7 +37,10 @@ export default function ZapsFeed() {
   const [where, setWhere] = useState<{ lat: number; lng: number } | null>(null);
   const [viewer, setViewer] = useState<number | null>(null);
   const [mode] = useMode();
-  const shownZ = useMemo(() => zaps.filter((z) => !z.chargers || suits({ connectors: z.chargers.connectors ?? [], network: z.chargers.network }, mode)), [zaps, mode]);
+  const today = todaysChallenge();
+  const [onlyChallenge, setOnlyChallenge] = useState(false);
+  const shownZ = useMemo(() => zaps.filter((z) => (!onlyChallenge || z.challenge === today.id) && (!z.chargers || suits({ connectors: z.chargers.connectors ?? [], network: z.chargers.network }, mode))), [zaps, mode, onlyChallenge, today.id]);
+  const entries = zaps.filter((z) => z.challenge === today.id).length;
 
   const load = useCallback(async (p = where) => {
     if (!p) return;
@@ -74,6 +78,14 @@ export default function ZapsFeed() {
             <Text style={{ color: "#fff", fontSize: 40, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.5 }}>Zings near you</Text>
             <View style={{ marginTop: 10, marginBottom: 4 }}><ModeSwitch dark /></View>
             <Text style={{ color: "#A9B3BC" }}>Live from chargers within 25 km · gone in 24 hours</Text>
+            <Pressable onPress={() => { tapHaptic(); setOnlyChallenge((v) => !v); }} style={[styles.board, onlyChallenge && { borderColor: "#FCE38A" }]} accessibilityRole="switch" accessibilityState={{ checked: onlyChallenge }}>
+              <Text style={{ fontSize: 20 }}>{today.emoji}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Today's challenge: {today.title}</Text>
+                <Text style={{ color: "#A9B3BC", fontSize: 12.5 }}>{onlyChallenge ? "Showing entries only · tap to see all" : `${today.hint} · ${entries} ${entries === 1 ? "entry" : "entries"} nearby`}</Text>
+              </View>
+              <Ionicons name={onlyChallenge ? "checkmark-circle" : "chevron-forward"} size={18} color={onlyChallenge ? "#FCE38A" : "#A9B3BC"} />
+            </Pressable>
             <Pressable onPress={() => router.push("/leaderboard")} style={styles.board} accessibilityRole="button">
               <Ionicons name="trophy" size={18} color="#FCE38A" />
               <View style={{ flex: 1 }}>
@@ -115,8 +127,11 @@ export default function ZapsFeed() {
                       {!!z.music && <View style={styles.mediaBadge}><Ionicons name="musical-note" size={13} color="#FCE38A" /></View>}
                     </View>
                   )}
-                <View style={{ position: "absolute", top: 10, left: 10 }}>
+                <View style={{ position: "absolute", top: 10, left: 10, gap: 6, alignItems: "flex-start" }}>
                   <ScoreChip points={z.zap_score} distanceM={z.distance_m} />
+                  {!!challengeById(z.challenge) && (
+                    <View style={styles.mediaBadge}><Text style={{ fontSize: 12 }}>{challengeById(z.challenge)!.emoji}</Text><Text style={styles.mediaText}>{challengeById(z.challenge)!.title}</Text></View>
+                  )}
                 </View>
                 {!!z.note && (
                   <Text style={styles.note} numberOfLines={3}>{z.note}</Text>
@@ -158,7 +173,7 @@ const styles = StyleSheet.create({
   mediaText: { color: "#fff", fontWeight: "800", fontSize: 12 },
   fab: { flexDirection: "row", alignItems: "center", gap: 8, height: 56, paddingHorizontal: 22, borderRadius: 28,
     shadowColor: "#FCE38A", shadowOpacity: 0.45, shadowRadius: 14, shadowOffset: { width: 0, height: 4 }, elevation: 8 },
-  board: { flexDirection: "row", alignItems: "center", gap: 12, marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: "#151E26" },
+  board: { flexDirection: "row", alignItems: "center", gap: 12, marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: "#151E26", borderWidth: 1, borderColor: "transparent" },
   card: { borderRadius: 20, overflow: "hidden", backgroundColor: "#151C23" },
   note: { position: "absolute", left: 14, right: 14, bottom: 14, color: "#fff", fontSize: 15, lineHeight: 21, textShadowColor: "rgba(0,0,0,0.8)", textShadowRadius: 8 },
   meta: { flexDirection: "row", alignItems: "center", gap: 10, padding: 12 },

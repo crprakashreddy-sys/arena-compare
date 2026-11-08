@@ -22,13 +22,18 @@ import { MusicPicker } from "../../components/MusicPicker";
 import { VideoLook } from "../../components/VideoLook";
 import { tickHaptic } from "../../lib/motion";
 import { searchPlaces, type PlaceHit } from "../../lib/places";
+import { SendSheet, type SendChoice } from "../../components/SendSheet";
+import { sendZingTo } from "../../lib/dms";
+import { challengeById } from "../../lib/challenges";
 
 const DARK = "#07090B";
 const YELLOW = "#FCE38A";
 
 /** Drop a zap: pick the charger (or use the nearest), shoot or choose a photo, grade it, post it. */
 export default function DropZap() {
-  const { id, uri: shot, kind: shotKind, look: shotLook } = useLocalSearchParams<{ id: string; uri?: string; kind?: string; look?: string }>();
+  const { id, uri: shot, kind: shotKind, look: shotLook, challenge } = useLocalSearchParams<{ id: string; uri?: string; kind?: string; look?: string; challenge?: string }>();
+  const ch = challengeById(challenge ? String(challenge) : null);
+  const [sendOpen, setSendOpen] = useState(false);
   const auth = useAuth();
   const [charger, setCharger] = useState<Charger | null>(null);
   const [nearby, setNearby] = useState<{ c: Charger; d: number }[]>([]);
@@ -43,7 +48,6 @@ export default function DropZap() {
   const [videoLook, setVideoLook] = useState(shotLook && shotKind === "video" ? String(shotLook) : "cinema");
   const [music, setMusic] = useState<string | null>(null);
   const [musicOpen, setMusicOpen] = useState(false);
-  const [audience, setAudience] = useState<"public" | "crew">("public");
   // Somewhere that isn't a charger: a highway café, a viewpoint, a meetup spot.
   const [place, setPlace] = useState<{ name: string; lat: number; lng: number } | null>(null);
   const [placeQ, setPlaceQ] = useState("");
@@ -131,7 +135,7 @@ export default function DropZap() {
     if (!res.canceled && res.assets[0]) setUri(res.assets[0].uri);
   };
 
-  const post = async () => {
+  const post = async (choice: SendChoice = { story: "public", friends: [] }) => {
     if (!charger && !place) return;
     if (!canPost(auth)) { router.push("/login"); return; }
     setPosting(true);
@@ -153,7 +157,16 @@ export default function DropZap() {
       }
       const latest = (await getZapFix()) ?? fix;
       const result = await postCheckin(charger?.id ?? null, charger ? status : "working", note, path, kind === "video" ? videoLook : editor.current?.lookId(), latest, charger ? issue : null, keep,
-        { media: kind, video_path: videoPath, music, audience, place: charger ? null : place });
+        { media: kind, video_path: videoPath, music, audience: choice.story ?? "direct", place: charger ? null : place, challenge: ch?.id ?? null });
+      // Straight to friends' chats.
+      let sentTo = 0;
+      if (choice.friends.length && auth.session) sentTo = await sendZingTo(choice.friends, result.id, auth.session.user.id);
+      setSendOpen(false);
+      if (!choice.story) {
+        Alert.alert("Sent ⚡", `Your zing went to ${sentTo} friend${sentTo === 1 ? "" : "s"}.`);
+        router.replace("/(tabs)/feed");
+        return;
+      }
       if (!charger) {
         Alert.alert("Zing dropped ⚡", `+${result.zap_score} Zing Score at ${place!.name}.`);
         router.replace("/(tabs)/feed");
@@ -185,8 +198,8 @@ export default function DropZap() {
         ),
         headerRight: () =>
           charger || place ? (
-            <Pressable onPress={post} disabled={posting} style={styles.dropBtn} accessibilityRole="button">
-              {posting ? <ActivityIndicator color="#1A1A1A" /> : <Text style={{ color: "#1A1A1A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Drop it</Text>}
+            <Pressable onPress={() => (canPost(auth) ? setSendOpen(true) : router.push("/login"))} disabled={posting} style={styles.dropBtn} accessibilityRole="button">
+              {posting ? <ActivityIndicator color="#1A1A1A" /> : <Text style={{ color: "#1A1A1A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Send to ▶</Text>}
             </Pressable>
           ) : null,
       }}
@@ -318,7 +331,7 @@ export default function DropZap() {
                   <Text style={{ color: "#fff", fontWeight: "600" }}>Choose from gallery</Text>
                 </Pressable>
                 <Text style={{ color: "#A3ADB6", fontSize: 12.5, textAlign: "center" }}>
-                  No photo? Tap Drop it to post the status only.
+                  No photo? Tap Send to post the status only.
                 </Text>
               </View>
             )}
@@ -338,14 +351,14 @@ export default function DropZap() {
                 <Ionicons name="musical-note" size={16} color={music ? "#1A1A1A" : "#fff"} />
                 <Text style={{ color: music ? "#1A1A1A" : "#fff", fontWeight: "800" }} numberOfLines={1}>{trackById(music)?.title ?? "Add music"}</Text>
               </Pressable>
-              {(["public", "crew"] as const).map((a) => (
-                <Pressable key={a} onPress={() => { tickHaptic(); setAudience(a); }} style={[styles.pill, audience === a && { backgroundColor: "#fff" }]}>
-                  <Ionicons name={a === "public" ? "globe" : "people"} size={15} color={audience === a ? "#1A1A1A" : "#fff"} />
-                  <Text style={{ color: audience === a ? "#1A1A1A" : "#fff", fontWeight: "800" }}>{a === "public" ? "Public" : "Crew only"}</Text>
-                </Pressable>
-              ))}
+              {ch && (
+                <View style={[styles.pill, { backgroundColor: "#2A2610" }]}>
+                  <Text>{ch.emoji}</Text><Text style={{ color: YELLOW, fontWeight: "800" }} numberOfLines={1}>{ch.title}</Text>
+                </View>
+              )}
             </View>
             <MusicPicker visible={musicOpen} value={music} onClose={() => setMusicOpen(false)} onPick={setMusic} />
+            <SendSheet visible={sendOpen} busy={posting} onClose={() => setSendOpen(false)} onSend={(c) => post(c)} />
 
             {/* Snapchat-style: gone in 24 hours, or keep it on your profile and the charger's gallery */}
             <View style={styles.life}>

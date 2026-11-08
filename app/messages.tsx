@@ -3,7 +3,7 @@ import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "rea
 import { router, useFocusEffect } from "expo-router";
 import { useAuth } from "../lib/auth";
 import { useTheme, CTA, ON_CTA } from "../lib/theme";
-import { fetchInbox, subscribeInbox, type DmThread } from "../lib/dms";
+import { fetchInbox, fetchZingStreaks, subscribeInbox, type DmThread } from "../lib/dms";
 import { timeAgo } from "../lib/geo";
 import { Avatar } from "../components/ui";
 import { IconTile } from "../components/Icon";
@@ -17,7 +17,11 @@ export default function Messages() {
   const me = session?.user.id;
   const [rows, setRows] = useState<DmThread[] | null>(null);
 
-  const load = useCallback(() => { fetchInbox().then(setRows).catch(() => setRows([])); }, []);
+  const [streaks, setStreaks] = useState<Record<string, number>>({});
+  const load = useCallback(() => {
+    fetchInbox().then(setRows).catch(() => setRows([]));
+    fetchZingStreaks().then(setStreaks).catch(() => {});
+  }, []);
   useFocusEffect(useCallback(() => { load(); }, [load]));
   useEffect(() => (me ? subscribeInbox(load) : undefined), [me, load]);
 
@@ -50,6 +54,7 @@ export default function Messages() {
             <View style={{ flex: 1, gap: 3 }}>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
                 <Text style={{ flex: 1, color: t.text, fontSize: 16, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }} numberOfLines={1}>{name}</Text>
+                {!!streaks[r.id] && <Text style={{ color: "#FF8A3D", fontWeight: "800", fontSize: 13 }}>🔥{streaks[r.id]}</Text>}
                 <Text style={{ color: unread ? t.text : t.faint, fontSize: 12, fontWeight: unread ? "700" : "500" }}>{timeAgo(last?.created_at ?? r.last_at)}</Text>
               </View>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>

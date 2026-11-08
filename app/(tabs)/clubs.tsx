@@ -8,7 +8,7 @@ import { useAuth } from "../../lib/auth";
 import { useTheme, CTA, ON_CTA } from "../../lib/theme";
 import { useGarage } from "../../lib/vehicles";
 import { activityLine, autoJoinFor, fetchActivity, fetchClubs, fetchMyClubs, joinClub, joinWithCode, type Activity, type Club, type MyClub } from "../../lib/clubs";
-import { fetchInbox, type DmThread } from "../../lib/dms";
+import { fetchInbox, fetchZingStreaks, type DmThread } from "../../lib/dms";
 import { acceptRequest, fetchFeed, fetchMyNetwork, fetchSuggestions, removeConnection, type DriverLite, type Suggestion } from "../../lib/community";
 import { successHaptic } from "../../lib/motion";
 import { timeAgo } from "../../lib/geo";
@@ -48,6 +48,7 @@ export default function Clubs() {
   const { vehicles } = useGarage();
   const [mine, setMine] = useState<MyClub[]>([]);
   const [dms, setDms] = useState<DmThread[]>([]);
+  const [streaks, setStreaks] = useState<Record<string, number>>({});
   const [all, setAll] = useState<Club[]>([]);
   const [act, setAct] = useState<Record<string, Activity>>({});
   const [zaps, setZaps] = useState<Checkin[]>([]);
@@ -75,6 +76,7 @@ export default function Clubs() {
       ]);
       setAll(a); setMine(m); setDms(d);
       fetchActivity().then(setAct).catch(() => {});
+      if (signedIn) fetchZingStreaks().then(setStreaks).catch(() => {});
       if (signedIn) { fetchSuggestions(20).then(setPeople).catch(() => {}); fetchMyNetwork().then((n) => setRequests(n.requests)).catch(() => {}); }
       loadStories();
     } catch (e: any) { setErr(e.message); }
@@ -203,7 +205,7 @@ export default function Clubs() {
               </View>
             ) : (
               <View style={{ paddingHorizontal: 8 }}>
-                {(showAll ? shownChats : shownChats.slice(0, 6)).map((x) => <ChatRow key={`${x.kind}-${x.id}`} x={x} act={x.kind === "club" ? act[x.id] : undefined} me={session!.user.id} />)}
+                {(showAll ? shownChats : shownChats.slice(0, 6)).map((x) => <ChatRow key={`${x.kind}-${x.id}`} x={x} act={x.kind === "club" ? act[x.id] : undefined} me={session!.user.id} streak={x.kind === "dm" ? streaks[x.id] : undefined} />)}
                 {shownChats.length > 6 && (
                   <Pressable onPress={() => setShowAll((v) => !v)} style={{ alignItems: "center", paddingVertical: 10 }}>
                     <Text style={{ color: t.muted, fontWeight: "800" }}>{showAll ? "Show less" : `Show all ${shownChats.length}`}</Text>
@@ -307,7 +309,7 @@ export default function Clubs() {
 }
 
 /** One row in the inbox, WhatsApp-style: big avatar, bold when unread, time and a count. */
-function ChatRow({ x, act, me }: { x: Chat; act?: Activity; me: string }) {
+function ChatRow({ x, act, me, streak }: { x: Chat; act?: Activity; me: string; streak?: number }) {
   const t = useTheme();
   const unread = x.unread > 0;
   let title = "", preview = "", avatar: React.ReactNode, muted = false;
@@ -330,7 +332,9 @@ function ChatRow({ x, act, me }: { x: Chat; act?: Activity; me: string }) {
       <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 16, flexShrink: 1 }} numberOfLines={1}>{title}</Text>
-          {x.kind === "dm" && <View style={[s.tag, { backgroundColor: t.surface }]}><Text style={{ color: t.muted, fontSize: 10.5, fontWeight: "800" }}>DM</Text></View>}
+          {x.kind === "dm" && (streak
+            ? <Text style={{ color: "#FF8A3D", fontWeight: "800", fontSize: 13 }}>🔥{streak}</Text>
+            : <View style={[s.tag, { backgroundColor: t.surface }]}><Text style={{ color: t.muted, fontSize: 10.5, fontWeight: "800" }}>DM</Text></View>)}
           <View style={{ flex: 1 }} />
           {!!x.at && <Text style={{ color: unread ? t.text : t.faint, fontSize: 12, fontWeight: unread ? "800" : "500" }}>{timeAgo(x.at).replace(" ago", "")}</Text>}
         </View>

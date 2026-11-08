@@ -49,9 +49,10 @@ export type Checkin = {
   media?: "photo" | "video";
   video_path?: string | null;
   music?: string | null;
-  audience?: "public" | "crew";
+  audience?: "public" | "crew" | "direct";
   look?: string | null;
   place_name?: string | null;
+  challenge?: string | null;
   place_lat?: number | null;
   place_lng?: number | null;
   score_breakdown?: ScorePart[];

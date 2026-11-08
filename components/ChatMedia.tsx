@@ -3,7 +3,7 @@ import { Image } from "expo-image";
 import { gifSize, gifSrc } from "../lib/gifs";
 import { StickerView } from "./ZingStickers";
 
-type M = { body?: string | null; photo_path?: string | null; gif_url?: string | null; sticker?: string | null; deleted?: boolean };
+type M = { body?: string | null; photo_path?: string | null; gif_url?: string | null; sticker?: string | null; zing_id?: string | null; deleted?: boolean };
 
 /** Stickers (and GIPHY stickers) sit on the chat with no bubble, like WhatsApp and iMessage. */
 export function isBare(m: M) {
@@ -12,7 +12,7 @@ export function isBare(m: M) {
 }
 
 export function previewOf(m: M) {
-  return m.deleted ? "Message deleted" : m.body ?? (m.sticker ? "Sticker" : m.gif_url ? (gifSize(m.gif_url).sticker ? "Sticker" : "GIF") : "📷 Photo");
+  return m.deleted ? "Message deleted" : m.body ?? (m.zing_id ? "📸 Sent you a zing" : m.sticker ? "Sticker" : m.gif_url ? (gifSize(m.gif_url).sticker ? "Sticker" : "GIF") : "📷 Photo");
 }
 
 /** The GIF or sticker inside a message, sized to its real shape before it loads. */

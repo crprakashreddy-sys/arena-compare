@@ -52,7 +52,7 @@ export async function fetchLiveStatus(chargerIds: string[]): Promise<Record<stri
 }
 
 // ───────── Snaps and check-ins ─────────
-const CHECKIN_FIELDS = "id,charger_id,user_id,status,note,photo_path,created_at,expires_at,keep,media,video_path,music,audience,look,place_name,place_lat,place_lng,distance_m,zap_score,score_breakdown,issue,profiles(display_name,car_model,avatar_path)";
+const CHECKIN_FIELDS = "id,charger_id,user_id,status,note,photo_path,created_at,expires_at,keep,media,video_path,music,audience,look,place_name,place_lat,place_lng,challenge,distance_m,zap_score,score_breakdown,issue,profiles(display_name,car_model,avatar_path)";
 
 export async function fetchSnaps(chargerId: string): Promise<Checkin[]> {
   const { data } = await supabase
@@ -146,8 +146,8 @@ export async function fetchIssues(chargerId: string) {
 
 export async function postCheckin(
   chargerId: string | null, status: Status, note: string, photoPath: string | null, look?: string, fix?: ZapFix | null, issue?: IssueKey | null, keep = false,
-  extra: { media?: "photo" | "video"; video_path?: string | null; music?: string | null; audience?: "public" | "crew"; place?: { name: string; lat: number; lng: number } | null } = {},
-): Promise<{ zap_score: number; score_breakdown: ScorePart[]; distance_m: number | null }> {
+  extra: { media?: "photo" | "video"; video_path?: string | null; music?: string | null; audience?: "public" | "crew" | "direct"; place?: { name: string; lat: number; lng: number } | null; challenge?: string | null } = {},
+): Promise<{ id: string; zap_score: number; score_breakdown: ScorePart[]; distance_m: number | null }> {
   const { data: u } = await supabase.auth.getUser();
   if (!u.user) throw new Error("Sign in to drop a zing.");
   const { data, error } = await supabase.from("checkins").insert({
@@ -165,11 +165,13 @@ export async function postCheckin(
     ...(keep ? { keep: true } : {}),
     ...(extra.media === "video" ? { media: "video", video_path: extra.video_path } : {}),
     ...(extra.music ? { music: extra.music } : {}),
-    ...(extra.audience === "crew" ? { audience: "crew" } : {}),
+    ...(extra.audience && extra.audience !== "public" ? { audience: extra.audience } : {}),
+    ...(extra.challenge ? { challenge: extra.challenge } : {}),
     ...(extra.place ? { place_name: extra.place.name.slice(0, 80), place_lat: extra.place.lat, place_lng: extra.place.lng } : {}),
-  }).select("zap_score,score_breakdown,distance_m").single();
+  }).select("id,zap_score,score_breakdown,distance_m").single();
   if (error) throw new Error("Your zing didn't post. Try again.");
   return {
+    id: String(data?.id ?? ""),
     zap_score: (data?.zap_score as number) ?? 0,
     score_breakdown: (data?.score_breakdown as ScorePart[]) ?? [],
     distance_m: (data?.distance_m as number | null) ?? null,
@@ -616,4 +618,9 @@ export async function fetchConnectionMap(): Promise<Record<string, Link>> {
     out[other] = r.status === "accepted" ? "connected" : r.requester_id === me ? "sent" : "received";
   });
   return out;
+}
+
+export async function fetchCheckin(id: string): Promise<Checkin | null> {
+  const { data } = await supabase.from("checkins").select(`${CHECKIN_FIELDS},chargers(name)`).eq("id", id).maybeSingle();
+  return (data as any) ?? null;
 }

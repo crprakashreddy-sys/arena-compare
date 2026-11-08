@@ -19,6 +19,7 @@ import { Avatar } from "../../components/ui";
 import { IconTile } from "../../components/Icon";
 import { GifPicker, type Pick as FunPick } from "../../components/GifPicker";
 import { ChatMedia, isBare, previewOf } from "../../components/ChatMedia";
+import { ZingTile } from "../../components/ZingTile";
 import { tapHaptic } from "../../lib/motion";
 
 const LEMON = "#FCE38A";
@@ -280,7 +281,12 @@ function Bubble({ m, mine, tight, replyTo, replyName, onLongPress }: {
   const pad = (m.photo_path || m.gif_url) ? { paddingHorizontal: 8 } : null;
   return (
     <View style={{ flexDirection: "row", justifyContent: mine ? "flex-end" : "flex-start", marginTop: tight ? 0 : 8 }}>
-      {isBare(m) ? (
+      {m.zing_id && !m.deleted ? (
+        <Pressable onLongPress={onLongPress} delayLongPress={280} style={{ alignItems: mine ? "flex-end" : "flex-start" }}>
+          <ZingTile zingId={m.zing_id} mine={mine} />
+          <Text style={[s.time, { color: t.faint, marginHorizontal: 6 }]}>{time}</Text>
+        </Pressable>
+      ) : isBare(m) ? (
         <Pressable onLongPress={onLongPress} delayLongPress={280} style={{ alignItems: mine ? "flex-end" : "flex-start" }}>
           <ChatMedia m={m} />
           <Text style={[s.time, { color: t.faint, marginHorizontal: 6 }]}>{time}</Text>

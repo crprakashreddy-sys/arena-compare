@@ -4,16 +4,16 @@ import { isBlocked } from "./community";
 export type DmMessage = {
   id: string; thread_id: string; user_id: string; body: string | null; photo_path: string | null;
   reply_to: string | null; deleted: boolean; created_at: string;
-  gif_url?: string | null; sticker?: string | null;
+  gif_url?: string | null; sticker?: string | null; zing_id?: string | null;
 };
 export type DmPerson = { id: string; display_name: string; avatar_path: string | null; car_model: string | null };
 export type DmThread = {
   id: string; last_at: string; other_id: string; unread: number;
-  last: { body: string | null; photo_path: string | null; gif_url?: string | null; sticker?: string | null; user_id: string; deleted: boolean; created_at: string } | null;
+  last: { body: string | null; photo_path: string | null; gif_url?: string | null; sticker?: string | null; zing_id?: string | null; user_id: string; deleted: boolean; created_at: string } | null;
   other?: DmPerson;
 };
 
-const FIELDS = "id,thread_id,user_id,body,photo_path,gif_url,sticker,reply_to,deleted,created_at";
+const FIELDS = "id,thread_id,user_id,body,photo_path,gif_url,sticker,zing_id,reply_to,deleted,created_at";
 
 /** Opens (or reuses) the chat with a connected driver and returns its id. */
 export async function startDm(otherId: string): Promise<string> {
@@ -109,4 +109,22 @@ export function subscribeInbox(onAny: () => void) {
     .on("postgres_changes", { event: "INSERT", schema: "public", table: "dm_messages" }, () => onAny())
     .subscribe();
   return () => { supabase.removeChannel(ch); };
+}
+
+/** Send a zing straight to friends: it lands in each chat as a tappable tile. */
+export async function sendZingTo(friendIds: string[], zingId: string, userId: string) {
+  const out = await Promise.allSettled(friendIds.map(async (f) => {
+    const tid = await startDm(f);
+    const { error } = await supabase.from("dm_messages").insert({ thread_id: tid, user_id: userId, zing_id: zingId });
+    if (error) throw error;
+  }));
+  return out.filter((r) => r.status === "fulfilled").length;
+}
+
+/** 🔥 streaks per chat: days in a row you've both sent each other zings. */
+export async function fetchZingStreaks(): Promise<Record<string, number>> {
+  const { data } = await supabase.rpc("zing_streaks");
+  const out: Record<string, number> = {};
+  (data ?? []).forEach((r: any) => { if (r.days >= 2) out[r.thread_id] = r.days; });
+  return out;
 }

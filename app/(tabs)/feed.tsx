@@ -19,6 +19,7 @@ import { useAuth } from "../../lib/auth";
 import { useTabSpace } from "../../lib/tabspace";
 import { successHaptic, tapHaptic, tickHaptic } from "../../lib/motion";
 import type { Charger, Checkin } from "../../lib/types";
+import { todaysChallenge } from "../../lib/challenges";
 
 const LEMON = "#FCE38A";
 const MAX_REC = 10;
@@ -46,6 +47,8 @@ export default function ZingCamera() {
   const [zoom, setZoom] = useState(0);
   const [lookIdx, setLookIdx] = useState(LOOKS.findIndex((l) => l.id === "zing"));
   const [mode, setMode] = useState<"picture" | "video">("picture");
+  const today = todaysChallenge();
+  const [inChallenge, setInChallenge] = useState(false);
   const [recording, setRecording] = useState(false);
   const [count, setCount] = useState<number | null>(null);
   const [whiteout, setWhiteout] = useState(false);
@@ -85,7 +88,7 @@ export default function ZingCamera() {
 
   const go = (uri: string, kind: "photo" | "video") => {
     successHaptic();
-    router.push({ pathname: "/zap/[id]", params: { id: near && near.d <= 400 ? encodeURIComponent(near.c.id) : "nearest", uri: encodeURIComponent(uri), kind, look: look.id } });
+    router.push({ pathname: "/zap/[id]", params: { id: near && near.d <= 400 ? encodeURIComponent(near.c.id) : "nearest", uri: encodeURIComponent(uri), kind, look: look.id, ...(inChallenge ? { challenge: today.id } : {}) } });
   };
 
   const snap = async () => {
@@ -216,6 +219,17 @@ export default function ZingCamera() {
         )}
       </View>
 
+      {/* Today's challenge: one tap to join, the next shot carries the tag */}
+      <Pressable onPress={() => { tickHaptic(); setInChallenge((v) => !v); }} style={[s.challenge, { top: insets.top + 56 }]}
+        accessibilityRole="switch" accessibilityState={{ checked: inChallenge }} accessibilityLabel={`Today's challenge: ${today.title}`}>
+        <Glass style={[s.challengePill, inChallenge && { backgroundColor: LEMON }]} interactive>
+          <Text style={{ fontSize: 14 }}>{today.emoji}</Text>
+          <Text style={[s.challengeText, inChallenge && { color: "#1A1A1A" }]} numberOfLines={1}>
+            {inChallenge ? `In: ${today.title}` : `Today: ${today.title}`}
+          </Text>
+        </Glass>
+      </Pressable>
+
       {/* Right rail: flip, flash, timer, grid */}
       <View style={[s.rail, { top: insets.top + 62 }]}>
         {([
@@ -282,6 +296,9 @@ const s = StyleSheet.create({
   pillText: { color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
   where: { flexShrink: 1, height: 36, paddingHorizontal: 12, borderRadius: 18, justifyContent: "center", backgroundColor: "rgba(0,0,0,0.45)" },
   whereText: { color: "#fff", fontWeight: "700", fontSize: 13 },
+  challenge: { position: "absolute", left: 14, maxWidth: "70%" },
+  challengePill: { flexDirection: "row", alignItems: "center", gap: 6, height: 32, paddingHorizontal: 12, borderRadius: 16, backgroundColor: "rgba(0,0,0,0.45)" },
+  challengeText: { color: "#fff", fontWeight: "800", fontSize: 12.5 },
   rail: { position: "absolute", right: 10, alignItems: "center", gap: 12 },
   railBtn: { alignItems: "center", gap: 3 },
   railGlass: { width: 42, height: 42, borderRadius: 21, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.4)" },
