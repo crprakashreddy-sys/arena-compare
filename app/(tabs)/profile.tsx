@@ -263,7 +263,8 @@ function Tools() {
   const t = useTheme();
   const { active } = useGarage();
   const { active: charging } = useSessions();
-  const { session } = useAuth();
+  const { session: authed, profile: me } = useAuth();
+  const session = authed && me ? authed : null;
   const [dm, setDm] = useState(0);
   useFocusEffect(useCallback(() => { if (session) unreadDms().then(setDm).catch(() => {}); }, [session]));
   const items: [string, string, string, () => void][] = [

@@ -103,6 +103,8 @@ export default function MapScreen() {
     }).catch(() => {});
   }, []);
 
+  const mapReady = useRef(false);
+  const pendingFly = useRef<null | (() => void)>(null);
   // Live GPS.
   const watch = useRef<Location.LocationSubscription | null>(null);
   const startLocation = useCallback(async () => {
@@ -111,7 +113,10 @@ export default function MapScreen() {
     const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
     const p = { lat: pos.coords.latitude, lng: pos.coords.longitude };
     setMe(p);
-    mapRef.current?.animateToRegion({ latitude: p.lat, longitude: p.lng, latitudeDelta: 0.08, longitudeDelta: 0.08 }, 600);
+    const fly = () => mapRef.current?.animateToRegion({ latitude: p.lat, longitude: p.lng, latitudeDelta: 0.08, longitudeDelta: 0.08 }, 600);
+    fly();
+    // The map can still be getting ready behind the tab bar; fly again once it is.
+    if (!mapReady.current) pendingFly.current = fly;
     load(p.lat, p.lng);
     if (!watch.current) {
       watch.current = await Location.watchPositionAsync({ accuracy: Location.Accuracy.Balanced, distanceInterval: 50 }, (l) =>
@@ -251,6 +256,7 @@ export default function MapScreen() {
         ref={mapRef}
         style={StyleSheet.absoluteFill}
         initialRegion={INDIA}
+        onMapReady={() => { mapReady.current = true; pendingFly.current?.(); pendingFly.current = null; }}
         provider={MAP_PROVIDER}
         mapType={!USE_GOOGLE && mapType === "standard" ? "mutedStandard" : mapType}
         customMapStyle={mapType === "standard" ? zappdStyle(scheme) : undefined}

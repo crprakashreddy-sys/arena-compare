@@ -128,13 +128,13 @@ export default function ZapsFeed() {
           );
         }}
       />
-      <Pressable onPress={() => { tapHaptic(); router.push("/zap/nearest"); }} accessibilityLabel="Drop a zing"
+      {shownZ.length > 0 && <Pressable onPress={() => { tapHaptic(); router.push("/zap/nearest"); }} accessibilityLabel="Drop a zing"
         style={({ pressed }) => ({ position: "absolute", right: 16, bottom: tabSpace + 14, transform: [{ scale: pressed ? 0.93 : 1 }] })}>
         <Glass style={styles.fab} tint="#FCE38A" interactive>
           <Ionicons name="camera" size={22} color="#1A1A1A" />
           <Text style={{ color: "#1A1A1A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 16 }}>Drop a zing</Text>
         </Glass>
-      </Pressable>
+      </Pressable>}
       {viewer !== null && <SnapViewer snaps={shownZ} start={viewer} onClose={() => setViewer(null)} onChanged={() => load()} />}
     </View>
   );

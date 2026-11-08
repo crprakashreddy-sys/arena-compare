@@ -23,7 +23,7 @@ export type IconName = keyof typeof MAP;
 
 /** Apple's SF Symbol for each icon, used on iPhone. Missing ones fall back to the vector set. */
 const SF: Partial<Record<IconName, string>> = {
-  bolt: "bolt.fill", car: "bolt.car.fill", two: "scooter", camera: "camera.fill", photo: "photo.fill", star: "star.fill",
+  bolt: "bolt.fill", car: "bolt.car.fill", camera: "camera.fill", photo: "photo.fill", star: "star.fill",
   check: "checkmark.circle.fill", key: "key.fill", chat: "bubble.left.and.bubble.right.fill", calendar: "calendar",
   wrench: "wrench.and.screwdriver.fill", pin: "mappin.circle.fill", shuffle: "shuffle", glasses: "eyeglasses", beard: "mustache.fill",
   palette: "paintpalette.fill", sprout: "leaf.fill", flame: "flame.fill", crown: "crown.fill", cafe: "cup.and.saucer.fill",
@@ -38,7 +38,7 @@ export function Icon({ name, size = 18, color = "#1A1A1A" }: { name: IconName; s
   const sf = Platform.OS === "ios" ? SF[name] : undefined;
   if (sf) {
     const fb = fam === "mci" ? <MaterialCommunityIcons name={glyph as any} size={size} color={color as any} /> : <Ionicons name={glyph as any} size={size} color={color as any} />;
-    return <SymbolView name={sf as SFSymbol} size={size * 0.92} tintColor={color as any} weight="semibold" type="hierarchical"
+    return <SymbolView name={sf as SFSymbol} size={size * 0.92} tintColor={color as any} weight="semibold"
       style={{ width: size, height: size }} fallback={fb} />;
   }
   return fam === "mci"
