@@ -1,8 +1,8 @@
 import React, { useMemo, useRef, useState } from "react";
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { PixelRatio, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import {
   Blur, Canvas, Circle, ColorMatrix, FractalNoise, Group, Image as SkImage, ImageFormat, RadialGradient, Rect,
-  RoundedRect, RuntimeShader, Text as SkText, matchFont, useCanvasRef, useImage, vec,
+  RoundedRect, RuntimeShader, Text as SkText, drawAsImage, matchFont, useCanvasRef, useImage, vec,
 } from "@shopify/react-native-skia";
 import { Directions, Gesture, GestureDetector } from "react-native-gesture-handler";
 import { Ionicons } from "./SFIcon";
@@ -12,8 +12,8 @@ import { Dial } from "./Dial";
 import { tickHaptic } from "../lib/motion";
 
 /** The colour grade for a look: the GPU shader when available, a simple matrix otherwise. */
-function Grade({ look, amount, adj }: { look: Look; amount: number; adj: Adjust }) {
-  if (GRADE_EFFECT) return <RuntimeShader source={GRADE_EFFECT} uniforms={uniformsFor(look.grade, adj, amount)} />;
+function Grade({ look, amount, adj, px = 1, grain = 0 }: { look: Look; amount: number; adj: Adjust; px?: number; grain?: number }) {
+  if (GRADE_EFFECT) return <RuntimeShader source={GRADE_EFFECT} uniforms={uniformsFor(look.grade, adj, amount, px, grain)} />;
   const e = Math.pow(2, adj.exposure * 0.8), w = adj.warmth * 0.07;
   return <ColorMatrix matrix={chain(mixMatrix(look.matrix, amount), contrast(1 + adj.contrast * 0.35), saturation(1 + adj.saturation * 0.6), scale(e * (1 + w), e, e * (1 - w)))} />;
 }
@@ -34,7 +34,8 @@ const fontBig = matchFont({ fontFamily: family, fontSize: 22, fontWeight: "bold"
 const fontSmall = matchFont({ fontFamily: family, fontSize: 15, fontWeight: "bold" });
 const fontTitle = matchFont({ fontFamily: family, fontSize: 40, fontWeight: "bold" });
 
-export type EditorHandle = { exportJpeg: () => string | null; lookId: () => string };
+export type EditorHandle = { exportJpeg: () => Promise<string | null>; lookId: () => string };
+const EXPORT_W = 1440;
 
 type Props = {
   uri: string;
@@ -188,9 +189,18 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
   );
 
   editorRef.current = {
-    exportJpeg: () => {
+    exportJpeg: async () => {
+      // Re-render the whole photo off screen at 1440 × 1920 so looks, grain and stickers stay crisp.
+      try {
+        const k = Math.min(EXPORT_W / W, image ? (image.width() / fit.w) * 1.05 : 4);
+        if (k > 1.2) {
+          const out = await Promise.resolve(drawAsImage(scene(k, k), { width: Math.round(W * k), height: Math.round(H * k) }));
+          const b64 = out?.encodeToBase64(ImageFormat.JPEG, 93);
+          if (b64) return b64;
+        }
+      } catch {}
       const snap = canvasRef.current?.makeImageSnapshot();
-      return snap ? snap.encodeToBase64(ImageFormat.JPEG, 86) : null;
+      return snap ? snap.encodeToBase64(ImageFormat.JPEG, 92) : null;
     },
     lookId: () => lookId,
   };
@@ -231,15 +241,13 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
     { key: "glow", label: "Glow" }, { key: "leak", label: "Light leak" },
   ];
 
-  return (
-    <View style={{ alignItems: "center", gap: 12 }}>
-      <GestureDetector gesture={gesture}>
-        <View style={{ width: W, height: H, borderRadius: 16, overflow: "hidden", backgroundColor: "#000" }}>
-          <Canvas ref={canvasRef} style={{ width: W, height: H }}>
+  // The photo as drawn: used on screen (k = 1) and again, scaled up, for the full-resolution export.
+  const scene = (k: number, px: number) => (
+          <Group transform={k === 1 ? undefined : [{ scale: k }]}>
             {image && (
               <>
                 <SkImage image={image} x={fit.x} y={fit.y} width={fit.w} height={fit.h} fit="fill">
-                  <Grade look={look} amount={amount} adj={adj} />
+                  <Grade look={look} amount={amount} adj={adj} px={px} grain={grain * amount} />
                 </SkImage>
                 {bloom > 0 && (
                   <SkImage image={image} x={fit.x} y={fit.y} width={fit.w} height={fit.h} fit="fill" opacity={bloom * amount} blendMode="screen">
@@ -264,7 +272,7 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
                   colors={["rgba(0,0,0,0)", "rgba(0,0,0,0)", `rgba(0,0,0,${vignette})`]} positions={[0, 0.55, 1]} />
               </Rect>
             )}
-            {grain > 0 && (
+            {grain > 0 && !GRADE_EFFECT && (
               <Rect x={0} y={0} width={W} height={H} opacity={grain} blendMode="overlay">
                 <FractalNoise freqX={0.9} freqY={0.9} octaves={2} />
               </Rect>
@@ -288,6 +296,15 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
                 {built[i]!.draw}
               </Group>
             ) : null)}
+          </Group>
+  );
+
+  return (
+    <View style={{ alignItems: "center", gap: 12 }}>
+      <GestureDetector gesture={gesture}>
+        <View style={{ width: W, height: H, borderRadius: 16, overflow: "hidden", backgroundColor: "#000" }}>
+          <Canvas ref={canvasRef} style={{ width: W, height: H }}>
+            {scene(1, PixelRatio.get())}
             {mode === "blur" && blurs.map((b, i) => (
               <Circle key={`r${i}`} cx={b.x} cy={b.y} r={34} color="rgba(255,255,255,0.6)" style="stroke" strokeWidth={1.5} />
             ))}

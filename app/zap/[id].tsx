@@ -151,7 +151,7 @@ export default function DropZap() {
         path = await uploadSnap(out.base64!);
         videoPath = await uploadVideo(uri);
       } else if (uri) {
-        const b64 = editor.current?.exportJpeg();
+        const b64 = await editor.current?.exportJpeg();
         if (!b64) throw new Error("Your photo isn't ready yet. Wait a second and try again.");
         path = await uploadSnap(b64);
       }
