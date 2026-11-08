@@ -34,6 +34,7 @@ import { tapHaptic } from "../../lib/motion";
 import { useSessions } from "../../lib/sessions";
 import { useChargeSpotter } from "../../lib/charging";
 import { ChargingCard } from "../../components/ChargingCard";
+import { recentlyDriving, useDriveTracker } from "../../lib/drive";
 
 const INDIA: Region = { latitude: 21.5, longitude: 79, latitudeDelta: 24, longitudeDelta: 24 };
 const MAP_TYPES = ["standard", "hybrid", "satellite"] as const;
@@ -74,7 +75,9 @@ export default function MapScreen() {
   const [tilted, setTilted] = useState(false);
   const scheme = useColorScheme();
   const { active: charging } = useSessions();
-  const spot = useChargeSpotter(me, chargers, charging, !!me);
+  const drive = useDriveTracker();
+  // With auto-detect on, only ask "Charging here?" when you've just driven in, so never from a cab.
+  const spot = useChargeSpotter(me, chargers, charging, !!me && (!drive.setupDone || recentlyDriving(drive)));
   const { height: screenH } = useWindowDimensions();
   const SHEET_H = [76, 170, Math.round(screenH * 0.62)] as const;
   const sheetPan = Gesture.Pan()

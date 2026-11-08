@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as Notifications from "expo-notifications";
 import type { Charger } from "./types";
-import { plugsOf, usablePowerKW, type Model, type Plug } from "./vehicles";
+import { getGarage, plugsOf, updateVehicle, usablePowerKW, type Model, type Plug } from "./vehicles";
 import { supabase } from "./supabase";
 import { finishSession, startSession, updateSession, type Session } from "./sessions";
 import { distanceM } from "./geo";
@@ -170,6 +170,9 @@ export function stopCharge(s: Session, patch: { endPct?: number; cost?: number |
   const endPct = patch.endPct ?? Math.round(st.pct);
   const kWh = Math.max(0, ((endPct - (s.startPct ?? 20)) / 100) * (s.capKWh ?? 40));
   finishSession(s.id, { endPct, kWh: Math.round(kWh * 10) / 10, cost: patch.cost ?? null, notifId: null });
+  // The best battery reading we'll get: where this charge ended.
+  const g = getGarage(); const v = g.vehicles.find((x) => x.key === g.activeKey) ?? g.vehicles[0];
+  if (v) updateVehicle(v.key, { batteryPct: endPct, batteryAt: new Date().toISOString(), batterySource: "charge" });
 }
 
 /** Re-renders every `ms` so the live numbers tick. */

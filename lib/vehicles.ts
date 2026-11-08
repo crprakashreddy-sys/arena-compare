@@ -70,7 +70,11 @@ export const CATALOG: Model[] = [
 ];
 
 /** A vehicle in the driver's garage: a catalog model plus the driver's own corrections. */
-export type MyVehicle = Model & { key: string; nickname?: string; batteryPct?: number };
+export type MyVehicle = Model & {
+  key: string; nickname?: string; batteryPct?: number;
+  batteryAt?: string;                    // when batteryPct was last set or estimated
+  batterySource?: "you" | "charge" | "drive"; // typed in, from a tracked charge, or estimated after a drive
+};
 
 export const vehicleName = (v: Pick<Model, "make" | "model">) => `${v.make} ${v.model}`;
 export const kmPerKWh = (v: Model) => v.rangeKm / v.batteryKWh;

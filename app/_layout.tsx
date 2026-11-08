@@ -8,6 +8,7 @@ import { Onboarding } from "../components/Onboarding";
 import { useTheme } from "../lib/theme";
 import { SpaceGrotesk_700Bold, useFonts } from "@expo-google-fonts/space-grotesk";
 import { usePush } from "../lib/push";
+import { useDriveTracker } from "../lib/drive";
 
 export default function RootLayout() {
   const t = useTheme();
@@ -40,6 +41,8 @@ export default function RootLayout() {
           <Stack.Screen name="savings" options={{ title: "Savings" }} />
           <Stack.Screen name="club/[id]" options={{ title: "Club" }} />
           <Stack.Screen name="charge-start" options={{ title: "Start charging", presentation: "modal" }} />
+          <Stack.Screen name="auto-detect" options={{ title: "Auto-detect my car" }} />
+          <Stack.Screen name="drive" options={{ headerShown: false, presentation: "transparentModal", animation: "fade" }} />
           <Stack.Screen name="memories" options={{ title: "Memories" }} />
           <Stack.Screen name="messages" options={{ title: "Messages" }} />
           <Stack.Screen name="dm/[id]" options={{ title: "" }} />
@@ -64,5 +67,6 @@ export default function RootLayout() {
 function Intro({ fontsReady }: { fontsReady: boolean }) {
   const { loading, session } = useAuth();
   usePush(session?.user.id);
+  useDriveTracker(); // measures distance while a detected drive is on
   return <IntroLoader ready={!loading && fontsReady} fontsReady={fontsReady} />;
 }

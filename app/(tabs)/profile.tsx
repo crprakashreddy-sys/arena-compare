@@ -277,6 +277,7 @@ function Tools() {
   }, [session]));
   const items: [string, string, string, () => void][] = [
     ...(session ? [["chatbubble-ellipses-outline", "Messages", dm ? `${dm} unread` : "Chats with your crew", () => router.push("/messages")] as [string, string, string, () => void]] : []),
+    ["car-sport-outline", "Auto-detect my car", "Knows when you're in your EV", () => router.push("/auto-detect")],
     ...(session ? [["albums-outline", "Memories", streak ? `🔥 ${streak}-day streak · all your zings` : "Every zing you've dropped", () => router.push("/memories")] as [string, string, string, () => void]] : []),
     ["car-sport-outline", "My vehicles", active ? vehicleName(active) : "Add your EV", () => router.push("/garage")],
     ["map-outline", "Plan a trip", "Charging stops on the way", () => router.push("/trip")],

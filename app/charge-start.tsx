@@ -9,6 +9,7 @@ import { networkById, openNetworkApp } from "../lib/networks";
 import { BatterySlider } from "../components/BatterySlider";
 import { Ionicons } from "../components/SFIcon";
 import { successHaptic, tapHaptic } from "../lib/motion";
+import { batteryNote } from "../lib/drive";
 import type { Charger } from "../lib/types";
 
 /** Start a tracked charge: battery now, goal, and a live estimate with a "nearly done" ping. */
@@ -39,7 +40,7 @@ export default function ChargeStart() {
 
   const start = async () => {
     setBusy(true);
-    if (v) updateVehicle(v.key, { batteryPct: from });
+    if (v) updateVehicle(v.key, { batteryPct: from, batteryAt: new Date().toISOString(), batterySource: "you" });
     await startCharge(c, v, from, goal, gun);
     successHaptic();
     router.back();
@@ -82,7 +83,9 @@ export default function ChargeStart() {
           <BatterySlider value={from} onChange={setFrom} />
           <Text style={{ color: t.text, fontSize: 28, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontVariant: ["tabular-nums"] }}>{from}%</Text>
         </View>
-        <Text style={{ color: t.muted, fontSize: 12.5 }}>Drag the battery to match your car's screen.</Text>
+        <Text style={{ color: t.muted, fontSize: 12.5 }}>
+          {v && batteryNote(v) && from === v.batteryPct ? `≈ ${from}% ${batteryNote(v)}. ` : ""}Drag to match your car's screen.
+        </Text>
       </View>
 
       <View style={{ gap: 10 }}>
