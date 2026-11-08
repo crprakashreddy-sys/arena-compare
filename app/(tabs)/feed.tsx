@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Animated, AppState, Easing, Linking, Platform, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, Alert, Animated, AppState, Easing, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { CameraView, useCameraPermissions, useMicrophonePermissions, type CameraType } from "expo-camera";
 import { Gesture, GestureDetector, Directions } from "react-native-gesture-handler";
 import * as ImagePicker from "expo-image-picker";
@@ -169,6 +169,13 @@ export default function ZingCamera() {
     if (!res.canceled && a) go(a.uri, a.type === "video" ? "video" : "photo");
   };
 
+  // Keep the chosen look centred in the scrollable row under the shutter.
+  const looksRef = useRef<ScrollView>(null);
+  const lookX = useRef<Record<number, { x: number; width: number }>>({});
+  useEffect(() => {
+    const p = lookX.current[lookIdx];
+    if (p) looksRef.current?.scrollTo({ x: Math.max(0, p.x + p.width / 2 - W / 2), animated: true });
+  }, [lookIdx, W]);
   const setLook = (i: number) => {
     const n = Math.max(0, Math.min(LOOKS.length - 1, i));
     if (n === lookIdx) return;
@@ -187,10 +194,12 @@ export default function ZingCamera() {
       setZoom(Math.max(0, Math.min(0.6, zoomBase.current + (e.scale - 1) * 0.25)));
     });
   const dbl = Gesture.Tap().numberOfTaps(2).runOnJS(true).onEnd(flip);
-  const swipeL = Gesture.Fling().direction(Directions.LEFT).runOnJS(true).onEnd(() => setLook(lookIdx + 1));
-  const swipeR = Gesture.Fling().direction(Directions.RIGHT).runOnJS(true).onEnd(() => setLook(lookIdx - 1));
+  // Sideways drag anywhere on the camera changes the look; works for slow and fast swipes.
+  const swipeX = Gesture.Pan().runOnJS(true).maxPointers(1)
+    .activeOffsetX([-16, 16]).failOffsetY([-24, 24])
+    .onEnd((e) => { if (Math.abs(e.translationX) > 40 || Math.abs(e.velocityX) > 450) setLook(lookIdx + (e.translationX < 0 ? 1 : -1)); });
   const swipeUp = Gesture.Fling().direction(Directions.UP).runOnJS(true).onEnd(() => router.push("/nearby"));
-  const gestures = Gesture.Race(pinch, dbl, Gesture.Simultaneous(swipeL, swipeR, swipeUp));
+  const gestures = Gesture.Race(pinch, swipeX, Gesture.Exclusive(swipeUp, dbl));
 
   if (!perm) return <View style={{ flex: 1, backgroundColor: "#000" }} />;
   if (!perm.granted) {
@@ -307,13 +316,15 @@ export default function ZingCamera() {
         </Glass>
         </Pressable>
         {!recording && (
-          <View style={s.looks}>
-            {LOOKS.map((l, i) => Math.abs(i - lookIdx) <= 3 ? (
-              <Pressable key={l.id} onPress={() => setLook(i)} style={[s.lookDot, i === lookIdx && s.lookDotOn]}>
+          <ScrollView ref={looksRef} horizontal showsHorizontalScrollIndicator={false} style={{ alignSelf: "stretch" }}
+            contentContainerStyle={[s.looks, { paddingHorizontal: W / 2 - 50 }]}>
+            {LOOKS.map((l, i) => (
+              <Pressable key={l.id} onPress={() => setLook(i)} onLayout={(e) => { lookX.current[i] = e.nativeEvent.layout; }}
+                style={[s.lookDot, i === lookIdx && s.lookDotOn]}>
                 <Text style={[s.lookDotText, i === lookIdx && { color: "#1A1A1A" }]} numberOfLines={1}>{l.name}</Text>
               </Pressable>
-            ) : null)}
-          </View>
+            ))}
+          </ScrollView>
         )}
         <View style={s.shutterRow}>
           <Pressable onPress={() => router.push(session ? "/memories" : "/login")} style={s.side} accessibilityLabel="Memories">

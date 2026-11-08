@@ -166,9 +166,11 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
     const i = LOOKS.findIndex((l) => l.id === lookId);
     pickLook(LOOKS[Math.max(0, Math.min(LOOKS.length - 1, i + dir))].id);
   };
-  const swipeLeft = Gesture.Fling().runOnJS(true).direction(Directions.LEFT).onEnd(() => stepLook(1));
-  const swipeRight = Gesture.Fling().runOnJS(true).direction(Directions.RIGHT).onEnd(() => stepLook(-1));
-  const swipe = Gesture.Simultaneous(swipeLeft, swipeRight);
+  // A sideways drag (not a fling) so slow and fast swipes both work; never steals a sticker drag.
+  const swipe = Gesture.Pan().runOnJS(true)
+    .activeOffsetX([-16, 16]).failOffsetY([-24, 24])
+    .onTouchesDown((e, manager) => { const t0 = e.allTouches[0]; if (t0 && hit(t0.x, t0.y) != null) manager.fail(); })
+    .onEnd((e) => { if (Math.abs(e.translationX) > 40 || Math.abs(e.velocityX) > 450) stepLook(e.translationX < 0 ? 1 : -1); });
 
   // Tap a sticker to change its look (pill → glass → script…); tap the photo to blur in Blur mode.
   const tap = Gesture.Tap()
