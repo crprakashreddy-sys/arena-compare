@@ -4,7 +4,7 @@ import { Image } from "expo-image";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTheme } from "../../lib/theme";
+import { useTheme, CTA, ON_CTA } from "../../lib/theme";
 import { useAuth } from "../../lib/auth";
 import { snapUrl } from "../../lib/supabase";
 import { timeAgo } from "../../lib/geo";
@@ -147,9 +147,9 @@ export default function IssueDetail() {
             {issue.tags.map((k) => <Text key={k} style={[s.tag, { backgroundColor: t.surface, color: t.muted }]}>{tagLabel(k)}</Text>)}
           </View>
         )}
-        <Pressable onPress={flipMeToo} style={[s.metoo, { backgroundColor: metoo ? INK : t.surface }]}>
-          <Ionicons name="hand-left" size={16} color={metoo ? LEMON : t.text} />
-          <Text style={{ color: metoo ? LEMON : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>
+        <Pressable onPress={flipMeToo} style={[s.metoo, { backgroundColor: metoo ? CTA : t.surface }]}>
+          <Ionicons name="hand-left" size={16} color={metoo ? ON_CTA : t.text} />
+          <Text style={{ color: metoo ? ON_CTA : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>
             {metoo ? "You have this too" : "I have this too"} · {issue.metoo}
           </Text>
         </Pressable>
@@ -178,9 +178,9 @@ export default function IssueDetail() {
                 </>
               )}
               <View style={{ flexDirection: "row", gap: 10, marginTop: 10, alignItems: "center" }}>
-                <Pressable onPress={() => vote(r)} style={[s.vote, { backgroundColor: r.votedByMe ? INK : fix ? "#fff" : t.bg }]}>
-                  <Ionicons name="arrow-up" size={14} color={r.votedByMe ? LEMON : t.text} />
-                  <Text style={{ color: r.votedByMe ? LEMON : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 13 }}>Helpful · {r.votes}</Text>
+                <Pressable onPress={() => vote(r)} style={[s.vote, { backgroundColor: r.votedByMe ? CTA : fix ? "#fff" : t.bg }]}>
+                  <Ionicons name="arrow-up" size={14} color={r.votedByMe ? ON_CTA : t.text} />
+                  <Text style={{ color: r.votedByMe ? ON_CTA : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 13 }}>Helpful · {r.votes}</Text>
                 </Pressable>
                 {canSolve && !fix && !r.deleted && (
                   <Pressable onPress={() => markSolved(issue.id, r.id).then(load)} hitSlop={8}>
@@ -200,7 +200,7 @@ export default function IssueDetail() {
         <TextInput value={text} onChangeText={setText} placeholder="Share a fix or what you've tried" placeholderTextColor={t.faint}
           multiline maxLength={3000} style={[s.input, { backgroundColor: t.surface, color: t.text }]} />
         <Pressable onPress={() => send()} disabled={busy || !text.trim()} style={[s.send, { opacity: text.trim() || busy ? 1 : 0.35 }]}>
-          {busy ? <ActivityIndicator color={LEMON} size="small" /> : <Ionicons name="arrow-up" size={20} color={LEMON} />}
+          {busy ? <ActivityIndicator color={ON_CTA} size="small" /> : <Ionicons name="arrow-up" size={20} color={ON_CTA} />}
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -217,5 +217,5 @@ const s = StyleSheet.create({
   composer: { flexDirection: "row", alignItems: "flex-end", gap: 8, paddingHorizontal: 10, paddingTop: 8, borderTopWidth: StyleSheet.hairlineWidth },
   iconBtn: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   input: { flex: 1, minHeight: 40, maxHeight: 120, borderRadius: 20, paddingHorizontal: 14, paddingTop: 10, paddingBottom: 10, fontSize: 15.5 },
-  send: { width: 40, height: 40, borderRadius: 20, backgroundColor: INK, alignItems: "center", justifyContent: "center" },
+  send: { width: 40, height: 40, borderRadius: 20, backgroundColor: CTA, alignItems: "center", justifyContent: "center" },
 });

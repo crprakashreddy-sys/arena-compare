@@ -3,7 +3,7 @@ import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Switch, Te
 import { Canvas, Circle, Group, ImageFormat, ImageSVG, Skia, useCanvasRef } from "@shopify/react-native-skia";
 import { Stack, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../lib/theme";
+import { useTheme, CTA, ON_CTA } from "../lib/theme";
 import { useAuth } from "../lib/auth";
 import { useGarage } from "../lib/vehicles";
 import { updateProfileExtras, uploadSnap } from "../lib/community";
@@ -58,7 +58,7 @@ export default function AvatarMaker() {
           </View>
           <Pressable onPress={() => setO({ ...randomAvatar(o.car), carColor: o.carColor })} style={styles.dice}>
             <Text style={{ fontSize: 16 }}>🎲</Text>
-            <Text style={{ color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Surprise me</Text>
+            <Text style={{ color: ON_CTA, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Surprise me</Text>
           </Pressable>
         </View>
 
@@ -89,8 +89,8 @@ export default function AvatarMaker() {
 
       <View style={[styles.footer, { backgroundColor: t.bg, borderTopColor: t.line }]}>
         <Pressable onPress={save} disabled={busy} style={styles.save}>
-          {busy ? <ActivityIndicator color={LEMON} /> : (
-            <><Ionicons name="checkmark-circle" size={20} color={LEMON} /><Text style={styles.saveText}>Use as my photo</Text></>
+          {busy ? <ActivityIndicator color={ON_CTA} /> : (
+            <><Ionicons name="checkmark-circle" size={20} color={ON_CTA} /><Text style={styles.saveText}>Use as my photo</Text></>
           )}
         </Pressable>
       </View>
@@ -115,8 +115,8 @@ function Dot({ color, on, onPress }: { color: string; on: boolean; onPress: () =
 }
 function Pill({ label, on, onPress, t }: { label: string; on: boolean; onPress: () => void; t: ReturnType<typeof useTheme> }) {
   return (
-    <Pressable onPress={onPress} style={[styles.pill, { backgroundColor: on ? INK : t.surface }]}>
-      <Text style={{ color: on ? LEMON : t.text, fontWeight: "700" }}>{label}</Text>
+    <Pressable onPress={onPress} style={[styles.pill, { backgroundColor: on ? CTA : t.surface }]}>
+      <Text style={{ color: on ? ON_CTA : t.text, fontWeight: "700" }}>{label}</Text>
     </Pressable>
   );
 }
@@ -131,11 +131,11 @@ function Toggle({ label, value, onChange, t }: { label: string; value: boolean; 
 
 const styles = StyleSheet.create({
   ring: { padding: 6, borderRadius: SIZE, backgroundColor: INK },
-  dice: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: INK, paddingHorizontal: 18, height: 42, borderRadius: 999 },
+  dice: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: CTA, paddingHorizontal: 18, height: 42, borderRadius: 999 },
   dot: { width: 42, height: 42, borderRadius: 21, borderWidth: 3, alignItems: "center", justifyContent: "center" },
   pill: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 999 },
   toggles: { flexDirection: "row", marginHorizontal: 16, marginTop: 14, borderWidth: StyleSheet.hairlineWidth, borderRadius: 14 },
   footer: { position: "absolute", left: 0, right: 0, bottom: 0, padding: 16, paddingBottom: 30, borderTopWidth: StyleSheet.hairlineWidth },
-  save: { backgroundColor: INK, height: 54, borderRadius: 999, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
-  saveText: { color: LEMON, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
+  save: { backgroundColor: CTA, height: 54, borderRadius: 999, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
+  saveText: { color: ON_CTA, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
 });

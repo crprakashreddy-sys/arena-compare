@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from "react-native";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import { useTheme } from "../lib/theme";
+import { useTheme, CTA, ON_CTA } from "../lib/theme";
 import { useAuth } from "../lib/auth";
 import { CLUB_COLORS, CLUB_EMOJIS, createClub, deleteClub, fetchClub, updateClub, type ClubDraft } from "../lib/clubs";
 import { ClubBadge } from "../components/ClubBadge";
@@ -15,7 +15,7 @@ export default function ClubEdit() {
   const { session, profile } = useAuth();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const editing = !!id;
-  const [d, setD] = useState<ClubDraft>({ name: "", description: "", city: profile?.city ?? "", emoji: "⚡", color: LEMON, is_private: false });
+  const [d, setD] = useState<ClubDraft>({ name: "", description: "", city: profile?.city ?? "", emoji: "⚡", color: ON_CTA, is_private: false });
   const [loading, setLoading] = useState(editing);
   const [busy, setBusy] = useState(false);
   const [createdBy, setCreatedBy] = useState<string | null>(null);
@@ -82,7 +82,7 @@ export default function ClubEdit() {
         <Field label="Icon" t={t}>
           <View style={s.wrap}>
             {CLUB_EMOJIS.map((e) => (
-              <Pressable key={e} onPress={() => set({ emoji: e })} style={[s.emoji, { backgroundColor: d.emoji === e ? INK : t.surface }]}>
+              <Pressable key={e} onPress={() => set({ emoji: e })} style={[s.emoji, { backgroundColor: d.emoji === e ? CTA : t.surface }]}>
                 <Text style={{ fontSize: 22 }}>{e}</Text>
               </Pressable>
             ))}
@@ -115,7 +115,7 @@ export default function ClubEdit() {
 
       <View style={[s.footer, { backgroundColor: t.bg, borderTopColor: t.line }]}>
         <Pressable onPress={save} disabled={busy} style={({ pressed }) => [s.save, { opacity: ok ? 1 : 0.5, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
-          {busy ? <ActivityIndicator color={LEMON} /> : <Text style={s.saveText}>{editing ? "Save changes" : "Create club"}</Text>}
+          {busy ? <ActivityIndicator color={ON_CTA} /> : <Text style={s.saveText}>{editing ? "Save changes" : "Create club"}</Text>}
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -133,6 +133,6 @@ const s = StyleSheet.create({
   color: { width: 40, height: 40, borderRadius: 20, borderWidth: 3 },
   toggle: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14, borderRadius: 14 },
   footer: { position: "absolute", left: 0, right: 0, bottom: 0, padding: 16, paddingBottom: 30, borderTopWidth: StyleSheet.hairlineWidth },
-  save: { backgroundColor: INK, height: 54, borderRadius: 999, alignItems: "center", justifyContent: "center" },
-  saveText: { color: LEMON, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
+  save: { backgroundColor: CTA, height: 54, borderRadius: 999, alignItems: "center", justifyContent: "center" },
+  saveText: { color: ON_CTA, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
 });

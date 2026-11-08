@@ -4,7 +4,7 @@ import MapView, { type Region } from "react-native-maps";
 import * as Location from "expo-location";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../lib/theme";
+import { useTheme, CTA, ON_CTA } from "../lib/theme";
 import { useAuth } from "../lib/auth";
 import { EVENT_KINDS, createEvent, type EventKind } from "../lib/events";
 import { MAP_PROVIDER, zappdStyle } from "../lib/maps";
@@ -63,9 +63,9 @@ export default function NewEvent() {
         <View style={{ padding: 16, gap: 16 }}>
           <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
             {EVENT_KINDS.map((k) => (
-              <Pressable key={k.key} onPress={() => setKind(k.key)} style={[s.chip, { backgroundColor: kind === k.key ? INK : t.surface }]}>
+              <Pressable key={k.key} onPress={() => setKind(k.key)} style={[s.chip, { backgroundColor: kind === k.key ? CTA : t.surface }]}>
                 <Text style={{ fontSize: 15 }}>{k.emoji}</Text>
-                <Text style={{ color: kind === k.key ? LEMON : t.text, fontWeight: "700" }}>{k.label}</Text>
+                <Text style={{ color: kind === k.key ? ON_CTA : t.text, fontWeight: "700" }}>{k.label}</Text>
               </Pressable>
             ))}
           </View>
@@ -77,10 +77,10 @@ export default function NewEvent() {
           <Text style={[s.label, { color: t.text }]}>Day</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
             {days.map((d, i) => (
-              <Pressable key={i} onPress={() => setDay(i)} style={[s.day, { backgroundColor: day === i ? INK : t.surface }]}>
-                <Text style={{ color: day === i ? LEMON : t.muted, fontSize: 11, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{i === 0 ? "TODAY" : d.toLocaleDateString([], { weekday: "short" }).toUpperCase()}</Text>
-                <Text style={{ color: day === i ? LEMON : t.text, fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold" }}>{d.getDate()}</Text>
-                <Text style={{ color: day === i ? LEMON : t.muted, fontSize: 11 }}>{d.toLocaleDateString([], { month: "short" })}</Text>
+              <Pressable key={i} onPress={() => setDay(i)} style={[s.day, { backgroundColor: day === i ? CTA : t.surface }]}>
+                <Text style={{ color: day === i ? ON_CTA : t.muted, fontSize: 11, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{i === 0 ? "TODAY" : d.toLocaleDateString([], { weekday: "short" }).toUpperCase()}</Text>
+                <Text style={{ color: day === i ? ON_CTA : t.text, fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold" }}>{d.getDate()}</Text>
+                <Text style={{ color: day === i ? ON_CTA : t.muted, fontSize: 11 }}>{d.toLocaleDateString([], { month: "short" })}</Text>
               </Pressable>
             ))}
           </ScrollView>
@@ -88,8 +88,8 @@ export default function NewEvent() {
           <Text style={[s.label, { color: t.text }]}>Time</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
             {TIMES.map((m) => (
-              <Pressable key={m} onPress={() => setMinutes(m)} style={[s.chip, { backgroundColor: minutes === m ? INK : t.surface }]}>
-                <Text style={{ color: minutes === m ? LEMON : t.text, fontWeight: "700" }}>{fmtTime(m)}</Text>
+              <Pressable key={m} onPress={() => setMinutes(m)} style={[s.chip, { backgroundColor: minutes === m ? CTA : t.surface }]}>
+                <Text style={{ color: minutes === m ? ON_CTA : t.text, fontWeight: "700" }}>{fmtTime(m)}</Text>
               </Pressable>
             ))}
           </ScrollView>
@@ -118,8 +118,8 @@ export default function NewEvent() {
           <Text style={[s.label, { color: t.text }]}>Spots</Text>
           <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
             {CAPS.map((c) => (
-              <Pressable key={String(c)} onPress={() => setCap(c)} style={[s.chip, { backgroundColor: cap === c ? INK : t.surface }]}>
-                <Text style={{ color: cap === c ? LEMON : t.text, fontWeight: "700" }}>{c ? `${c} people` : "No limit"}</Text>
+              <Pressable key={String(c)} onPress={() => setCap(c)} style={[s.chip, { backgroundColor: cap === c ? CTA : t.surface }]}>
+                <Text style={{ color: cap === c ? ON_CTA : t.text, fontWeight: "700" }}>{c ? `${c} people` : "No limit"}</Text>
               </Pressable>
             ))}
           </View>
@@ -130,7 +130,7 @@ export default function NewEvent() {
           {startsAt.toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" })} · {fmtTime(minutes)}
         </Text>
         <Pressable onPress={save} disabled={busy} style={[s.save, { opacity: ok ? 1 : 0.5 }]}>
-          {busy ? <ActivityIndicator color={LEMON} /> : <Text style={s.saveText}>Create event</Text>}
+          {busy ? <ActivityIndicator color={ON_CTA} /> : <Text style={s.saveText}>Create event</Text>}
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -148,6 +148,6 @@ const s = StyleSheet.create({
   hint: { position: "absolute", bottom: 10, alignSelf: "center", backgroundColor: "rgba(26,26,26,0.85)", paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999 },
   hintText: { color: "#fff", fontSize: 12, fontWeight: "700" },
   footer: { position: "absolute", left: 0, right: 0, bottom: 0, padding: 16, paddingBottom: 30, borderTopWidth: StyleSheet.hairlineWidth },
-  save: { backgroundColor: INK, height: 54, borderRadius: 999, alignItems: "center", justifyContent: "center" },
-  saveText: { color: LEMON, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
+  save: { backgroundColor: CTA, height: 54, borderRadius: 999, alignItems: "center", justifyContent: "center" },
+  saveText: { color: ON_CTA, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
 });

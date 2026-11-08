@@ -8,7 +8,7 @@ import { useAuth } from "../../lib/auth";
 import {
   acceptRequest, badgeProgress, fetchMyNetwork, updateProfileExtras, fetchPoints, fetchUserStats, removeConnection, type DriverLite,
 } from "../../lib/community";
-import { useTheme } from "../../lib/theme";
+import { useTheme, CTA, ON_CTA, dyn } from "../../lib/theme";
 import { Avatar, Button, VerifiedBadge } from "../../components/ui";
 import { reachKm, useGarage, vehicleName } from "../../lib/vehicles";
 import { fetchMyClubs, type MyClub } from "../../lib/clubs";
@@ -157,7 +157,7 @@ export default function You() {
               <Pressable key={c.id} onPress={() => router.push(`/club/${encodeURIComponent(c.id)}`)} style={[styles.clubChip, { backgroundColor: t.surface }]}>
                 <ClubBadge c={c} size={34} />
                 <Text style={{ color: t.text, fontWeight: "700", maxWidth: 150 }} numberOfLines={1}>{c.name}</Text>
-                {c.unread > 0 && <View style={styles.unread}><Text style={{ color: "#FCE38A", fontSize: 11, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{c.unread}</Text></View>}
+                {c.unread > 0 && <View style={styles.unread}><Text style={{ color: ON_CTA, fontSize: 11, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{c.unread}</Text></View>}
               </Pressable>
             ))}
           </ScrollView>
@@ -230,13 +230,13 @@ const styles = StyleSheet.create({
   statLbl: { color: "#1A1A1A", opacity: 0.6, fontSize: 12, fontWeight: "700" },
   scoreCard: { margin: 16, marginBottom: 0, padding: 16, borderRadius: 20, gap: 10 },
   bar: { height: 10, borderRadius: 5, overflow: "hidden" },
-  barFill: { height: 10, borderRadius: 5, backgroundColor: "#1A1A1A" },
-  ride: { flexDirection: "row", alignItems: "center", gap: 12, marginHorizontal: 16, marginTop: 12, padding: 16, borderRadius: 20, backgroundColor: "#1A1A1A" },
+  barFill: { height: 10, borderRadius: 5, backgroundColor: CTA },
+  ride: { flexDirection: "row", alignItems: "center", gap: 12, marginHorizontal: 16, marginTop: 12, padding: 16, borderRadius: 20, backgroundColor: "#1A1A1A", borderWidth: 1, borderColor: dyn("#1A1A1A", "#3A3A3A") },
   battery: { height: 22, borderRadius: 11, backgroundColor: "#333", marginTop: 10, overflow: "hidden", justifyContent: "center" },
   batteryFill: { position: "absolute", left: 0, top: 0, bottom: 0, backgroundColor: "#FCE38A", borderRadius: 11 },
   batteryText: { color: "#1A1A1A", fontSize: 11.5, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", paddingHorizontal: 10 },
   clubChip: { flexDirection: "row", alignItems: "center", gap: 8, paddingLeft: 6, paddingRight: 12, paddingVertical: 6, borderRadius: 999 },
-  unread: { minWidth: 20, height: 20, borderRadius: 10, backgroundColor: "#1A1A1A", alignItems: "center", justifyContent: "center", paddingHorizontal: 5 },
+  unread: { minWidth: 20, height: 20, borderRadius: 10, backgroundColor: CTA, alignItems: "center", justifyContent: "center", paddingHorizontal: 5 },
   stat: { flex: 1, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 4, alignItems: "center" },
   section: { paddingHorizontal: 16, paddingVertical: 14, borderTopWidth: StyleSheet.hairlineWidth, gap: 10 },
   h: { fontSize: 13, fontWeight: "600" },

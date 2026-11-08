@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../lib/theme";
+import { useTheme, CTA, ON_CTA } from "../lib/theme";
 import { timeAgo } from "../lib/geo";
 import { ISSUE_TAGS, fetchIssues, tagLabel, type Issue } from "../lib/issues";
 
@@ -84,8 +84,8 @@ export function IssuesBoard({ clubId }: { clubId: string }) {
         )}
       />
       <Pressable onPress={() => router.push({ pathname: "/issue-new", params: { clubId } })} style={s.fab}>
-        <Ionicons name="add" size={20} color={LEMON} />
-        <Text style={{ color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 15 }}>Ask the club</Text>
+        <Ionicons name="add" size={20} color={ON_CTA} />
+        <Text style={{ color: ON_CTA, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 15 }}>Ask the club</Text>
       </Pressable>
     </View>
   );
@@ -93,8 +93,8 @@ export function IssuesBoard({ clubId }: { clubId: string }) {
 
 function Chip({ label, on, onPress, t }: { label: string; on: boolean; onPress: () => void; t: ReturnType<typeof useTheme> }) {
   return (
-    <Pressable onPress={onPress} style={[s.chip, { backgroundColor: on ? INK : t.surface }]}>
-      <Text style={{ color: on ? LEMON : t.text, fontWeight: "700", fontSize: 13 }}>{label}</Text>
+    <Pressable onPress={onPress} style={[s.chip, { backgroundColor: on ? CTA : t.surface }]}>
+      <Text style={{ color: on ? ON_CTA : t.text, fontWeight: "700", fontSize: 13 }}>{label}</Text>
     </Pressable>
   );
 }
@@ -115,6 +115,6 @@ const s = StyleSheet.create({
   solved: { flexDirection: "row", alignItems: "center", gap: 3, backgroundColor: LEMON, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999 },
   solvedText: { color: INK, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12 },
   tag: { fontSize: 12, fontWeight: "700", paddingHorizontal: 9, paddingVertical: 4, borderRadius: 999, overflow: "hidden" },
-  fab: { position: "absolute", right: 16, bottom: 24, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: INK,
+  fab: { position: "absolute", right: 16, bottom: 24, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: CTA,
     paddingHorizontal: 18, height: 50, borderRadius: 999, shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 6 },
 });

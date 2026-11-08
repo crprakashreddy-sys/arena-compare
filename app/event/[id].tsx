@@ -3,7 +3,7 @@ import { ActivityIndicator, Alert, Pressable, ScrollView, Share, StyleSheet, Tex
 import MapView, { Marker } from "react-native-maps";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../../lib/theme";
+import { useTheme, CTA, ON_CTA } from "../../lib/theme";
 import { useAuth } from "../../lib/auth";
 import { report } from "../../lib/community";
 import { myRole } from "../../lib/clubs";
@@ -100,8 +100,8 @@ export default function EventDetail() {
                 <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }} numberOfLines={1}>{e.place_name || "Meeting point"}</Text>
                 {!!e.destination && <Text style={{ color: t.muted, fontSize: 13 }} numberOfLines={1}>Heading to {e.destination}</Text>}
               </View>
-              <Pressable onPress={() => openDirections(e)} style={[s.small, { backgroundColor: INK }]}>
-                <Ionicons name="navigate" size={14} color={LEMON} /><Text style={{ color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Directions</Text>
+              <Pressable onPress={() => openDirections(e)} style={[s.small, { backgroundColor: CTA }]}>
+                <Ionicons name="navigate" size={14} color={ON_CTA} /><Text style={{ color: ON_CTA, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Directions</Text>
               </Pressable>
             </View>
           </View>
@@ -137,8 +137,8 @@ export default function EventDetail() {
             )}
           </Pressable>
           <Pressable onPress={() => set(mine === "interested" ? null : "interested")} disabled={busy}
-            style={[s.big, { flex: 1, backgroundColor: mine === "interested" ? INK : t.surface }]}>
-            <Text style={{ color: mine === "interested" ? LEMON : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{mine === "interested" ? "★ Interested" : "Interested"}</Text>
+            style={[s.big, { flex: 1, backgroundColor: mine === "interested" ? CTA : t.surface }]}>
+            <Text style={{ color: mine === "interested" ? ON_CTA : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{mine === "interested" ? "★ Interested" : "Interested"}</Text>
           </Pressable>
         </View>
       )}

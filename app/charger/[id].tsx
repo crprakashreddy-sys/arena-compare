@@ -13,7 +13,7 @@ import { nearbyFood, FOOD_LABEL } from "../../lib/places";
 import { networkById } from "../../lib/networks";
 import { fmtDistance, timeAgo, walkTime } from "../../lib/geo";
 import { snapUrl } from "../../lib/supabase";
-import { useTheme } from "../../lib/theme";
+import { useTheme, CTA, ON_CTA } from "../../lib/theme";
 import { useAuth, canPost } from "../../lib/auth";
 import { Avatar, Button, Pin, Section, Stars, StatusBanner } from "../../components/ui";
 import SnapViewer from "../../components/SnapViewer";
@@ -154,9 +154,9 @@ export default function ChargerPage() {
           )}
 
           <View style={{ flexDirection: "row", gap: 8 }}>
-            <Pressable onPress={() => router.push(`/zap/${encodeURIComponent(c.id)}`)} style={[styles.action, { backgroundColor: "#1A1A1A" }]}>
-              <Ionicons name="camera" size={18} color="#FCE38A" />
-              <Text style={{ color: "#FCE38A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Drop a zing</Text>
+            <Pressable onPress={() => router.push(`/zap/${encodeURIComponent(c.id)}`)} style={[styles.action, { backgroundColor: CTA }]}>
+              <Ionicons name="camera" size={18} color={ON_CTA} />
+              <Text style={{ color: ON_CTA, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Drop a zing</Text>
             </Pressable>
             <Button title="Directions" icon="navigate" kind="primary" onPress={directions} style={{ flex: 1 }} />
           </View>

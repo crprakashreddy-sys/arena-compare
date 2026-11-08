@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Alert, FlatList, Pressable, Share, StyleSheet, Text, View } from "react-native";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../../lib/theme";
+import { useTheme, CTA, ON_CTA } from "../../lib/theme";
 import { useAuth } from "../../lib/auth";
 import { fetchClub, fetchMembers, myRole, removeMember, setRole, type Club, type ClubMember } from "../../lib/clubs";
 import { Avatar } from "../../components/ui";
@@ -67,8 +67,8 @@ export default function ClubMembers() {
                 </Pressable>
               )}
               {!!club.invite_code && (
-                <Pressable onPress={invite} style={[s.btn, { backgroundColor: INK }]}>
-                  <Ionicons name="share-outline" size={16} color={LEMON} /><Text style={{ color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Invite · {club.invite_code}</Text>
+                <Pressable onPress={invite} style={[s.btn, { backgroundColor: CTA }]}>
+                  <Ionicons name="share-outline" size={16} color={ON_CTA} /><Text style={{ color: ON_CTA, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Invite · {club.invite_code}</Text>
                 </Pressable>
               )}
             </View>

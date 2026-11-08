@@ -3,7 +3,7 @@ import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, Sc
 import MapView, { type Region } from "react-native-maps";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../lib/theme";
+import { useTheme, CTA, ON_CTA } from "../lib/theme";
 import { useAuth } from "../lib/auth";
 import { NETWORKS, OTHER } from "../lib/networks";
 import { addCommunityCharger, chargersNear } from "../lib/chargers";
@@ -86,7 +86,7 @@ export default function AddCharger() {
             showsPointsOfInterest={false}
           />
           <View pointerEvents="none" style={s.pinWrap}>
-            <View style={s.pin}><Ionicons name="flash" size={20} color={LEMON} /></View>
+            <View style={s.pin}><Ionicons name="flash" size={20} color={ON_CTA} /></View>
             <View style={s.pinTip} />
           </View>
           <View style={s.hint}><Text style={s.hintText}>Move the map so the pin sits on the charger</Text></View>
@@ -142,9 +142,9 @@ export default function AddCharger() {
 
       <View style={[s.footer, { backgroundColor: t.bg, borderTopColor: t.line }]}>
         <Pressable onPress={save} disabled={busy} style={({ pressed }) => [s.save, { opacity: ready ? 1 : 0.5, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
-          {busy ? <ActivityIndicator color={LEMON} /> : (
+          {busy ? <ActivityIndicator color={ON_CTA} /> : (
             <>
-              <Ionicons name="add-circle" size={20} color={LEMON} />
+              <Ionicons name="add-circle" size={20} color={ON_CTA} />
               <Text style={s.saveText}>{session ? "Add to the map" : "Sign in to add"}</Text>
             </>
           )}
@@ -168,9 +168,9 @@ function Pill({ label, on, onPress, dot, big, t }: {
 }) {
   return (
     <Pressable onPress={onPress} style={[s.pill, big && { flex: 1, justifyContent: "center", paddingVertical: 12 },
-      { backgroundColor: on ? INK : t.surface }]}>
+      { backgroundColor: on ? CTA : t.surface }]}>
       {dot && <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: dot }} />}
-      <Text style={{ color: on ? LEMON : t.text, fontWeight: "700", fontSize: 14 }}>{label}</Text>
+      <Text style={{ color: on ? ON_CTA : t.text, fontWeight: "700", fontSize: 14 }}>{label}</Text>
     </Pressable>
   );
 }
@@ -186,6 +186,6 @@ const s = StyleSheet.create({
   wrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   pill: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, paddingVertical: 9, borderRadius: 999 },
   footer: { position: "absolute", left: 0, right: 0, bottom: 0, padding: 16, paddingBottom: 30, borderTopWidth: StyleSheet.hairlineWidth },
-  save: { backgroundColor: INK, height: 54, borderRadius: 999, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
-  saveText: { color: LEMON, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
+  save: { backgroundColor: CTA, height: 54, borderRadius: 999, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
+  saveText: { color: ON_CTA, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
 });

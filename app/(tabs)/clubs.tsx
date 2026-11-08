@@ -4,7 +4,7 @@ import { router, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../../lib/auth";
-import { useTheme } from "../../lib/theme";
+import { useTheme, CTA, ON_CTA } from "../../lib/theme";
 import { useGarage } from "../../lib/vehicles";
 import { autoJoinFor, fetchClubs, fetchMyClubs, joinClub, joinWithCode, type Club, type MyClub } from "../../lib/clubs";
 import { timeAgo } from "../../lib/geo";
@@ -73,7 +73,7 @@ export default function Clubs() {
           <Text style={{ color: t.muted, marginTop: 2 }}>Your EV crew. Fixes, tips, drives and meetups.</Text>
         </View>
         <Pressable onPress={() => (session ? router.push("/club-edit") : router.push("/login"))} style={s.newBtn} accessibilityLabel="Start a club">
-          <Ionicons name="add" size={18} color={LEMON} />
+          <Ionicons name="add" size={18} color={ON_CTA} />
           <Text style={s.newBtnText}>New</Text>
         </Pressable>
       </View>
@@ -213,8 +213,8 @@ function BrandCard({ c, onJoin }: { c: Club; onJoin: () => void }) {
 const s = StyleSheet.create({
   h1: { fontSize: 32, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -1 },
   h3: { fontSize: 12, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: 0.6, paddingHorizontal: 16, marginTop: 16, marginBottom: 8 },
-  newBtn: { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: INK, paddingHorizontal: 14, height: 38, borderRadius: 999, marginTop: 6 },
-  newBtnText: { color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
+  newBtn: { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: CTA, paddingHorizontal: 14, height: 38, borderRadius: 999, marginTop: 6 },
+  newBtnText: { color: ON_CTA, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
   community: { flexDirection: "row", alignItems: "center", gap: 12, padding: 12, borderRadius: 18 },
   h2: { fontSize: 18, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", marginTop: 24, marginBottom: 10, paddingHorizontal: 16 },
   hero: { marginHorizontal: 16, padding: 18, borderRadius: 20, backgroundColor: LEMON, gap: 6 },
@@ -223,8 +223,8 @@ const s = StyleSheet.create({
   heroBtn: { alignSelf: "flex-start", backgroundColor: INK, paddingHorizontal: 18, height: 44, borderRadius: 999, justifyContent: "center", marginTop: 8 },
   heroBtnText: { color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
   mine: { flexDirection: "row", alignItems: "center", gap: 12, padding: 12, borderRadius: 18 },
-  unread: { minWidth: 22, height: 22, borderRadius: 11, backgroundColor: INK, alignItems: "center", justifyContent: "center", paddingHorizontal: 6 },
-  unreadText: { color: LEMON, fontSize: 12, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
+  unread: { minWidth: 22, height: 22, borderRadius: 11, backgroundColor: CTA, alignItems: "center", justifyContent: "center", paddingHorizontal: 6 },
+  unreadText: { color: ON_CTA, fontSize: 12, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
   search: { flexDirection: "row", alignItems: "center", gap: 8, height: 44, borderRadius: 12, paddingHorizontal: 12 },
   brand: { width: 120, padding: 12, borderRadius: 18, backgroundColor: LEMON, alignItems: "center", gap: 4 },
   brandName: { fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", color: INK, fontSize: 15, marginTop: 4 },

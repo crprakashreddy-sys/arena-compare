@@ -1,4 +1,13 @@
-import { useColorScheme } from "react-native";
+import { DynamicColorIOS, Platform, useColorScheme, type ColorValue } from "react-native";
+
+/** A colour that flips with light and dark mode, even inside static StyleSheets. */
+export const dyn = (light: string, dark: string): ColorValue =>
+  Platform.OS === "ios" ? DynamicColorIOS({ light, dark }) : light;
+/** Main action buttons: black with lemon text by day, lemon with black text at night. */
+export const CTA = dyn("#1A1A1A", "#FCE38A");
+export const ON_CTA = dyn("#FCE38A", "#1A1A1A");
+/** Text on your own chat bubbles. */
+export const MY_BUBBLE_TEXT = dyn("#FFFFFF", "#1A1A1A");
 
 const light = {
   bg: "#FFFFFF",

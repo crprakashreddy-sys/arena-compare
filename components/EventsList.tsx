@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../lib/theme";
+import { useTheme, CTA, ON_CTA } from "../lib/theme";
 import { fetchClubEvents, kindOf, type ClubEvent } from "../lib/events";
 
 const INK = "#1A1A1A";
@@ -40,8 +40,8 @@ export function EventsList({ clubId }: { clubId: string }) {
         renderItem={({ item: e }) => <EventCard e={e} />}
       />
       <Pressable onPress={() => router.push({ pathname: "/event-new", params: { clubId } })} style={s.fab}>
-        <Ionicons name="add" size={20} color={LEMON} />
-        <Text style={{ color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 15 }}>Plan an event</Text>
+        <Ionicons name="add" size={20} color={ON_CTA} />
+        <Text style={{ color: ON_CTA, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 15 }}>Plan an event</Text>
       </Pressable>
     </View>
   );
@@ -77,6 +77,6 @@ const s = StyleSheet.create({
   month: { color: INK, fontSize: 11, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: 0.5 },
   day: { color: INK, fontSize: 26, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", lineHeight: 30 },
   wday: { color: INK, fontSize: 11, fontWeight: "700", opacity: 0.6 },
-  fab: { position: "absolute", right: 16, bottom: 24, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: INK,
+  fab: { position: "absolute", right: 16, bottom: 24, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: CTA,
     paddingHorizontal: 18, height: 50, borderRadius: 999, shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 6 },
 });

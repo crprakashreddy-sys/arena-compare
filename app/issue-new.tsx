@@ -3,7 +3,7 @@ import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, Sc
 import { Image } from "expo-image";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../lib/theme";
+import { useTheme, CTA, ON_CTA } from "../lib/theme";
 import { useAuth } from "../lib/auth";
 import { snapUrl } from "../lib/supabase";
 import { ISSUE_TAGS, createIssue } from "../lib/issues";
@@ -58,9 +58,9 @@ export default function NewIssue() {
             const on = tags.includes(x.key);
             return (
               <Pressable key={x.key} onPress={() => setTags((v) => (on ? v.filter((k) => k !== x.key) : [...v, x.key].slice(-3)))}
-                style={[s.chip, { backgroundColor: on ? INK : t.surface }]}>
-                <Ionicons name={x.icon as any} size={14} color={on ? LEMON : t.text} />
-                <Text style={{ color: on ? LEMON : t.text, fontWeight: "700", fontSize: 13.5 }}>{x.label}</Text>
+                style={[s.chip, { backgroundColor: on ? CTA : t.surface }]}>
+                <Ionicons name={x.icon as any} size={14} color={on ? ON_CTA : t.text} />
+                <Text style={{ color: on ? ON_CTA : t.text, fontWeight: "700", fontSize: 13.5 }}>{x.label}</Text>
               </Pressable>
             );
           })}
@@ -80,7 +80,7 @@ export default function NewIssue() {
       </ScrollView>
       <View style={[s.footer, { backgroundColor: t.bg, borderTopColor: t.line }]}>
         <Pressable onPress={post} disabled={busy || uploading} style={[s.save, { opacity: ok ? 1 : 0.5 }]}>
-          {busy ? <ActivityIndicator color={LEMON} /> : <Text style={s.saveText}>Post to the club</Text>}
+          {busy ? <ActivityIndicator color={ON_CTA} /> : <Text style={s.saveText}>Post to the club</Text>}
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -93,6 +93,6 @@ const s = StyleSheet.create({
   photoBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, height: 56, borderRadius: 14, borderWidth: 1.5, borderStyle: "dashed" },
   remove: { position: "absolute", top: 8, right: 8, width: 30, height: 30, borderRadius: 15, backgroundColor: "rgba(0,0,0,0.6)", alignItems: "center", justifyContent: "center" },
   footer: { position: "absolute", left: 0, right: 0, bottom: 0, padding: 16, paddingBottom: 30, borderTopWidth: StyleSheet.hairlineWidth },
-  save: { backgroundColor: INK, height: 54, borderRadius: 999, alignItems: "center", justifyContent: "center" },
-  saveText: { color: LEMON, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
+  save: { backgroundColor: CTA, height: 54, borderRadius: 999, alignItems: "center", justifyContent: "center" },
+  saveText: { color: ON_CTA, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
 });

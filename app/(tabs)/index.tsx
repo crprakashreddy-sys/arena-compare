@@ -22,7 +22,7 @@ import SnapViewer from "../../components/SnapViewer";
 import { NETWORKS, OTHER, isOem, networkById } from "../../lib/networks";
 import { distanceM, fmtDistance } from "../../lib/geo";
 import { searchPlaces, type PlaceHit } from "../../lib/places";
-import { STATUS_LABEL, statusColors, useTheme } from "../../lib/theme";
+import { STATUS_LABEL, statusColors, useTheme, CTA, ON_CTA } from "../../lib/theme";
 import { Chip, ClusterPin, Pin } from "../../components/ui";
 import type { Charger, Checkin, LiveStatus } from "../../lib/types";
 import { chargeMinutes, fitFor, fmtMinutes, reachKm, updateVehicle, usablePowerKW, useGarage } from "../../lib/vehicles";
@@ -470,9 +470,9 @@ export default function MapScreen() {
             <View style={{ flexDirection: "row", gap: 8 }}>
               <Pressable
                 onPress={() => (peekZaps.length ? setViewer({ list: peekZaps, start: 0 }) : router.push(`/zap/${encodeURIComponent(peek.id)}`))}
-                style={[styles.peekBtn, { backgroundColor: "#1A1A1A" }]}
+                style={[styles.peekBtn, { backgroundColor: CTA }]}
               >
-                <Text style={{ color: "#FCE38A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{peekZaps.length ? `Watch ${peekZaps.length} zing${peekZaps.length > 1 ? "s" : ""}` : "Drop the first zing"}</Text>
+                <Text style={{ color: ON_CTA, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{peekZaps.length ? `Watch ${peekZaps.length} zing${peekZaps.length > 1 ? "s" : ""}` : "Drop the first zing"}</Text>
               </Pressable>
               <Pressable onPress={() => openCharger(peek)} style={[styles.peekBtn, { backgroundColor: t.accent }]}>
                 <Text style={{ color: t.onAccent, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Open charger</Text>
@@ -591,7 +591,7 @@ function EmptyState({ hiddenCount, onClear, onAdd }: { hiddenCount: number; onCl
         The public map doesn't cover this area. Know one nearby? Add it and be the first to zing it.
       </Text>
       <Pressable onPress={onAdd} style={styles.emptyBtn}>
-        <Ionicons name="add-circle" size={18} color="#FCE38A" />
+        <Ionicons name="add-circle" size={18} color={ON_CTA} />
         <Text style={styles.emptyBtnText}>Add a charger here</Text>
       </Pressable>
     </View>
@@ -605,8 +605,8 @@ const styles = StyleSheet.create({
   empty: { alignItems: "center", paddingVertical: 22, gap: 10 },
   emptyIcon: { width: 72, height: 72, borderRadius: 36, alignItems: "center", justifyContent: "center", marginBottom: 4 },
   emptyTitle: { fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", textAlign: "center" },
-  emptyBtn: { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: "#1A1A1A", paddingHorizontal: 20, height: 48, borderRadius: 999, marginTop: 6 },
-  emptyBtnText: { color: "#FCE38A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 15 },
+  emptyBtn: { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: CTA, paddingHorizontal: 20, height: 48, borderRadius: 999, marginTop: 6 },
+  emptyBtnText: { color: ON_CTA, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 15 },
   addRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 16, borderTopWidth: StyleSheet.hairlineWidth },
   search: {
     flex: 1, flexDirection: "row", alignItems: "center", gap: 8, height: 48, borderRadius: 24, paddingHorizontal: 14,

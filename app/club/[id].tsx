@@ -9,7 +9,7 @@ import { Stack, router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../../lib/auth";
-import { useTheme } from "../../lib/theme";
+import { useTheme, CTA, ON_CTA, MY_BUBBLE_TEXT } from "../../lib/theme";
 import { snapUrl, supabase } from "../../lib/supabase";
 import { blockUser, isBlocked, report, uploadSnap } from "../../lib/community";
 import {
@@ -223,9 +223,9 @@ export default function ClubChat() {
   const tabs = (
     <View style={[s.tabs, { backgroundColor: t.bg, borderBottomColor: t.line }]}>
       {(["chat", "issues", "events"] as const).map((k) => (
-        <Pressable key={k} onPress={() => setTab(k)} style={[s.tab, tab === k && { backgroundColor: INK }]}>
-          <Ionicons name={k === "chat" ? "chatbubbles" : k === "issues" ? "construct" : "calendar"} size={15} color={tab === k ? LEMON : t.muted} />
-          <Text style={{ color: tab === k ? LEMON : t.muted, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{k === "chat" ? "Chat" : k === "issues" ? "Issues" : "Events"}</Text>
+        <Pressable key={k} onPress={() => setTab(k)} style={[s.tab, tab === k && { backgroundColor: CTA }]}>
+          <Ionicons name={k === "chat" ? "chatbubbles" : k === "issues" ? "construct" : "calendar"} size={15} color={tab === k ? ON_CTA : t.muted} />
+          <Text style={{ color: tab === k ? ON_CTA : t.muted, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{k === "chat" ? "Chat" : k === "issues" ? "Issues" : "Events"}</Text>
         </Pressable>
       ))}
     </View>
@@ -273,7 +273,7 @@ export default function ClubChat() {
 
       {reply && (
         <View style={[s.replyBar, { backgroundColor: t.bg, borderTopColor: t.line }]}>
-          <View style={{ width: 3, alignSelf: "stretch", backgroundColor: INK, borderRadius: 2 }} />
+          <View style={{ width: 3, alignSelf: "stretch", backgroundColor: CTA, borderRadius: 2 }} />
           <View style={{ flex: 1 }}>
             <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12.5 }}>Replying to {reply.profiles?.display_name ?? "driver"}</Text>
             <Text style={{ color: t.muted, fontSize: 13 }} numberOfLines={1}>{reply.body ?? "📷 Photo"}</Text>
@@ -289,7 +289,7 @@ export default function ClubChat() {
         <TextInput value={text} onChangeText={setText} placeholder="Message the club" placeholderTextColor={t.faint}
           multiline maxLength={2000} style={[s.input, { backgroundColor: t.surface, color: t.text }]} />
         <Pressable onPress={() => send()} disabled={sending || !text.trim()} style={[s.send, { opacity: text.trim() || sending ? 1 : 0.35 }]}>
-          {sending ? <ActivityIndicator color={LEMON} size="small" /> : <Ionicons name="arrow-up" size={20} color={LEMON} />}
+          {sending ? <ActivityIndicator color={ON_CTA} size="small" /> : <Ionicons name="arrow-up" size={20} color={ON_CTA} />}
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -315,8 +315,8 @@ function Bubble({ m, mine, showName, replyTo, onLongPress }: {
         )}
         {replyTo && (
           <View style={[s.quote, { backgroundColor: mine ? "rgba(252,227,138,0.15)" : t.surface }]}>
-            <Text style={{ color: mine ? LEMON : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12 }}>{replyTo.profiles?.display_name ?? "Driver"}</Text>
-            <Text style={{ color: mine ? "#ddd" : t.muted, fontSize: 12.5 }} numberOfLines={2}>
+            <Text style={{ color: mine ? ON_CTA : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12 }}>{replyTo.profiles?.display_name ?? "Driver"}</Text>
+            <Text style={{ color: mine ? MY_BUBBLE_TEXT : t.muted, fontSize: 12.5 }} numberOfLines={2}>
               {replyTo.deleted ? "Message deleted" : replyTo.body ?? "📷 Photo"}
             </Text>
           </View>
@@ -326,7 +326,7 @@ function Bubble({ m, mine, showName, replyTo, onLongPress }: {
         ) : (
           <>
             {m.photo_path && <Image source={{ uri: snapUrl(m.photo_path) }} style={s.photo} contentFit="cover" transition={150} />}
-            {!!m.body && <Text style={[{ color: mine ? "#fff" : t.text, fontSize: 15.5, lineHeight: 21 }, pad, m.photo_path ? { paddingTop: 6 } : null]}>{m.body}</Text>}
+            {!!m.body && <Text style={[{ color: mine ? MY_BUBBLE_TEXT : t.text, fontSize: 15.5, lineHeight: 21 }, pad, m.photo_path ? { paddingTop: 6 } : null]}>{m.body}</Text>}
           </>
         )}
         <Text style={[s.time, { color: mine ? "#999" : t.faint }, pad, m.photo_path ? { paddingBottom: 4 } : null]}>{time}</Text>
@@ -339,7 +339,7 @@ const s = StyleSheet.create({
   tabs: { flexDirection: "row", gap: 8, paddingHorizontal: 12, paddingVertical: 8, borderBottomWidth: StyleSheet.hairlineWidth },
   tab: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, height: 38, borderRadius: 999 },
   bubble: { maxWidth: "78%", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 18 },
-  mine: { backgroundColor: INK, borderBottomRightRadius: 6 },
+  mine: { backgroundColor: CTA, borderBottomRightRadius: 6 },
   theirs: { borderBottomLeftRadius: 6 },
   name: { fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12.5, color: "#B8860B", marginBottom: 2 },
   quote: { borderLeftWidth: 3, borderLeftColor: LEMON, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 5, marginBottom: 6 },
@@ -349,7 +349,7 @@ const s = StyleSheet.create({
   composer: { flexDirection: "row", alignItems: "flex-end", gap: 8, paddingHorizontal: 10, paddingTop: 8, borderTopWidth: StyleSheet.hairlineWidth },
   iconBtn: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   input: { flex: 1, minHeight: 40, maxHeight: 120, borderRadius: 20, paddingHorizontal: 14, paddingTop: 10, paddingBottom: 10, fontSize: 15.5 },
-  send: { width: 40, height: 40, borderRadius: 20, backgroundColor: INK, alignItems: "center", justifyContent: "center" },
-  bigBtn: { backgroundColor: INK, paddingHorizontal: 28, height: 54, borderRadius: 999, justifyContent: "center", marginTop: 10 },
-  bigBtnText: { color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 16 },
+  send: { width: 40, height: 40, borderRadius: 20, backgroundColor: CTA, alignItems: "center", justifyContent: "center" },
+  bigBtn: { backgroundColor: CTA, paddingHorizontal: 28, height: 54, borderRadius: 999, justifyContent: "center", marginTop: 10 },
+  bigBtnText: { color: ON_CTA, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 16 },
 });
