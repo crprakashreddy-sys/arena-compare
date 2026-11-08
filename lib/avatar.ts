@@ -2,7 +2,7 @@
  * zingd avatar maker: a cartoon of you with your EV, drawn as an SVG. No AI, no network, free.
  * The same SVG is drawn on screen (Skia) and saved as your profile photo.
  */
-export type CarShape = "suv" | "hatch" | "sedan" | "scooter";
+export type CarShape = "suv" | "boxy" | "compact" | "coupe" | "crossover" | "hatch" | "sedan" | "mpv" | "micro" | "scooter" | "bike";
 export type AvatarOpts = {
   skin: number; hair: number; hairColor: number; eyes: number; mouth: number;
   glasses: boolean; beard: boolean; shirt: number; bg: number; car: CarShape; carColor: number;
@@ -15,16 +15,22 @@ export const BGS = ["#FCE38A", "#B8E0D2", "#F6C6C7", "#C9B8FF", "#A9DDF3", "#FFC
 export const CAR_COLORS = ["#F2F2F2", "#1A1A1A", "#C8102E", "#2D6BD8", "#7C8791", "#0F9D74", "#FCE38A", "#F28C28"];
 export const HAIR_STYLES = ["Short", "Quiff", "Long", "Bun", "Curly", "Bald"];
 export const CAR_SHAPES: { key: CarShape; label: string }[] = [
-  { key: "suv", label: "SUV" }, { key: "hatch", label: "Hatchback" }, { key: "sedan", label: "Sedan" }, { key: "scooter", label: "Scooter" },
+  { key: "suv", label: "SUV" }, { key: "coupe", label: "Coupé SUV" }, { key: "boxy", label: "Big SUV" }, { key: "compact", label: "Compact SUV" },
+  { key: "crossover", label: "Crossover" }, { key: "hatch", label: "Hatchback" }, { key: "sedan", label: "Sedan" }, { key: "mpv", label: "7-seater" },
+  { key: "micro", label: "City car" }, { key: "scooter", label: "Scooter" }, { key: "bike", label: "Motorbike" },
 ];
 
-/** Guess the car shape from the driver's vehicle. */
-export function shapeFor(v?: { kind: string; model: string } | null): CarShape {
+/** Body type for each model in the vehicle list, so the cartoon matches the driver's EV. */
+const BODY: Record<string, CarShape> = {
+  "tata-nexon-ev-45": "compact", "tata-punch-ev-lr": "compact", "tata-tiago-ev-lr": "hatch", "tata-curvv-ev-55": "coupe",
+  "tata-harrier-ev-75": "boxy", "mg-windsor-38": "crossover", "mg-zs-ev": "suv", "mg-comet": "micro",
+  "hyundai-creta-electric": "suv", "hyundai-ioniq5": "crossover", "mahindra-xuv400": "compact", "mahindra-be6": "coupe",
+  "mahindra-xev9e": "coupe", "byd-atto3": "suv", "byd-emax7": "mpv", "kia-ev6": "crossover", "citroen-ec3": "hatch",
+  "revolt-rv400": "bike",
+};
+export function shapeFor(v?: { id: string; kind: string } | null): CarShape {
   if (!v) return "suv";
-  if (v.kind !== "car") return "scooter";
-  if (/tiago|comet|ec3|punch/i.test(v.model)) return "hatch";
-  if (/ioniq|ev6|seal|emax/i.test(v.model)) return "sedan";
-  return "suv";
+  return BODY[v.id] ?? (v.kind === "bike" ? "bike" : v.kind === "scooter" ? "scooter" : "suv");
 }
 
 export function randomAvatar(car: CarShape = "suv"): AvatarOpts {
@@ -68,29 +74,52 @@ function mouth(kind: number) {
   return `<path d="M234 258 q22 22 44 0" stroke="#7A1F1F" stroke-width="7" fill="none" stroke-linecap="round"/>`;
 }
 
+type Body = { x0: number; x1: number; top: number; belt: number; rearBase: number; roofR: number; roofF: number; ws: number; r: number; inset?: number };
+const BODIES: Record<string, Body> = {
+  suv:       { x0: 50,  x1: 464, top: 280, belt: 350, rearBase: 64,  roofR: 98,  roofF: 318, ws: 400, r: 36 },
+  boxy:      { x0: 46,  x1: 466, top: 268, belt: 346, rearBase: 54,  roofR: 72,  roofF: 334, ws: 394, r: 38 },
+  compact:   { x0: 74,  x1: 442, top: 282, belt: 350, rearBase: 86,  roofR: 112, roofF: 310, ws: 382, r: 35 },
+  coupe:     { x0: 42,  x1: 470, top: 286, belt: 352, rearBase: 66,  roofR: 196, roofF: 318, ws: 404, r: 37 },
+  crossover: { x0: 48,  x1: 468, top: 298, belt: 358, rearBase: 60,  roofR: 112, roofF: 320, ws: 410, r: 34 },
+  hatch:     { x0: 82,  x1: 438, top: 290, belt: 354, rearBase: 92,  roofR: 122, roofF: 300, ws: 372, r: 32 },
+  sedan:     { x0: 34,  x1: 478, top: 306, belt: 362, rearBase: 110, roofR: 178, roofF: 318, ws: 404, r: 32 },
+  mpv:       { x0: 38,  x1: 474, top: 270, belt: 348, rearBase: 46,  roofR: 64,  roofF: 352, ws: 424, r: 34 },
+  micro:     { x0: 128, x1: 392, top: 268, belt: 350, rearBase: 136, roofR: 146, roofF: 330, ws: 372, r: 30, inset: 46 },
+};
+
 function car(shape: CarShape, col: string) {
   const dark = shade(col, 0.72), glass = "#BFE3F2", tyre = "#1A1A1A";
-  const wheel = (x: number, r = 34) => `<circle cx="${x}" cy="452" r="${r}" fill="${tyre}"/><circle cx="${x}" cy="452" r="${r * 0.45}" fill="#C9CED3"/>`;
+  const wheel = (x: number, r: number) => `<circle cx="${x}" cy="${452 - (36 - r) * 0.4}" r="${r}" fill="${tyre}"/><circle cx="${x}" cy="${452 - (36 - r) * 0.4}" r="${r * 0.45}" fill="#C9CED3"/>`;
   const bolt = (x: number, y: number) => `<path d="M${x + 6} ${y} l-14 22 h10 l-6 16 l18 -24 h-10 z" fill="#FCE38A" stroke="#1A1A1A" stroke-width="2"/>`;
   if (shape === "scooter") {
     return `<path d="M120 440 C120 400 160 380 210 380 L300 380 L330 330 L352 330 L340 392 C380 396 404 420 404 446 Z" fill="${col}" stroke="${dark}" stroke-width="5"/>
       <rect x="190" y="360" width="110" height="20" rx="10" fill="#1A1A1A"/><path d="M340 330 L330 296" stroke="#1A1A1A" stroke-width="10" stroke-linecap="round"/>
       <path d="M314 292 h36" stroke="#1A1A1A" stroke-width="10" stroke-linecap="round"/>${wheel(160, 30)}${wheel(372, 30)}${bolt(244, 398)}`;
   }
-  const body = {
-    suv: `M48 438 L48 382 C48 362 62 350 84 348 L136 344 L176 290 C184 280 196 276 210 276 L350 276 C364 276 374 282 382 294 L414 344 L440 350 C458 354 466 366 466 384 L466 438 Z`,
-    hatch: `M64 438 L64 384 C64 364 78 352 100 350 L150 346 L192 296 C200 286 210 282 224 282 L330 282 C350 282 362 292 368 306 L392 352 L420 358 C438 362 448 374 448 392 L448 438 Z`,
-    sedan: `M36 438 L36 394 C36 376 50 366 72 364 L140 358 L194 310 C204 302 216 298 230 298 L320 298 C336 298 348 304 358 314 L404 360 L450 368 C470 372 478 384 478 400 L478 438 Z`,
-  }[shape];
-  const win = {
-    suv: `<path d="M150 344 L184 298 C188 292 194 290 202 290 L262 290 L262 344 Z" fill="${glass}"/><path d="M276 290 L346 290 C354 290 360 294 364 300 L394 344 L276 344 Z" fill="${glass}"/>`,
-    hatch: `<path d="M164 346 L198 304 C202 298 208 296 216 296 L268 296 L268 346 Z" fill="${glass}"/><path d="M282 296 L326 296 C338 296 346 302 350 310 L370 346 L282 346 Z" fill="${glass}"/>`,
-    sedan: `<path d="M158 358 L200 320 C206 314 214 312 224 312 L268 312 L268 358 Z" fill="${glass}"/><path d="M282 312 L318 312 C330 312 338 316 346 324 L382 358 L282 358 Z" fill="${glass}"/>`,
-  }[shape];
-  const wx = shape === "sedan" ? [130, 390] : shape === "hatch" ? [144, 372] : [136, 384];
-  return `<path d="${body}" fill="${col}" stroke="${dark}" stroke-width="5" stroke-linejoin="round"/>${win}
-    <rect x="${shape === "sedan" ? 446 : shape === "hatch" ? 420 : 434}" y="372" width="26" height="12" rx="6" fill="#FFF3B0"/>
-    <path d="M60 410 H460" stroke="${dark}" stroke-width="3" opacity="0.5"/>${wheel(wx[0])}${wheel(wx[1])}${bolt(266, 368)}`;
+  if (shape === "bike") {
+    return `<path d="M146 452 L236 378" stroke="#2E2E2E" stroke-width="18" stroke-linecap="round"/>
+      <path d="M398 452 L350 336" stroke="#2E2E2E" stroke-width="14" stroke-linecap="round"/>
+      <path d="M200 406 C200 372 240 352 290 350 L336 350 L352 384 L300 412 Z" fill="#2E2E2E"/>
+      <path d="M210 356 C214 322 252 306 296 308 L340 312 L354 348 L236 366 Z" fill="${col}" stroke="${dark}" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M160 352 C170 336 200 330 232 334 L240 352 Z" fill="#1A1A1A"/>
+      <path d="M344 320 L366 286" stroke="#1A1A1A" stroke-width="10" stroke-linecap="round"/><path d="M352 282 h34" stroke="#1A1A1A" stroke-width="10" stroke-linecap="round"/>
+      <circle cx="372" cy="322" r="13" fill="#FFF3B0" stroke="#1A1A1A" stroke-width="3"/>
+      ${wheel(146, 42)}${wheel(398, 42)}${bolt(278, 318)}`;
+  }
+  const b = BODIES[shape] ?? BODIES.suv;
+  const { x0, x1, top, belt, rearBase, roofR, roofF, ws, r } = b;
+  const inset = b.inset ?? 72;
+  const body = `M${x0} 438 L${x0} ${belt + 10} Q${x0} ${belt} ${rearBase} ${belt - 4} L${roofR} ${top + 4} Q${roofR + 6} ${top} ${roofR + 18} ${top}
+    L${roofF - 10} ${top} Q${roofF} ${top} ${roofF + 8} ${top + 8} L${ws} ${belt - 2} L${x1 - 26} ${belt + 8} Q${x1} ${belt + 12} ${x1} ${belt + 36} L${x1} 438 Z`;
+  const mid = Math.round((roofR + roofF) / 2 + 8);
+  const g1 = `M${rearBase + 20} ${belt - 4} L${roofR + 8} ${top + 14} L${mid - 7} ${top + 14} L${mid - 7} ${belt - 4} Z`;
+  const g2 = `M${mid + 7} ${belt - 4} L${mid + 7} ${top + 14} L${roofF - 6} ${top + 14} Q${roofF + 2} ${top + 16} ${roofF + 8} ${top + 24} L${ws - 18} ${belt - 4} Z`;
+  return `<path d="${body}" fill="${col}" stroke="${dark}" stroke-width="5" stroke-linejoin="round"/>
+    <path d="${g1}" fill="${glass}" stroke-linejoin="round"/><path d="${g2}" fill="${glass}" stroke-linejoin="round"/>
+    <rect x="${x1 - 30}" y="${belt + 20}" width="26" height="12" rx="6" fill="#FFF3B0"/>
+    <rect x="${x0 + 2}" y="${belt + 20}" width="14" height="12" rx="5" fill="#E04A3A"/>
+    <path d="M${x0 + 10} ${belt + 58} H${x1 - 10}" stroke="${dark}" stroke-width="3" opacity="0.5"/>
+    ${wheel(x0 + inset, r)}${wheel(x1 - inset, r)}${bolt(mid - 2, belt + 14)}`;
 }
 
 /** The finished cartoon as an SVG string, 512 × 512. */
