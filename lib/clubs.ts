@@ -8,14 +8,20 @@ export type Club = {
   description?: string | null; city?: string | null; emoji?: string | null; color?: string | null;
   is_private?: boolean; invite_code?: string | null; created_by?: string | null;
   rules?: string | null; pinned_message_id?: string | null; photo_path?: string | null;
-};
+} & Partial<ClubRules>;
 export type ClubMember = {
   user_id: string; role: "member" | "admin"; joined_at: string;
   profiles?: { display_name: string; car_model: string | null; avatar_path?: string | null } | null;
 };
+export type ClubRules = { req_min_profile: number; req_personalities: string[]; req_traits: string[]; req_same_city: boolean };
+export const NO_RULES: ClubRules = { req_min_profile: 0, req_personalities: [], req_traits: [], req_same_city: false };
 export type ClubDraft = {
   name: string; description: string; city: string; emoji: string; color: string; is_private: boolean;
-};
+} & Partial<ClubRules>;
+export const hasRules = (c: Partial<ClubRules>) => !!(c.req_min_profile || c.req_personalities?.length || c.req_traits?.length || c.req_same_city);
+const rulesOf = (d: Partial<ClubRules>) => hasRules(d) || d.req_min_profile === 0 ? {
+  req_min_profile: d.req_min_profile ?? 0, req_personalities: d.req_personalities ?? [], req_traits: d.req_traits ?? [], req_same_city: !!d.req_same_city,
+} : {};
 export type ClubMessage = {
   id: string; club_id: string; user_id: string; body: string | null; photo_path: string | null;
   reply_to: string | null; deleted: boolean; created_at: string;
@@ -131,6 +137,7 @@ export async function createClub(d: ClubDraft, userId: string): Promise<string> 
   const { error } = await supabase.from("clubs").insert({
     id, kind: "custom", make: "community", name: d.name.trim(), description: d.description.trim() || null,
     city: d.city.trim() || null, emoji: d.emoji, color: d.color, is_private: d.is_private, created_by: userId,
+    ...(hasRules(d) ? rulesOf(d) : {}),
   });
   if (error) throw new Error(error.message.includes("up to 5") ? "You can run up to 5 clubs." : error.message.includes("clubs_text_check") ? "Use a name of 3 to 50 characters." : error.message);
   return id;
@@ -140,6 +147,7 @@ export async function updateClub(id: string, d: ClubDraft) {
   const { error } = await supabase.from("clubs").update({
     name: d.name.trim(), description: d.description.trim() || null, city: d.city.trim() || null,
     emoji: d.emoji, color: d.color, is_private: d.is_private,
+    ...("req_min_profile" in d ? rulesOf(d) : {}),
   }).eq("id", id);
   if (error) throw new Error(error.message.includes("clubs_text_check") ? "Use a name of 3 to 50 characters." : error.message);
 }

@@ -26,6 +26,9 @@ import { ChatMedia, isBare, previewOf } from "../../components/ChatMedia";
 import * as Clipboard from "expo-clipboard";
 import { MessageMenu, ReactionChips, type MenuAction } from "../../components/MessageMenu";
 import { sendRequest } from "../../lib/community";
+import { profileScore } from "../../lib/profileScore";
+import { personalityById } from "../../lib/personality";
+import { traitById } from "../../lib/traits";
 import { fetchReactions, pinMessage, subscribeReactions, toggleReaction, type Reaction, type ReactionMap } from "../../lib/clubs";
 
 const INK = "#1A1A1A";
@@ -254,7 +257,38 @@ export default function ClubChat() {
         <Text style={{ color: t.muted, textAlign: "center", lineHeight: 20 }}>
           {club?.description || `${club?.members ?? 0} drivers swapping fixes, charging tips and drive plans.`}
         </Text>
-        <Pressable onPress={join} style={s.bigBtn}><Text style={s.bigBtnText}>{me ? "Join the club" : "Sign in to join"}</Text></Pressable>
+        {(() => {
+          // The club's door policy, checked against your profile before you tap Join.
+          const c = club; if (!c) return null;
+          const sc = profileScore(profile);
+          const rows: { ok: boolean; text: string; fix?: string }[] = [];
+          if (c.req_min_profile) rows.push({ ok: sc.pct >= c.req_min_profile, text: `Profile ${c.req_min_profile}%+ complete (yours: ${sc.pct}%)`, fix: sc.missing[0]?.go });
+          if (c.req_personalities?.length) rows.push({ ok: !!profile?.personality && c.req_personalities.includes(profile.personality),
+            text: `For ${c.req_personalities.map((x) => { const pp = personalityById(x); return pp ? `${pp.emoji} ${pp.name}` : x; }).join(", ")}`, fix: "/personality" });
+          if (c.req_traits?.length) rows.push({ ok: (profile?.traits ?? []).some((x) => c.req_traits!.includes(x)),
+            text: `Vibe: ${c.req_traits.map((x) => { const tr = traitById(x); return tr ? `${tr.emoji} ${tr.label}` : x; }).join(" or ")}`, fix: "/edit-profile" });
+          if (c.req_same_city && c.city) rows.push({ ok: (profile?.city ?? "").toLowerCase() === c.city.toLowerCase(), text: `Drivers in ${c.city}`, fix: "/edit-profile" });
+          const blocked = rows.some((r) => !r.ok);
+          return (
+            <>
+              {rows.length > 0 && (
+                <View style={[s.rules, { backgroundColor: t.surface }]}>
+                  <Text style={{ color: t.text, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold" }}>Who can join</Text>
+                  {rows.map((r) => (
+                    <Pressable key={r.text} onPress={() => !r.ok && r.fix && router.push(r.fix as any)} style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <Text style={{ fontSize: 16 }}>{r.ok ? "✅" : "⭕"}</Text>
+                      <Text style={{ color: r.ok ? t.text : t.muted, flex: 1 }}>{r.text}</Text>
+                      {!r.ok && r.fix && <Text style={{ color: t.text, fontWeight: "800", fontSize: 13 }}>Fix ›</Text>}
+                    </Pressable>
+                  ))}
+                </View>
+              )}
+              <Pressable onPress={join} disabled={!!me && blocked} style={[s.bigBtn, !!me && blocked && { opacity: 0.4 }]}>
+                <Text style={s.bigBtnText}>{!me ? "Sign in to join" : blocked ? "Complete the ⭕ to join" : "Join the club"}</Text>
+              </Pressable>
+            </>
+          );
+        })()}
       </View>
     );
   }
@@ -412,6 +446,7 @@ function Bubble({ m, mine, showName, replyTo, onLongPress, onDoubleTap }: {
 }
 
 const s = StyleSheet.create({
+  rules: { alignSelf: "stretch", borderRadius: 20, padding: 14, gap: 10, marginTop: 4 },
   pin: { flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 14, paddingVertical: 8, borderBottomWidth: StyleSheet.hairlineWidth },
   pinIcon: { width: 26, height: 26, borderRadius: 13, backgroundColor: LEMON, alignItems: "center", justifyContent: "center" },
   tabs: { flexDirection: "row", gap: 8, paddingHorizontal: 12, paddingVertical: 8, borderBottomWidth: StyleSheet.hairlineWidth },

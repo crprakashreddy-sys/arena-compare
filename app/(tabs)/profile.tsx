@@ -21,6 +21,7 @@ import { unreadDms } from "../../lib/dms";
 import { zingStreak } from "../../lib/community";
 import { personalityById } from "../../lib/personality";
 import { PersonalityBadge } from "../../components/PersonalityBadge";
+import { profileScore } from "../../lib/profileScore";
 import { useTabSpace } from "../../lib/tabspace";
 import { ChargingCard } from "../../components/ChargingCard";
 
@@ -103,6 +104,21 @@ export default function You() {
           <View style={styles.cam}>{uploading ? <ActivityIndicator size="small" color="#FCE38A" /> : <Ionicons name="camera" size={15} color="#FCE38A" />}</View>
         </Pressable>
         <Text style={styles.name}>{profile.display_name}</Text>
+        {(() => {
+          const sc = profileScore(profile);
+          if (sc.pct >= 100) return null;
+          const next = sc.missing[0];
+          return (
+            <Pressable onPress={() => router.push(next.go as any)} style={styles.complete}>
+              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                <Text style={{ color: "#1A1A1A", fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold" }}>Profile {sc.pct}% complete</Text>
+                <Text style={{ color: "#1A1A1A", fontWeight: "700", fontSize: 12.5 }}>Next: {next.label} ›</Text>
+              </View>
+              <View style={styles.completeTrack}><View style={[styles.completeFill, { width: `${sc.pct}%` }]} /></View>
+              <Text style={{ color: "#3C3410", fontSize: 11.5 }}>Some clubs only let complete profiles join.</Text>
+            </Pressable>
+          );
+        })()}
         {profile.personality ? (
           <Pressable onPress={() => router.push("/personality")} style={{ marginTop: 6 }}><PersonalityBadge id={profile.personality} size="md" /></Pressable>
         ) : (
@@ -248,6 +264,9 @@ export default function You() {
 }
 
 const styles = StyleSheet.create({
+  complete: { alignSelf: "stretch", marginHorizontal: 20, marginTop: 10, padding: 12, gap: 6, borderRadius: 16, backgroundColor: "rgba(255,255,255,0.55)" },
+  completeTrack: { height: 8, borderRadius: 4, backgroundColor: "rgba(26,26,26,0.12)", overflow: "hidden" },
+  completeFill: { height: 8, borderRadius: 4, backgroundColor: "#1A1A1A" },
   hero: { backgroundColor: "#FCE38A", alignItems: "center", paddingHorizontal: 20, paddingBottom: 20, gap: 4, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   avatarRing: { padding: 4, borderRadius: 60, backgroundColor: "#1A1A1A" },
   cam: { position: "absolute", right: 0, bottom: 2, width: 32, height: 32, borderRadius: 16, backgroundColor: "#1A1A1A", borderWidth: 3, borderColor: "#FCE38A", alignItems: "center", justifyContent: "center" },

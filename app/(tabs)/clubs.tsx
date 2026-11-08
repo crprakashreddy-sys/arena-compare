@@ -351,7 +351,7 @@ function ExploreTile({ c, a, onJoin }: { c: Club; a?: Activity; onJoin: () => vo
     <Pressable onPress={() => router.push(`/club/${encodeURIComponent(c.id)}`)} style={({ pressed }) => [s.tile, { backgroundColor: tint(c), transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
         <ClubBadge c={c} size={46} />
-        {c.kind === "custom" && <View style={s.kind}><Text style={s.kindText}>BY DRIVERS</Text></View>}
+        {c.kind === "custom" && <View style={s.kind}><Text style={s.kindText}>{(c.req_min_profile || c.req_personalities?.length || c.req_traits?.length || c.req_same_city) ? "🔐 RULES" : "BY DRIVERS"}</Text></View>}
       </View>
       <Text style={s.tileName} numberOfLines={2}>{c.kind === "brand" ? `${c.make} owners` : c.name}</Text>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>

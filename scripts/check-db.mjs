@@ -44,6 +44,7 @@ const TABLES = [
   ["checkins", "place_name,place_lat,place_lng", "zing_places.sql"],
   ["profiles", "personality", "personality.sql"],
   ["profiles", "traits", "traits.sql"],
+  ["clubs", "req_min_profile,req_personalities,req_traits,req_same_city", "club_rules.sql"],
   ["connections", "note", "bumble.sql"],
   ["zing_views", "checkin_id,viewer_id", "zings_plus.sql"],
   ["zing_reactions", "checkin_id,user_id,emoji", "zings_plus.sql"],
@@ -94,7 +95,7 @@ for (const [fn, args, file] of FUNCS) {
 
 if (networkErr) { console.log(`   ⚠️  Couldn't reach Supabase (${networkErr}). Check your internet.`); process.exit(0); }
 if (!missing.size) { console.log("   ✅ Database matches the app."); process.exit(0); }
-const order = ["schema.sql", "profile.sql", "clubs.sql", "issues.sql", "events.sql", "notifications.sql", "dms.sql", "speeds.sql", "clubs_plus.sql", "crew.sql", "gifs.sql", "zings_plus.sql", "bumble.sql", "zing_video.sql", "zing_places.sql", "personality.sql", "traits.sql"];
+const order = ["schema.sql", "profile.sql", "clubs.sql", "issues.sql", "events.sql", "notifications.sql", "dms.sql", "speeds.sql", "clubs_plus.sql", "crew.sql", "gifs.sql", "zings_plus.sql", "bumble.sql", "zing_video.sql", "zing_places.sql", "personality.sql", "traits.sql", "club_rules.sql"];
 const files = [...missing.keys()].sort((a, b) => order.indexOf(a) - order.indexOf(b));
 console.log("   ❌ Your database is missing parts the app needs:");
 for (const f of files) { console.log(`      • supabase/${f}`); missing.get(f).slice(0, 3).forEach((w) => console.log(`          ${w}`)); }
