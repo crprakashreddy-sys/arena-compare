@@ -122,7 +122,7 @@ export default function Trip() {
         </View>
 
         <Pressable onPress={() => go()} disabled={busy} style={[styles.cta, { backgroundColor: t.accent, opacity: busy ? 0.7 : 1 }]}>
-          {busy ? <ActivityIndicator color={t.onAccent} /> : <Text style={{ color: t.onAccent, fontWeight: "800", fontSize: 16 }}>Plan my charging stops</Text>}
+          {busy ? <ActivityIndicator color={t.onAccent} /> : <Text style={{ color: t.onAccent, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 16 }}>Plan my charging stops</Text>}
         </Pressable>
         {error && <Text style={{ color: t.bad }}>{error}</Text>}
       </View>
@@ -139,7 +139,7 @@ export default function Trip() {
                 onCalloutPress={() => router.push(`/charger/${encodeURIComponent(s.charger.id)}`)}
                 title={`Stop ${i + 1}: ${s.charger.name}`} description={`${s.arrivePct}% → ${s.leavePct}% · ${fmtMinutes(s.chargeMin)}`}>
                 <View style={[styles.stopPin, { backgroundColor: networkById(s.charger.network).color }]}>
-                  <Text style={{ color: "#fff", fontWeight: "900" }}>{i + 1}</Text>
+                  <Text style={{ color: "#fff", fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold" }}>{i + 1}</Text>
                 </View>
               </Marker>
             ))}
@@ -153,7 +153,7 @@ export default function Trip() {
                 [`${plan.stops.length}`, plan.stops.length === 1 ? "Stop" : "Stops"],
               ].map(([a, b]) => (
                 <View key={b} style={[styles.stat, { backgroundColor: t.surface }]}>
-                  <Text style={{ color: t.text, fontWeight: "800", fontSize: 18, fontVariant: ["tabular-nums"] }}>{a}</Text>
+                  <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 18, fontVariant: ["tabular-nums"] }}>{a}</Text>
                   <Text style={{ color: t.muted, fontSize: 12 }}>{b}</Text>
                 </View>
               ))}
@@ -172,7 +172,7 @@ export default function Trip() {
             {plan.ok && <Leg icon="location" color={t.bad} title={to?.label ?? "Destination"} sub={`Arrive with about ${Math.max(0, plan.arrivePct)}%`} />}
 
             <Pressable onPress={() => from && to && Linking.openURL(mapsUrl(from, to, plan.stops))} style={[styles.cta, { backgroundColor: t.accent }]}>
-              <Text style={{ color: t.onAccent, fontWeight: "800", fontSize: 16 }}>Start in Google Maps</Text>
+              <Text style={{ color: t.onAccent, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 16 }}>Start in Google Maps</Text>
             </Pressable>
             <Text style={{ color: t.muted, fontSize: 12.5, lineHeight: 18 }}>
               Estimates assume highway driving and keep at least 15% in reserve. Check each stop's latest zings before you go; broken chargers are skipped automatically.
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   hit: { padding: 12, gap: 2 },
   step: { width: 44, height: 44, borderRadius: 12, alignItems: "center", justifyContent: "center" },
   track: { flex: 1, height: 44, borderRadius: 12, overflow: "hidden", justifyContent: "center", padding: 3 },
-  pct: { position: "absolute", alignSelf: "center", color: "#fff", fontWeight: "800", textShadowColor: "rgba(0,0,0,0.5)", textShadowRadius: 4 },
+  pct: { position: "absolute", alignSelf: "center", color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", textShadowColor: "rgba(0,0,0,0.5)", textShadowRadius: 4 },
   cta: { height: 52, borderRadius: 14, alignItems: "center", justifyContent: "center" },
   stat: { flex: 1, padding: 12, borderRadius: 12 },
   stopPin: { width: 30, height: 30, borderRadius: 15, borderWidth: 3, borderColor: "#fff", alignItems: "center", justifyContent: "center" },

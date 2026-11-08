@@ -28,7 +28,7 @@ export default function ChargingLog() {
           [totals.perKWh ? `₹${totals.perKWh.toFixed(1)}` : "—", "Avg per kWh"],
         ].map(([a, b]) => (
           <View key={b} style={[styles.stat, { backgroundColor: t.surface }]}>
-            <Text style={{ color: t.text, fontWeight: "800", fontSize: 18, fontVariant: ["tabular-nums"] }}>{a}</Text>
+            <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 18, fontVariant: ["tabular-nums"] }}>{a}</Text>
             <Text style={{ color: t.muted, fontSize: 12 }}>{b}</Text>
           </View>
         ))}
@@ -95,7 +95,7 @@ function ActiveCard({ s }: { s: Session }) {
         <View style={styles.pulse} />
         <Text style={{ color: "#A3ADB6", fontSize: 13, fontWeight: "600" }}>CHARGING NOW</Text>
       </View>
-      <Text style={{ color: "#fff", fontSize: 40, fontWeight: "900", fontVariant: ["tabular-nums"] }}>
+      <Text style={{ color: "#fff", fontSize: 40, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontVariant: ["tabular-nums"] }}>
         {hh > 0 ? `${hh}:` : ""}{String(mm).padStart(2, "0")}:{String(ss).padStart(2, "0")}
       </Text>
       <Text style={{ color: "#D8DDE2" }} numberOfLines={1}>{s.chargerName}</Text>
@@ -106,7 +106,7 @@ function ActiveCard({ s }: { s: Session }) {
         <Small value={endPct} onChange={setEndPct} placeholder="Battery %" />
       </View>
       <Pressable onPress={stop} style={[styles.stop, { backgroundColor: "#FCE38A" }]}>
-        <Text style={{ color: "#1A1A1A", fontWeight: "800" }}>Stop and save</Text>
+        <Text style={{ color: "#1A1A1A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Stop and save</Text>
       </Pressable>
     </View>
   );
@@ -138,7 +138,7 @@ function ManualEntry({ onDone }: { onDone: () => void }) {
         <TextInput value={mins} onChangeText={setMins} placeholder="Minutes" keyboardType="number-pad" placeholderTextColor={t.faint} style={[input, { flex: 1 }]} />
       </View>
       <View style={{ flexDirection: "row", gap: 8 }}>
-        <Pressable onPress={save} style={[styles.stop, { flex: 1, backgroundColor: t.accent }]}><Text style={{ color: t.onAccent, fontWeight: "800" }}>Save</Text></Pressable>
+        <Pressable onPress={save} style={[styles.stop, { flex: 1, backgroundColor: t.accent }]}><Text style={{ color: t.onAccent, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Save</Text></Pressable>
         <Pressable onPress={onDone} style={[styles.stop, { flex: 1, backgroundColor: t.surface }]}><Text style={{ color: t.text, fontWeight: "700" }}>Cancel</Text></Pressable>
       </View>
     </View>

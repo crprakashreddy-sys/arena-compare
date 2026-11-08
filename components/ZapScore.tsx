@@ -15,7 +15,7 @@ export function ScoreChip({ points, distanceM, dark = true }: { points?: number;
     <View style={[styles.chip, { backgroundColor: dark ? "rgba(0,0,0,0.55)" : "rgba(0,0,0,0.06)" }]}
       accessibilityLabel={`Zing score ${points}${distanceM != null ? `, taken ${formatMetres(distanceM)} from the charger` : ""}`}>
       <Ionicons name="flash" size={12} color={tone} />
-      <Text style={{ color: dark ? "#fff" : "#111", fontWeight: "800", fontSize: 12.5, fontVariant: ["tabular-nums"] }}>{points}</Text>
+      <Text style={{ color: dark ? "#fff" : "#111", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12.5, fontVariant: ["tabular-nums"] }}>{points}</Text>
       {distanceM != null && <Text style={{ color: dark ? "rgba(255,255,255,0.75)" : "#555", fontSize: 11.5 }}>· {formatMetres(distanceM)}</Text>}
     </View>
   );
@@ -93,7 +93,7 @@ export function ScoreCard({ total, parts, onClose }: { total: number; parts: Sco
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
         <View style={[styles.bolt, { backgroundColor: tone }]}><Ionicons name="flash" size={20} color="#1A1A1A" /></View>
         <View style={{ flex: 1 }}>
-          <Text style={{ color: "#fff", fontWeight: "800", fontSize: 26, fontVariant: ["tabular-nums"] }}>+{shown}</Text>
+          <Text style={{ color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 26, fontVariant: ["tabular-nums"] }}>+{shown}</Text>
           <Text style={{ color: "#A3ADB6", fontSize: 12.5 }}>Zing Score · disappears from the map in 24 hours</Text>
         </View>
         {onClose && (
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   meter: { flexDirection: "row", gap: 12, alignItems: "center", marginHorizontal: 16, padding: 14, borderRadius: 14, backgroundColor: "#151A1F" },
   meterTitle: { color: "#fff", fontWeight: "700", fontSize: 14.5 },
   meterSub: { color: "#A3ADB6", fontSize: 12.5, lineHeight: 17 },
-  big: { fontSize: 28, fontWeight: "900", fontVariant: ["tabular-nums"] },
+  big: { fontSize: 28, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontVariant: ["tabular-nums"] },
   track: { height: 8, borderRadius: 4, backgroundColor: "#262D34", overflow: "hidden" },
   bar: { height: 8, borderRadius: 4 },
   tick: { position: "absolute", top: 0, bottom: 0, width: 2, backgroundColor: "#07090B" },

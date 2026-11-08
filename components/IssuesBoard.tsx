@@ -57,14 +57,14 @@ export function IssuesBoard({ clubId }: { clubId: string }) {
         ListEmptyComponent={busy ? <ActivityIndicator style={{ marginTop: 30 }} color={t.muted} /> : (
           <View style={{ alignItems: "center", padding: 30, gap: 8 }}>
             <Text style={{ fontSize: 40 }}>🔧</Text>
-            <Text style={{ color: t.text, fontWeight: "800", fontSize: 17 }}>{q || tag || filter !== "all" ? "Nothing matches" : "No issues yet"}</Text>
+            <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 17 }}>{q || tag || filter !== "all" ? "Nothing matches" : "No issues yet"}</Text>
             <Text style={{ color: t.muted, textAlign: "center" }}>Got a problem with your EV? Ask the owners who've been there.</Text>
           </View>
         )}
         renderItem={({ item: p }) => (
           <Pressable onPress={() => router.push(`/issue/${p.id}`)} style={({ pressed }) => [s.card, { backgroundColor: t.surface, opacity: pressed ? 0.85 : 1 }]}>
             <View style={{ flexDirection: "row", gap: 8, alignItems: "flex-start" }}>
-              <Text style={{ color: t.text, fontWeight: "800", fontSize: 16, flex: 1, lineHeight: 21 }} numberOfLines={2}>{p.title}</Text>
+              <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 16, flex: 1, lineHeight: 21 }} numberOfLines={2}>{p.title}</Text>
               {p.solved && <View style={s.solved}><Ionicons name="checkmark" size={13} color={INK} /><Text style={s.solvedText}>Solved</Text></View>}
             </View>
             {!!p.body && <Text style={{ color: t.muted, marginTop: 4, lineHeight: 19 }} numberOfLines={2}>{p.body}</Text>}
@@ -85,7 +85,7 @@ export function IssuesBoard({ clubId }: { clubId: string }) {
       />
       <Pressable onPress={() => router.push({ pathname: "/issue-new", params: { clubId } })} style={s.fab}>
         <Ionicons name="add" size={20} color={LEMON} />
-        <Text style={{ color: LEMON, fontWeight: "800", fontSize: 15 }}>Ask the club</Text>
+        <Text style={{ color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 15 }}>Ask the club</Text>
       </Pressable>
     </View>
   );
@@ -113,7 +113,7 @@ const s = StyleSheet.create({
   chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 999 },
   card: { padding: 14, borderRadius: 18 },
   solved: { flexDirection: "row", alignItems: "center", gap: 3, backgroundColor: LEMON, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999 },
-  solvedText: { color: INK, fontWeight: "800", fontSize: 12 },
+  solvedText: { color: INK, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12 },
   tag: { fontSize: 12, fontWeight: "700", paddingHorizontal: 9, paddingVertical: 4, borderRadius: 999, overflow: "hidden" },
   fab: { position: "absolute", right: 16, bottom: 24, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: INK,
     paddingHorizontal: 18, height: 50, borderRadius: 999, shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 6 },

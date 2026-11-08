@@ -40,7 +40,7 @@ export default function Leaderboard() {
         ListHeaderComponent={
           <View style={{ gap: 14, marginBottom: 8 }}>
             <View>
-              <Text style={{ color: "#fff", fontSize: 32, fontWeight: "900" }}>This week</Text>
+              <Text style={{ color: "#fff", fontSize: 32, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold" }}>This week</Text>
               <Text style={{ color: "#A9B3BC" }}>Resets every Monday · {city ? city : "All of India"}</Text>
             </View>
             <ModeSwitch dark />
@@ -72,7 +72,7 @@ export default function Leaderboard() {
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
               <Ionicons name="flash" size={14} color="#FCE38A" />
-              <Text style={{ color: "#fff", fontWeight: "900", fontSize: 17, fontVariant: ["tabular-nums"] }}>{r.week_score}</Text>
+              <Text style={{ color: "#fff", fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 17, fontVariant: ["tabular-nums"] }}>{r.week_score}</Text>
             </View>
           </Pressable>
         )}
@@ -81,7 +81,7 @@ export default function Leaderboard() {
         )}
         ListFooterComponent={
           <View style={styles.rules}>
-            <Text style={{ color: "#fff", fontWeight: "800", fontSize: 16 }}>How Zing Score works</Text>
+            <Text style={{ color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 16 }}>How Zing Score works</Text>
             {TIERS.map((t) => (
               <Rule key={t.label} left={`${t.label} (within ${t.maxM} m)`} right={`+${t.points}`} />
             ))}
@@ -103,7 +103,7 @@ function Rule({ left, right }: { left: string; right: string }) {
   return (
     <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
       <Text style={{ color: "#D8DDE2", flex: 1 }}>{left}</Text>
-      <Text style={{ color: "#FCE38A", fontWeight: "800", fontVariant: ["tabular-nums"] }}>{right}</Text>
+      <Text style={{ color: "#FCE38A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontVariant: ["tabular-nums"] }}>{right}</Text>
     </View>
   );
 }
@@ -111,7 +111,7 @@ function Rule({ left, right }: { left: string; right: string }) {
 const styles = StyleSheet.create({
   tab: { height: 36, paddingHorizontal: 14, borderRadius: 18, borderWidth: 1, borderColor: "#2A3540", justifyContent: "center" },
   row: { flexDirection: "row", alignItems: "center", gap: 12, padding: 12, borderRadius: 14, backgroundColor: "#151E26", borderWidth: 1, borderColor: "transparent" },
-  rank: { width: 26, fontSize: 20, fontWeight: "900", textAlign: "center", fontVariant: ["tabular-nums"] },
+  rank: { width: 26, fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", textAlign: "center", fontVariant: ["tabular-nums"] },
   rules: { marginTop: 18, gap: 10, padding: 16, borderRadius: 14, backgroundColor: "#151E26" },
   small: { color: "#A9B3BC", fontSize: 12.5, lineHeight: 18, marginTop: 4 },
 });

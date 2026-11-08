@@ -157,7 +157,7 @@ export default function AddCharger() {
 function Field({ label, children, t }: { label: string; children: React.ReactNode; t: ReturnType<typeof useTheme> }) {
   return (
     <View style={{ gap: 8 }}>
-      <Text style={{ color: t.text, fontWeight: "800", fontSize: 14 }}>{label}</Text>
+      <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 14 }}>{label}</Text>
       {children}
     </View>
   );
@@ -187,5 +187,5 @@ const s = StyleSheet.create({
   pill: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, paddingVertical: 9, borderRadius: 999 },
   footer: { position: "absolute", left: 0, right: 0, bottom: 0, padding: 16, paddingBottom: 30, borderTopWidth: StyleSheet.hairlineWidth },
   save: { backgroundColor: INK, height: 54, borderRadius: 999, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
-  saveText: { color: LEMON, fontSize: 17, fontWeight: "800" },
+  saveText: { color: LEMON, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
 });

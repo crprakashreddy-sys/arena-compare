@@ -34,7 +34,7 @@ const MAX_MS = 4500;
  * Opening screen: picks up exactly where the native lemon splash leaves off, then the zing
  * mark pulses while photo cards burst out around it. Fades away once the app is ready.
  */
-export function IntroLoader({ ready }: { ready: boolean }) {
+export function IntroLoader({ ready, fontsReady }: { ready: boolean; fontsReady?: boolean }) {
   const { width, height } = useWindowDimensions();
   const [cards, setCards] = useState<{ src: any; name: string }[]>(STARTERS);
   const [gone, setGone] = useState(false);
@@ -130,7 +130,7 @@ export function IntroLoader({ ready }: { ready: boolean }) {
       </Animated.View>
 
       <View style={s.words}>
-        <Text style={s.brand}>zingd</Text>
+        <Text style={[s.brand, fontsReady && { fontFamily: "SpaceGrotesk_700Bold" }]}>zingd</Text>
         <Text style={s.tag}>been there. zingd it.</Text>
       </View>
     </Animated.View>

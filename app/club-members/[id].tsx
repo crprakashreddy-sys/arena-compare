@@ -55,7 +55,7 @@ export default function ClubMembers() {
         ListHeaderComponent={club ? (
           <View style={{ alignItems: "center", gap: 8, paddingBottom: 16 }}>
             <ClubBadge c={club} size={72} />
-            <Text style={{ color: t.text, fontSize: 20, fontWeight: "900", textAlign: "center" }}>{club.name}</Text>
+            <Text style={{ color: t.text, fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", textAlign: "center" }}>{club.name}</Text>
             {!!club.description && <Text style={{ color: t.muted, textAlign: "center", lineHeight: 20 }}>{club.description}</Text>}
             <Text style={{ color: t.muted, fontSize: 13 }}>
               {[club.city, `${club.members} members`, club.is_private ? "Invite only" : null].filter(Boolean).join(" · ")}
@@ -63,12 +63,12 @@ export default function ClubMembers() {
             <View style={{ flexDirection: "row", gap: 8, marginTop: 6 }}>
               {admin && club.kind === "custom" && (
                 <Pressable onPress={() => router.push({ pathname: "/club-edit", params: { id: club.id } })} style={[s.btn, { backgroundColor: t.surface }]}>
-                  <Ionicons name="create-outline" size={16} color={t.text} /><Text style={{ color: t.text, fontWeight: "800" }}>Edit club</Text>
+                  <Ionicons name="create-outline" size={16} color={t.text} /><Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Edit club</Text>
                 </Pressable>
               )}
               {!!club.invite_code && (
                 <Pressable onPress={invite} style={[s.btn, { backgroundColor: INK }]}>
-                  <Ionicons name="share-outline" size={16} color={LEMON} /><Text style={{ color: LEMON, fontWeight: "800" }}>Invite · {club.invite_code}</Text>
+                  <Ionicons name="share-outline" size={16} color={LEMON} /><Text style={{ color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Invite · {club.invite_code}</Text>
                 </Pressable>
               )}
             </View>
@@ -93,5 +93,5 @@ const s = StyleSheet.create({
   btn: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 999 },
   row: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10, borderTopWidth: StyleSheet.hairlineWidth },
   admin: { backgroundColor: LEMON, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
-  adminText: { color: INK, fontWeight: "800", fontSize: 12 },
+  adminText: { color: INK, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12 },
 });

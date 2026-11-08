@@ -46,7 +46,7 @@ export default function VehicleFit({ charger }: { charger: Charger }) {
             [fmtMinutes(chargeMinutes(charger, v, 0.1, 1)), "10 → 100%"],
           ].map(([a, b]) => (
             <View key={b} style={{ flex: 1, padding: 10, borderRadius: 10, backgroundColor: t.bg }}>
-              <Text style={{ color: t.text, fontWeight: "800", fontSize: 16, fontVariant: ["tabular-nums"] }}>{a}</Text>
+              <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 16, fontVariant: ["tabular-nums"] }}>{a}</Text>
               <Text style={{ color: t.muted, fontSize: 11.5 }}>{b}</Text>
             </View>
           ))}

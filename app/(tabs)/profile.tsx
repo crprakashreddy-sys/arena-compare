@@ -43,7 +43,7 @@ export default function You() {
     return (
       <View style={{ flex: 1, padding: 24, paddingTop: insets.top + 40, gap: 14 }}>
         <Ionicons name="flash" size={40} color={t.accent} />
-        <Text style={{ color: t.text, fontSize: 26, fontWeight: "800" }}>Join the EV crew</Text>
+        <Text style={{ color: t.text, fontSize: 26, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Join the EV crew</Text>
         <Text style={{ color: t.muted, fontSize: 15, lineHeight: 21 }}>
           Sign in to drop zings, review chargers, mark facilities and connect with other drivers. The map works without an account.
         </Text>
@@ -113,8 +113,8 @@ export default function You() {
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
           <Text style={{ fontSize: 34 }}>{prog.cur.emoji}</Text>
           <View style={{ flex: 1 }}>
-            <Text style={{ color: t.muted, fontSize: 12, fontWeight: "800", letterSpacing: 0.5 }}>ZING SCORE</Text>
-            <Text style={{ color: t.text, fontSize: 28, fontWeight: "900", letterSpacing: -0.5 }}>{points.toLocaleString("en-IN")}</Text>
+            <Text style={{ color: t.muted, fontSize: 12, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: 0.5 }}>ZING SCORE</Text>
+            <Text style={{ color: t.text, fontSize: 28, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.5 }}>{points.toLocaleString("en-IN")}</Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color={t.faint} />
         </View>
@@ -129,10 +129,10 @@ export default function You() {
       {/* My ride */}
       <Pressable onPress={() => router.push("/garage")} style={styles.ride}>
         <View style={{ flex: 1 }}>
-          <Text style={{ color: "#FCE38A", fontSize: 12, fontWeight: "800", letterSpacing: 0.5 }}>MY RIDE</Text>
+          <Text style={{ color: "#FCE38A", fontSize: 12, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: 0.5 }}>MY RIDE</Text>
           {active ? (
             <>
-              <Text style={{ color: "#fff", fontSize: 20, fontWeight: "900", marginTop: 2 }} numberOfLines={1}>{vehicleName(active)}</Text>
+              <Text style={{ color: "#fff", fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", marginTop: 2 }} numberOfLines={1}>{vehicleName(active)}</Text>
               <Text style={{ color: "#B9B9B9", fontSize: 13, marginTop: 2 }}>
                 {active.batteryKWh} kWh · ~{active.rangeKm} km range{active.maxDcKW ? ` · ${active.maxDcKW} kW DC` : ""}
               </Text>
@@ -142,7 +142,7 @@ export default function You() {
               </View>
             </>
           ) : (
-            <Text style={{ color: "#fff", fontSize: 18, fontWeight: "800", marginTop: 4 }}>Add your EV →</Text>
+            <Text style={{ color: "#fff", fontSize: 18, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", marginTop: 4 }}>Add your EV →</Text>
           )}
         </View>
         <Ionicons name={active?.kind === "car" || !active ? "car-sport" : "bicycle"} size={46} color="#FCE38A" />
@@ -157,7 +157,7 @@ export default function You() {
               <Pressable key={c.id} onPress={() => router.push(`/club/${encodeURIComponent(c.id)}`)} style={[styles.clubChip, { backgroundColor: t.surface }]}>
                 <ClubBadge c={c} size={34} />
                 <Text style={{ color: t.text, fontWeight: "700", maxWidth: 150 }} numberOfLines={1}>{c.name}</Text>
-                {c.unread > 0 && <View style={styles.unread}><Text style={{ color: "#FCE38A", fontSize: 11, fontWeight: "800" }}>{c.unread}</Text></View>}
+                {c.unread > 0 && <View style={styles.unread}><Text style={{ color: "#FCE38A", fontSize: 11, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{c.unread}</Text></View>}
               </Pressable>
             ))}
           </ScrollView>
@@ -222,11 +222,11 @@ const styles = StyleSheet.create({
   hero: { backgroundColor: "#FCE38A", alignItems: "center", paddingHorizontal: 20, paddingBottom: 20, gap: 4, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   avatarRing: { padding: 4, borderRadius: 60, backgroundColor: "#1A1A1A" },
   cam: { position: "absolute", right: 0, bottom: 2, width: 32, height: 32, borderRadius: 16, backgroundColor: "#1A1A1A", borderWidth: 3, borderColor: "#FCE38A", alignItems: "center", justifyContent: "center" },
-  name: { color: "#1A1A1A", fontSize: 26, fontWeight: "900", letterSpacing: -0.5, marginTop: 8 },
+  name: { color: "#1A1A1A", fontSize: 26, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.5, marginTop: 8 },
   sub: { color: "#1A1A1A", opacity: 0.7, fontWeight: "700" },
   bio: { color: "#1A1A1A", textAlign: "center", lineHeight: 20, marginTop: 6, maxWidth: 320 },
   statRow: { flexDirection: "row", alignSelf: "stretch", marginTop: 14, backgroundColor: "rgba(255,255,255,0.55)", borderRadius: 18, paddingVertical: 12 },
-  statNum: { color: "#1A1A1A", fontSize: 20, fontWeight: "900" },
+  statNum: { color: "#1A1A1A", fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold" },
   statLbl: { color: "#1A1A1A", opacity: 0.6, fontSize: 12, fontWeight: "700" },
   scoreCard: { margin: 16, marginBottom: 0, padding: 16, borderRadius: 20, gap: 10 },
   bar: { height: 10, borderRadius: 5, overflow: "hidden" },
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
   ride: { flexDirection: "row", alignItems: "center", gap: 12, marginHorizontal: 16, marginTop: 12, padding: 16, borderRadius: 20, backgroundColor: "#1A1A1A" },
   battery: { height: 22, borderRadius: 11, backgroundColor: "#333", marginTop: 10, overflow: "hidden", justifyContent: "center" },
   batteryFill: { position: "absolute", left: 0, top: 0, bottom: 0, backgroundColor: "#FCE38A", borderRadius: 11 },
-  batteryText: { color: "#1A1A1A", fontSize: 11.5, fontWeight: "800", paddingHorizontal: 10 },
+  batteryText: { color: "#1A1A1A", fontSize: 11.5, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", paddingHorizontal: 10 },
   clubChip: { flexDirection: "row", alignItems: "center", gap: 8, paddingLeft: 6, paddingRight: 12, paddingVertical: 6, borderRadius: 999 },
   unread: { minWidth: 20, height: 20, borderRadius: 10, backgroundColor: "#1A1A1A", alignItems: "center", justifyContent: "center", paddingHorizontal: 5 },
   stat: { flex: 1, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 4, alignItems: "center" },

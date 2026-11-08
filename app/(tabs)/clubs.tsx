@@ -135,12 +135,12 @@ export default function Clubs() {
                   <Pressable key={c.id} onPress={() => router.push(`/club/${encodeURIComponent(c.id)}`)} style={[s.community, { backgroundColor: t.surface }]}>
                     <ClubBadge c={c} size={48} />
                     <View style={{ flex: 1, minWidth: 0 }}>
-                      <Text style={{ color: t.text, fontWeight: "800", fontSize: 15.5 }} numberOfLines={1}>{c.name}</Text>
+                      <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 15.5 }} numberOfLines={1}>{c.name}</Text>
                       {!!c.description && <Text style={{ color: t.muted, fontSize: 13 }} numberOfLines={2}>{c.description}</Text>}
                       <Text style={{ color: t.faint, fontSize: 12, marginTop: 2 }}>{[c.city, `${c.members} members`].filter(Boolean).join(" · ")}</Text>
                     </View>
                     <Pressable onPress={() => join(c)} style={[s.join, { backgroundColor: t.bg }]}>
-                      <Text style={{ color: t.text, fontWeight: "800" }}>Join</Text>
+                      <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Join</Text>
                     </Pressable>
                   </Pressable>
                 ))}
@@ -162,7 +162,7 @@ export default function Clubs() {
                   <Text style={{ color: t.muted, fontSize: 12.5 }}>{c.members} {c.members === 1 ? "member" : "members"}</Text>
                 </View>
                 <Pressable onPress={() => join(c)} style={[s.join, { backgroundColor: t.surface }]}>
-                  <Text style={{ color: t.text, fontWeight: "800" }}>Join</Text>
+                  <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Join</Text>
                 </Pressable>
               </View>
             ))}
@@ -184,7 +184,7 @@ function MyClubRow({ c }: { c: MyClub }) {
       <ClubBadge c={c} size={50} />
       <View style={{ flex: 1, minWidth: 0 }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 8 }}>
-          <Text style={{ color: t.text, fontWeight: "800", fontSize: 16, flexShrink: 1 }} numberOfLines={1}>{c.name}</Text>
+          <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 16, flexShrink: 1 }} numberOfLines={1}>{c.name}</Text>
           {last && <Text style={{ color: c.unread ? t.text : t.faint, fontSize: 12 }}>{timeAgo(last.created_at)}</Text>}
         </View>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: 3 }}>
@@ -211,26 +211,26 @@ function BrandCard({ c, onJoin }: { c: Club; onJoin: () => void }) {
 }
 
 const s = StyleSheet.create({
-  h1: { fontSize: 32, fontWeight: "900", letterSpacing: -1 },
-  h3: { fontSize: 12, fontWeight: "800", letterSpacing: 0.6, paddingHorizontal: 16, marginTop: 16, marginBottom: 8 },
+  h1: { fontSize: 32, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -1 },
+  h3: { fontSize: 12, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: 0.6, paddingHorizontal: 16, marginTop: 16, marginBottom: 8 },
   newBtn: { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: INK, paddingHorizontal: 14, height: 38, borderRadius: 999, marginTop: 6 },
-  newBtnText: { color: LEMON, fontWeight: "800" },
+  newBtnText: { color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
   community: { flexDirection: "row", alignItems: "center", gap: 12, padding: 12, borderRadius: 18 },
-  h2: { fontSize: 18, fontWeight: "800", marginTop: 24, marginBottom: 10, paddingHorizontal: 16 },
+  h2: { fontSize: 18, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", marginTop: 24, marginBottom: 10, paddingHorizontal: 16 },
   hero: { marginHorizontal: 16, padding: 18, borderRadius: 20, backgroundColor: LEMON, gap: 6 },
-  heroTitle: { fontSize: 20, fontWeight: "900", color: INK, marginTop: 4 },
+  heroTitle: { fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", color: INK, marginTop: 4 },
   heroBody: { fontSize: 14.5, color: INK, opacity: 0.75, lineHeight: 20 },
   heroBtn: { alignSelf: "flex-start", backgroundColor: INK, paddingHorizontal: 18, height: 44, borderRadius: 999, justifyContent: "center", marginTop: 8 },
-  heroBtnText: { color: LEMON, fontWeight: "800" },
+  heroBtnText: { color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
   mine: { flexDirection: "row", alignItems: "center", gap: 12, padding: 12, borderRadius: 18 },
   unread: { minWidth: 22, height: 22, borderRadius: 11, backgroundColor: INK, alignItems: "center", justifyContent: "center", paddingHorizontal: 6 },
-  unreadText: { color: LEMON, fontSize: 12, fontWeight: "800" },
+  unreadText: { color: LEMON, fontSize: 12, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
   search: { flexDirection: "row", alignItems: "center", gap: 8, height: 44, borderRadius: 12, paddingHorizontal: 12 },
   brand: { width: 120, padding: 12, borderRadius: 18, backgroundColor: LEMON, alignItems: "center", gap: 4 },
-  brandName: { fontWeight: "900", color: INK, fontSize: 15, marginTop: 4 },
+  brandName: { fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", color: INK, fontSize: 15, marginTop: 4 },
   brandMeta: { color: INK, opacity: 0.6, fontSize: 12 },
   brandJoin: { marginTop: 6, backgroundColor: INK, paddingHorizontal: 18, paddingVertical: 7, borderRadius: 999 },
-  brandJoinText: { color: LEMON, fontWeight: "800", fontSize: 13 },
+  brandJoinText: { color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 13 },
   row: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth },
   join: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 999 },
 });

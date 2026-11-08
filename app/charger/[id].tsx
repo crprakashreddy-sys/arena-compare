@@ -107,13 +107,13 @@ export default function ChargerPage() {
         <View style={{ padding: 16, gap: 12 }}>
           <View style={{ flexDirection: "row", gap: 12 }}>
             <View style={{ flex: 1, gap: 3 }}>
-              <Text style={{ color: t.text, fontSize: 22, fontWeight: "800" }}>{c.name}</Text>
+              <Text style={{ color: t.text, fontSize: 22, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{c.name}</Text>
               <Text style={{ color: t.muted }}>{[n.name, speedLabel(c), c.address].filter(Boolean).join(" · ")}</Text>
               {!!c.connectors?.length && <Text style={{ color: t.muted, fontSize: 13 }}>{c.connectors.join(", ")}</Text>}
               {c.id.startsWith("c-") && (
                 <View style={{ flexDirection: "row", alignSelf: "flex-start", alignItems: "center", gap: 5, backgroundColor: "#FCE38A", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, marginTop: 4 }}>
                   <Ionicons name="people" size={13} color="#1A1A1A" />
-                  <Text style={{ color: "#1A1A1A", fontSize: 12, fontWeight: "800" }}>Added by drivers · zing it to confirm</Text>
+                  <Text style={{ color: "#1A1A1A", fontSize: 12, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Added by drivers · zing it to confirm</Text>
                 </View>
               )}
               {n.oem && (
@@ -126,7 +126,7 @@ export default function ChargerPage() {
               )}
             </View>
             <View style={{ alignItems: "flex-end" }}>
-              <Text style={{ color: t.text, fontSize: 20, fontWeight: "800" }}>{rating.count ? rating.avg.toFixed(1) : "–"}</Text>
+              <Text style={{ color: t.text, fontSize: 20, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{rating.count ? rating.avg.toFixed(1) : "–"}</Text>
               <Stars value={rating.avg} size={12} />
               <Text style={{ color: t.muted, fontSize: 12 }}>{rating.count} review{rating.count === 1 ? "" : "s"}</Text>
             </View>
@@ -156,7 +156,7 @@ export default function ChargerPage() {
           <View style={{ flexDirection: "row", gap: 8 }}>
             <Pressable onPress={() => router.push(`/zap/${encodeURIComponent(c.id)}`)} style={[styles.action, { backgroundColor: "#1A1A1A" }]}>
               <Ionicons name="camera" size={18} color="#FCE38A" />
-              <Text style={{ color: "#FCE38A", fontWeight: "800" }}>Drop a zing</Text>
+              <Text style={{ color: "#FCE38A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Drop a zing</Text>
             </Pressable>
             <Button title="Directions" icon="navigate" kind="primary" onPress={directions} style={{ flex: 1 }} />
           </View>
@@ -369,7 +369,7 @@ function Hero({ charger, live, zings, onOpen, scheme }: {
         </View>
         <View style={heroS.count}>
           <Ionicons name="images" size={14} color="#1A1A1A" />
-          <Text style={{ color: "#1A1A1A", fontWeight: "800", fontSize: 13 }}>{zings.length} {zings.length === 1 ? "zing" : "zings"}</Text>
+          <Text style={{ color: "#1A1A1A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 13 }}>{zings.length} {zings.length === 1 ? "zing" : "zings"}</Text>
         </View>
       </View>
     </Pressable>
@@ -380,11 +380,11 @@ const heroS = StyleSheet.create({
   topRow: { position: "absolute", top: 12, left: 12, right: 12, flexDirection: "row" },
   badge: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#fff" },
-  badgeText: { color: "#fff", fontWeight: "800", fontSize: 13 },
+  badgeText: { color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 13 },
   shadeTop: { position: "absolute", top: 0, left: 0, right: 0, height: 70, backgroundColor: "rgba(0,0,0,0.18)" },
   shadeBottom: { position: "absolute", bottom: 0, left: 0, right: 0, height: 96, backgroundColor: "rgba(0,0,0,0.5)" },
   bottomRow: { position: "absolute", left: 14, right: 14, bottom: 14, flexDirection: "row", alignItems: "center", gap: 10 },
-  by: { color: "#fff", fontWeight: "800", fontSize: 15 },
+  by: { color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 15 },
   when: { color: "rgba(255,255,255,0.8)", fontSize: 12.5, marginTop: 1 },
   count: { flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "#FCE38A", paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999 },
   nudge: { position: "absolute", left: 12, right: 12, bottom: 12, backgroundColor: "rgba(26,26,26,0.85)", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12 },

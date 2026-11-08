@@ -61,7 +61,7 @@ export default function ClubEdit() {
       <ScrollView contentContainerStyle={{ padding: 16, gap: 18, paddingBottom: 120 }} keyboardShouldPersistTaps="handled">
         <View style={{ alignItems: "center", gap: 10, paddingVertical: 6 }}>
           <ClubBadge c={{ kind: "custom", make: "", emoji: d.emoji, color: d.color }} size={88} />
-          <Text style={{ color: t.text, fontWeight: "900", fontSize: 20, textAlign: "center" }} numberOfLines={2}>{d.name || "Your club"}</Text>
+          <Text style={{ color: t.text, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 20, textAlign: "center" }} numberOfLines={2}>{d.name || "Your club"}</Text>
         </View>
 
         <Field label="Club name" t={t}>
@@ -100,7 +100,7 @@ export default function ClubEdit() {
 
         <View style={[s.toggle, { backgroundColor: t.surface }]}>
           <View style={{ flex: 1 }}>
-            <Text style={{ color: t.text, fontWeight: "800" }}>Invite only</Text>
+            <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Invite only</Text>
             <Text style={{ color: t.muted, fontSize: 13, marginTop: 2 }}>Hidden from Discover. People join with your invite code.</Text>
           </View>
           <Switch value={d.is_private} onValueChange={(is_private) => set({ is_private })} />
@@ -123,7 +123,7 @@ export default function ClubEdit() {
 }
 
 function Field({ label, children, t }: { label: string; children: React.ReactNode; t: ReturnType<typeof useTheme> }) {
-  return <View style={{ gap: 8 }}><Text style={{ color: t.text, fontWeight: "800", fontSize: 14 }}>{label}</Text>{children}</View>;
+  return <View style={{ gap: 8 }}><Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 14 }}>{label}</Text>{children}</View>;
 }
 
 const s = StyleSheet.create({
@@ -134,5 +134,5 @@ const s = StyleSheet.create({
   toggle: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14, borderRadius: 14 },
   footer: { position: "absolute", left: 0, right: 0, bottom: 0, padding: 16, paddingBottom: 30, borderTopWidth: StyleSheet.hairlineWidth },
   save: { backgroundColor: INK, height: 54, borderRadius: 999, alignItems: "center", justifyContent: "center" },
-  saveText: { color: LEMON, fontSize: 17, fontWeight: "800" },
+  saveText: { color: LEMON, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
 });

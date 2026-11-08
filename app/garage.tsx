@@ -49,7 +49,7 @@ export default function Garage() {
         </Pressable>
       ) : (
         <View style={{ gap: 10 }}>
-          <Text style={{ color: t.text, fontSize: 20, fontWeight: "800" }}>{vehicles.length ? "Add a vehicle" : "What do you drive?"}</Text>
+          <Text style={{ color: t.text, fontSize: 20, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{vehicles.length ? "Add a vehicle" : "What do you drive?"}</Text>
           <Text style={{ color: t.muted }}>We'll show chargers that fit it and how long each one takes.</Text>
           <View style={{ flexDirection: "row", gap: 8 }}>
             {(["car", "two"] as const).map((k) => (
@@ -90,7 +90,7 @@ export default function Garage() {
       </Text>
       {vehicles.length > 0 && (
         <Pressable onPress={() => router.back()} style={[styles.done, { backgroundColor: t.accent }]}>
-          <Text style={{ color: t.onAccent, fontWeight: "800" }}>Done</Text>
+          <Text style={{ color: t.onAccent, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Done</Text>
         </Pressable>
       )}
     </ScrollView>
@@ -115,7 +115,7 @@ function VehicleCard({ v, active, editing, onPick, onEdit, onRemove }: {
           <Ionicons name={v.kind === "car" ? "car-sport" : "bicycle"} size={22} color={active ? t.bg : t.accent} />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={{ color: t.text, fontWeight: "800", fontSize: 16 }}>{vehicleName(v)}</Text>
+          <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 16 }}>{vehicleName(v)}</Text>
           <Text style={{ color: t.muted, fontSize: 12.5 }}>
             {v.batteryKWh} kWh · {v.rangeKm} km · {v.plugs.map((p) => PLUG_LABEL[p]).join(", ")}
           </Text>

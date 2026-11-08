@@ -195,7 +195,7 @@ export default function ClubChat() {
           style={{ flexDirection: "row", alignItems: "center", gap: 8, maxWidth: 240 }}>
           {club && <ClubBadge c={club} size={30} />}
           <View style={{ flexShrink: 1 }}>
-            <Text style={{ color: t.text, fontWeight: "800", fontSize: 15 }} numberOfLines={1}>{club?.name ?? "Club"}</Text>
+            <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 15 }} numberOfLines={1}>{club?.name ?? "Club"}</Text>
             {club && <Text style={{ color: t.muted, fontSize: 11.5 }}>{club.members} members{muted ? " · muted" : ""}</Text>}
           </View>
         </Pressable>
@@ -211,7 +211,7 @@ export default function ClubChat() {
       <View style={{ flex: 1, backgroundColor: t.bg, alignItems: "center", justifyContent: "center", padding: 28, gap: 12 }}>
         {header}
         {club && <ClubBadge c={club} size={84} />}
-        <Text style={{ color: t.text, fontSize: 24, fontWeight: "900", textAlign: "center" }}>{club?.name}</Text>
+        <Text style={{ color: t.text, fontSize: 24, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", textAlign: "center" }}>{club?.name}</Text>
         <Text style={{ color: t.muted, textAlign: "center", lineHeight: 20 }}>
           {club?.description || `${club?.members ?? 0} drivers swapping fixes, charging tips and drive plans.`}
         </Text>
@@ -225,7 +225,7 @@ export default function ClubChat() {
       {(["chat", "issues", "events"] as const).map((k) => (
         <Pressable key={k} onPress={() => setTab(k)} style={[s.tab, tab === k && { backgroundColor: INK }]}>
           <Ionicons name={k === "chat" ? "chatbubbles" : k === "issues" ? "construct" : "calendar"} size={15} color={tab === k ? LEMON : t.muted} />
-          <Text style={{ color: tab === k ? LEMON : t.muted, fontWeight: "800" }}>{k === "chat" ? "Chat" : k === "issues" ? "Issues" : "Events"}</Text>
+          <Text style={{ color: tab === k ? LEMON : t.muted, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{k === "chat" ? "Chat" : k === "issues" ? "Issues" : "Events"}</Text>
         </Pressable>
       ))}
     </View>
@@ -257,7 +257,7 @@ export default function ClubChat() {
           ListEmptyComponent={
             <View style={{ alignItems: "center", padding: 30, gap: 8, transform: [{ scaleY: -1 }] }}>
               <Text style={{ fontSize: 40 }}>👋</Text>
-              <Text style={{ color: t.text, fontWeight: "800", fontSize: 17 }}>Be the first to say hi</Text>
+              <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 17 }}>Be the first to say hi</Text>
               <Text style={{ color: t.muted, textAlign: "center" }}>Ask about range, charging, service, accessories, or plan a drive.</Text>
             </View>
           }
@@ -275,7 +275,7 @@ export default function ClubChat() {
         <View style={[s.replyBar, { backgroundColor: t.bg, borderTopColor: t.line }]}>
           <View style={{ width: 3, alignSelf: "stretch", backgroundColor: INK, borderRadius: 2 }} />
           <View style={{ flex: 1 }}>
-            <Text style={{ color: t.text, fontWeight: "800", fontSize: 12.5 }}>Replying to {reply.profiles?.display_name ?? "driver"}</Text>
+            <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12.5 }}>Replying to {reply.profiles?.display_name ?? "driver"}</Text>
             <Text style={{ color: t.muted, fontSize: 13 }} numberOfLines={1}>{reply.body ?? "📷 Photo"}</Text>
           </View>
           <Pressable onPress={() => setReply(null)} hitSlop={10}><Ionicons name="close-circle" size={22} color={t.muted} /></Pressable>
@@ -315,7 +315,7 @@ function Bubble({ m, mine, showName, replyTo, onLongPress }: {
         )}
         {replyTo && (
           <View style={[s.quote, { backgroundColor: mine ? "rgba(252,227,138,0.15)" : t.surface }]}>
-            <Text style={{ color: mine ? LEMON : t.text, fontWeight: "800", fontSize: 12 }}>{replyTo.profiles?.display_name ?? "Driver"}</Text>
+            <Text style={{ color: mine ? LEMON : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12 }}>{replyTo.profiles?.display_name ?? "Driver"}</Text>
             <Text style={{ color: mine ? "#ddd" : t.muted, fontSize: 12.5 }} numberOfLines={2}>
               {replyTo.deleted ? "Message deleted" : replyTo.body ?? "📷 Photo"}
             </Text>
@@ -341,7 +341,7 @@ const s = StyleSheet.create({
   bubble: { maxWidth: "78%", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 18 },
   mine: { backgroundColor: INK, borderBottomRightRadius: 6 },
   theirs: { borderBottomLeftRadius: 6 },
-  name: { fontWeight: "800", fontSize: 12.5, color: "#B8860B", marginBottom: 2 },
+  name: { fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12.5, color: "#B8860B", marginBottom: 2 },
   quote: { borderLeftWidth: 3, borderLeftColor: LEMON, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 5, marginBottom: 6 },
   photo: { width: 230, height: 280, borderRadius: 14 },
   time: { fontSize: 10.5, alignSelf: "flex-end", marginTop: 3 },
@@ -351,5 +351,5 @@ const s = StyleSheet.create({
   input: { flex: 1, minHeight: 40, maxHeight: 120, borderRadius: 20, paddingHorizontal: 14, paddingTop: 10, paddingBottom: 10, fontSize: 15.5 },
   send: { width: 40, height: 40, borderRadius: 20, backgroundColor: INK, alignItems: "center", justifyContent: "center" },
   bigBtn: { backgroundColor: INK, paddingHorizontal: 28, height: 54, borderRadius: 999, justifyContent: "center", marginTop: 10 },
-  bigBtnText: { color: LEMON, fontWeight: "800", fontSize: 16 },
+  bigBtnText: { color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 16 },
 });

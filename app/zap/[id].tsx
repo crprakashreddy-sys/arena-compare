@@ -126,7 +126,7 @@ export default function DropZap() {
         headerRight: () =>
           charger ? (
             <Pressable onPress={post} disabled={posting} style={styles.dropBtn} accessibilityRole="button">
-              {posting ? <ActivityIndicator color="#1A1A1A" /> : <Text style={{ color: "#1A1A1A", fontWeight: "800" }}>Drop it</Text>}
+              {posting ? <ActivityIndicator color="#1A1A1A" /> : <Text style={{ color: "#1A1A1A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Drop it</Text>}
             </Pressable>
           ) : null,
       }}
@@ -213,7 +213,7 @@ export default function DropZap() {
               <View style={{ marginHorizontal: 16, gap: 10 }}>
                 <Pressable onPress={() => shoot(true)} style={styles.shoot}>
                   <Ionicons name="camera" size={40} color="#1A1A1A" />
-                  <Text style={{ color: "#1A1A1A", fontWeight: "800", fontSize: 17 }}>Take a zing</Text>
+                  <Text style={{ color: "#1A1A1A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 17 }}>Take a zing</Text>
                   <Text style={{ color: "#3C3410", fontSize: 13 }}>Show the screen, the queue or the spot</Text>
                 </Pressable>
                 <Pressable onPress={() => shoot(false)} style={styles.secondary}>

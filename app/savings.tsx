@@ -49,7 +49,7 @@ export default function Savings() {
 
       <View style={[styles.hero, { backgroundColor: "#1A1A1A" }]}>
         <Text style={{ color: "#A3ADB6", fontSize: 13, fontWeight: "600" }}>YOU SAVE ABOUT</Text>
-        <Text style={{ color: save >= 0 ? "#6DD39A" : "#F28B82", fontSize: 44, fontWeight: "900", fontVariant: ["tabular-nums"] }}>
+        <Text style={{ color: save >= 0 ? "#6DD39A" : "#F28B82", fontSize: 44, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontVariant: ["tabular-nums"] }}>
           {rupees(Math.abs(save))}<Text style={{ fontSize: 18, color: "#A3ADB6" }}> / month</Text>
         </Text>
         <Text style={{ color: "#D8DDE2" }}>

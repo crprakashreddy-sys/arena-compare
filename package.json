@@ -10,7 +10,7 @@
     "fix-deps": "expo install --fix",
     "typecheck": "tsc --noEmit",
     "phone": "expo start --tunnel",
-    "setup": "expo install react react-native expo-router expo-constants expo-linking expo-status-bar expo-image expo-image-picker expo-image-manipulator expo-haptics expo-location expo-apple-authentication react-native-maps react-native-safe-area-context react-native-screens react-native-gesture-handler @shopify/react-native-skia @react-native-async-storage/async-storage @expo/vector-icons @react-native-google-signin/google-signin && expo install -- --save-dev typescript @types/react"
+    "setup": "expo install react react-native expo-router expo-constants expo-linking expo-status-bar expo-image expo-image-picker expo-image-manipulator expo-haptics expo-font @expo-google-fonts/space-grotesk expo-location expo-apple-authentication react-native-maps react-native-safe-area-context react-native-screens react-native-gesture-handler @shopify/react-native-skia @react-native-async-storage/async-storage @expo/vector-icons @react-native-google-signin/google-signin && expo install -- --save-dev typescript @types/react"
   },
   "dependencies": {
     "expo": "*",

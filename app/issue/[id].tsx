@@ -131,9 +131,9 @@ export default function IssueDetail() {
       }} />
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 30, gap: 14 }} keyboardShouldPersistTaps="handled">
         {issue.solved && (
-          <View style={s.solvedBanner}><Ionicons name="checkmark-circle" size={18} color={INK} /><Text style={{ color: INK, fontWeight: "800" }}>Solved{issue.solution_id ? " · fix pinned below" : ""}</Text></View>
+          <View style={s.solvedBanner}><Ionicons name="checkmark-circle" size={18} color={INK} /><Text style={{ color: INK, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Solved{issue.solution_id ? " · fix pinned below" : ""}</Text></View>
         )}
-        <Text style={{ color: t.text, fontSize: 22, fontWeight: "900", lineHeight: 28 }}>{issue.title}</Text>
+        <Text style={{ color: t.text, fontSize: 22, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", lineHeight: 28 }}>{issue.title}</Text>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <Avatar name={issue.profiles?.display_name ?? "?"} photo={issue.profiles?.avatar_path} size={28} />
           <Text style={{ color: t.muted, flex: 1 }} numberOfLines={1}>
@@ -149,12 +149,12 @@ export default function IssueDetail() {
         )}
         <Pressable onPress={flipMeToo} style={[s.metoo, { backgroundColor: metoo ? INK : t.surface }]}>
           <Ionicons name="hand-left" size={16} color={metoo ? LEMON : t.text} />
-          <Text style={{ color: metoo ? LEMON : t.text, fontWeight: "800" }}>
+          <Text style={{ color: metoo ? LEMON : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>
             {metoo ? "You have this too" : "I have this too"} · {issue.metoo}
           </Text>
         </Pressable>
 
-        <Text style={{ color: t.text, fontWeight: "900", fontSize: 17, marginTop: 6 }}>
+        <Text style={{ color: t.text, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 17, marginTop: 6 }}>
           {replies.length ? `${replies.length} ${replies.length === 1 ? "reply" : "replies"}` : "No replies yet"}
         </Text>
 
@@ -163,10 +163,10 @@ export default function IssueDetail() {
           return (
             <Pressable key={r.id} onLongPress={() => replyMenu(r)} delayLongPress={280}
               style={[s.reply, { backgroundColor: fix ? "#FFF6D1" : t.surface, borderColor: fix ? "#E8C64A" : "transparent" }]}>
-              {fix && <View style={s.fixTag}><Ionicons name="checkmark-circle" size={14} color={INK} /><Text style={{ color: INK, fontWeight: "800", fontSize: 12 }}>The fix</Text></View>}
+              {fix && <View style={s.fixTag}><Ionicons name="checkmark-circle" size={14} color={INK} /><Text style={{ color: INK, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12 }}>The fix</Text></View>}
               <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
                 <Avatar name={r.profiles?.display_name ?? "?"} photo={r.profiles?.avatar_path} size={26} />
-                <Text style={{ color: fix ? INK : t.text, fontWeight: "800", flex: 1 }} numberOfLines={1}>
+                <Text style={{ color: fix ? INK : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", flex: 1 }} numberOfLines={1}>
                   {r.profiles?.display_name ?? "Driver"}<Text style={{ color: fix ? "#5a5a5a" : t.muted, fontWeight: "500" }}>{r.profiles?.car_model ? ` · ${r.profiles.car_model}` : ""}</Text>
                 </Text>
                 <Text style={{ color: fix ? "#5a5a5a" : t.faint, fontSize: 12 }}>{timeAgo(r.created_at)}</Text>
@@ -180,7 +180,7 @@ export default function IssueDetail() {
               <View style={{ flexDirection: "row", gap: 10, marginTop: 10, alignItems: "center" }}>
                 <Pressable onPress={() => vote(r)} style={[s.vote, { backgroundColor: r.votedByMe ? INK : fix ? "#fff" : t.bg }]}>
                   <Ionicons name="arrow-up" size={14} color={r.votedByMe ? LEMON : t.text} />
-                  <Text style={{ color: r.votedByMe ? LEMON : t.text, fontWeight: "800", fontSize: 13 }}>Helpful · {r.votes}</Text>
+                  <Text style={{ color: r.votedByMe ? LEMON : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 13 }}>Helpful · {r.votes}</Text>
                 </Pressable>
                 {canSolve && !fix && !r.deleted && (
                   <Pressable onPress={() => markSolved(issue.id, r.id).then(load)} hitSlop={8}>

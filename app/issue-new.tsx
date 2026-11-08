@@ -52,7 +52,7 @@ export default function NewIssue() {
         <TextInput value={body} onChangeText={setBody} multiline placeholder={"Details help: when it happens, which charger or software version, what you've tried."}
           placeholderTextColor={t.faint} style={[input, { minHeight: 140, textAlignVertical: "top" }]} maxLength={4000} />
 
-        <Text style={{ color: t.text, fontWeight: "800" }}>Topic</Text>
+        <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Topic</Text>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
           {ISSUE_TAGS.map((x) => {
             const on = tags.includes(x.key);
@@ -94,5 +94,5 @@ const s = StyleSheet.create({
   remove: { position: "absolute", top: 8, right: 8, width: 30, height: 30, borderRadius: 15, backgroundColor: "rgba(0,0,0,0.6)", alignItems: "center", justifyContent: "center" },
   footer: { position: "absolute", left: 0, right: 0, bottom: 0, padding: 16, paddingBottom: 30, borderTopWidth: StyleSheet.hairlineWidth },
   save: { backgroundColor: INK, height: 54, borderRadius: 999, alignItems: "center", justifyContent: "center" },
-  saveText: { color: LEMON, fontSize: 17, fontWeight: "800" },
+  saveText: { color: LEMON, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
 });

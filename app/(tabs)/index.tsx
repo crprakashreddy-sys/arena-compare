@@ -313,7 +313,7 @@ export default function MapScreen() {
           >
             <View style={styles.bubble}>
               <RNImage source={{ uri: snapUrl(bubbles[c.id].photo) }} style={styles.bubbleImg} />
-              <View style={styles.bubbleCount}><Text style={{ color: "#1A1A1A", fontWeight: "800", fontSize: 11 }}>{bubbles[c.id].count}</Text></View>
+              <View style={styles.bubbleCount}><Text style={{ color: "#1A1A1A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 11 }}>{bubbles[c.id].count}</Text></View>
             </View>
           </Marker>
         ))}
@@ -405,7 +405,7 @@ export default function MapScreen() {
         style={[styles.round, { backgroundColor: tilted ? t.accent : t.bg, position: "absolute", right: 12, bottom: (peek ? 300 : sheetH + 12) + 56 }]}
         accessibilityLabel={tilted ? "Flat map" : "3D map"}
       >
-        <Text style={{ color: tilted ? t.bg : t.text, fontWeight: "900", fontSize: 14 }}>3D</Text>
+        <Text style={{ color: tilted ? t.bg : t.text, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 14 }}>3D</Text>
       </Pressable>
 
       {/* Range on the battery left */}
@@ -414,7 +414,7 @@ export default function MapScreen() {
           <Pressable onPress={() => setShowRange((v) => !v)} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
             accessibilityLabel={showRange ? "Hide range ring" : "Show range ring"}>
             <View style={{ width: 12, height: 12, borderRadius: 6, borderWidth: 2, borderColor: "#FCE38A", backgroundColor: showRange ? "rgba(255,214,10,0.3)" : "transparent" }} />
-            <Text style={{ color: t.text, fontWeight: "800", fontVariant: ["tabular-nums"] }}>≈{Math.round(reachKm(vehicle))} km</Text>
+            <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontVariant: ["tabular-nums"] }}>≈{Math.round(reachKm(vehicle))} km</Text>
           </Pressable>
           <BatterySlider value={vehicle.batteryPct ?? 60} onChange={(v) => updateVehicle(vehicle.key, { batteryPct: v })} />
         </View>
@@ -439,7 +439,7 @@ export default function MapScreen() {
           <View style={[styles.peek, { backgroundColor: t.bg }]}>
             <View style={{ flexDirection: "row", gap: 10, alignItems: "flex-start" }}>
               <View style={{ flex: 1, gap: 2 }}>
-                <Text style={{ color: t.text, fontSize: 17, fontWeight: "800" }} numberOfLines={2}>{peek.name}</Text>
+                <Text style={{ color: t.text, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }} numberOfLines={2}>{peek.name}</Text>
                 <Text style={{ color: t.muted, fontSize: 13 }} numberOfLines={1}>
                   {[n.short, d != null ? fmtDistance(d) : null, speedLabel(peek), ratings[peek.id] ? `★ ${ratings[peek.id].toFixed(1)}` : null].filter(Boolean).join(" · ")}
                 </Text>
@@ -472,10 +472,10 @@ export default function MapScreen() {
                 onPress={() => (peekZaps.length ? setViewer({ list: peekZaps, start: 0 }) : router.push(`/zap/${encodeURIComponent(peek.id)}`))}
                 style={[styles.peekBtn, { backgroundColor: "#1A1A1A" }]}
               >
-                <Text style={{ color: "#FCE38A", fontWeight: "800" }}>{peekZaps.length ? `Watch ${peekZaps.length} zing${peekZaps.length > 1 ? "s" : ""}` : "Drop the first zing"}</Text>
+                <Text style={{ color: "#FCE38A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{peekZaps.length ? `Watch ${peekZaps.length} zing${peekZaps.length > 1 ? "s" : ""}` : "Drop the first zing"}</Text>
               </Pressable>
               <Pressable onPress={() => openCharger(peek)} style={[styles.peekBtn, { backgroundColor: t.accent }]}>
-                <Text style={{ color: t.onAccent, fontWeight: "800" }}>Open charger</Text>
+                <Text style={{ color: t.onAccent, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Open charger</Text>
               </Pressable>
             </View>
           </View>
@@ -512,7 +512,7 @@ export default function MapScreen() {
               <Ionicons name="trophy" size={17} color="#1A1A1A" />
             </View>
             <View style={{ flex: 1, minWidth: 0 }}>
-              <Text style={{ color: "#FCE38A", fontSize: 11.5, fontWeight: "800", letterSpacing: 0.4 }}>BEST RIGHT NOW</Text>
+              <Text style={{ color: "#FCE38A", fontSize: 11.5, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: 0.4 }}>BEST RIGHT NOW</Text>
               <Text style={{ color: "#fff", fontWeight: "700" }} numberOfLines={1}>{best.c.name}</Text>
               <Text style={{ color: "#A9B3BC", fontSize: 12 }} numberOfLines={1}>
                 {[
@@ -601,12 +601,12 @@ function EmptyState({ hiddenCount, onClear, onAdd }: { hiddenCount: number; onCl
 const styles = StyleSheet.create({
   eventPin: { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: "#FCE38A", borderWidth: 2, borderColor: "#1A1A1A",
     paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999 },
-  eventPinText: { color: "#1A1A1A", fontWeight: "800", fontSize: 12 },
+  eventPinText: { color: "#1A1A1A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 12 },
   empty: { alignItems: "center", paddingVertical: 22, gap: 10 },
   emptyIcon: { width: 72, height: 72, borderRadius: 36, alignItems: "center", justifyContent: "center", marginBottom: 4 },
-  emptyTitle: { fontSize: 17, fontWeight: "800", textAlign: "center" },
+  emptyTitle: { fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", textAlign: "center" },
   emptyBtn: { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: "#1A1A1A", paddingHorizontal: 20, height: 48, borderRadius: 999, marginTop: 6 },
-  emptyBtnText: { color: "#FCE38A", fontWeight: "800", fontSize: 15 },
+  emptyBtnText: { color: "#FCE38A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 15 },
   addRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 16, borderTopWidth: StyleSheet.hairlineWidth },
   search: {
     flex: 1, flexDirection: "row", alignItems: "center", gap: 8, height: 48, borderRadius: 24, paddingHorizontal: 14,

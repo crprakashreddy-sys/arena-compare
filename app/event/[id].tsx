@@ -76,12 +76,12 @@ export default function EventDetail() {
       <ScrollView contentContainerStyle={{ paddingBottom: 140 }}>
         <View style={s.hero}>
           <Text style={{ fontSize: 44 }}>{k.emoji}</Text>
-          {e.cancelled && <View style={s.cancelled}><Text style={{ color: "#fff", fontWeight: "800" }}>CANCELLED</Text></View>}
+          {e.cancelled && <View style={s.cancelled}><Text style={{ color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>CANCELLED</Text></View>}
           <Text style={s.title}>{e.title}</Text>
           <Text style={s.when}>{fmtWhen(e.starts_at)}</Text>
           <Pressable onPress={() => router.push(`/club/${encodeURIComponent(e.club_id)}`)} style={s.clubPill}>
             <ClubBadge c={{ kind: e.club_kind, make: e.club_make, emoji: e.club_emoji, color: e.club_color }} size={22} />
-            <Text style={{ color: INK, fontWeight: "800" }} numberOfLines={1}>{e.club_name}</Text>
+            <Text style={{ color: INK, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }} numberOfLines={1}>{e.club_name}</Text>
           </Pressable>
         </View>
 
@@ -97,16 +97,16 @@ export default function EventDetail() {
             </MapView>
             <View style={{ flexDirection: "row", alignItems: "center", padding: 12, gap: 10 }}>
               <View style={{ flex: 1 }}>
-                <Text style={{ color: t.text, fontWeight: "800" }} numberOfLines={1}>{e.place_name || "Meeting point"}</Text>
+                <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }} numberOfLines={1}>{e.place_name || "Meeting point"}</Text>
                 {!!e.destination && <Text style={{ color: t.muted, fontSize: 13 }} numberOfLines={1}>Heading to {e.destination}</Text>}
               </View>
               <Pressable onPress={() => openDirections(e)} style={[s.small, { backgroundColor: INK }]}>
-                <Ionicons name="navigate" size={14} color={LEMON} /><Text style={{ color: LEMON, fontWeight: "800" }}>Directions</Text>
+                <Ionicons name="navigate" size={14} color={LEMON} /><Text style={{ color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Directions</Text>
               </Pressable>
             </View>
           </View>
 
-          <Text style={{ color: t.text, fontWeight: "900", fontSize: 17 }}>
+          <Text style={{ color: t.text, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 17 }}>
             {going.length} going{e.max_people ? ` · ${Math.max(0, e.max_people - going.length)} spots left` : ""}
           </Text>
           {going.length > 0 ? (
@@ -131,14 +131,14 @@ export default function EventDetail() {
           <Pressable onPress={() => set(mine === "going" ? null : "going")} disabled={busy || full}
             style={[s.big, { flex: 2, backgroundColor: mine === "going" ? LEMON : INK, opacity: full ? 0.5 : 1 }]}>
             {busy ? <ActivityIndicator color={mine === "going" ? INK : LEMON} /> : (
-              <Text style={{ color: mine === "going" ? INK : LEMON, fontWeight: "900", fontSize: 16 }}>
+              <Text style={{ color: mine === "going" ? INK : LEMON, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 16 }}>
                 {mine === "going" ? "✓ You're in" : full ? "Full" : "I'm in"}
               </Text>
             )}
           </Pressable>
           <Pressable onPress={() => set(mine === "interested" ? null : "interested")} disabled={busy}
             style={[s.big, { flex: 1, backgroundColor: mine === "interested" ? INK : t.surface }]}>
-            <Text style={{ color: mine === "interested" ? LEMON : t.text, fontWeight: "800" }}>{mine === "interested" ? "★ Interested" : "Interested"}</Text>
+            <Text style={{ color: mine === "interested" ? LEMON : t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{mine === "interested" ? "★ Interested" : "Interested"}</Text>
           </Pressable>
         </View>
       )}
@@ -148,7 +148,7 @@ export default function EventDetail() {
 
 const s = StyleSheet.create({
   hero: { backgroundColor: LEMON, padding: 24, paddingTop: 20, alignItems: "center", gap: 6 },
-  title: { fontSize: 26, fontWeight: "900", color: INK, textAlign: "center", letterSpacing: -0.5, lineHeight: 31 },
+  title: { fontSize: 26, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", color: INK, textAlign: "center", letterSpacing: -0.5, lineHeight: 31 },
   when: { fontSize: 16, fontWeight: "700", color: INK, opacity: 0.75 },
   clubPill: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(255,255,255,0.6)", paddingLeft: 4, paddingRight: 12, paddingVertical: 4, borderRadius: 999, marginTop: 6, maxWidth: "90%" },
   cancelled: { backgroundColor: "#C5221F", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },

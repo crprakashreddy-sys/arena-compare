@@ -108,7 +108,7 @@ export function Pin({ network, status, selected, kw, fits = true }: {
         shadowColor: "#000", shadowOpacity: 0.35, shadowRadius: 3, shadowOffset: { width: 0, height: 1 }, elevation: 4,
       }}>
         <Ionicons name="flash" size={selected ? 15 : 12} color="#fff" />
-        {label && <Text style={{ color: "#fff", fontWeight: "800", fontSize: selected ? 13 : 11 }}>{label}</Text>}
+        {label && <Text style={{ color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: selected ? 13 : 11 }}>{label}</Text>}
       </View>
       {/* pointer */}
       <View style={{ width: 0, height: 0, borderLeftWidth: 5, borderRightWidth: 5, borderTopWidth: 6, borderLeftColor: "transparent", borderRightColor: "transparent", borderTopColor: "#FFFFFF", marginTop: -1 }} />
@@ -127,8 +127,8 @@ export function ClusterPin({ count, working }: { count: number; working: number 
       width: size, height: size, borderRadius: size / 2, backgroundColor: "rgba(20,32,43,0.92)", borderWidth: 2.5, borderColor: "#FCE38A",
       alignItems: "center", justifyContent: "center",
     }}>
-      <Text style={{ color: "#fff", fontWeight: "900", fontSize: size > 40 ? 15 : 13 }}>{count}</Text>
-      {working > 0 && <Text style={{ color: "#34C759", fontWeight: "800", fontSize: 9.5, marginTop: -2 }}>{working} live</Text>}
+      <Text style={{ color: "#fff", fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: size > 40 ? 15 : 13 }}>{count}</Text>
+      {working > 0 && <Text style={{ color: "#34C759", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 9.5, marginTop: -2 }}>{working} live</Text>}
     </View>
   );
 }

@@ -54,6 +54,6 @@ export function BatterySlider({ value, onChange, dark }: { value: number; onChan
 const s = StyleSheet.create({
   body: { width: W, height: H, borderRadius: 9, borderWidth: 2.5, padding: 1.5, justifyContent: "center", overflow: "hidden" },
   fill: { position: "absolute", left: 1.5, top: 1.5, bottom: 1.5, borderRadius: 6 },
-  label: { alignSelf: "center", fontWeight: "900", fontSize: 13, fontVariant: ["tabular-nums"] },
+  label: { alignSelf: "center", fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 13, fontVariant: ["tabular-nums"] },
   nub: { width: 4, height: 12, borderTopRightRadius: 3, borderBottomRightRadius: 3, marginLeft: 1.5 },
 });

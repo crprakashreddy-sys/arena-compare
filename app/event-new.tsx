@@ -78,8 +78,8 @@ export default function NewEvent() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
             {days.map((d, i) => (
               <Pressable key={i} onPress={() => setDay(i)} style={[s.day, { backgroundColor: day === i ? INK : t.surface }]}>
-                <Text style={{ color: day === i ? LEMON : t.muted, fontSize: 11, fontWeight: "800" }}>{i === 0 ? "TODAY" : d.toLocaleDateString([], { weekday: "short" }).toUpperCase()}</Text>
-                <Text style={{ color: day === i ? LEMON : t.text, fontSize: 20, fontWeight: "900" }}>{d.getDate()}</Text>
+                <Text style={{ color: day === i ? LEMON : t.muted, fontSize: 11, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{i === 0 ? "TODAY" : d.toLocaleDateString([], { weekday: "short" }).toUpperCase()}</Text>
+                <Text style={{ color: day === i ? LEMON : t.text, fontSize: 20, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold" }}>{d.getDate()}</Text>
                 <Text style={{ color: day === i ? LEMON : t.muted, fontSize: 11 }}>{d.toLocaleDateString([], { month: "short" })}</Text>
               </Pressable>
             ))}
@@ -138,7 +138,7 @@ export default function NewEvent() {
 }
 
 const s = StyleSheet.create({
-  label: { fontWeight: "800", fontSize: 14 },
+  label: { fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 14 },
   input: { borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 16 },
   chip: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, paddingVertical: 9, borderRadius: 999 },
   day: { width: 62, alignItems: "center", paddingVertical: 8, borderRadius: 14 },
@@ -149,5 +149,5 @@ const s = StyleSheet.create({
   hintText: { color: "#fff", fontSize: 12, fontWeight: "700" },
   footer: { position: "absolute", left: 0, right: 0, bottom: 0, padding: 16, paddingBottom: 30, borderTopWidth: StyleSheet.hairlineWidth },
   save: { backgroundColor: INK, height: 54, borderRadius: 999, alignItems: "center", justifyContent: "center" },
-  saveText: { color: LEMON, fontSize: 17, fontWeight: "800" },
+  saveText: { color: LEMON, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
 });

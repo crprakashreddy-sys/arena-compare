@@ -58,7 +58,7 @@ export default function AvatarMaker() {
           </View>
           <Pressable onPress={() => setO({ ...randomAvatar(o.car), carColor: o.carColor })} style={styles.dice}>
             <Text style={{ fontSize: 16 }}>🎲</Text>
-            <Text style={{ color: LEMON, fontWeight: "800" }}>Surprise me</Text>
+            <Text style={{ color: LEMON, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Surprise me</Text>
           </Pressable>
         </View>
 
@@ -73,7 +73,7 @@ export default function AvatarMaker() {
         </View>
         <Row label="Top" t={t}>{SHIRTS.map((c, i) => <Dot key={c} color={c} on={o.shirt === i} onPress={() => set({ shirt: i })} />)}</Row>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, marginTop: 18 }}>
-          <Text style={{ color: t.text, fontWeight: "800" }}>Your ride</Text>
+          <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Your ride</Text>
           <View style={{ flexDirection: "row", gap: 6 }}>
             {(["car", "two"] as const).map((k) => (
               <Pill key={k} label={k === "car" ? "🚗 Cars" : "🛵 2-wheelers"} on={rideKind === k} t={t}
@@ -101,7 +101,7 @@ export default function AvatarMaker() {
 function Row({ label, children, t }: { label: string; children: React.ReactNode; t: ReturnType<typeof useTheme> }) {
   return (
     <View style={{ marginTop: 14 }}>
-      {!!label && <Text style={{ color: t.text, fontWeight: "800", paddingHorizontal: 16, marginBottom: 8 }}>{label}</Text>}
+      {!!label && <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", paddingHorizontal: 16, marginBottom: 8 }}>{label}</Text>}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingHorizontal: 16 }}>{children}</ScrollView>
     </View>
   );
@@ -137,5 +137,5 @@ const styles = StyleSheet.create({
   toggles: { flexDirection: "row", marginHorizontal: 16, marginTop: 14, borderWidth: StyleSheet.hairlineWidth, borderRadius: 14 },
   footer: { position: "absolute", left: 0, right: 0, bottom: 0, padding: 16, paddingBottom: 30, borderTopWidth: StyleSheet.hairlineWidth },
   save: { backgroundColor: INK, height: 54, borderRadius: 999, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
-  saveText: { color: LEMON, fontSize: 17, fontWeight: "800" },
+  saveText: { color: LEMON, fontSize: 17, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" },
 });

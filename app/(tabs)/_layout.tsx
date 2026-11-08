@@ -22,6 +22,7 @@ export default function TabsLayout() {
       screenListeners={{ tabPress: () => tapHaptic() }}
       screenOptions={{
         tabBarActiveTintColor: t.accent,
+        tabBarLabelStyle: { fontFamily: "SpaceGrotesk_700Bold", fontSize: 11 },
         tabBarInactiveTintColor: t.muted,
         tabBarStyle: { backgroundColor: t.bg, borderTopColor: t.line },
         headerStyle: { backgroundColor: t.bg },

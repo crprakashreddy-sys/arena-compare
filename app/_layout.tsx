@@ -6,18 +6,21 @@ import { AuthProvider, useAuth } from "../lib/auth";
 import { IntroLoader } from "../components/IntroLoader";
 import { Onboarding } from "../components/Onboarding";
 import { useTheme } from "../lib/theme";
+import { SpaceGrotesk_700Bold, useFonts } from "@expo-google-fonts/space-grotesk";
 
 export default function RootLayout() {
   const t = useTheme();
+  const [loaded, fontError] = useFonts({ SpaceGrotesk_700Bold });
+  const fontsLoaded = loaded || !!fontError; // never get stuck on the opening screen
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AuthProvider>
         <StatusBar style="auto" />
-        <Stack
+        {fontsLoaded && <Stack
           screenOptions={{
             headerTintColor: t.accent,
             headerStyle: { backgroundColor: t.bg },
-            headerTitleStyle: { color: t.text },
+            headerTitleStyle: { color: t.text, fontFamily: "SpaceGrotesk_700Bold" },
             contentStyle: { backgroundColor: t.bg },
             headerBackTitle: "Back",
           }}
@@ -44,16 +47,16 @@ export default function RootLayout() {
           <Stack.Screen name="avatar-maker" options={{ title: "Make my cartoon", presentation: "modal" }} />
           <Stack.Screen name="add-charger" options={{ title: "Add a charger", presentation: "modal" }} />
           <Stack.Screen name="login" options={{ title: "Join zingd", presentation: "modal" }} />
-        </Stack>
-        <Onboarding />
-        <Intro />
+        </Stack>}
+        {fontsLoaded && <Onboarding />}
+        <Intro fontsReady={fontsLoaded} />
       </AuthProvider>
     </GestureHandlerRootView>
   );
 }
 
 /** Opening animation, shown until the sign-in check finishes. */
-function Intro() {
+function Intro({ fontsReady }: { fontsReady: boolean }) {
   const { loading } = useAuth();
-  return <IntroLoader ready={!loading} />;
+  return <IntroLoader ready={!loading && fontsReady} fontsReady={fontsReady} />;
 }
