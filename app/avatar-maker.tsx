@@ -53,7 +53,12 @@ export default function AvatarMaker() {
             <Canvas ref={ref} style={{ width: SIZE, height: SIZE }}>
               <Group clip={clip}>
                 <Circle cx={SIZE / 2} cy={SIZE / 2} r={SIZE / 2} color={BGS[o.bg]} />
-                {svg && <ImageSVG svg={svg} x={0} y={0} width={SIZE} height={SIZE} />}
+                {svg && (
+                  // The SVG is drawn at its own 512 × 512 size and scaled down, so nothing gets cropped.
+                  <Group transform={[{ scale: SIZE / 512 }]}>
+                    <ImageSVG svg={svg} x={0} y={0} width={512} height={512} />
+                  </Group>
+                )}
               </Group>
             </Canvas>
           </View>
