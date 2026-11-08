@@ -2,6 +2,7 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { MODE_LABEL, useMode, type Mode } from "../lib/mode";
 import { useTheme } from "../lib/theme";
+import { springNext, tapHaptic } from "../lib/motion";
 
 /** The Cars / 2-wheelers switch. `compact` for the map's floating row. */
 export function ModeSwitch({ compact, dark }: { compact?: boolean; dark?: boolean }) {
@@ -13,7 +14,7 @@ export function ModeSwitch({ compact, dark }: { compact?: boolean; dark?: boolea
       {(["car", "two"] as Mode[]).map((m) => {
         const on = mode === m;
         return (
-          <Pressable key={m} onPress={() => setMode(m)} style={[s.btn, compact && s.btnC, on && { backgroundColor: "#1A1A1A" }]}
+          <Pressable key={m} onPress={() => { if (mode !== m) { tapHaptic(); springNext(); } setMode(m); }} style={[s.btn, compact && s.btnC, on && { backgroundColor: "#1A1A1A" }]}
             accessibilityRole="button" accessibilityState={{ selected: on }}>
             <Text style={{ color: on ? "#FCE38A" : dark ? "#fff" : t.text, fontWeight: "800", fontSize: compact ? 13 : 14 }}>
               {compact ? (m === "car" ? "🚗" : "🛵") : MODE_LABEL[m]}

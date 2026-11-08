@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useAuth } from "../../lib/auth";
 import { useGarage } from "../../lib/vehicles";
 import { syncVehicleKind } from "../../lib/community";
+import { tapHaptic } from "../../lib/motion";
 import { Pressable, View } from "react-native";
 import { Tabs, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,6 +19,7 @@ export default function TabsLayout() {
   }, [profile?.id, hasCar, hasTwo]);
   return (
     <Tabs
+      screenListeners={{ tabPress: () => tapHaptic() }}
       screenOptions={{
         tabBarActiveTintColor: t.accent,
         tabBarInactiveTintColor: t.muted,

@@ -10,6 +10,9 @@ import { fetchChargers, isFast, onChargersChanged, speedLabel } from "../../lib/
 import { useOnboarded } from "../../lib/onboarding";
 import { suits, useMode } from "../../lib/mode";
 import { ModeSwitch } from "../../components/ModeSwitch";
+import { BatterySlider } from "../../components/BatterySlider";
+import { ListSkeleton } from "../../components/Skeleton";
+import { springNext } from "../../lib/motion";
 import { MAP_PROVIDER, USE_GOOGLE, zappdStyle } from "../../lib/maps";
 import { fetchEventsNear, kindOf, type ClubEvent } from "../../lib/events";
 import { fetchLiveStatus, fetchRatings, fetchSnaps, fetchZapBubbles } from "../../lib/community";
@@ -66,8 +69,8 @@ export default function MapScreen() {
     .runOnJS(true)
     .activeOffsetY([-12, 12])
     .onEnd((e) => {
-      if (e.translationY > 40 || e.velocityY > 600) setSheet((v) => (v > 0 ? ((v - 1) as 0 | 1) : 0));
-      else if (e.translationY < -40 || e.velocityY < -600) setSheet((v) => (v < 2 ? ((v + 1) as 1 | 2) : 2));
+      if (e.translationY > 40 || e.velocityY > 600) springNext(), setSheet((v) => (v > 0 ? ((v - 1) as 0 | 1) : 0));
+      else if (e.translationY < -40 || e.velocityY < -600) springNext(), setSheet((v) => (v < 2 ? ((v + 1) as 1 | 2) : 2));
     });
 
   const [query, setQuery] = useState("");
@@ -413,13 +416,7 @@ export default function MapScreen() {
             <View style={{ width: 12, height: 12, borderRadius: 6, borderWidth: 2, borderColor: "#FCE38A", backgroundColor: showRange ? "rgba(255,214,10,0.3)" : "transparent" }} />
             <Text style={{ color: t.text, fontWeight: "800", fontVariant: ["tabular-nums"] }}>≈{Math.round(reachKm(vehicle))} km</Text>
           </Pressable>
-          <Pressable onPress={() => updateVehicle(vehicle.key, { batteryPct: Math.max(10, (vehicle.batteryPct ?? 60) - 10) })} hitSlop={8} accessibilityLabel="Less battery">
-            <Ionicons name="remove-circle-outline" size={22} color={t.muted} />
-          </Pressable>
-          <Text style={{ color: t.muted, fontWeight: "700", fontVariant: ["tabular-nums"], minWidth: 34, textAlign: "center" }}>{vehicle.batteryPct ?? 60}%</Text>
-          <Pressable onPress={() => updateVehicle(vehicle.key, { batteryPct: Math.min(100, (vehicle.batteryPct ?? 60) + 10) })} hitSlop={8} accessibilityLabel="More battery">
-            <Ionicons name="add-circle-outline" size={22} color={t.muted} />
-          </Pressable>
+          <BatterySlider value={vehicle.batteryPct ?? 60} onChange={(v) => updateVehicle(vehicle.key, { batteryPct: v })} />
         </View>
       )}
 
@@ -491,12 +488,12 @@ export default function MapScreen() {
       <View style={[styles.sheet, { backgroundColor: t.bg, height: sheetH, display: peek ? "none" : "flex" }]}>
         <GestureDetector gesture={sheetPan}>
         <View>
-        <Pressable onPress={() => setSheet((v) => (v === 2 ? 0 : ((v + 1) as 1 | 2)))} style={{ alignItems: "center", paddingVertical: 10 }}
+        <Pressable onPress={() => { springNext(); setSheet((v) => (v === 2 ? 0 : ((v + 1) as 1 | 2))); }} style={{ alignItems: "center", paddingVertical: 10 }}
           accessibilityRole="button"
           accessibilityLabel={sheet === 2 ? "Hide the station list" : sheet === 0 ? "Show stations" : "Show all stations"}>
           <View style={{ width: 36, height: 5, borderRadius: 3, backgroundColor: t.line }} />
         </Pressable>
-        <Pressable onPress={() => setSheet((v) => (v === 0 ? 1 : v))}
+        <Pressable onPress={() => { springNext(); setSheet((v) => (v === 0 ? 1 : v)); }}
           style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", paddingHorizontal: 16, paddingBottom: 6 }}>
           <Text style={{ color: t.text, fontSize: 18, fontWeight: "700" }} numberOfLines={1}>
             {origin ? `Near ${origin.label}` : "Near you"}
@@ -531,7 +528,7 @@ export default function MapScreen() {
         <FlatList
           data={shown}
           keyExtractor={(x) => x.c.id}
-          ListEmptyComponent={loading || !from ? null : (
+          ListEmptyComponent={loading ? <ListSkeleton /> : !from ? null : (
             <EmptyState
               hiddenCount={chargers.filter((c) => suits(c, mode)).length - shown.length}
               onClear={() => { setFastOnly(false); setWorkingOnly(false); setFitsOnly(false); setHidden(new Set()); }}

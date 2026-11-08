@@ -21,6 +21,7 @@ import { openSafetyMenu } from "../../components/SafetyMenu";
 import type { Charger, Checkin, FacilitySummary, FoodPlace, FoodTip, LiveStatus, Review } from "../../lib/types";
 import { ScoreCard } from "../../components/ZapScore";
 import VehicleFit from "../../components/VehicleFit";
+import { Confetti } from "../../components/Confetti";
 import { startSession, useSessions } from "../../lib/sessions";
 import { openNetworkApp } from "../../lib/networks";
 import type { ScorePart } from "../../lib/types";
@@ -292,6 +293,7 @@ export default function ChargerPage() {
       {viewer !== null && (
         <SnapViewer snaps={zaps} start={viewer} onClose={() => setViewer(null)} onChanged={loadCommunity} />
       )}
+      {showScore && Number(score ?? 0) >= 100 && <Confetti />}
     </>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { successHaptic } from "../lib/motion";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { FRESH_BONUS, PHOTO_BONUS, TIERS, formatMetres, scoreTone, tierFor } from "../lib/zapscore";
@@ -83,7 +84,7 @@ export function ScoreCard({ total, parts, onClose }: { total: number; parts: Sco
   const [shown, setShown] = React.useState(0);
   useEffect(() => {
     const id = n.addListener(({ value }) => setShown(Math.round(value)));
-    Animated.timing(n, { toValue: total, duration: 900, useNativeDriver: false }).start();
+    Animated.timing(n, { toValue: total, duration: 900, useNativeDriver: false }).start(() => successHaptic());
     return () => n.removeListener(id);
   }, [total]);
   const tone = scoreTone(parts[0]?.points ?? total);

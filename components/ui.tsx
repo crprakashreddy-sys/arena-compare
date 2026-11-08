@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View, type ViewStyle } 
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { snapUrl } from "../lib/supabase";
+import { tapHaptic } from "../lib/motion";
 import { STATUS_LABEL, statusColors, useTheme } from "../lib/theme";
 import { networkById } from "../lib/networks";
 import { timeAgo } from "../lib/geo";
@@ -19,10 +20,10 @@ export function Button({ title, icon, onPress, kind = "secondary", busy, style, 
   const fg = kind === "primary" ? t.onAccent : kind === "danger" ? t.bad : t.text;
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => { tapHaptic(); onPress(); }}
       disabled={busy || disabled}
       accessibilityRole="button"
-      style={({ pressed }) => [styles.btn, { backgroundColor: bg, opacity: pressed || disabled ? 0.7 : 1 }, style]}
+      style={({ pressed }) => [styles.btn, { backgroundColor: bg, opacity: disabled ? 0.6 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] }, style]}
     >
       {busy ? <ActivityIndicator color={fg} /> : (
         <>
@@ -38,9 +39,9 @@ export function Chip({ label, on, onPress, dot, icon }: { label: string; on: boo
   const t = useTheme();
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => { tapHaptic(); onPress(); }}
       accessibilityState={{ selected: on }}
-      style={[styles.chip, { backgroundColor: on ? t.accentSoft : t.bg, borderColor: on ? t.accent : t.line }]}
+      style={({ pressed }) => [styles.chip, { backgroundColor: on ? t.accentSoft : t.bg, borderColor: on ? t.accent : t.line, transform: [{ scale: pressed ? 0.95 : 1 }] }]}
     >
       {dot && <View style={{ width: 9, height: 9, borderRadius: 5, backgroundColor: on ? dot : t.faint }} />}
       {icon && <Ionicons name={icon} size={14} color={on ? t.accent : t.muted} />}
