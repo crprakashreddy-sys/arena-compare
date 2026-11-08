@@ -6,6 +6,11 @@ alter table public.clubs add column if not exists req_traits text[] not null def
 alter table public.clubs add column if not exists req_same_city boolean not null default false;
 
 -- Profile completeness, the same formula the app shows (adds up to 100).
+-- Needs personality.sql, traits.sql and bumble.sql first (for personality, traits, interests, prompts).
+alter table public.profiles add column if not exists personality text;
+alter table public.profiles add column if not exists traits text[] not null default '{}';
+alter table public.profiles add column if not exists interests text[] not null default '{}';
+alter table public.profiles add column if not exists prompts jsonb not null default '[]';
 create or replace function public.profile_completeness(u uuid) returns int
 language sql stable security definer set search_path = public as $$
   select coalesce((
