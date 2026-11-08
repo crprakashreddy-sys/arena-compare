@@ -95,7 +95,14 @@ export async function sendMessage(clubId: string, userId: string, body: string |
   const { data, error } = await supabase.from("club_messages")
     .insert({ club_id: clubId, user_id: userId, body: body?.trim() || null, photo_path: photoPath, reply_to: replyTo })
     .select(MSG_FIELDS).single();
-  if (error) throw new Error("Message didn't send. Check your connection and try again.");
+  if (error) {
+    // Say what really happened: a database step not yet run looks very different from bad signal.
+    const m = error.message ?? "";
+    if (/does not exist|Could not find|schema cache/i.test(m)) throw new Error(`The database needs an update (run sh update.sh and the SQL it opens).\n\n${m}`);
+    if (/row-level security|permission/i.test(m)) throw new Error("You need to be a member of this club to post. Try leaving and joining again.");
+    if (/JWT|token/i.test(m)) throw new Error("Your sign-in expired. Go to You → Sign out, then sign in again.");
+    throw new Error(m || "Message didn't send. Check your connection and try again.");
+  }
   return data as any as ClubMessage;
 }
 
