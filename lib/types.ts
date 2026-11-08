@@ -41,6 +41,7 @@ export type Checkin = {
   distance_m?: number | null;
   issue?: string | null;
   zap_score?: number;
+  keep?: boolean;
   score_breakdown?: ScorePart[];
   profiles?: { display_name: string; car_model: string | null; avatar_path?: string | null } | null;
   chargers?: { name: string; lat: number; lng: number; network: string; connectors?: string[] } | null;

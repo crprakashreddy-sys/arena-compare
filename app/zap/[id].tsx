@@ -27,6 +27,7 @@ export default function DropZap() {
   const [uri, setUri] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("working");
   const [note, setNote] = useState("");
+  const [keep, setKeep] = useState(false);
   const [issue, setIssue] = useState<IssueKey | null>(null);
   const [posting, setPosting] = useState(false);
   const editor = useRef<EditorHandle | null>(null);
@@ -104,7 +105,7 @@ export default function DropZap() {
         path = await uploadSnap(b64);
       }
       const latest = (await getZapFix()) ?? fix;
-      const result = await postCheckin(charger.id, status, note, path, editor.current?.lookId(), latest, issue);
+      const result = await postCheckin(charger.id, status, note, path, editor.current?.lookId(), latest, issue, keep);
       router.replace({
         pathname: "/charger/[id]",
         params: { id: charger.id, posted: "1", score: String(result.zap_score), parts: JSON.stringify(result.score_breakdown) },
@@ -235,6 +236,15 @@ export default function DropZap() {
               style={styles.note}
               multiline
             />
+            {/* Snapchat-style: gone in 24 hours, or keep it on your profile and the charger's gallery */}
+            <View style={styles.life}>
+              {([[false, "⏱  24 hours", "On the live map, then only in your Memories"], [true, "♾  Keep", "Stays on your profile and the charger page"]] as const).map(([k, label, sub]) => (
+                <Pressable key={String(k)} onPress={() => setKeep(k)} style={[styles.lifeOpt, keep === k && { backgroundColor: YELLOW }]}>
+                  <Text style={{ color: keep === k ? "#1A1A1A" : "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{label}</Text>
+                  <Text style={{ color: keep === k ? "#3C3410" : "#8A949D", fontSize: 11.5, textAlign: "center" }} numberOfLines={2}>{sub}</Text>
+                </Pressable>
+              ))}
+            </View>
             {uri && (
               <Pressable onPress={() => setUri(null)} style={{ alignSelf: "center", padding: 8 }}>
                 <Text style={{ color: "#A3ADB6" }}>Retake photo</Text>
@@ -256,5 +266,7 @@ const styles = StyleSheet.create({
   shoot: { height: 220, borderRadius: 18, backgroundColor: YELLOW, alignItems: "center", justifyContent: "center", gap: 6 },
   secondary: { height: 48, borderRadius: 12, borderWidth: 1, borderColor: "#3A424A", flexDirection: "row", gap: 8, alignItems: "center", justifyContent: "center" },
   issue: { height: 36, paddingHorizontal: 12, borderRadius: 18, borderWidth: 1, borderColor: "#3A424A", justifyContent: "center" },
+  life: { flexDirection: "row", gap: 8, marginHorizontal: 16, padding: 4, borderRadius: 18, backgroundColor: "#151A1F" },
+  lifeOpt: { flex: 1, alignItems: "center", gap: 2, paddingVertical: 10, paddingHorizontal: 8, borderRadius: 14 },
   note: { marginHorizontal: 16, minHeight: 52, borderRadius: 12, backgroundColor: "#151A1F", color: "#fff", padding: 14, fontSize: 15 },
 });

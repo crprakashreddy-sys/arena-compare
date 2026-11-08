@@ -38,6 +38,9 @@ const TABLES = [
   ["club_messages", "gif_url,sticker", "gifs.sql"],
   ["dm_messages", "gif_url,sticker", "gifs.sql"],
   ["clubs", "photo_path", "gifs.sql"],
+  ["checkins", "keep", "zings_plus.sql"],
+  ["zing_views", "checkin_id,viewer_id", "zings_plus.sql"],
+  ["zing_reactions", "checkin_id,user_id,emoji", "zings_plus.sql"],
 ];
 // [function, safe dummy arguments, SQL file]. Called signed-out, so they do nothing.
 // Joins the app makes. "More than one relationship" here breaks loading names on messages.
@@ -51,6 +54,7 @@ const FUNCS = [
   ["club_activity", {}, "clubs_plus.sql"],
   ["club_info_stats", { c: "__check__" }, "clubs_plus.sql"],
   ["driver_suggestions", { lim: 1 }, "crew.sql"],
+  ["zing_streak", { u: "00000000-0000-0000-0000-000000000000" }, "zings_plus.sql"],
 ];
 
 const missing = new Map(); // file -> reasons
@@ -84,7 +88,7 @@ for (const [fn, args, file] of FUNCS) {
 
 if (networkErr) { console.log(`   ⚠️  Couldn't reach Supabase (${networkErr}). Check your internet.`); process.exit(0); }
 if (!missing.size) { console.log("   ✅ Database matches the app."); process.exit(0); }
-const order = ["schema.sql", "profile.sql", "clubs.sql", "issues.sql", "events.sql", "notifications.sql", "dms.sql", "speeds.sql", "clubs_plus.sql", "crew.sql", "gifs.sql"];
+const order = ["schema.sql", "profile.sql", "clubs.sql", "issues.sql", "events.sql", "notifications.sql", "dms.sql", "speeds.sql", "clubs_plus.sql", "crew.sql", "gifs.sql", "zings_plus.sql"];
 const files = [...missing.keys()].sort((a, b) => order.indexOf(a) - order.indexOf(b));
 console.log("   ❌ Your database is missing parts the app needs:");
 for (const f of files) { console.log(`      • supabase/${f}`); missing.get(f).slice(0, 3).forEach((w) => console.log(`          ${w}`)); }

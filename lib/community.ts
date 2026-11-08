@@ -52,7 +52,7 @@ export async function fetchLiveStatus(chargerIds: string[]): Promise<Record<stri
 }
 
 // ───────── Snaps and check-ins ─────────
-const CHECKIN_FIELDS = "id,charger_id,user_id,status,note,photo_path,created_at,expires_at,distance_m,zap_score,score_breakdown,issue,profiles(display_name,car_model,avatar_path)";
+const CHECKIN_FIELDS = "id,charger_id,user_id,status,note,photo_path,created_at,expires_at,keep,distance_m,zap_score,score_breakdown,issue,profiles(display_name,car_model,avatar_path)";
 
 export async function fetchSnaps(chargerId: string): Promise<Checkin[]> {
   const { data } = await supabase
@@ -60,7 +60,7 @@ export async function fetchSnaps(chargerId: string): Promise<Checkin[]> {
     .select(CHECKIN_FIELDS)
     .eq("charger_id", chargerId)
     .not("photo_path", "is", null)
-    .gt("expires_at", new Date().toISOString())
+    .or(`expires_at.gt.${new Date().toISOString()},keep.eq.true`)
     .order("created_at", { ascending: false })
     .limit(30);
   return visible((data ?? []) as any);
@@ -129,7 +129,7 @@ export async function fetchIssues(chargerId: string) {
 }
 
 export async function postCheckin(
-  chargerId: string, status: Status, note: string, photoPath: string | null, look?: string, fix?: ZapFix | null, issue?: IssueKey | null,
+  chargerId: string, status: Status, note: string, photoPath: string | null, look?: string, fix?: ZapFix | null, issue?: IssueKey | null, keep = false,
 ): Promise<{ zap_score: number; score_breakdown: ScorePart[]; distance_m: number | null }> {
   const { data: u } = await supabase.auth.getUser();
   if (!u.user) throw new Error("Sign in to drop a zing.");
@@ -145,6 +145,7 @@ export async function postCheckin(
     taken_accuracy_m: fix?.accuracy ?? null,
     taken_mocked: fix?.mocked ?? null,
     issue: status === "working" ? null : issue ?? null,
+    ...(keep ? { keep: true } : {}),
   }).select("zap_score,score_breakdown,distance_m").single();
   if (error) throw new Error("Your zing didn't post. Try again.");
   return {
@@ -183,7 +184,7 @@ export async function fetchZapBubbles(chargerIds: string[]): Promise<Record<stri
 export async function fetchUserZaps(userId: string) {
   const { data } = await supabase
     .from("checkins")
-    .select("id,charger_id,status,photo_path,created_at,zap_score,distance_m,chargers(name)")
+    .select("id,charger_id,status,photo_path,created_at,expires_at,keep,zap_score,distance_m,chargers(name)")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(20);
@@ -504,4 +505,44 @@ export async function fetchSuggestions(limit = 20): Promise<Suggestion[]> {
   const { data, error } = await supabase.rpc("driver_suggestions", { lim: limit });
   if (error) return [];
   return ((data ?? []) as Suggestion[]).filter((s) => !blockedIds.has(s.id));
+}
+
+// ───────── Snapchat-style zings ─────────
+export const ZING_REACTIONS = ["🔥", "⚡", "❤️", "😂", "🙌"] as const;
+export type ZingReaction = (typeof ZING_REACTIONS)[number];
+
+/** Log that I watched a zing (once per zing; your own don't count). */
+export async function markZingViewed(c: Checkin, me?: string | null) {
+  if (!me || c.user_id === me) return;
+  await supabase.from("zing_views").insert({ checkin_id: c.id, viewer_id: me }).then(() => {}, () => {});
+}
+/** For my own zing: how many watched, and who (newest first). */
+export async function zingViewers(checkinId: string) {
+  const { data } = await supabase.from("zing_views").select("viewer_id,viewed_at,profiles(display_name,avatar_path)")
+    .eq("checkin_id", checkinId).order("viewed_at", { ascending: false }).limit(100);
+  return (data ?? []) as any[];
+}
+export async function zingReactions(checkinId: string) {
+  const { data } = await supabase.from("zing_reactions").select("user_id,emoji").eq("checkin_id", checkinId);
+  return (data ?? []) as { user_id: string; emoji: ZingReaction }[];
+}
+export async function reactToZing(checkinId: string, me: string, emoji: ZingReaction, on: boolean) {
+  if (on) await supabase.from("zing_reactions").insert({ checkin_id: checkinId, user_id: me, emoji });
+  else await supabase.from("zing_reactions").delete().eq("checkin_id", checkinId).eq("user_id", me).eq("emoji", emoji);
+}
+export async function setZingKeep(checkinId: string, keep: boolean) {
+  const { error } = await supabase.from("checkins").update({ keep }).eq("id", checkinId);
+  if (error) throw new Error("Couldn't change that. Try again.");
+}
+export async function zingStreak(userId: string): Promise<number> {
+  const { data } = await supabase.rpc("zing_streak", { u: userId });
+  return (data as number) ?? 0;
+}
+/** All my zings, newest first: live, kept and expired (only I can see expired ones). */
+export async function fetchMemories(userId: string) {
+  const { data } = await supabase.from("checkins")
+    .select(`${CHECKIN_FIELDS},chargers(name,lat,lng,network)`)
+    .eq("user_id", userId).not("photo_path", "is", null)
+    .order("created_at", { ascending: false }).limit(300);
+  return (data ?? []) as (Checkin & { keep: boolean })[];
 }

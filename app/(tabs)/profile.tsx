@@ -18,6 +18,7 @@ import { useSessions } from "../../lib/sessions";
 import { Icon, IconTile } from "../../components/Icon";
 import { NotifyCard, NotifySettings } from "../../components/NotifyCard";
 import { unreadDms } from "../../lib/dms";
+import { zingStreak } from "../../lib/community";
 import { useTabSpace } from "../../lib/tabspace";
 import { ChargingCard } from "../../components/ChargingCard";
 
@@ -269,9 +270,13 @@ function Tools() {
   const { session: authed, profile: me } = useAuth();
   const session = authed && me ? authed : null;
   const [dm, setDm] = useState(0);
-  useFocusEffect(useCallback(() => { if (session) unreadDms().then(setDm).catch(() => {}); }, [session]));
+  const [streak, setStreak] = useState(0);
+  useFocusEffect(useCallback(() => {
+    if (session) { unreadDms().then(setDm).catch(() => {}); zingStreak(session.user.id).then(setStreak).catch(() => {}); }
+  }, [session]));
   const items: [string, string, string, () => void][] = [
     ...(session ? [["chatbubble-ellipses-outline", "Messages", dm ? `${dm} unread` : "Chats with your crew", () => router.push("/messages")] as [string, string, string, () => void]] : []),
+    ...(session ? [["albums-outline", "Memories", streak ? `🔥 ${streak}-day streak · all your zings` : "Every zing you've dropped", () => router.push("/memories")] as [string, string, string, () => void]] : []),
     ["car-sport-outline", "My vehicles", active ? vehicleName(active) : "Add your EV", () => router.push("/garage")],
     ["map-outline", "Plan a trip", "Charging stops on the way", () => router.push("/trip")],
     ["timer-outline", "Charging log", charging ? "Charging now" : "Track charges and spend", () => router.push("/log")],

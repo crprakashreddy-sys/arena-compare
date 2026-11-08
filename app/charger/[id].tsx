@@ -181,7 +181,7 @@ export default function ChargerPage() {
           </View>
         </View>
 
-        <Section title="Zings · gone in 24 hours">
+        <Section title="Zings · live for 24 hours, ♾ kept by drivers">
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
             <Pressable onPress={() => router.push(`/zap/${encodeURIComponent(c.id)}`)} style={[styles.zapTile, styles.addTile, { borderColor: t.faint }]}>
               <Ionicons name="camera-outline" size={26} color={t.accent} />
