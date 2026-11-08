@@ -5,7 +5,7 @@ const REASONS = ["Spam or fake", "Offensive or abusive", "Shows a number plate o
 
 /** Report and block options for any post or person. Required for App Store review of community apps. */
 export function openSafetyMenu(opts: {
-  kind: "checkin" | "review" | "food_tip" | "user";
+  kind: "checkin" | "review" | "food_tip" | "user" | "club_message";
   targetId: string;
   userId: string;
   userName: string;

@@ -14,6 +14,7 @@ export async function loadBlocks() {
   const { data } = await supabase.from("blocks").select("blocked_id").eq("blocker_id", u.user.id);
   blockedIds = new Set((data ?? []).map((r) => r.blocked_id));
 }
+export const isBlocked = (userId: string) => blockedIds.has(userId);
 const visible = <T extends { user_id: string }>(rows: T[]) => rows.filter((r) => !blockedIds.has(r.user_id));
 
 // ───────── Live status ─────────
@@ -322,7 +323,7 @@ export async function addFoodTip(chargerId: string, name: string, note: string) 
 }
 
 // ───────── Safety ─────────
-export async function report(kind: "checkin" | "review" | "food_tip" | "user", targetId: string, reason: string) {
+export async function report(kind: "checkin" | "review" | "food_tip" | "user" | "club_message", targetId: string, reason: string) {
   const { data: u } = await supabase.auth.getUser();
   if (!u.user) throw new Error("Sign in to report.");
   const { error } = await supabase.from("reports").insert({ reporter_id: u.user.id, target_kind: kind, target_id: targetId, reason });

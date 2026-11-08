@@ -1,0 +1,185 @@
+import React, { useCallback, useMemo, useState } from "react";
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { router, useFocusEffect } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAuth } from "../../lib/auth";
+import { useTheme } from "../../lib/theme";
+import { useGarage } from "../../lib/vehicles";
+import { autoJoinFor, fetchClubs, fetchMyClubs, joinClub, type Club, type MyClub } from "../../lib/clubs";
+import { timeAgo } from "../../lib/geo";
+import { ClubBadge } from "../../components/ClubBadge";
+
+const INK = "#1A1A1A";
+const LEMON = "#FCE38A";
+
+/** Clubs: owner communities for each brand and model, with live group chat. */
+export default function Clubs() {
+  const t = useTheme();
+  const insets = useSafeAreaInsets();
+  const { session } = useAuth();
+  const { vehicles } = useGarage();
+  const [mine, setMine] = useState<MyClub[]>([]);
+  const [all, setAll] = useState<Club[]>([]);
+  const [q, setQ] = useState("");
+  const [busy, setBusy] = useState(true);
+  const [err, setErr] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setErr(null);
+    try {
+      if (session) await autoJoinFor(vehicles, session.user.id).catch(() => {});
+      const [a, m] = await Promise.all([fetchClubs(), session ? fetchMyClubs(session.user.id) : Promise.resolve([])]);
+      setAll(a); setMine(m);
+    } catch (e: any) { setErr(e.message); }
+    setBusy(false);
+  }, [session, vehicles]);
+  useFocusEffect(useCallback(() => { load(); }, [load]));
+
+  const mineIds = useMemo(() => new Set(mine.map((c) => c.id)), [mine]);
+  const discover = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    return all.filter((c) => !mineIds.has(c.id) && (!s || c.name.toLowerCase().includes(s)));
+  }, [all, mineIds, q]);
+  const brands = discover.filter((c) => c.kind === "brand");
+  const models = discover.filter((c) => c.kind === "model");
+
+  const join = async (c: Club) => {
+    if (!session) return router.push("/login");
+    await joinClub(c.id, session.user.id);
+    router.push(`/club/${encodeURIComponent(c.id)}`);
+  };
+
+  return (
+    <ScrollView style={{ flex: 1, backgroundColor: t.bg }} contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: 40 }}
+      refreshControl={<RefreshControl refreshing={false} onRefresh={load} />} keyboardShouldPersistTaps="handled">
+      <View style={{ paddingHorizontal: 16 }}>
+        <Text style={[s.h1, { color: t.text }]}>Clubs</Text>
+        <Text style={{ color: t.muted, marginTop: 2 }}>Owners of your EV. Fixes, tips, drives and meetups.</Text>
+      </View>
+
+      {!session && (
+        <View style={[s.hero, { marginTop: 16 }]}>
+          <Ionicons name="people" size={28} color={INK} />
+          <Text style={s.heroTitle}>Find your EV crew</Text>
+          <Text style={s.heroBody}>Sign in to chat with owners of your car, sort out issues and plan drives together.</Text>
+          <Pressable onPress={() => router.push("/login")} style={s.heroBtn}><Text style={s.heroBtnText}>Sign in to join</Text></Pressable>
+        </View>
+      )}
+
+      {err && (
+        <View style={{ margin: 16, padding: 14, borderRadius: 14, backgroundColor: t.warnSoft }}>
+          <Text style={{ color: t.warn, fontWeight: "600" }}>{err}</Text>
+        </View>
+      )}
+
+      {busy && !all.length && !err && <ActivityIndicator style={{ marginTop: 40 }} color={t.muted} />}
+
+      {!!mine.length && (
+        <>
+          <Text style={[s.h2, { color: t.text }]}>Your clubs</Text>
+          <View style={{ paddingHorizontal: 16, gap: 10 }}>
+            {mine.map((c) => <MyClubRow key={c.id} c={c} />)}
+          </View>
+        </>
+      )}
+
+      {session && !mine.length && !busy && !err && (
+        <View style={[s.hero, { marginTop: 16 }]}>
+          <Ionicons name="car-sport" size={28} color={INK} />
+          <Text style={s.heroTitle}>Add your EV to auto-join its club</Text>
+          <Text style={s.heroBody}>We'll put you in your brand and model clubs. Or pick any club below.</Text>
+          <Pressable onPress={() => router.push("/garage")} style={s.heroBtn}><Text style={s.heroBtnText}>Add my EV</Text></Pressable>
+        </View>
+      )}
+
+      {!!all.length && (
+        <>
+          <Text style={[s.h2, { color: t.text }]}>Discover</Text>
+          <View style={[s.search, { backgroundColor: t.surface, marginHorizontal: 16 }]}>
+            <Ionicons name="search" size={17} color={t.muted} />
+            <TextInput value={q} onChangeText={setQ} placeholder="Search Nexon, Ather, BYD…" placeholderTextColor={t.faint}
+              style={{ flex: 1, color: t.text, fontSize: 15 }} />
+          </View>
+          {!!brands.length && (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingHorizontal: 16, paddingVertical: 12 }}>
+              {brands.map((c) => <BrandCard key={c.id} c={c} onJoin={() => join(c)} />)}
+            </ScrollView>
+          )}
+          <View style={{ paddingHorizontal: 16 }}>
+            {models.map((c) => (
+              <View key={c.id} style={[s.row, { borderBottomColor: t.line }]}>
+                <ClubBadge c={c} size={42} />
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Text style={{ color: t.text, fontWeight: "700", fontSize: 15 }} numberOfLines={1}>{c.name}</Text>
+                  <Text style={{ color: t.muted, fontSize: 12.5 }}>{c.members} {c.members === 1 ? "member" : "members"}</Text>
+                </View>
+                <Pressable onPress={() => join(c)} style={[s.join, { backgroundColor: t.surface }]}>
+                  <Text style={{ color: t.text, fontWeight: "800" }}>Join</Text>
+                </Pressable>
+              </View>
+            ))}
+          </View>
+        </>
+      )}
+    </ScrollView>
+  );
+}
+
+function MyClubRow({ c }: { c: MyClub }) {
+  const t = useTheme();
+  const last = c.last;
+  const preview = !last ? "Say hi to the crew 👋" : last.deleted ? "Message deleted"
+    : `${last.profiles?.display_name?.split(" ")[0] ?? "Someone"}: ${last.body ?? "📷 Photo"}`;
+  return (
+    <Pressable onPress={() => router.push(`/club/${encodeURIComponent(c.id)}`)}
+      style={({ pressed }) => [s.mine, { backgroundColor: t.surface, opacity: pressed ? 0.8 : 1 }]}>
+      <ClubBadge c={c} size={50} />
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 8 }}>
+          <Text style={{ color: t.text, fontWeight: "800", fontSize: 16, flexShrink: 1 }} numberOfLines={1}>{c.name}</Text>
+          {last && <Text style={{ color: c.unread ? t.text : t.faint, fontSize: 12 }}>{timeAgo(last.created_at)}</Text>}
+        </View>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: 3 }}>
+          <Text style={{ color: t.muted, flex: 1 }} numberOfLines={1}>{preview}</Text>
+          {c.muted && <Ionicons name="notifications-off" size={14} color={t.faint} />}
+          {c.unread > 0 && (
+            <View style={s.unread}><Text style={s.unreadText}>{c.unread > 99 ? "99+" : c.unread}</Text></View>
+          )}
+        </View>
+      </View>
+    </Pressable>
+  );
+}
+
+function BrandCard({ c, onJoin }: { c: Club; onJoin: () => void }) {
+  return (
+    <View style={s.brand}>
+      <ClubBadge c={c} size={44} />
+      <Text style={s.brandName} numberOfLines={1}>{c.make}</Text>
+      <Text style={s.brandMeta}>{c.members} {c.members === 1 ? "member" : "members"}</Text>
+      <Pressable onPress={onJoin} style={s.brandJoin}><Text style={s.brandJoinText}>Join</Text></Pressable>
+    </View>
+  );
+}
+
+const s = StyleSheet.create({
+  h1: { fontSize: 32, fontWeight: "900", letterSpacing: -1 },
+  h2: { fontSize: 18, fontWeight: "800", marginTop: 24, marginBottom: 10, paddingHorizontal: 16 },
+  hero: { marginHorizontal: 16, padding: 18, borderRadius: 20, backgroundColor: LEMON, gap: 6 },
+  heroTitle: { fontSize: 20, fontWeight: "900", color: INK, marginTop: 4 },
+  heroBody: { fontSize: 14.5, color: INK, opacity: 0.75, lineHeight: 20 },
+  heroBtn: { alignSelf: "flex-start", backgroundColor: INK, paddingHorizontal: 18, height: 44, borderRadius: 999, justifyContent: "center", marginTop: 8 },
+  heroBtnText: { color: LEMON, fontWeight: "800" },
+  mine: { flexDirection: "row", alignItems: "center", gap: 12, padding: 12, borderRadius: 18 },
+  unread: { minWidth: 22, height: 22, borderRadius: 11, backgroundColor: INK, alignItems: "center", justifyContent: "center", paddingHorizontal: 6 },
+  unreadText: { color: LEMON, fontSize: 12, fontWeight: "800" },
+  search: { flexDirection: "row", alignItems: "center", gap: 8, height: 44, borderRadius: 12, paddingHorizontal: 12 },
+  brand: { width: 120, padding: 12, borderRadius: 18, backgroundColor: LEMON, alignItems: "center", gap: 4 },
+  brandName: { fontWeight: "900", color: INK, fontSize: 15, marginTop: 4 },
+  brandMeta: { color: INK, opacity: 0.6, fontSize: 12 },
+  brandJoin: { marginTop: 6, backgroundColor: INK, paddingHorizontal: 18, paddingVertical: 7, borderRadius: 999 },
+  brandJoinText: { color: LEMON, fontWeight: "800", fontSize: 13 },
+  row: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth },
+  join: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 999 },
+});

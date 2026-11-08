@@ -51,6 +51,10 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="clubs"
+        options={{ title: "Clubs", headerShown: false, tabBarIcon: ({ color, size }) => <Ionicons name="people" color={color} size={size} /> }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{ title: "You", tabBarIcon: ({ color, size }) => <Ionicons name="person-circle" color={color} size={size} /> }}
       />
