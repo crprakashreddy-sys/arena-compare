@@ -9,6 +9,11 @@ import { useTheme, CTA, ON_CTA } from "../lib/theme";
 import { useAuth } from "../lib/auth";
 import { updateProfileExtras, uploadSnap } from "../lib/community";
 import { aiCartoon, aiStyles, type AiStyle } from "../modules/zingd-imagine";
+import { ImageFormat, useImage } from "@shopify/react-native-skia";
+import { TOON_STYLES, renderToon } from "../lib/toon";
+
+// Until the App Store build, a preview made with zingd's own on-phone cartoon engine.
+const PREVIEW_STYLE: Record<AiStyle, string> = { illustration: "anime", animation: "pastel", sketch: "sketch" };
 import { successHaptic, tapHaptic, tickHaptic } from "../lib/motion";
 
 const STYLE_LABEL: Record<AiStyle, { name: string; emoji: string }> = {
@@ -30,6 +35,8 @@ export default function AiCartoon() {
   const [src, setSrc] = useState<string | null>(null);
   const [out, setOut] = useState<string | null>(null);
   const [busy, setBusy] = useState<null | "make" | "save">(null);
+  const [isPreview, setIsPreview] = useState(false);
+  const srcImg = useImage(src);
   const W = Math.min(width - 32, 420);
 
   const unsupported = styles !== null && styles.length === 0;
@@ -42,12 +49,27 @@ export default function AiCartoon() {
     if (res.canceled || !res.assets?.[0]) return;
     const img = await ImageManipulator.manipulate(res.assets[0].uri).resize({ width: 1400 }).renderAsync();
     const saved = await img.saveAsync({ format: SaveFormat.JPEG, compress: 0.9 });
-    setSrc(saved.uri); setOut(null);
-    make(saved.uri); // straight from your photo, no typing
+    setSrc(saved.uri); setOut(null); setIsPreview(false);
+    if (!unsupported) make(saved.uri); // straight from your photo, no typing
+  };
+
+  const preview = (st: AiStyle) => {
+    if (!srcImg) return;
+    setBusy("make");
+    setTimeout(() => {
+      try {
+        const look = TOON_STYLES.find((x) => x.id === PREVIEW_STYLE[st]) ?? TOON_STYLES[0];
+        const b64 = renderToon(srcImg, look, 0.35)?.encodeToBase64(ImageFormat.JPEG, 90);
+        if (b64) { setOut(`data:image/jpeg;base64,${b64}`); setIsPreview(true); successHaptic(); }
+        else Alert.alert("Preview didn't work", "Try another photo.");
+      } catch { Alert.alert("Preview didn't work", "Try another photo."); }
+      setBusy(null);
+    }, 30);
   };
 
   const make = async (from = src, st = style) => {
-    if (!from || unsupported) return;
+    if (!from) return;
+    if (unsupported) return preview(st);
     setBusy("make");
     try { setOut(await aiCartoon(from, "", st)); successHaptic(); }
     catch (e: any) { Alert.alert("Couldn't make it", e?.message ?? "Try another photo."); }
@@ -58,9 +80,13 @@ export default function AiCartoon() {
     if (!out || !profile) return router.push("/login");
     setBusy("save");
     try {
-      const sq = await ImageManipulator.manipulate(out).resize({ width: 900 }).renderAsync();
-      const b = await sq.saveAsync({ format: SaveFormat.JPEG, compress: 0.9, base64: true });
-      const path = await uploadSnap(b.base64!);
+      let b64: string;
+      if (out.startsWith("data:")) b64 = out.slice(out.indexOf(",") + 1);
+      else {
+        const sq = await ImageManipulator.manipulate(out).resize({ width: 900 }).renderAsync();
+        b64 = (await sq.saveAsync({ format: SaveFormat.JPEG, compress: 0.9, base64: true })).base64!;
+      }
+      const path = await uploadSnap(b64);
       await updateProfileExtras(profile.id, { avatar_path: path });
       await refreshProfile(); successHaptic(); router.back();
     } catch (e: any) { Alert.alert("Didn't save", e?.message ?? "Try again."); }
@@ -97,7 +123,7 @@ export default function AiCartoon() {
               <Text style={{ color: "#fff", fontWeight: "800", marginTop: 10 }}>Drawing on your phone…</Text>
             </View>
           )}
-          {!!out && <View style={s.badge}><Text style={{ color: "#1A1A1A", fontWeight: "900", fontSize: 12 }}>✨ AI</Text></View>}
+          {!!out && <View style={s.badge}><Text style={{ color: "#1A1A1A", fontWeight: "900", fontSize: 12 }}>{isPreview ? "Preview · full AI in App Store version" : "✨ AI"}</Text></View>}
         </View>
 
         <View style={{ flexDirection: "row", gap: 10 }}>
@@ -112,7 +138,7 @@ export default function AiCartoon() {
         <Text style={[s.label, { color: t.text }]}>Style</Text>
         <View style={{ flexDirection: "row", gap: 8 }}>
           {(styles?.length ? styles : (Object.keys(STYLE_LABEL) as AiStyle[])).map((k) => (
-            <Pressable key={k} onPress={() => { tickHaptic(); setStyle(k); if (src && !busy) make(src, k); }}
+            <Pressable key={k} onPress={() => { tickHaptic(); setStyle(k); if (src && !busy && (out || !unsupported)) make(src, k); }}
               style={[s.style, { backgroundColor: style === k ? CTA : t.surface, borderColor: style === k ? CTA : t.line }]}>
               <Text style={{ fontSize: 22 }}>{STYLE_LABEL[k].emoji}</Text>
               <Text style={{ color: style === k ? ON_CTA : t.text, fontWeight: "800", fontSize: 12.5 }}>{STYLE_LABEL[k].name}</Text>
@@ -133,11 +159,8 @@ export default function AiCartoon() {
             </Pressable>
           </>
         ) : (
-          <Pressable onPress={() => unsupported
-              ? Alert.alert("Needs the App Store version", "AI cartoons are drawn by Apple Intelligence on your iPhone. Expo Go can't run them. They'll work as soon as zingd is installed as a real app (after your Apple Developer approval, run sh cloud.sh).")
-              : make()}
-            disabled={!src || !!busy} style={[s.cta, (!src || unsupported) && { opacity: 0.55 }]}>
-            {busy === "make" ? <ActivityIndicator color={ON_CTA} /> : <Text style={s.ctaText}>{unsupported ? "🔒 Works in the App Store version" : "✨ Make my AI cartoon"}</Text>}
+          <Pressable onPress={() => make()} disabled={!src || !!busy} style={[s.cta, !src && { opacity: 0.5 }]}>
+            {busy === "make" ? <ActivityIndicator color={ON_CTA} /> : <Text style={s.ctaText}>{unsupported ? "👀 Show me a preview" : "✨ Make my AI cartoon"}</Text>}
           </Pressable>
         )}
       </View>
