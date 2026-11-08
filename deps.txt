@@ -27,3 +27,4 @@ expo-audio
 expo-video
 expo-video-thumbnails
 expo-camera
+react-native-purchases
