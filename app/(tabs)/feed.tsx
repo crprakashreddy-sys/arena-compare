@@ -103,13 +103,13 @@ export default function ZapsFeed() {
               <Pressable onPress={() => setViewer(index)} accessibilityLabel={`Zing by ${name} at ${z.chargers?.name ?? "a charger"}`}>
                 {z.photo_path && (
                   <Image source={{ uri: snapUrl(z.photo_path) }} style={{ width: cardW, height: Math.min(cardW * 4 / 3, 520) }} contentFit="cover" transition={200} />
+                )}
                   {(z.video_path || z.music) && (
                     <View style={{ position: "absolute", top: 12, right: 12, flexDirection: "row", gap: 6 }}>
                       {!!z.video_path && <View style={styles.mediaBadge}><Ionicons name="play" size={13} color="#fff" /><Text style={styles.mediaText}>Video</Text></View>}
                       {!!z.music && <View style={styles.mediaBadge}><Ionicons name="musical-note" size={13} color="#FCE38A" /></View>}
                     </View>
                   )}
-                )}
                 <View style={{ position: "absolute", top: 10, left: 10 }}>
                   <ScoreChip points={z.zap_score} distanceM={z.distance_m} />
                 </View>
