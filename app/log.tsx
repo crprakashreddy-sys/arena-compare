@@ -5,6 +5,8 @@ import { Ionicons } from "../components/SFIcon";
 import { useTheme } from "../lib/theme";
 import { networkById } from "../lib/networks";
 import { addPastSession, deleteSession, finishSession, monthTotals, rupees, useSessions, type Session } from "../lib/sessions";
+import { ChargingCard } from "../components/ChargingCard";
+import { stopCharge } from "../lib/charging";
 
 const MONTH = new Date().toLocaleString("en-IN", { month: "long" });
 
@@ -19,6 +21,7 @@ export default function ChargingLog() {
     <ScrollView style={{ flex: 1, backgroundColor: t.bg }} contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
       <Stack.Screen options={{ title: "Charging log" }} />
 
+      {active?.kw != null && <ChargingCard s={active} />}
       {active && <ActiveCard s={active} />}
 
       <View style={{ flexDirection: "row", gap: 8 }}>
@@ -86,27 +89,39 @@ function ActiveCard({ s }: { s: Session }) {
   useEffect(() => { const id = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(id); }, []);
   const secs = Math.max(0, Math.floor((now - new Date(s.startedAt).getTime()) / 1000));
   const hh = Math.floor(secs / 3600), mm = Math.floor((secs % 3600) / 60), ss = secs % 60;
-  const stop = () => finishSession(s.id, {
-    kWh: parseFloat(kWh) || null, cost: parseFloat(cost) || null, endPct: parseInt(endPct, 10) || null,
-  });
+  const stop = () => {
+    if (s.kw != null) {
+      // Tracked charge: use what you typed, else the estimate.
+      stopCharge(s, { endPct: parseInt(endPct, 10) || undefined, cost: parseFloat(cost) || null });
+      if (parseFloat(kWh)) finishSession(s.id, { kWh: parseFloat(kWh) });
+      return;
+    }
+    finishSession(s.id, { kWh: parseFloat(kWh) || null, cost: parseFloat(cost) || null, endPct: parseInt(endPct, 10) || null });
+  };
   return (
     <View style={[styles.active, { backgroundColor: "#1A1A1A" }]}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-        <View style={styles.pulse} />
-        <Text style={{ color: "#A3ADB6", fontSize: 13, fontWeight: "600" }}>CHARGING NOW</Text>
-      </View>
-      <Text style={{ color: "#fff", fontSize: 40, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontVariant: ["tabular-nums"], letterSpacing: -1 }}>
-        {hh > 0 ? `${hh}:` : ""}{String(mm).padStart(2, "0")}:{String(ss).padStart(2, "0")}
-      </Text>
-      <Text style={{ color: "#D8DDE2" }} numberOfLines={1}>{s.chargerName}</Text>
-      <Text style={{ color: "#A3ADB6", fontSize: 12.5 }}>When you finish, add what the charger's app showed:</Text>
+      {s.kw == null ? (
+        <>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+            <View style={styles.pulse} />
+            <Text style={{ color: "#A3ADB6", fontSize: 13, fontWeight: "600" }}>CHARGING NOW</Text>
+          </View>
+          <Text style={{ color: "#fff", fontSize: 40, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontVariant: ["tabular-nums"], letterSpacing: -1 }}>
+            {hh > 0 ? `${hh}:` : ""}{String(mm).padStart(2, "0")}:{String(ss).padStart(2, "0")}
+          </Text>
+          <Text style={{ color: "#D8DDE2" }} numberOfLines={1}>{s.chargerName}</Text>
+        </>
+      ) : (
+        <Text style={{ color: "#fff", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 15 }}>Got the real numbers? (optional)</Text>
+      )}
+      <Text style={{ color: "#A3ADB6", fontSize: 12.5 }}>{s.kw == null ? "When you finish, add what the charger's app showed:" : "Add what the charger's app shows when you're done. We'll use the estimate for anything you leave blank."}</Text>
       <View style={{ flexDirection: "row", gap: 8 }}>
         <Small value={kWh} onChange={setKWh} placeholder="kWh" />
         <Small value={cost} onChange={setCost} placeholder="₹ paid" />
         <Small value={endPct} onChange={setEndPct} placeholder="Battery %" />
       </View>
       <Pressable onPress={stop} style={[styles.stop, { backgroundColor: "#FCE38A" }]}>
-        <Text style={{ color: "#1A1A1A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Stop and save</Text>
+        <Text style={{ color: "#1A1A1A", fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>{s.kw == null ? "Stop and save" : "Stop and save these"}</Text>
       </Pressable>
     </View>
   );

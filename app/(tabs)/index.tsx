@@ -31,6 +31,9 @@ import { Icon } from "../../components/Icon";
 import { Glass } from "../../components/Glass";
 import { useTabSpace } from "../../lib/tabspace";
 import { tapHaptic } from "../../lib/motion";
+import { useSessions } from "../../lib/sessions";
+import { useChargeSpotter } from "../../lib/charging";
+import { ChargingCard } from "../../components/ChargingCard";
 
 const INDIA: Region = { latitude: 21.5, longitude: 79, latitudeDelta: 24, longitudeDelta: 24 };
 const MAP_TYPES = ["standard", "hybrid", "satellite"] as const;
@@ -68,6 +71,8 @@ export default function MapScreen() {
   const [showRange, setShowRange] = useState(true);
   const [tilted, setTilted] = useState(false);
   const scheme = useColorScheme();
+  const { active: charging } = useSessions();
+  const spot = useChargeSpotter(me, chargers, charging, !!me);
   const { height: screenH } = useWindowDimensions();
   const SHEET_H = [76, 170, Math.round(screenH * 0.62)] as const;
   const sheetPan = Gesture.Pan()
@@ -427,7 +432,43 @@ export default function MapScreen() {
       </Pressable>
 
       {/* Range on the battery left */}
-      {vehicle && me && !peek && (
+      {charging && !peek && (
+        <View style={{ position: "absolute", left: 12, bottom: sheetH + 12 + tabSpace }}><ChargingCard s={charging} compact /></View>
+      )}
+
+      {/* "Charging here?" when you've stopped at a charger, and "logged" when you drive off */}
+      {(spot.prompt || spot.ended) && !peek && hits.length === 0 && (
+        <View style={{ position: "absolute", left: 12, right: 12, top: insets.top + 132 }}>
+          <Glass style={styles.spot}>
+            <View style={styles.spotIcon}><Icon name={spot.prompt ? "station" : "check"} size={22} color="#1A1A1A" /></View>
+            <View style={{ flex: 1, gap: 1 }}>
+              <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 15.5 }} numberOfLines={1}>
+                {spot.prompt ? `Charging at ${spot.prompt.name}?` : "Charge logged"}
+              </Text>
+              <Text style={{ color: t.muted, fontSize: 12.5 }} numberOfLines={2}>
+                {spot.prompt ? "Track it live and get a ping when it's nearly full." : `${spot.ended?.chargerName} · saved to your charging log`}
+              </Text>
+            </View>
+            {spot.prompt ? (
+              <>
+                <Pressable onPress={spot.dismiss} hitSlop={8} style={[styles.spotBtn, { backgroundColor: t.surface }]}>
+                  <Text style={{ color: t.text, fontWeight: "700" }}>No</Text>
+                </Pressable>
+                <Pressable onPress={() => { const c = spot.prompt!; spot.dismiss(); router.push(`/charge-start?id=${encodeURIComponent(c.id)}`); }}
+                  style={[styles.spotBtn, { backgroundColor: CTA }]}>
+                  <Text style={{ color: ON_CTA, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Start</Text>
+                </Pressable>
+              </>
+            ) : (
+              <Pressable onPress={() => { spot.clearEnded(); router.push("/log"); }} style={[styles.spotBtn, { backgroundColor: CTA }]}>
+                <Text style={{ color: ON_CTA, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>View</Text>
+              </Pressable>
+            )}
+          </Glass>
+        </View>
+      )}
+
+      {vehicle && me && !peek && !charging && (
         <Glass style={[styles.range, { bottom: sheetH + 12 + tabSpace }]}>
           <Pressable onPress={() => setShowRange((v) => !v)} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
             accessibilityLabel={showRange ? "Hide range ring" : "Show range ring"}>
@@ -657,6 +698,9 @@ const styles = StyleSheet.create({
     shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 4,
   },
   best: { flexDirection: "row", alignItems: "center", gap: 10, marginHorizontal: 12, marginBottom: 4, padding: 10, borderRadius: 14 },
+  spot: { flexDirection: "row", alignItems: "center", gap: 10, padding: 12, borderRadius: 22 },
+  spotIcon: { width: 40, height: 40, borderRadius: 13, backgroundColor: "#FCE38A", alignItems: "center", justifyContent: "center" },
+  spotBtn: { height: 36, paddingHorizontal: 14, borderRadius: 18, alignItems: "center", justifyContent: "center" },
   fab: {
     width: 56, height: 56, borderRadius: 28, alignItems: "center", justifyContent: "center",
     shadowColor: "#FCE38A", shadowOpacity: 0.6, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 8,

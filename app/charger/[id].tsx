@@ -162,12 +162,12 @@ export default function ChargerPage() {
             <Button title="Directions" icon="navigate" kind="primary" onPress={directions} style={{ flex: 1 }} />
           </View>
           <View style={{ flexDirection: "row", gap: 8 }}>
-            <Button title={`Pay in ${n.short} app`} icon="card-outline" onPress={() => openNetworkApp(n)} style={{ flex: 1 }} />
+            <Button title={n.id === "other" ? "Book or pay" : `Book in ${n.short}`} icon="card-outline" onPress={() => openNetworkApp(n)} style={{ flex: 1 }} />
             {charging?.chargerId === c.id ? (
               <Button title="Charging…" icon="timer-outline" onPress={() => router.push("/log")} style={{ flex: 1 }} />
             ) : (
               <Button title="Start charging" icon="timer-outline" style={{ flex: 1 }}
-                onPress={() => { startSession({ id: c.id, name: c.name, network: c.network }); router.push("/log"); }} />
+                onPress={() => router.push(`/charge-start?id=${encodeURIComponent(c.id)}`)} />
             )}
           </View>
         </View>

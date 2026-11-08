@@ -14,6 +14,14 @@ export type Session = {
   cost: number | null;      // rupees
   startPct: number | null;
   endPct: number | null;
+  // Live estimate (optional, set when started with a vehicle)
+  kw?: number;          // power the car can take at this charger
+  capKWh?: number;      // usable battery
+  slowKW?: number;      // power above 80%, where charging tapers
+  targetPct?: number;
+  lat?: number; lng?: number;
+  notifId?: string | null;
+  auto?: boolean;       // started from the "are you charging?" prompt
 };
 
 type Store = { sessions: Session[] };
@@ -35,10 +43,10 @@ function save(next: Store) {
   AsyncStorage.setItem(KEY, JSON.stringify(store)).catch(() => {});
 }
 
-export function startSession(c: { id: string | null; name: string; network: string }, startPct: number | null = null) {
+export function startSession(c: { id: string | null; name: string; network: string }, startPct: number | null = null, extra: Partial<Session> = {}) {
   const s: Session = {
     id: Date.now().toString(36), chargerId: c.id, chargerName: c.name, network: c.network,
-    startedAt: new Date().toISOString(), endedAt: null, kWh: null, cost: null, startPct, endPct: null,
+    startedAt: new Date().toISOString(), endedAt: null, kWh: null, cost: null, startPct, endPct: null, ...extra,
   };
   // Only one charge runs at a time.
   save({ sessions: [s, ...store.sessions.map((x) => (x.endedAt ? x : { ...x, endedAt: s.startedAt }))] });
@@ -47,6 +55,10 @@ export function startSession(c: { id: string | null; name: string; network: stri
 
 export function finishSession(id: string, patch: Partial<Session>) {
   save({ sessions: store.sessions.map((s) => (s.id === id ? { ...s, endedAt: s.endedAt ?? new Date().toISOString(), ...patch } : s)) });
+}
+
+export function updateSession(id: string, patch: Partial<Session>) {
+  save({ sessions: store.sessions.map((s) => (s.id === id ? { ...s, ...patch } : s)) });
 }
 
 export function addPastSession(s: Omit<Session, "id">) {

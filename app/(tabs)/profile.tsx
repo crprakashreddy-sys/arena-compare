@@ -19,6 +19,7 @@ import { Icon, IconTile } from "../../components/Icon";
 import { NotifyCard, NotifySettings } from "../../components/NotifyCard";
 import { unreadDms } from "../../lib/dms";
 import { useTabSpace } from "../../lib/tabspace";
+import { ChargingCard } from "../../components/ChargingCard";
 
 const GUIDELINES_URL = "https://crprakashreddy-sys.github.io/zingd/terms.html";
 const PRIVACY_URL = "https://crprakashreddy-sys.github.io/zingd/privacy.html";
@@ -27,6 +28,7 @@ export default function You() {
   const t = useTheme();
   const insets = useSafeAreaInsets();
   const tabSpace = useTabSpace();
+  const { active: charging } = useSessions();
   const { session, profile, signOut, refreshProfile } = useAuth();
   const [points, setPoints] = useState(0);
   const [stats, setStats] = useState({ zaps: 0, reviews: 0 });
@@ -173,6 +175,7 @@ export default function You() {
       )}
 
       <View style={{ height: 18 }} />
+      {charging && <View style={{ marginHorizontal: 16, marginBottom: 14 }}><ChargingCard s={charging} /></View>}
       <Tools />
       <View style={{ height: 16 }} />
 
