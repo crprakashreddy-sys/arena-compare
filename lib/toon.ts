@@ -100,12 +100,12 @@ export type ToonStyle = {
 };
 
 export const TOON_STYLES: ToonStyle[] = [
-  { id: "toon", name: "Toon", emoji: "🎨", smooth: 1, levels: 5, sat: 1.35, edge: 1, thresh: 0.018, lift: 0, mono: 0, halftone: 0, ink: [0.06, 0.06, 0.08], glow: 0 },
-  { id: "comic", name: "Comic", emoji: "💥", smooth: 1.25, levels: 4, sat: 1.6, edge: 1, thresh: 0.015, lift: 0, mono: 0, halftone: 1, ink: [0.02, 0.02, 0.04], glow: 0 },
-  { id: "anime", name: "Anime", emoji: "✨", smooth: 1.1, levels: 6, sat: 1.2, edge: 0.85, thresh: 0.022, lift: 0.3, mono: 0, halftone: 0, ink: [0.2, 0.15, 0.26], glow: 0 },
-  { id: "pastel", name: "Pastel", emoji: "🍬", smooth: 1.2, levels: 5, sat: 0.85, edge: 0.6, thresh: 0.024, lift: 1, mono: 0, halftone: 0, ink: [0.36, 0.3, 0.44], glow: 0 },
-  { id: "sketch", name: "Sketch", emoji: "✏️", smooth: 0.8, levels: 4, sat: 0, edge: 0.95, thresh: 0.012, lift: 0, mono: 1, halftone: 0, ink: [0.18, 0.18, 0.22], glow: 0 },
-  { id: "neon", name: "Neon", emoji: "🌃", smooth: 1, levels: 5, sat: 1.4, edge: 1, thresh: 0.014, lift: 0, mono: 0, halftone: 0, ink: [0.99, 0.89, 0.54], glow: 1 },
+  { id: "toon", name: "Toon", emoji: "🎨", smooth: 1, levels: 5, sat: 1.35, edge: 1, thresh: 0.026, lift: 0, mono: 0, halftone: 0, ink: [0.06, 0.06, 0.08], glow: 0 },
+  { id: "comic", name: "Comic", emoji: "💥", smooth: 1.25, levels: 4, sat: 1.6, edge: 1, thresh: 0.022, lift: 0, mono: 0, halftone: 1, ink: [0.02, 0.02, 0.04], glow: 0 },
+  { id: "anime", name: "Anime", emoji: "✨", smooth: 1.1, levels: 6, sat: 1.2, edge: 0.85, thresh: 0.03, lift: 0.3, mono: 0, halftone: 0, ink: [0.2, 0.15, 0.26], glow: 0 },
+  { id: "pastel", name: "Pastel", emoji: "🍬", smooth: 1.2, levels: 5, sat: 0.85, edge: 0.6, thresh: 0.032, lift: 1, mono: 0, halftone: 0, ink: [0.36, 0.3, 0.44], glow: 0 },
+  { id: "sketch", name: "Sketch", emoji: "✏️", smooth: 0.8, levels: 4, sat: 0, edge: 0.95, thresh: 0.018, lift: 0, mono: 1, halftone: 0, ink: [0.18, 0.18, 0.22], glow: 0 },
+  { id: "neon", name: "Neon", emoji: "🌃", smooth: 1, levels: 5, sat: 1.4, edge: 1, thresh: 0.02, lift: 0, mono: 0, halftone: 0, ink: [0.99, 0.89, 0.54], glow: 1 },
 ];
 
 /** Draw one shader pass over an image into a new image the same size. */
@@ -134,7 +134,7 @@ export function renderToon(img: SkImage, style: ToonStyle, bold: number): SkImag
     if (!smooth) {
       let cur: SkImage | null = img;
       for (const r of [1.2, 2.2, 3.4]) {
-        cur = cur && pass(BILATERAL_FX, cur, [r * style.smooth * scale, 0.11]);
+        cur = cur && pass(BILATERAL_FX, cur, [r * style.smooth * scale, 0.15]);
       }
       if (!cur) return null;
       smooth = cur;
