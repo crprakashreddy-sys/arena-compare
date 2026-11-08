@@ -27,7 +27,8 @@ const BODY: Record<string, CarShape> = {
   "hyundai-creta-electric": "suv", "hyundai-ioniq5": "crossover", "mahindra-xuv400": "compact", "mahindra-be6": "coupe",
   "mahindra-xev9e": "coupe", "byd-atto3": "suv", "byd-emax7": "mpv", "kia-ev6": "crossover", "citroen-ec3": "hatch",
   "revolt-rv400": "bike", "mahindra-xev9s": "boxy", "maruti-e-vitara-61": "suv", "maruti-e-vitara-49": "suv",
-  "kia-carens-clavis-ev": "mpv",
+  "kia-carens-clavis-ev": "mpv", "tata-sierra-ev-75": "boxy", "tata-sierra-ev-63": "boxy", "vinfast-vf6": "compact",
+  "vinfast-vf7": "coupe", "mg-m9": "mpv",
 };
 export function shapeFor(v?: { id: string; kind: string } | null): CarShape {
   if (!v) return "suv";

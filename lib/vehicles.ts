@@ -48,6 +48,11 @@ export const CATALOG: Model[] = [
   { id: "maruti-e-vitara-61", make: "Maruti Suzuki", model: "e Vitara (61 kWh)", kind: "car", batteryKWh: 61, rangeKm: 410, plugs: ["ccs2", "type2"], maxDcKW: 70, maxAcKW: 7.4 },
   { id: "maruti-e-vitara-49", make: "Maruti Suzuki", model: "e Vitara (49 kWh)", kind: "car", batteryKWh: 49, rangeKm: 330, plugs: ["ccs2", "type2"], maxDcKW: 60, maxAcKW: 7.4 },
   { id: "kia-carens-clavis-ev", make: "Kia", model: "Carens Clavis EV", kind: "car", batteryKWh: 51.4, rangeKm: 370, plugs: ["ccs2", "type2"], maxDcKW: 100, maxAcKW: 11 },
+  { id: "tata-sierra-ev-75", make: "Tata", model: "Sierra EV (75 kWh)", kind: "car", batteryKWh: 75, rangeKm: 500, plugs: ["ccs2", "type2"], maxDcKW: 120, maxAcKW: 7.2 },
+  { id: "tata-sierra-ev-63", make: "Tata", model: "Sierra EV (63 kWh)", kind: "car", batteryKWh: 63, rangeKm: 420, plugs: ["ccs2", "type2"], maxDcKW: 120, maxAcKW: 7.2 },
+  { id: "vinfast-vf6", make: "VinFast", model: "VF 6", kind: "car", batteryKWh: 59.6, rangeKm: 350, plugs: ["ccs2", "type2"], maxDcKW: 60, maxAcKW: 7.4 },
+  { id: "vinfast-vf7", make: "VinFast", model: "VF 7", kind: "car", batteryKWh: 70.8, rangeKm: 400, plugs: ["ccs2", "type2"], maxDcKW: 80, maxAcKW: 7.4 },
+  { id: "mg-m9", make: "MG", model: "M9", kind: "car", batteryKWh: 90, rangeKm: 420, plugs: ["ccs2", "type2"], maxDcKW: 160, maxAcKW: 11 },
   { id: "byd-atto3", make: "BYD", model: "Atto 3", kind: "car", batteryKWh: 60, rangeKm: 420, plugs: ["ccs2", "type2"], maxDcKW: 80, maxAcKW: 7 },
   { id: "byd-emax7", make: "BYD", model: "eMax 7", kind: "car", batteryKWh: 72, rangeKm: 420, plugs: ["ccs2", "type2"], maxDcKW: 115, maxAcKW: 7 },
   { id: "kia-ev6", make: "Kia", model: "EV6", kind: "car", batteryKWh: 84, rangeKm: 500, plugs: ["ccs2", "type2"], maxDcKW: 240, maxAcKW: 11 },
@@ -59,6 +64,8 @@ export const CATALOG: Model[] = [
   { id: "tvs-iqube", make: "TVS", model: "iQube", kind: "scooter", batteryKWh: 3.4, rangeKm: 100, plugs: ["ac15a"], maxDcKW: 0, maxAcKW: 0.95 },
   { id: "bajaj-chetak", make: "Bajaj", model: "Chetak", kind: "scooter", batteryKWh: 3.5, rangeKm: 120, plugs: ["ac15a"], maxDcKW: 0, maxAcKW: 0.75 },
   { id: "hero-vida-v2", make: "Hero", model: "Vida V2", kind: "scooter", batteryKWh: 3.9, rangeKm: 100, plugs: ["ac15a"], maxDcKW: 0, maxAcKW: 0.7 },
+  { id: "suzuki-e-access", make: "Suzuki", model: "e-Access", kind: "scooter", batteryKWh: 3, rangeKm: 80, plugs: ["ac15a"], maxDcKW: 0, maxAcKW: 0.75 },
+  { id: "yamaha-ec06", make: "Yamaha", model: "EC-06", kind: "scooter", batteryKWh: 4, rangeKm: 130, plugs: ["ac15a"], maxDcKW: 0, maxAcKW: 0.6 },
   { id: "revolt-rv400", make: "Revolt", model: "RV400", kind: "bike", batteryKWh: 3.2, rangeKm: 120, plugs: ["ac15a"], maxDcKW: 0, maxAcKW: 0.6 },
 ];
 
