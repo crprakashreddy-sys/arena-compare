@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AuthProvider, useAuth } from "../lib/auth";
 import { IntroLoader } from "../components/IntroLoader";
+import { Onboarding } from "../components/Onboarding";
 import { useTheme } from "../lib/theme";
 
 export default function RootLayout() {
@@ -35,6 +36,7 @@ export default function RootLayout() {
           <Stack.Screen name="savings" options={{ title: "Savings" }} />
           <Stack.Screen name="login" options={{ title: "Join zappd", presentation: "modal" }} />
         </Stack>
+        <Onboarding />
         <Intro />
       </AuthProvider>
     </GestureHandlerRootView>

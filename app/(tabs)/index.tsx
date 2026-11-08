@@ -7,6 +7,7 @@ import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { fetchChargers, isFast, speedLabel } from "../../lib/chargers";
+import { useOnboarded } from "../../lib/onboarding";
 import { fetchLiveStatus, fetchRatings, fetchSnaps, fetchZapBubbles } from "../../lib/community";
 import { isConfigured, snapUrl } from "../../lib/supabase";
 import { timeAgo } from "../../lib/geo";
@@ -104,10 +105,13 @@ export default function MapScreen() {
     }
     return true;
   }, [load]);
+  // Wait for the welcome screens so the location prompt comes after we've explained why.
+  const onboarded = useOnboarded();
   useEffect(() => {
+    if (!onboarded) return;
     startLocation();
     return () => { watch.current?.remove(); watch.current = null; };
-  }, [startLocation]);
+  }, [startLocation, onboarded]);
 
   // Place search, debounced.
   useEffect(() => {
