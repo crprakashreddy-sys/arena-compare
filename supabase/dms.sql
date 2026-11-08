@@ -116,6 +116,9 @@ create trigger dm_messages_after after insert on public.dm_messages for each row
 
 do $$ begin alter publication supabase_realtime add table public.dm_messages;
 exception when duplicate_object then null; end $$;
+-- Read receipts: the chat screen listens for the other person's read time.
+do $$ begin alter publication supabase_realtime add table public.dm_threads;
+exception when duplicate_object then null; end $$;
 
 -- Reports cover DMs too.
 alter table public.reports drop constraint if exists reports_target_kind_check;

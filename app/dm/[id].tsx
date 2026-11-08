@@ -13,7 +13,7 @@ import { useTheme, CTA, ON_CTA, MY_BUBBLE_TEXT } from "../../lib/theme";
 import { snapUrl } from "../../lib/supabase";
 import { blockUser, report, uploadSnap } from "../../lib/community";
 import {
-  deleteDm, fetchDm, fetchDmMessages, fetchThread, markDmRead, sendDm, subscribeDm, type DmMessage, type DmPerson,
+  deleteDm, fetchDm, fetchDmMessages, fetchThread, markDmRead, otherReadAt, sendDm, subscribeDm, type DmMessage, type DmPerson,
 } from "../../lib/dms";
 import { Avatar } from "../../components/ui";
 import { IconTile } from "../../components/Icon";
@@ -57,14 +57,16 @@ export default function DirectMessage() {
   const [text, setText] = useState("");
   const [reply, setReply] = useState<DmMessage | null>(null);
   const [sending, setSending] = useState(false);
+  const [seenAt, setSeenAt] = useState<string | null>(null);
 
   const byId = useMemo(() => new Map(msgs.map((m) => [m.id, m])), [msgs]);
+  const myLatest = msgs.find((m) => m.user_id === me && !m.deleted)?.id;
   const nameOf = (uid: string) => (uid === me ? "You" : other?.display_name ?? "Driver");
 
   useEffect(() => {
     if (!me) return;
     let alive = true;
-    fetchThread(threadId).then((r) => { if (alive) { setOther(r.other); setCanSend(r.canSend); } });
+    fetchThread(threadId, me).then((r) => { if (alive) { setOther(r.other); setCanSend(r.canSend); setSeenAt(r.seenAt); } });
     fetchDmMessages(threadId).then((m) => { if (alive) { setMsgs(m); setOlder(m.length === 50); setLoading(false); } })
       .catch(() => alive && setLoading(false));
     markDmRead(threadId);
@@ -79,7 +81,8 @@ export default function DirectMessage() {
         const m = await fetchDm(chId);
         if (!alive) return;
         setMsgs((cur) => (m ? cur.map((x) => (x.id === chId ? m : x)) : cur.filter((x) => x.id !== chId)));
-      });
+      },
+      (row) => { if (alive) setSeenAt(otherReadAt(row, me)); });
     return () => { alive = false; off(); markDmRead(threadId); };
   }, [threadId, me]);
 
@@ -209,6 +212,9 @@ export default function DirectMessage() {
                 )}
                 <Bubble m={m} mine={m.user_id === me} tight={grouped}
                   replyTo={m.reply_to ? byId.get(m.reply_to) : undefined} replyName={(uid) => nameOf(uid)} onLongPress={() => longPress(m)} />
+                {m.id === myLatest && (
+                  <Receipt seen={!!seenAt && seenAt >= m.created_at} />
+                )}
               </View>
             );
           }}
@@ -244,6 +250,16 @@ export default function DirectMessage() {
         </View>
       )}
     </KeyboardAvoidingView>
+  );
+}
+
+function Receipt({ seen }: { seen: boolean }) {
+  const t = useTheme();
+  return (
+    <View style={{ flexDirection: "row", alignSelf: "flex-end", alignItems: "center", gap: 3, marginTop: 3, marginRight: 4 }}>
+      <Ionicons name={seen ? "checkmark-done" : "checkmark"} size={13} color={seen ? "#B8860B" : t.faint} />
+      <Text style={{ color: seen ? t.text : t.faint, fontSize: 11, fontWeight: "700" }}>{seen ? "Seen" : "Sent"}</Text>
+    </View>
   );
 }
 

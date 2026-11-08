@@ -17,6 +17,7 @@ import { ClubBadge } from "../../components/ClubBadge";
 import { useSessions } from "../../lib/sessions";
 import { Icon, IconTile } from "../../components/Icon";
 import { NotifyCard, NotifySettings } from "../../components/NotifyCard";
+import { unreadDms } from "../../lib/dms";
 
 const GUIDELINES_URL = "https://crprakashreddy-sys.github.io/zingd/terms.html";
 const PRIVACY_URL = "https://crprakashreddy-sys.github.io/zingd/privacy.html";
@@ -260,7 +261,11 @@ function Tools() {
   const t = useTheme();
   const { active } = useGarage();
   const { active: charging } = useSessions();
+  const { session } = useAuth();
+  const [dm, setDm] = useState(0);
+  useFocusEffect(useCallback(() => { if (session) unreadDms().then(setDm).catch(() => {}); }, [session]));
   const items: [string, string, string, () => void][] = [
+    ...(session ? [["chatbubble-ellipses-outline", "Messages", dm ? `${dm} unread` : "Chats with your crew", () => router.push("/messages")] as [string, string, string, () => void]] : []),
     ["car-sport-outline", "My vehicles", active ? vehicleName(active) : "Add your EV", () => router.push("/garage")],
     ["map-outline", "Plan a trip", "Charging stops on the way", () => router.push("/trip")],
     ["timer-outline", "Charging log", charging ? "Charging now" : "Track charges and spend", () => router.push("/log")],

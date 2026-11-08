@@ -39,14 +39,21 @@ export async function unreadDms(): Promise<number> {
   return (data ?? []).filter((r: any) => !isBlocked(r.other_id)).reduce((n: number, r: any) => n + (r.unread ?? 0), 0);
 }
 
-export async function fetchThread(threadId: string): Promise<{ other: DmPerson | null; canSend: boolean }> {
+/** When the other person last opened the chat (for "Seen"). */
+export function otherReadAt(row: any, me: string): string | null {
+  if (!row) return null;
+  return row.user_a === me ? row.b_read_at : row.a_read_at;
+}
+
+export async function fetchThread(threadId: string, me: string): Promise<{ other: DmPerson | null; canSend: boolean; seenAt: string | null }> {
   const { data: other_id } = await supabase.rpc("thread_other", { t: threadId });
-  if (!other_id) return { other: null, canSend: false };
-  const [{ data: p }, { data: ok }] = await Promise.all([
+  if (!other_id) return { other: null, canSend: false, seenAt: null };
+  const [{ data: p }, { data: ok }, { data: th }] = await Promise.all([
     supabase.from("profiles").select("id,display_name,avatar_path,car_model").eq("id", other_id).maybeSingle(),
     supabase.rpc("can_dm", { other: other_id }),
+    supabase.from("dm_threads").select("user_a,a_read_at,b_read_at").eq("id", threadId).maybeSingle(),
   ]);
-  return { other: (p as DmPerson) ?? null, canSend: !!ok };
+  return { other: (p as DmPerson) ?? null, canSend: !!ok, seenAt: otherReadAt(th, me) };
 }
 
 export async function fetchDmMessages(threadId: string, before?: string): Promise<DmMessage[]> {
@@ -78,11 +85,12 @@ export async function markDmRead(threadId: string) {
   await supabase.rpc("mark_dm_read", { t: threadId });
 }
 
-export function subscribeDm(threadId: string, onNew: (id: string) => void, onChange: (id: string) => void) {
+export function subscribeDm(threadId: string, onNew: (id: string) => void, onChange: (id: string) => void, onThread?: (row: any) => void) {
   const ch = supabase
     .channel(`dm-${threadId}`)
     .on("postgres_changes", { event: "INSERT", schema: "public", table: "dm_messages", filter: `thread_id=eq.${threadId}` }, (p: any) => onNew(p.new.id))
     .on("postgres_changes", { event: "UPDATE", schema: "public", table: "dm_messages", filter: `thread_id=eq.${threadId}` }, (p: any) => onChange(p.new.id))
+    .on("postgres_changes", { event: "UPDATE", schema: "public", table: "dm_threads", filter: `id=eq.${threadId}` }, (p: any) => onThread?.(p.new))
     .subscribe();
   return () => { supabase.removeChannel(ch); };
 }
