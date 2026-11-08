@@ -69,12 +69,24 @@ export const QUIZ: { q: string; answers: Answer[] }[] = [
   ] },
 ];
 
-/** Tally the answers; ties go to the type picked earliest in the quiz. */
+// Most points each type can get. Some types appear in more answers than others, so raw totals
+// would push people toward those; scoring as a share of each type's best keeps every type fair.
+const MAX: Record<string, number> = (() => {
+  const m: Record<string, number> = {};
+  QUIZ.forEach((q) => {
+    const best: Record<string, number> = {};
+    q.answers.forEach((a) => Object.entries(a.gives).forEach(([k, v]) => { best[k] = Math.max(best[k] ?? 0, v as number); }));
+    Object.entries(best).forEach(([k, v]) => { m[k] = (m[k] ?? 0) + v; });
+  });
+  return m;
+})();
+
+/** Tally the answers as a share of each type's maximum; ties go to the type picked earliest in the quiz. */
 export function scoreQuiz(picks: number[]): PersonalityId {
   const tally: Record<string, number> = {};
   picks.forEach((a, qi) => {
     const g = QUIZ[qi]?.answers[a]?.gives ?? {};
-    Object.entries(g).forEach(([k, v]) => { tally[k] = (tally[k] ?? 0) + (v as number) + (QUIZ.length - qi) * 0.01; });
+    Object.entries(g).forEach(([k, v]) => { tally[k] = (tally[k] ?? 0) + (v as number) / Math.sqrt(MAX[k] || 1) + (QUIZ.length - qi) * 0.001; });
   });
   return (Object.entries(tally).sort((x, y) => y[1] - x[1])[0]?.[0] ?? "city_glider") as PersonalityId;
 }

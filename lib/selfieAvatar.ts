@@ -44,17 +44,22 @@ const tidy = (c: RGB, lift = 1.08): RGB => {
 };
 
 export async function avatarFromSelfie(uri: string): Promise<Partial<AvatarOpts>> {
-  const p = await pixels(uri);
-  // The selfie screen asks for the face inside a centred oval, so these boxes land on the right spots.
+  return readFace(await pixels(uri));
+}
+
+/** The pure part (testable without a phone): read skin, hair, hair length and beard from RGBA pixels. */
+export function readFace(p: { px: Uint8Array; w: number; h: number }): Partial<AvatarOpts> {
+  // The selfie screen asks for the face inside a centred square, so these boxes land on the right spots.
   const cheekL = region(p, 0.32, 0.5, 0.42, 0.6), cheekR = region(p, 0.58, 0.5, 0.68, 0.6);
   const skin: RGB = [(cheekL[0] + cheekR[0]) / 2, (cheekL[1] + cheekR[1]) / 2, (cheekL[2] + cheekR[2]) / 2];
   const crown = region(p, 0.4, 0.14, 0.6, 0.22);
-  const sideL = region(p, 0.16, 0.5, 0.24, 0.66), sideR = region(p, 0.76, 0.5, 0.84, 0.66);
+  const sideL = region(p, 0.05, 0.56, 0.13, 0.76), sideR = region(p, 0.87, 0.56, 0.95, 0.76);
   const chin = region(p, 0.42, 0.74, 0.58, 0.8);
 
-  const bald = dist(crown, skin) < 38;
+  // Bald only when the crown really is skin-coloured (blonde hair on fair skin is close, so be strict).
+  const bald = dist(crown, skin) < 26;
   const hair: RGB = bald ? skin : crown;
-  const longHair = !bald && (dist(sideL, hair) < 45 || dist(sideR, hair) < 45) && dist(sideL, skin) > 40;
+  const longHair = !bald && (dist(sideL, hair) < 50 || dist(sideR, hair) < 50) && Math.min(dist(sideL, skin), dist(sideR, skin)) > 30;
   const beard = dist(chin, skin) > 55 && lum(chin) < lum(skin) - 25;
 
   return {
