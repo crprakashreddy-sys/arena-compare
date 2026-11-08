@@ -32,6 +32,30 @@ else
   echo "   All packages present."
 fi
 
+echo "🩺 Checking the database…"
+rm -f .db-missing
+node scripts/check-db.mjs || true
+if [ -f .db-missing ]; then
+  # Add any missing files to what gets copied for Supabase, in the right order.
+  for b in $(cat .db-missing); do case " $newsql " in *" $b "*) ;; *) newsql="$newsql $b" ;; esac; done
+  rm -f .db-missing
+fi
+
+echo "🔎 Checking the code…"
+if [ -x node_modules/.bin/tsc ]; then
+  errs=$(node_modules/.bin/tsc --noEmit -p . 2>&1 | grep -E "error TS" || true)
+  n=$(printf "%s" "$errs" | grep -c "error TS" || true)
+  if [ "$n" = "0" ]; then echo "   ✅ No code errors."
+  else
+    echo "   ⚠️  $n type warnings (the app can still run). First few:"
+    printf "%s\n" "$errs" | head -5 | sed 's/^/      /'
+    printf "%s\n" "$errs" > .code-check.txt
+    echo "      Full list saved to .code-check.txt. Send it to Claude if something looks broken."
+  fi
+else
+  echo "   (TypeScript isn't installed yet, skipping. Run: npx expo install -- --save-dev typescript)"
+fi
+
 if [ -n "$newsql" ]; then
   for b in $newsql; do cat "supabase/$b"; echo; done | pbcopy
   open "https://supabase.com/dashboard/project/$PROJECT_REF/sql/new" || true
