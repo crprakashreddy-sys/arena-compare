@@ -23,7 +23,7 @@ const GUIDELINES_URL = "https://crprakashreddy-sys.github.io/zingd/terms.html";
 
 export default function Login() {
   const t = useTheme();
-  const { session, profile, refreshProfile } = useAuth();
+  const { session, profile, refreshProfile, profileError } = useAuth();
   const [step, setStep] = useState<"choose" | "email" | "code" | "profile">("choose");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
@@ -188,6 +188,13 @@ export default function Login() {
         {step === "profile" && (
           <View style={{ gap: 12 }}>
             <Text style={{ color: t.text, fontSize: 22, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", letterSpacing: -0.6 }}>Set up your driver profile</Text>
+            {!!profileError && (
+              <Pressable onPress={() => refreshProfile()} style={{ backgroundColor: "#FDECEA", borderRadius: 14, padding: 12, gap: 4 }}>
+                <Text style={{ color: "#B3261E", fontWeight: "800" }}>We couldn't load your existing profile</Text>
+                <Text style={{ color: "#B3261E", fontSize: 13 }} selectable>{profileError}</Text>
+                <Text style={{ color: "#B3261E", fontSize: 13, fontWeight: "700" }}>Tap to try again</Text>
+              </Pressable>
+            )}
             <Label text="Your name" />
             <TextInput value={name} onChangeText={setName} placeholder="Prakash Reddy" placeholderTextColor={t.faint} style={input} maxLength={40} />
             <Label text="Your EV (optional)" />
