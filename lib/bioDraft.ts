@@ -11,7 +11,7 @@ export const TONES: { id: Tone; label: string; emoji: string }[] = [
   { id: "witty", label: "Witty", emoji: "😏" }, { id: "funny", label: "Funny", emoji: "😂" },
   { id: "classy", label: "Classy", emoji: "🥂" }, { id: "chill", label: "Chill", emoji: "😌" },
 ];
-type Input = { car?: string | null; city?: string | null; personality?: string | null; traits?: string[]; interests?: string[] };
+type Input = { car?: string | null; city?: string | null; personality?: string | null; traits?: string[]; interests?: string[]; kind?: string | null };
 
 const pick = <T,>(a: T[], r: () => number) => a[Math.floor(r() * a.length)];
 // mulberry32: small, well-mixed random numbers so every Shuffle feels different.
@@ -32,12 +32,17 @@ const PHRASE: Record<string, string> = {
   "Solar at home": "solar", "Pets on board": "road trips with my dog", "Driving playlists": "a good playlist", "Highway food": "highway food",
 };
 const phrase = (label: string) => PHRASE[label] ?? label.toLowerCase();
+// "books and art & design", never "books & art & design".
+const joinNice = (a: string[]) => a.join(a.some((x) => x.includes("&")) ? " and " : " & ");
 const cap = (s: string) => s.replace(/(^|[.!?]\s+)([a-z])/g, (_, a, b) => a + b.toUpperCase());
 
 export function draftBio(p: Input, tone: Tone, seed = Date.now(), avoid?: string | null): string {
   const r = rng(seed);
   const hasCar = !!p.car?.trim();
   const car = p.car?.trim() || "EV";
+  // Scooter and bike owners get "ride", not "car".
+  const isTwo = p.kind === "two" || /scooter|e-access|ather|ola s1|chetak|iqube|vida|rv400|bike|activa/i.test(car);
+  const ride = isTwo ? "ride" : "car";
   const aCar = hasCar ? `my ${car}` : "an EV";
   const city = p.city?.trim();
   const per = personalityById(p.personality);
@@ -48,7 +53,7 @@ export function draftBio(p: Input, tone: Tone, seed = Date.now(), avoid?: string
   const likes = [...vibes.filter((v) => !v.label.startsWith("My ex") && !["Introvert", "Ambivert", "Extrovert", "Early bird", "Night owl", "Planner", "Spontaneous", "Chill", "Go-getter"].includes(v.label)), ...ints];
   const two = likes.sort(() => r() - 0.5).slice(0, 2);
   const one = two[0] ? phrase(two[0].label) : null;
-  const like = two.length ? two.map((x) => phrase(x.label)).join(" & ") : null;
+  const like = two.length ? joinNice(two.map((x) => phrase(x.label))) : null;
   // Short sign-off; the personality badge already shows on the profile.
   const tagLine = [hasCar ? car : null, city].filter(Boolean).join(" · ");
   const tail = tagLine ? ` ${tagLine}` : "";
@@ -57,7 +62,7 @@ export function draftBio(p: Input, tone: Tone, seed = Date.now(), avoid?: string
   const special: Partial<Record<Tone, string[]>> = { witty: [], funny: [], classy: [], chill: [] };
   const add = (t: Tone, line: string) => special[t]!.push(line);
   if (has("My ex's favourites (still trying to forget)")) {
-    add("funny", `Still playing my ex's playlist. The car moved on. I'm buffering.${tail}`);
+    add("funny", `Still playing my ex's playlist. The ${ride} moved on. I'm buffering.${tail}`);
     add("witty", `Zero emissions. Some baggage. Mostly my ex's playlist.${tail}`);
   }
   if (has("Night owl") || has("Night drives") || per?.id === "night_cruiser") {
@@ -75,13 +80,13 @@ export function draftBio(p: Input, tone: Tone, seed = Date.now(), avoid?: string
     add("classy", `Believes the best restaurants are found at 80% charge.${tail}`);
   }
   if (has("Chai stops")) add("chill", `Every charge is a chai break if you plan it right ☕${tail}`);
-  if (has("Regional mass songs")) add("funny", `Silent car. Mass songs on full volume. The neighbours know when I'm back 🔊${tail}`);
+  if (has("Regional mass songs")) add("funny", `Silent ${ride}. Mass songs on full volume. The neighbours know when I'm back 🔊${tail}`);
   if (has("Classical")) add("classy", `Classical in the cabin, calm on the road.${tail}`);
   if (has("Max range") || per?.id === "range_master") add("witty", `I don't have range anxiety. My passengers do 🔋${tail}`);
-  if (has("EV tech") || per?.id === "tech_geek") add("witty", `Reads release notes for fun. Yes, even the car's.${tail}`);
-  if (has("Introvert")) add("witty", `Introvert who bought the quietest car on the road. Coincidence? No.${tail}`);
+  if (has("EV tech") || per?.id === "tech_geek") add("witty", `Reads release notes for fun. Yes, even the ${ride}'s.${tail}`);
+  if (has("Introvert")) add("witty", `Introvert who bought the quietest ${ride} on the road. Coincidence? No.${tail}`);
   if (has("Extrovert") || per?.id === "social_charger") add("funny", `I make friends at every charger. Some of them even wanted one ☕${tail}`);
-  if (has("Car photography") || has("Detailing")) add("classy", `Keeps the car spotless and the photos sharper.${tail}`);
+  if (has("Car photography") || has("Detailing")) add("classy", `Keeps the ${ride} spotless and the photos sharper.${tail}`);
   if (has("Startups")) add("witty", `Building a startup by day, building range by night.${tail}`);
 
   const opts: Record<Tone, (() => string)[]> = {
@@ -91,14 +96,14 @@ export function draftBio(p: Input, tone: Tone, seed = Date.now(), avoid?: string
       () => `Zero emissions, plenty of opinions${one ? `, mostly about ${one}` : ""}.${tail}`,
       () => `Low on carbon, high on ${one ?? "good company"}.${tail}`,
       () => `Running on electrons and good decisions. Mostly electrons ⚡${tail}`,
-      () => `${hasCar ? `The ${car} is silent.` : "My car is silent."} I am not.${city ? ` ${city}` : ""}`,
+      () => `${hasCar ? `The ${car} is silent.` : `My ${ride} is silent.`} I am not.${city ? ` ${city}` : ""}`,
       () => `Plugged in, rarely switched off${like ? `. Into ${like}` : ""}.${tail}`,
     ],
     funny: [
       () => `Range anxiety? I have regular anxiety. The range is fine 🔋${tail}`,
-      () => `${hasCar ? `My ${car}` : "My car"} has more charge than my phone. Priorities.${city ? ` ${city}` : ""}`,
+      () => `${hasCar ? `My ${car}` : `My ${ride}`} has more charge than my phone. Priorities.${city ? ` ${city}` : ""}`,
       () => `Last fuel bill: ₹0. Last chai bill: classified ☕${tail}`,
-      () => `Mom still thinks the car is broken because it makes no sound.${tail}`,
+      () => `Mom still thinks the ${ride} is broken because it makes no sound.${tail}`,
       () => `Swipe right if you know where the free chargers are 😌${tail}`,
       () => `Fluent in kWh. Still learning ${city ?? "city"} traffic.${hasCar ? ` ${car}` : ""}`,
       () => `I don't visit petrol pumps. I visit charger cafés${one ? ` and talk about ${one}` : ""}.${tail}`,

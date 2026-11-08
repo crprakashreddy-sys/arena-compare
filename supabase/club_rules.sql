@@ -38,10 +38,16 @@ begin
     return format('This club asks for a profile at least %s%% complete.', k.req_min_profile);
   end if;
   if cardinality(k.req_personalities) > 0 and (p.personality is null or not (p.personality = any(k.req_personalities))) then
-    return 'This club is for certain EV personalities. Take the quiz on your profile.';
+    -- Name the personalities so people know exactly what the club wants.
+    return format('This club is for %s.%s',
+      (select string_agg(case x when 'road_tripper' then 'Road Trippers 🛣️' when 'range_master' then 'Range Masters 🔋' when 'city_glider' then 'City Gliders 🏙️'
+        when 'tech_geek' then 'Tech Geeks 🤓' when 'eco_warrior' then 'Eco Warriors 🌱' when 'thrill_seeker' then 'Thrill Seekers ⚡'
+        when 'social_charger' then 'Social Chargers ☕' when 'night_cruiser' then 'Night Cruisers 🌙' else x end, ', ') from unnest(k.req_personalities) x),
+      case when p.personality is null then ' Take the 1-minute quiz on your profile to see yours.' else '' end);
   end if;
   if cardinality(k.req_traits) > 0 and not (p.traits && k.req_traits) then
-    return 'This club is for drivers with a certain vibe. Add your vibe on your profile.';
+    return format('This club looks for: %s. If that''s you, add it under Your vibe on your profile.',
+      (select string_agg(initcap(replace(x, '_', ' ')), ', ') from unnest(k.req_traits) x));
   end if;
   if k.req_same_city and (coalesce(k.city, '') = '' or lower(coalesce(p.city, '')) <> lower(k.city)) then
     return format('This club is for drivers in %s.', k.city);

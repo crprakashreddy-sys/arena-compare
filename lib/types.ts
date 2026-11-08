@@ -23,6 +23,7 @@ export type Profile = {
   vehicle_verified: boolean;
   avatar_path?: string | null;
   bio?: string | null;
+  vehicle_kind?: "car" | "two" | "both" | null;
   interests?: string[];
   personality?: string | null;
   traits?: string[];
