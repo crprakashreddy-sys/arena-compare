@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, Alert, Pressable, ScrollView, Share, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
@@ -7,7 +7,6 @@ import { Stack, router } from "expo-router";
 import { Ionicons } from "../components/SFIcon";
 import { useTheme, CTA, ON_CTA } from "../lib/theme";
 import { useAuth } from "../lib/auth";
-import { useGarage } from "../lib/vehicles";
 import { updateProfileExtras, uploadSnap } from "../lib/community";
 import { aiCartoon, aiStyles, type AiStyle } from "../modules/zingd-imagine";
 import { successHaptic, tapHaptic, tickHaptic } from "../lib/motion";
@@ -26,15 +25,14 @@ export default function AiCartoon() {
   const t = useTheme();
   const { width } = useWindowDimensions();
   const { profile, refreshProfile } = useAuth();
-  const { active } = useGarage();
   const [styles, setStyles] = useState<AiStyle[] | null>(null);
   const [style, setStyle] = useState<AiStyle>("illustration");
   const [src, setSrc] = useState<string | null>(null);
   const [out, setOut] = useState<string | null>(null);
-  const [idea, setIdea] = useState(active ? `with our ${active.make} ${active.model}` : "");
   const [busy, setBusy] = useState<null | "make" | "save">(null);
   const W = Math.min(width - 32, 420);
 
+  const unsupported = styles !== null && styles.length === 0;
   useEffect(() => { aiStyles().then((s) => { setStyles(s); if (s.length && !s.includes("illustration")) setStyle(s[0]); }); }, []);
 
   const pick = async (camera: boolean) => {
@@ -45,12 +43,13 @@ export default function AiCartoon() {
     const img = await ImageManipulator.manipulate(res.assets[0].uri).resize({ width: 1400 }).renderAsync();
     const saved = await img.saveAsync({ format: SaveFormat.JPEG, compress: 0.9 });
     setSrc(saved.uri); setOut(null);
+    make(saved.uri); // straight from your photo, no typing
   };
 
-  const make = async () => {
-    if (!src) return;
+  const make = async (from = src, st = style) => {
+    if (!from || unsupported) return;
     setBusy("make");
-    try { setOut(await aiCartoon(src, idea, style)); successHaptic(); }
+    try { setOut(await aiCartoon(from, "", st)); successHaptic(); }
     catch (e: any) { Alert.alert("Couldn't make it", e?.message ?? "Try another photo."); }
     setBusy(null);
   };
@@ -67,8 +66,6 @@ export default function AiCartoon() {
     } catch (e: any) { Alert.alert("Didn't save", e?.message ?? "Try again."); }
     setBusy(null);
   };
-
-  const unsupported = styles !== null && styles.length === 0;
 
   return (
     <View style={{ flex: 1, backgroundColor: t.bg }}>
@@ -91,7 +88,7 @@ export default function AiCartoon() {
             <View style={{ alignItems: "center", gap: 8, padding: 24 }}>
               <Text style={{ fontSize: 48 }}>👨‍👩‍👦🚙</Text>
               <Text style={[s.h, { color: t.text }]}>You, your people, your EV</Text>
-              <Text style={{ color: t.muted, textAlign: "center", lineHeight: 20 }}>Pick a photo: a selfie, your family at delivery day, you with your car. We'll redraw it as art.</Text>
+              <Text style={{ color: t.muted, textAlign: "center", lineHeight: 20 }}>Upload a photo: a selfie, your family on delivery day, you with your car. We redraw it as art, nothing to type.</Text>
             </View>
           )}
           {busy === "make" && (
@@ -115,7 +112,7 @@ export default function AiCartoon() {
         <Text style={[s.label, { color: t.text }]}>Style</Text>
         <View style={{ flexDirection: "row", gap: 8 }}>
           {(styles?.length ? styles : (Object.keys(STYLE_LABEL) as AiStyle[])).map((k) => (
-            <Pressable key={k} onPress={() => { tickHaptic(); setStyle(k); }}
+            <Pressable key={k} onPress={() => { tickHaptic(); setStyle(k); if (src && !busy) make(src, k); }}
               style={[s.style, { backgroundColor: style === k ? CTA : t.surface, borderColor: style === k ? CTA : t.line }]}>
               <Text style={{ fontSize: 22 }}>{STYLE_LABEL[k].emoji}</Text>
               <Text style={{ color: style === k ? ON_CTA : t.text, fontWeight: "800", fontSize: 12.5 }}>{STYLE_LABEL[k].name}</Text>
@@ -123,9 +120,6 @@ export default function AiCartoon() {
           ))}
         </View>
 
-        <Text style={[s.label, { color: t.text }]}>Add a touch (optional)</Text>
-        <TextInput value={idea} onChangeText={setIdea} placeholder="e.g. delivery day, festive lights, road trip" placeholderTextColor={t.faint}
-          style={[s.input, { color: t.text, backgroundColor: t.surface }]} maxLength={80} />
       </ScrollView>
 
       <View style={[s.footer, { backgroundColor: t.bg, borderTopColor: t.line }]}>
@@ -139,7 +133,7 @@ export default function AiCartoon() {
             </Pressable>
           </>
         ) : (
-          <Pressable onPress={make} disabled={!src || !!busy || unsupported} style={[s.cta, (!src || unsupported) && { opacity: 0.4 }]}>
+          <Pressable onPress={() => make()} disabled={!src || !!busy || unsupported} style={[s.cta, (!src || unsupported) && { opacity: 0.4 }]}>
             {busy === "make" ? <ActivityIndicator color={ON_CTA} /> : <Text style={s.ctaText}>✨ Make my AI cartoon</Text>}
           </Pressable>
         )}
