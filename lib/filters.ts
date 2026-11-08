@@ -45,10 +45,13 @@ const chain = (...ms: M[]) => ms.reduce((acc, m) => compose(acc, m), IDENTITY);
 export type Blend = "softLight" | "overlay" | "screen" | "lighten" | "multiply" | "srcOver";
 export type Tint = { color: string; blend: Blend };
 
+import { g, type Grade } from "./grade";
+
 export type Look = {
   id: string;
   name: string;
-  matrix: M;
+  grade: Grade;     // the real grade (GPU shader)
+  matrix: M;        // simple fallback if the shader can't run
   tints: Tint[];
   vignette: number; // 0–1 darkness at the edges
   grain: number;    // 0–1 opacity of film grain
@@ -57,46 +60,64 @@ export type Look = {
   letterbox: boolean;
 };
 
+// Teal, orange, lemon… [r, g, b] from 0 to 1, 0.5 = no tint.
+const TEAL: [number, number, number] = [0.32, 0.58, 0.62], ORANGE: [number, number, number] = [0.72, 0.52, 0.36];
+const MAGENTA: [number, number, number] = [0.66, 0.36, 0.64], BLUE: [number, number, number] = [0.36, 0.44, 0.7];
+const WARM: [number, number, number] = [0.66, 0.54, 0.4], GREEN: [number, number, number] = [0.42, 0.6, 0.5];
+const LEMON: [number, number, number] = [0.68, 0.64, 0.34], PINK: [number, number, number] = [0.7, 0.5, 0.58];
+const COOL: [number, number, number] = [0.44, 0.5, 0.62], VIOLET: [number, number, number] = [0.5, 0.4, 0.66];
+
+const base = { tints: [] as Tint[], vignette: 0, grain: 0, bloom: 0, leak: false, letterbox: false };
+
 export const LOOKS: Look[] = [
-  { id: "original", name: "Original", matrix: IDENTITY, tints: [], vignette: 0, grain: 0, bloom: 0, leak: false, letterbox: false },
-  {
-    id: "cinema", name: "Cinema", matrix: chain(contrast(1.16), saturation(1.12), scale(1.02, 1.02, 1.02)),
-    tints: [{ color: "rgba(0,110,120,0.38)", blend: "softLight" }, { color: "rgba(255,140,60,0.22)", blend: "overlay" }],
-    vignette: 0.6, grain: 0.22, bloom: 0, leak: false, letterbox: true,
-  },
-  {
-    id: "neon", name: "Neon Night", matrix: chain(saturation(1.65), contrast(1.18), scale(1.06, 1.06, 1.06)),
-    tints: [{ color: "rgba(255,0,170,0.16)", blend: "screen" }, { color: "rgba(0,60,140,0.25)", blend: "softLight" }],
-    vignette: 0.55, grain: 0.14, bloom: 0.6, leak: false, letterbox: false,
-  },
-  {
-    id: "golden", name: "Golden Hour", matrix: chain(sepia(0.32), saturation(1.5), contrast(1.06), scale(1.06, 1.06, 1.06)),
-    tints: [{ color: "rgba(255,150,60,0.22)", blend: "softLight" }],
-    vignette: 0.4, grain: 0.12, bloom: 0, leak: true, letterbox: false,
-  },
-  {
-    id: "monsoon", name: "Monsoon", matrix: chain(saturation(0.72), contrast(1.06), scale(0.95, 0.97, 1.0)),
-    tints: [{ color: "rgba(40,96,150,0.32)", blend: "softLight" }, { color: "rgba(200,215,230,0.10)", blend: "srcOver" }],
-    vignette: 0.45, grain: 0.18, bloom: 0, leak: false, letterbox: false,
-  },
-  {
-    id: "film", name: "Film 35", matrix: chain(contrast(0.9), saturation(0.85), sepia(0.2), scale(1.05, 1.05, 1.05)),
-    tints: [{ color: "rgba(42,34,28,0.55)", blend: "lighten" }, { color: "rgba(255,170,120,0.12)", blend: "softLight" }],
-    vignette: 0.35, grain: 0.38, bloom: 0, leak: true, letterbox: false,
-  },
-  {
-    id: "noir", name: "Noir", matrix: chain(saturation(0), contrast(1.5), scale(0.94, 0.94, 0.94)),
-    tints: [], vignette: 0.7, grain: 0.3, bloom: 0, leak: false, letterbox: true,
-  },
-  {
-    id: "dreamy", name: "Dreamy", matrix: chain(saturation(1.25), scale(1.08, 1.08, 1.08), contrast(0.96)),
-    tints: [{ color: "rgba(255,170,210,0.16)", blend: "screen" }],
-    vignette: 0.25, grain: 0.08, bloom: 0.5, leak: false, letterbox: false,
-  },
-  { id: "vivid", name: "Vivid", matrix: chain(saturation(1.5), contrast(1.12)), tints: [], vignette: 0.2, grain: 0.05, bloom: 0, leak: false, letterbox: false },
+  { ...base, id: "original", name: "Original", grade: g({}), matrix: IDENTITY },
+  { ...base, id: "zing", name: "Zing", vignette: 0.35, grain: 0.06,
+    grade: g({ contrast: 1.08, curve: 0.35, vib: 0.5, sat: 1.08, highlights: -0.3, shadows: 0.25, splitAmt: 0.35, shadowTint: BLUE, highTint: LEMON }),
+    matrix: chain(contrast(1.12), saturation(1.2)) },
+  { ...base, id: "clean", name: "Clean", vignette: 0.15,
+    grade: g({ exposure: 0.08, curve: 0.25, vib: 0.45, highlights: -0.35, shadows: 0.35 }),
+    matrix: chain(contrast(1.05), saturation(1.12)) },
+  { ...base, id: "cinema", name: "Cinema", vignette: 0.6, grain: 0.2, letterbox: true,
+    grade: g({ contrast: 1.12, curve: 0.45, sat: 0.92, vib: 0.2, highlights: -0.4, shadows: 0.1, splitAmt: 0.9, shadowTint: TEAL, highTint: ORANGE }),
+    matrix: chain(contrast(1.16), saturation(1.12)), tints: [{ color: "rgba(0,110,120,0.38)", blend: "softLight" }, { color: "rgba(255,140,60,0.22)", blend: "overlay" }] },
+  { ...base, id: "golden", name: "Golden Hour", vignette: 0.4, grain: 0.1, leak: true,
+    grade: g({ exposure: 0.06, temp: 0.55, tint: 0.08, curve: 0.3, vib: 0.4, highlights: -0.2, splitAmt: 0.5, shadowTint: WARM, highTint: ORANGE }),
+    matrix: chain(sepia(0.32), saturation(1.5), contrast(1.06)) },
+  { ...base, id: "neon", name: "Neon Night", vignette: 0.55, grain: 0.12, bloom: 0.55,
+    grade: g({ exposure: -0.05, contrast: 1.15, curve: 0.4, sat: 1.35, vib: 0.3, temp: -0.25, splitAmt: 0.9, shadowTint: BLUE, highTint: MAGENTA }),
+    matrix: chain(saturation(1.65), contrast(1.18)) },
+  { ...base, id: "monsoon", name: "Monsoon", vignette: 0.45, grain: 0.16,
+    grade: g({ temp: -0.3, sat: 0.78, contrast: 0.98, curve: 0.25, fade: 0.25, shadows: 0.2, splitAmt: 0.7, shadowTint: GREEN, highTint: COOL }),
+    matrix: chain(saturation(0.72), contrast(1.06), scale(0.95, 0.97, 1.0)) },
+  { ...base, id: "film", name: "Film 35", vignette: 0.35, grain: 0.36, leak: true,
+    grade: g({ contrast: 0.94, curve: 0.35, sat: 0.88, fade: 0.45, temp: 0.15, highlights: -0.35, splitAmt: 0.6, shadowTint: GREEN, highTint: WARM }),
+    matrix: chain(contrast(0.9), saturation(0.85), sepia(0.2)) },
+  { ...base, id: "dusk", name: "Dusk", vignette: 0.5, grain: 0.1, bloom: 0.25,
+    grade: g({ exposure: -0.08, contrast: 1.06, curve: 0.35, sat: 1.1, temp: 0.1, highlights: -0.3, splitAmt: 0.85, shadowTint: VIOLET, highTint: ORANGE }),
+    matrix: chain(saturation(1.2), contrast(1.1), scale(1.03, 0.98, 1.02)) },
+  { ...base, id: "matte", name: "Matte", vignette: 0.2, grain: 0.12,
+    grade: g({ contrast: 0.9, curve: 0.2, sat: 0.82, fade: 0.7, highlights: -0.25, splitAmt: 0.3, shadowTint: COOL, highTint: WARM }),
+    matrix: chain(contrast(0.88, 0.04), saturation(0.82)) },
+  { ...base, id: "dreamy", name: "Dreamy", vignette: 0.2, grain: 0.06, bloom: 0.5,
+    grade: g({ exposure: 0.15, contrast: 0.92, sat: 1.05, vib: 0.3, fade: 0.25, splitAmt: 0.5, shadowTint: PINK, highTint: PINK }),
+    matrix: chain(saturation(1.25), scale(1.08, 1.08, 1.08), contrast(0.96)) },
+  { ...base, id: "vivid", name: "Vivid", vignette: 0.2, grain: 0.04,
+    grade: g({ contrast: 1.12, curve: 0.4, sat: 1.25, vib: 0.6, highlights: -0.25, shadows: 0.2 }),
+    matrix: chain(saturation(1.5), contrast(1.12)) },
+  { ...base, id: "noir", name: "Noir", vignette: 0.7, grain: 0.3, letterbox: true,
+    grade: g({ mono: 1, contrast: 1.3, curve: 0.6, highlights: -0.2, shadows: -0.15 }),
+    matrix: chain(saturation(0), contrast(1.5)) },
+  { ...base, id: "silver", name: "Silver", vignette: 0.35, grain: 0.22,
+    grade: g({ mono: 1, contrast: 0.95, curve: 0.3, fade: 0.4, highlights: -0.3, shadows: 0.25, splitAmt: 0.35, shadowTint: COOL, highTint: WARM }),
+    matrix: chain(saturation(0), contrast(1.1, 0.03)) },
 ];
 
+/** Fallback only: fade a matrix look towards "no change". */
+export function mixMatrix(m: M, amount: number): M { return m.map((v, i) => IDENTITY[i] + (v - IDENTITY[i]) * amount); }
+
 export const lookById = (id: string) => LOOKS.find((l) => l.id === id) ?? LOOKS[1];
+
+export { chain, contrast, saturation, scale };
 
 /** Brightens the blurred copy used for glow. */
 export const BLOOM_MATRIX: M = chain(scale(1.3, 1.3, 1.3), saturation(1.4));

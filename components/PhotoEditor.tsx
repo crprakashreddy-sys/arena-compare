@@ -2,11 +2,21 @@ import React, { useMemo, useRef, useState } from "react";
 import { Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import {
   Blur, Canvas, Circle, ColorMatrix, FractalNoise, Group, Image as SkImage, ImageFormat, RadialGradient, Rect,
-  RoundedRect, Text as SkText, matchFont, useCanvasRef, useImage, vec,
+  RoundedRect, RuntimeShader, Text as SkText, matchFont, useCanvasRef, useImage, vec,
 } from "@shopify/react-native-skia";
 import { Directions, Gesture, GestureDetector } from "react-native-gesture-handler";
 import { Ionicons } from "./SFIcon";
-import { BLOOM_MATRIX, LOOKS, lookById, toolsFor, type CinemaTools } from "../lib/filters";
+import { BLOOM_MATRIX, LOOKS, chain, contrast, lookById, mixMatrix, saturation, scale, toolsFor, type CinemaTools, type Look } from "../lib/filters";
+import { ADJUST_LABELS, GRADE_EFFECT, NO_ADJUST, uniformsFor, type Adjust } from "../lib/grade";
+import { Dial } from "./Dial";
+import { tickHaptic } from "../lib/motion";
+
+/** The colour grade for a look: the GPU shader when available, a simple matrix otherwise. */
+function Grade({ look, amount, adj }: { look: Look; amount: number; adj: Adjust }) {
+  if (GRADE_EFFECT) return <RuntimeShader source={GRADE_EFFECT} uniforms={uniformsFor(look.grade, adj, amount)} />;
+  const e = Math.pow(2, adj.exposure * 0.8), w = adj.warmth * 0.07;
+  return <ColorMatrix matrix={chain(mixMatrix(look.matrix, amount), contrast(1 + adj.contrast * 0.35), saturation(1 + adj.saturation * 0.6), scale(e * (1 + w), e, e * (1 - w)))} />;
+}
 import { STATUS_LABEL } from "../lib/theme";
 import type { Status } from "../lib/types";
 
@@ -44,7 +54,10 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
   const [lookId, setLookId] = useState("cinema");
   const look = lookById(lookId);
   const [tools, setTools] = useState<CinemaTools>(toolsFor(look));
-  const [mode, setMode] = useState<"looks" | "cinema" | "stickers" | "blur">("looks");
+  const [mode, setMode] = useState<"looks" | "adjust" | "cinema" | "stickers" | "blur">("looks");
+  const [amount, setAmount] = useState(1);
+  const [adj, setAdj] = useState<Adjust>(NO_ADJUST);
+  const [adjKey, setAdjKey] = useState<keyof Adjust>("exposure");
   const [battery, setBattery] = useState(80);
   const [waited, setWaited] = useState(10);
   const [blurs, setBlurs] = useState<{ x: number; y: number }[]>([]);
@@ -57,7 +70,9 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
   const now = useMemo(() => new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }), []);
 
   const pickLook = (id: string) => {
+    tickHaptic();
     setLookId(id);
+    setAmount(1);
     setTools(toolsFor(lookById(id)));
   };
 
@@ -176,18 +191,18 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
             {image && (
               <>
                 <SkImage image={image} x={fit.x} y={fit.y} width={fit.w} height={fit.h} fit="fill">
-                  <ColorMatrix matrix={look.matrix} />
+                  <Grade look={look} amount={amount} adj={adj} />
                 </SkImage>
                 {bloom > 0 && (
-                  <SkImage image={image} x={fit.x} y={fit.y} width={fit.w} height={fit.h} fit="fill" opacity={bloom} blendMode="screen">
+                  <SkImage image={image} x={fit.x} y={fit.y} width={fit.w} height={fit.h} fit="fill" opacity={bloom * amount} blendMode="screen">
                     <ColorMatrix matrix={BLOOM_MATRIX} />
                     <Blur blur={16} />
                   </SkImage>
                 )}
               </>
             )}
-            {look.tints.map((tn, i) => (
-              <Rect key={`t${i}`} x={0} y={0} width={W} height={H} color={tn.color} blendMode={tn.blend} />
+            {!GRADE_EFFECT && look.tints.map((tn, i) => (
+              <Rect key={`t${i}`} x={0} y={0} width={W} height={H} color={tn.color} blendMode={tn.blend} opacity={amount} />
             ))}
             {tools.leak && (
               <Rect x={0} y={0} width={W} height={H} blendMode="screen">
@@ -240,18 +255,19 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
       </GestureDetector>
 
       <View style={styles.tabs}>
-        {(["looks", "cinema", "stickers", "blur"] as const).map((m) => (
+        {(["looks", "adjust", "cinema", "stickers", "blur"] as const).map((m) => (
           <Pressable key={m} onPress={() => setMode(m)} style={[styles.tab, mode === m && { backgroundColor: YELLOW }]}
             accessibilityRole="tab" accessibilityState={{ selected: mode === m }}>
             <Text style={{ color: mode === m ? "#1A1A1A" : "#A3ADB6", fontWeight: "700", fontSize: 13.5 }}>
-              {m === "looks" ? "Looks" : m === "cinema" ? "Cinema" : m === "stickers" ? "Stickers" : "Blur"}
+              {m === "looks" ? "Looks" : m === "adjust" ? "Adjust" : m === "cinema" ? "Cinema" : m === "stickers" ? "Stickers" : "Blur"}
             </Text>
           </Pressable>
         ))}
       </View>
 
-      <View style={{ height: 118, width: "100%" }}>
+      <View style={{ height: 160, width: "100%" }}>
         {mode === "looks" && (
+          <>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingHorizontal: 16 }}>
             {LOOKS.map((l) => {
               const on = l.id === lookId;
@@ -261,10 +277,10 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
                     <Canvas style={{ width: 62, height: 82 }}>
                       {image && (
                         <SkImage image={image} x={0} y={0} width={62} height={82} fit="cover">
-                          <ColorMatrix matrix={l.matrix} />
+                          <Grade look={l} amount={1} adj={NO_ADJUST} />
                         </SkImage>
                       )}
-                      {l.tints.map((tn, i) => <Rect key={i} x={0} y={0} width={62} height={82} color={tn.color} blendMode={tn.blend} />)}
+                      {!GRADE_EFFECT && l.tints.map((tn, i) => <Rect key={i} x={0} y={0} width={62} height={82} color={tn.color} blendMode={tn.blend} />)}
                       {l.vignette > 0 && (
                         <Rect x={0} y={0} width={62} height={82}>
                           <RadialGradient c={vec(31, 41)} r={52} colors={["rgba(0,0,0,0)", `rgba(0,0,0,${l.vignette})`]} positions={[0.5, 1]} />
@@ -278,6 +294,36 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
               );
             })}
           </ScrollView>
+          {lookId !== "original" && (
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 12, paddingHorizontal: 20, marginTop: 6 }}>
+              <Text style={{ color: "#A3ADB6", fontSize: 12.5, fontWeight: "700", width: 64 }}>Intensity</Text>
+              <Dial value={amount} onChange={setAmount} width={W - 100} from0 />
+            </View>
+          )}
+          </>
+        )}
+
+        {mode === "adjust" && (
+          <View style={{ gap: 6 }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 16 }}>
+              {ADJUST_LABELS.map((o) => {
+                const on = adjKey === o.key, changed = adj[o.key] !== 0;
+                return (
+                  <Pressable key={o.key} onPress={() => { tickHaptic(); setAdjKey(o.key); }} style={{ alignItems: "center", gap: 4, width: 70 }}>
+                    <View style={{ width: 46, height: 46, borderRadius: 23, borderWidth: 2, borderColor: on ? YELLOW : changed ? "#8A7A3A" : "#3A424A", alignItems: "center", justifyContent: "center", backgroundColor: on ? "#3A3210" : "transparent" }}>
+                      {changed && !on ? <Text style={{ color: YELLOW, fontWeight: "800", fontSize: 12 }}>{(adj[o.key] > 0 ? "+" : "") + Math.round(adj[o.key] * 100)}</Text>
+                        : <Ionicons name={o.icon as any} size={19} color={on ? YELLOW : "#C4CCD3"} />}
+                    </View>
+                    <Text style={{ color: on ? YELLOW : "#C4CCD3", fontSize: 11.5, fontWeight: on ? "700" : "400" }}>{o.label}</Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 20 }}>
+              <Dial value={adj[adjKey]} onChange={(v) => setAdj((a) => ({ ...a, [adjKey]: v }))} width={W - 80} />
+              <Pressable onPress={() => { tickHaptic(); setAdj(NO_ADJUST); }} hitSlop={8}><Text style={{ color: "#A3ADB6", fontWeight: "700", fontSize: 12.5 }}>Reset</Text></Pressable>
+            </View>
+          </View>
         )}
 
         {mode === "cinema" && (
@@ -367,7 +413,7 @@ function Stepper({ label, value, onMinus, onPlus }: { label: string; value: stri
 
 const styles = StyleSheet.create({
   tabs: { flexDirection: "row", borderRadius: 12, padding: 4, gap: 4, backgroundColor: "#1A1F24", marginHorizontal: 16, alignSelf: "stretch" },
-  tab: { flex: 1, alignItems: "center", paddingVertical: 9, borderRadius: 9 },
+  tab: { flex: 1, alignItems: "center", paddingVertical: 9, borderRadius: 9, minWidth: 0 },
   wrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   chip: { flexDirection: "row", alignItems: "center", gap: 6, borderWidth: 1, borderRadius: 18, paddingHorizontal: 13, paddingVertical: 8 },
   round: { width: 36, height: 36, borderRadius: 18, borderWidth: 1, borderColor: "#3A424A", alignItems: "center", justifyContent: "center" },
