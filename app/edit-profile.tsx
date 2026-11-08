@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Alert, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { INTERESTS, PROMPTS, type Prompt } from "../lib/interests";
 import { LIFESTYLE, MAX_LIFESTYLE, SCALES } from "../lib/traits";
+import { TONES, draftBio, type Tone } from "../lib/bioDraft";
 import { tickHaptic } from "../lib/motion";
 import { CTA, ON_CTA } from "../lib/theme";
 import { router } from "expo-router";
@@ -19,6 +20,8 @@ export default function EditProfile() {
   const [city, setCity] = useState(profile?.city ?? "");
   const [plate, setPlate] = useState("");
   const [bio, setBio] = useState(profile?.bio ?? "");
+  const [tone, setTone] = useState<Tone>("fun");
+  const draft = (tn: Tone = tone) => { tickHaptic(); setTone(tn); setBio(draftBio({ car, city, personality: profile?.personality, traits, interests }, tn)); };
   const [busy, setBusy] = useState(false);
   const [interests, setInterests] = useState<string[]>(profile?.interests ?? []);
   const [prompts, setPrompts] = useState<Prompt[]>(profile?.prompts ?? []);
@@ -71,7 +74,21 @@ export default function EditProfile() {
     <ScrollView contentContainerStyle={{ padding: 20, gap: 10 }} keyboardShouldPersistTaps="handled">
       <Text style={{ color: t.muted, fontWeight: "600" }}>Name</Text>
       <TextInput value={name} onChangeText={setName} style={input} maxLength={40} />
-      <Text style={{ color: t.muted, fontWeight: "600" }}>Bio ({160 - bio.length} left)</Text>
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <Text style={{ color: t.muted, fontWeight: "600", flex: 1 }}>Bio ({160 - bio.length} left)</Text>
+        <Pressable onPress={() => draft()} hitSlop={8} style={{ flexDirection: "row", alignItems: "center", gap: 5, height: 32, paddingHorizontal: 12, borderRadius: 16, backgroundColor: CTA }}>
+          <Text style={{ color: ON_CTA, fontWeight: "800", fontSize: 13 }}>{bio ? "✨ Shuffle" : "✨ Draft for me"}</Text>
+        </Pressable>
+      </View>
+      <View style={{ flexDirection: "row", gap: 6 }}>
+        {TONES.map((tn) => (
+          <Pressable key={tn.id} onPress={() => draft(tn.id)} style={{ flexDirection: "row", gap: 4, alignItems: "center", height: 30, paddingHorizontal: 10, borderRadius: 15, backgroundColor: tone === tn.id && bio ? t.text : t.surface }}>
+            <Text style={{ fontSize: 12 }}>{tn.emoji}</Text>
+            <Text style={{ color: tone === tn.id && bio ? t.bg : t.text, fontWeight: "700", fontSize: 12.5 }}>{tn.label}</Text>
+          </Pressable>
+        ))}
+        <Text style={{ color: t.faint, fontSize: 11.5, alignSelf: "center", flex: 1, textAlign: "right" }}>Edit it however you like</Text>
+      </View>
       <TextInput value={bio} onChangeText={setBio} placeholder="Weekend road-tripper. Nexon EV since 2023. Chai at every charger."
         placeholderTextColor={t.faint} multiline maxLength={160} style={[input, { height: 84, paddingTop: 12, textAlignVertical: "top" }]} />
       <Text style={{ color: t.text, fontWeight: "900", fontFamily: "SpaceGrotesk_700Bold", fontSize: 18, marginTop: 8 }}>Your vibe</Text>
