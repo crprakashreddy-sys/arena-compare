@@ -226,7 +226,7 @@ export default function ClubChat() {
           {club && <ClubBadge c={club} size={30} />}
           <View style={{ flexShrink: 1 }}>
             <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 15 }} numberOfLines={1}>{club?.name ?? "Club"}</Text>
-            {club && <Text style={{ color: t.muted, fontSize: 11.5 }}>{club.members} members{muted ? " · muted" : ""}</Text>}
+            {club && <Text style={{ color: t.muted, fontSize: 11.5 }}>{club.members} {club.members === 1 ? "member" : "members"}{muted ? " · muted" : ""}</Text>}
           </View>
         </Pressable>
       ),
