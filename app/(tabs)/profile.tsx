@@ -31,6 +31,7 @@ const PRIVACY_URL = "https://crprakashreddy-sys.github.io/zingd/privacy.html";
 export default function You() {
   const t = useTheme();
   const insets = useSafeAreaInsets();
+  const [scrolled, setScrolled] = useState(false);
   const tabSpace = useTabSpace();
   const { active: charging } = useSessions();
   const { session, profile, signOut, refreshProfile } = useAuth();
@@ -98,7 +99,8 @@ export default function You() {
 
   return (
     <View style={{ flex: 1, backgroundColor: t.bg }}>
-    <ScrollView style={{ flex: 1, backgroundColor: t.bg }} contentContainerStyle={{ paddingBottom: tabSpace + 28 }}>
+    <ScrollView style={{ flex: 1, backgroundColor: t.bg }} contentContainerStyle={{ paddingBottom: tabSpace + 28 }}
+      scrollEventThrottle={32} onScroll={(e) => { const y = e.nativeEvent.contentOffset.y > 160; if (y !== scrolled) setScrolled(y); }}>
       {/* Hero */}
       <View style={[styles.hero, { paddingTop: insets.top + 18 }]}>
         <Pressable onPress={changePhoto} accessibilityLabel="Change profile photo">
@@ -263,7 +265,7 @@ export default function You() {
       </View>
     </ScrollView>
     {/* Keeps the clock and battery readable when the page scrolls under them */}
-    <View pointerEvents="none" style={{ position: "absolute", top: 0, left: 0, right: 0, height: insets.top, backgroundColor: t.bg, opacity: 0.94 }} />
+    {scrolled && <View pointerEvents="none" style={{ position: "absolute", top: 0, left: 0, right: 0, height: insets.top, backgroundColor: t.bg, opacity: 0.94 }} />}
     </View>
   );
 }
