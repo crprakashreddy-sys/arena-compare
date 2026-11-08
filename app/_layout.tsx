@@ -2,7 +2,8 @@ import React from "react";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { AuthProvider } from "../lib/auth";
+import { AuthProvider, useAuth } from "../lib/auth";
+import { IntroLoader } from "../components/IntroLoader";
 import { useTheme } from "../lib/theme";
 
 export default function RootLayout() {
@@ -34,7 +35,14 @@ export default function RootLayout() {
           <Stack.Screen name="savings" options={{ title: "Savings" }} />
           <Stack.Screen name="login" options={{ title: "Join zappd", presentation: "modal" }} />
         </Stack>
+        <Intro />
       </AuthProvider>
     </GestureHandlerRootView>
   );
+}
+
+/** Opening animation, shown until the sign-in check finishes. */
+function Intro() {
+  const { loading } = useAuth();
+  return <IntroLoader ready={!loading} />;
 }

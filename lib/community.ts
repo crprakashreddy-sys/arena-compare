@@ -449,3 +449,18 @@ export async function verifyVehicle(reg: string): Promise<{ verified: boolean; c
   }
   return { verified: !!data?.verified, checked: !!data?.checked };
 }
+
+/** The newest live zap photos anywhere, for the opening screen. Empty if offline or none yet. */
+export async function fetchIntroZaps(limit = 5): Promise<{ photo: string; name: string }[]> {
+  if (!isConfigured) return [];
+  const { data } = await supabase
+    .from("checkins")
+    .select("user_id,photo_path,chargers(name)")
+    .not("photo_path", "is", null)
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false })
+    .limit(limit * 2);
+  return visible((data ?? []) as any[])
+    .slice(0, limit)
+    .map((r) => ({ photo: r.photo_path as string, name: (r.chargers?.name as string) ?? "zapped" }));
+}
