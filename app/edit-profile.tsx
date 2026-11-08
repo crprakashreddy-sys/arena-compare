@@ -20,8 +20,8 @@ export default function EditProfile() {
   const [city, setCity] = useState(profile?.city ?? "");
   const [plate, setPlate] = useState("");
   const [bio, setBio] = useState(profile?.bio ?? "");
-  const [tone, setTone] = useState<Tone>("fun");
-  const draft = (tn: Tone = tone) => { tickHaptic(); setTone(tn); setBio(draftBio({ car, city, personality: profile?.personality, traits, interests }, tn)); };
+  const [tone, setTone] = useState<Tone>("witty");
+  const draft = (tn: Tone = tone) => { tickHaptic(); setTone(tn); setBio(draftBio({ car, city, personality: profile?.personality, traits, interests }, tn, Date.now(), bio)); };
   const [busy, setBusy] = useState(false);
   const [interests, setInterests] = useState<string[]>(profile?.interests ?? []);
   const [prompts, setPrompts] = useState<Prompt[]>(profile?.prompts ?? []);
