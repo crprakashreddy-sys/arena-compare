@@ -74,4 +74,5 @@ if [ -n "$newsql" ]; then
 fi
 
 echo "✅ zingd updated. Starting the app… (scan or reopen zingd in Expo Go)"
+[ "$1" = "--no-start" ] && exit 0
 npx expo start -c
