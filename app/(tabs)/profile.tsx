@@ -204,6 +204,7 @@ export default function You() {
           ["Edit profile and my EV", () => router.push("/edit-profile")],
           ["Community guidelines", () => Linking.openURL(GUIDELINES_URL)],
           ["Privacy policy", () => Linking.openURL(PRIVACY_URL)],
+          ["Help & support", () => Linking.openURL("mailto:zingd.support@gmail.com?subject=zingd%20help")],
           ["Sign out", signOut],
         ].map(([label, fn]) => (
           <Pressable key={label as string} onPress={fn as () => void} style={[styles.rowBtn, { borderBottomColor: t.line }]}>
