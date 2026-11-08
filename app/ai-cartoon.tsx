@@ -133,8 +133,11 @@ export default function AiCartoon() {
             </Pressable>
           </>
         ) : (
-          <Pressable onPress={() => make()} disabled={!src || !!busy || unsupported} style={[s.cta, (!src || unsupported) && { opacity: 0.4 }]}>
-            {busy === "make" ? <ActivityIndicator color={ON_CTA} /> : <Text style={s.ctaText}>✨ Make my AI cartoon</Text>}
+          <Pressable onPress={() => unsupported
+              ? Alert.alert("Needs the App Store version", "AI cartoons are drawn by Apple Intelligence on your iPhone. Expo Go can't run them. They'll work as soon as zingd is installed as a real app (after your Apple Developer approval, run sh cloud.sh).")
+              : make()}
+            disabled={!src || !!busy} style={[s.cta, (!src || unsupported) && { opacity: 0.55 }]}>
+            {busy === "make" ? <ActivityIndicator color={ON_CTA} /> : <Text style={s.ctaText}>{unsupported ? "🔒 Works in the App Store version" : "✨ Make my AI cartoon"}</Text>}
           </Pressable>
         )}
       </View>
