@@ -41,7 +41,7 @@ const config: ExpoConfig = {
     [
       "@react-native-google-signin/google-signin",
       // The reversed iOS client ID from Google Cloud, e.g. com.googleusercontent.apps.1234-abcd
-      { iosUrlScheme: process.env.EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME ?? "com.googleusercontent.apps.placeholder" },
+      { iosUrlScheme: process.env.EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME || "com.googleusercontent.apps.placeholder" },
     ],
     [
       "expo-location",
