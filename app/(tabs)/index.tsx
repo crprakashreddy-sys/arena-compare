@@ -68,7 +68,9 @@ export default function MapScreen() {
   const [sheet, setSheet] = useState<0 | 1 | 2>(1);
   const { active: vehicle } = useGarage();
   const [fitsOnly, setFitsOnly] = useState(true);
-  const [showRange, setShowRange] = useState(true);
+  // Battery and range need a live reading from the car, which Indian makers don't share yet, so the map
+  // doesn't show a guess. Battery % is asked only when tracking a charge or planning a trip.
+  const [showRange, setShowRange] = useState(false);
   const [tilted, setTilted] = useState(false);
   const scheme = useColorScheme();
   const { active: charging } = useSessions();
@@ -468,7 +470,7 @@ export default function MapScreen() {
         </View>
       )}
 
-      {vehicle && me && !peek && !charging && (
+      {false && vehicle && me && !peek && !charging && (
         <Glass style={[styles.range, { bottom: sheetH + 12 + tabSpace }]}>
           <Pressable onPress={() => setShowRange((v) => !v)} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
             accessibilityLabel={showRange ? "Hide range ring" : "Show range ring"}>
