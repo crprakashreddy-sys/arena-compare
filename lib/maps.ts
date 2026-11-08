@@ -13,7 +13,7 @@ const inExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreCl
 export const USE_GOOGLE = Platform.OS === "android" || (Platform.OS === "ios" && !!IOS_KEY && !inExpoGo);
 export const MAP_PROVIDER = USE_GOOGLE ? PROVIDER_GOOGLE : undefined;
 
-/** The zappd map look for Google maps (Apple Maps can't be restyled). */
+/** The zingd map look for Google maps (Apple Maps can't be restyled). */
 export const zappdStyle = (scheme: "light" | "dark" | null | undefined) =>
   USE_GOOGLE ? (scheme === "dark" ? NIGHT_STYLE : DAY_STYLE) : undefined;
 

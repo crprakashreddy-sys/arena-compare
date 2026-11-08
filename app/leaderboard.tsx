@@ -61,7 +61,7 @@ export default function Leaderboard() {
               <Text style={{ color: "#fff", fontWeight: "700" }} numberOfLines={1}>{r.display_name}{r.user_id === me ? " (you)" : ""}</Text>
               <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
                 <Text style={{ color: "#A9B3BC", fontSize: 12.5 }} numberOfLines={1}>
-                  {[r.car_model, `${r.week_zaps} zap${r.week_zaps === 1 ? "" : "s"}`].filter(Boolean).join(" · ")}
+                  {[r.car_model, `${r.week_zaps} zing${r.week_zaps === 1 ? "" : "s"}`].filter(Boolean).join(" · ")}
                 </Text>
                 <VerifiedBadge verified={r.vehicle_verified} />
               </View>
@@ -73,20 +73,20 @@ export default function Leaderboard() {
           </Pressable>
         )}
         ListEmptyComponent={loading ? null : (
-          <Text style={{ color: "#A9B3BC", textAlign: "center", paddingVertical: 30 }}>No zaps yet this week. Drop one and take the top spot.</Text>
+          <Text style={{ color: "#A9B3BC", textAlign: "center", paddingVertical: 30 }}>No zings yet this week. Drop one and take the top spot.</Text>
         )}
         ListFooterComponent={
           <View style={styles.rules}>
-            <Text style={{ color: "#fff", fontWeight: "800", fontSize: 16 }}>How Zap Score works</Text>
+            <Text style={{ color: "#fff", fontWeight: "800", fontSize: 16 }}>How Zing Score works</Text>
             {TIERS.map((t) => (
               <Rule key={t.label} left={`${t.label} (within ${t.maxM} m)`} right={`+${t.points}`} />
             ))}
             <Rule left="Further away" right="+5" />
             <Rule left="Photo" right={`+${PHOTO_BONUS}`} />
-            <Rule left="First zap at the charger in 3 hours (on site)" right={`+${FRESH_BONUS}`} />
+            <Rule left="First zing at the charger in 3 hours (on site)" right={`+${FRESH_BONUS}`} />
             <Text style={styles.small}>
-              Distance is measured from where your phone is when you drop the zap. Only the distance is saved, never your location.
-              Same charger again within 3 hours earns nothing. Up to {DAILY_CAP} points a day. Zaps hidden after reports lose their points.
+              Distance is measured from where your phone is when you drop the zing. Only the distance is saved, never your location.
+              Same charger again within 3 hours earns nothing. Up to {DAILY_CAP} points a day. Zings hidden after reports lose their points.
             </Text>
           </View>
         }

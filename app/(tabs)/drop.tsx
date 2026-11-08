@@ -1,4 +1,4 @@
-// Placeholder route for the centre tab button, which opens the zap camera instead of this screen.
+// Placeholder route for the centre tab button, which opens the zing camera instead of this screen.
 import { Redirect } from "expo-router";
 
 export default function Drop() {

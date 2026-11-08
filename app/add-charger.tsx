@@ -135,7 +135,7 @@ export default function AddCharger() {
           </Field>
 
           <Text style={{ color: t.muted, fontSize: 12.5, lineHeight: 18 }}>
-            Public chargers only. It shows up for everyone as "Added by drivers" until others zap it there.
+            Public chargers only. It shows up for everyone as "Added by drivers" until others zing it there.
           </Text>
         </View>
       </ScrollView>

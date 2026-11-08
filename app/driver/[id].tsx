@@ -61,7 +61,7 @@ export default function DriverProfile() {
           <Text style={{ color: t.muted }}>{[p.car_model, p.city].filter(Boolean).join(" · ")}</Text>
           <VerifiedBadge verified={p.vehicle_verified} />
           <View style={{ flexDirection: "row", gap: 8, marginTop: 12, alignSelf: "stretch" }}>
-            {[[String(points), "Zap Score"], [String(conns), "Connections"], [badgeFor(points), "Badge"]].map(([v, l]) => (
+            {[[String(points), "Zing Score"], [String(conns), "Connections"], [badgeFor(points), "Badge"]].map(([v, l]) => (
               <View key={l} style={[styles.stat, { backgroundColor: t.surface }]}>
                 <Text style={{ color: t.text, fontWeight: "800", fontSize: v.length > 6 ? 14 : 20 }} numberOfLines={1}>{v}</Text>
                 <Text style={{ color: t.muted, fontSize: 12 }}>{l}</Text>
@@ -79,8 +79,8 @@ export default function DriverProfile() {
         </View>
 
         <View style={{ paddingHorizontal: 16, gap: 10 }}>
-          <Text style={{ color: t.muted, fontWeight: "600", fontSize: 13 }}>{stats.zaps} zaps · {stats.reviews} reviews</Text>
-          {zaps.length === 0 && <Text style={{ color: t.muted }}>No zaps yet.</Text>}
+          <Text style={{ color: t.muted, fontWeight: "600", fontSize: 13 }}>{stats.zaps} zings · {stats.reviews} reviews</Text>
+          {zaps.length === 0 && <Text style={{ color: t.muted }}>No zings yet.</Text>}
           {zaps.map((z) => (
             <Pressable key={z.id} onPress={() => router.push(`/charger/${encodeURIComponent(z.charger_id)}`)} style={[styles.row, { borderColor: t.line }]}>
               <View style={styles.thumb}>

@@ -19,7 +19,7 @@ try {
   });
 } catch { GoogleSignin = null; }
 
-const GUIDELINES_URL = "https://YOUR-SITE/zappd/community-guidelines";
+const GUIDELINES_URL = "https://YOUR-SITE/zingd/community-guidelines";
 
 export default function Login() {
   const t = useTheme();
@@ -123,7 +123,7 @@ export default function Login() {
     return (
       <View style={{ flex: 1, padding: 24, gap: 12, justifyContent: "center" }}>
         <Text style={{ color: t.text, fontSize: 18, fontWeight: "700" }}>You're in demo mode</Text>
-        <Text style={{ color: t.muted }}>The map, chargers, trip planner, vehicles, charging log and photo looks all work. Signing in, posting zaps and reviews start working once the backend is connected (Launch Steps, step 3).</Text>
+        <Text style={{ color: t.muted }}>The map, chargers, trip planner, vehicles, charging log and photo looks all work. Signing in, posting zings and reviews start working once the backend is connected (Launch Steps, step 3).</Text>
       </View>
     );
   }
@@ -137,12 +137,12 @@ export default function Login() {
           <>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
               <Ionicons name="flash" size={34} color={t.accent} />
-              <Text style={{ color: t.text, fontSize: 34, fontWeight: "900", letterSpacing: -1 }}>zappd</Text>
+              <Text style={{ color: t.text, fontSize: 34, fontWeight: "900", letterSpacing: -1 }}>zingd</Text>
             </View>
-            <Text style={{ color: t.accent, fontWeight: "700" }}>been there. zappd it.</Text>
+            <Text style={{ color: t.accent, fontWeight: "700" }}>been there. zingd it.</Text>
             <Text style={{ color: t.text, fontSize: 24, fontWeight: "800" }}>Join India's EV driver community</Text>
             <Text style={{ color: t.muted, fontSize: 15, lineHeight: 21 }}>
-              Drop zaps from chargers, see what is working right now, review stations and connect with other EV drivers.
+              Drop zings from chargers, see what is working right now, review stations and connect with other EV drivers.
             </Text>
           </>
         )}
@@ -205,7 +205,7 @@ export default function Login() {
                 : no abusive, fake or unsafe posts, and no number plates or faces of other people.
               </Text>
             </Pressable>
-            <Button title="Join zappd" kind="primary" busy={busy} onPress={saveProfile} />
+            <Button title="Join zingd" kind="primary" busy={busy} onPress={saveProfile} />
           </View>
         )}
       </ScrollView>

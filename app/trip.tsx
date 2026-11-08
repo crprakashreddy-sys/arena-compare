@@ -175,7 +175,7 @@ export default function Trip() {
               <Text style={{ color: t.onAccent, fontWeight: "800", fontSize: 16 }}>Start in Google Maps</Text>
             </Pressable>
             <Text style={{ color: t.muted, fontSize: 12.5, lineHeight: 18 }}>
-              Estimates assume highway driving and keep at least 15% in reserve. Check each stop's latest zaps before you go; broken chargers are skipped automatically.
+              Estimates assume highway driving and keep at least 15% in reserve. Check each stop's latest zings before you go; broken chargers are skipped automatically.
             </Text>
           </View>
         </View>

@@ -32,7 +32,7 @@ type Props = {
   editorRef: React.MutableRefObject<EditorHandle | null>;
 };
 
-/** The zap editor: cinematic looks, cinema tools, EV stickers and privacy blur, rendered with Skia. */
+/** The zing editor: cinematic looks, cinema tools, EV stickers and privacy blur, rendered with Skia. */
 export default function PhotoEditor({ uri, status, chargerName, speedText, carModel, editorRef }: Props) {
   const { width: screenW, height: screenH } = useWindowDimensions();
   const W = Math.min(screenW - 24, 480, Math.round((screenH * 0.52 * 3) / 4));

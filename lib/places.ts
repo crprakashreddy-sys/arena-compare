@@ -7,7 +7,7 @@ export async function nearbyFood(lat: number, lng: number, radiusM = 700): Promi
   try {
     const res = await fetch("https://overpass-api.de/api/interpreter", {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded", "User-Agent": "zappd/1.0" },
+      headers: { "Content-Type": "application/x-www-form-urlencoded", "User-Agent": "zingd/1.0" },
       body: "data=" + encodeURIComponent(q),
     });
     if (!res.ok) return [];
@@ -56,7 +56,7 @@ export async function searchPlaces(query: string, near?: { lat: number; lng: num
   }
   try {
     const res = await fetch(`https://photon.komoot.io/api/?${params.toString()}`, {
-      headers: { "User-Agent": "zappd/1.0" },
+      headers: { "User-Agent": "zingd/1.0" },
     });
     if (!res.ok) return [];
     const json = await res.json();

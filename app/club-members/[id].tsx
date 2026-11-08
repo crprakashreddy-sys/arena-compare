@@ -29,7 +29,7 @@ export default function ClubMembers() {
   useEffect(() => { load(); }, [load]);
 
   const invite = () => club?.invite_code && Share.share({
-    message: `Join "${club.name}" on zappd ⚡\nOpen zappd → Clubs → Have an invite code? → ${club.invite_code}`,
+    message: `Join "${club.name}" on zingd ⚡\nOpen zingd → Clubs → Have an invite code? → ${club.invite_code}`,
   });
 
   const act = (m: ClubMember) => {

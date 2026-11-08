@@ -302,7 +302,7 @@ export default function MapScreen() {
             tracksViewChanges={bubbleTrack}
             onPress={() => watchZaps(c)}
             zIndex={10}
-            accessibilityLabel={`${bubbles[c.id].count} zaps at ${c.name}`}
+            accessibilityLabel={`${bubbles[c.id].count} zings at ${c.name}`}
           >
             <View style={styles.bubble}>
               <RNImage source={{ uri: snapUrl(bubbles[c.id].photo) }} style={styles.bubbleImg} />
@@ -371,7 +371,7 @@ export default function MapScreen() {
             ) : (
               <Chip label="Add your EV" icon="add-circle" on={false} onPress={() => router.push("/garage")} />
             )}
-            <Chip label="Zaps" icon="camera" on={showZaps} onPress={() => setShowZaps((v) => !v)} />
+            <Chip label="Zings" icon="camera" on={showZaps} onPress={() => setShowZaps((v) => !v)} />
             <Chip label="DC fast" icon="flash" on={fastOnly} onPress={() => setFastOnly((v) => !v)} />
             <Chip label="Working now" icon="checkmark-circle" on={workingOnly} onPress={() => setWorkingOnly((v) => !v)} />
             {presentOem.length > 0 && <Chip label="Brand chargers" icon="car-sport" on={oemOn} onPress={toggleOem} />}
@@ -427,7 +427,7 @@ export default function MapScreen() {
         <Ionicons name="locate" size={21} color={t.accent} />
       </Pressable>
 
-      {/* Preview card for a tapped charger, with zaps from the latest visits */}
+      {/* Preview card for a tapped charger, with zings from the latest visits */}
       {peek && (() => {
         const n = networkById(peek.network);
         const st = live[peek.id];
@@ -451,7 +451,7 @@ export default function MapScreen() {
             </View>
             {peekZaps.length > 0 ? (
               <>
-                <Text style={{ color: t.muted, fontSize: 12.5, fontWeight: "700" }}>Zaps from the last visits</Text>
+                <Text style={{ color: t.muted, fontSize: 12.5, fontWeight: "700" }}>Zings from the last visits</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
                   {peekZaps.map((z, i) => (
                     <Pressable key={z.id} onPress={() => setViewer({ list: peekZaps, start: i })} style={styles.peekTile}>
@@ -463,14 +463,14 @@ export default function MapScreen() {
                 </ScrollView>
               </>
             ) : (
-              <Text style={{ color: t.muted, fontSize: 13.5 }}>No zaps here in the last 24 hours. Be the first to drop one.</Text>
+              <Text style={{ color: t.muted, fontSize: 13.5 }}>No zings here in the last 24 hours. Be the first to drop one.</Text>
             )}
             <View style={{ flexDirection: "row", gap: 8 }}>
               <Pressable
                 onPress={() => (peekZaps.length ? setViewer({ list: peekZaps, start: 0 }) : router.push(`/zap/${encodeURIComponent(peek.id)}`))}
                 style={[styles.peekBtn, { backgroundColor: "#1A1A1A" }]}
               >
-                <Text style={{ color: "#FCE38A", fontWeight: "800" }}>{peekZaps.length ? `Watch ${peekZaps.length} zap${peekZaps.length > 1 ? "s" : ""}` : "Drop the first zap"}</Text>
+                <Text style={{ color: "#FCE38A", fontWeight: "800" }}>{peekZaps.length ? `Watch ${peekZaps.length} zing${peekZaps.length > 1 ? "s" : ""}` : "Drop the first zing"}</Text>
               </Pressable>
               <Pressable onPress={() => openCharger(peek)} style={[styles.peekBtn, { backgroundColor: t.accent }]}>
                 <Text style={{ color: t.onAccent, fontWeight: "800" }}>Open charger</Text>
@@ -586,7 +586,7 @@ function EmptyState({ hiddenCount, onClear, onAdd }: { hiddenCount: number; onCl
       <View style={[styles.emptyIcon, { backgroundColor: "#FCE38A" }]}><Ionicons name="flash-off" size={32} color="#1A1A1A" /></View>
       <Text style={[styles.emptyTitle, { color: t.text }]}>No chargers listed here yet</Text>
       <Text style={{ color: t.muted, textAlign: "center", lineHeight: 20, maxWidth: 300 }}>
-        The public map doesn't cover this area. Know one nearby? Add it and be the first to zap it.
+        The public map doesn't cover this area. Know one nearby? Add it and be the first to zing it.
       </Text>
       <Pressable onPress={onAdd} style={styles.emptyBtn}>
         <Ionicons name="add-circle" size={18} color="#FCE38A" />

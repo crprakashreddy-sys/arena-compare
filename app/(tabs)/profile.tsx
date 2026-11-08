@@ -13,8 +13,8 @@ import { Avatar, Button, VerifiedBadge } from "../../components/ui";
 import { useGarage, vehicleName } from "../../lib/vehicles";
 import { useSessions } from "../../lib/sessions";
 
-const GUIDELINES_URL = "https://YOUR-SITE/zappd/community-guidelines";
-const PRIVACY_URL = "https://YOUR-SITE/zappd/privacy";
+const GUIDELINES_URL = "https://YOUR-SITE/zingd/community-guidelines";
+const PRIVACY_URL = "https://YOUR-SITE/zingd/privacy";
 
 export default function You() {
   const t = useTheme();
@@ -38,7 +38,7 @@ export default function You() {
         <Ionicons name="flash" size={40} color={t.accent} />
         <Text style={{ color: t.text, fontSize: 26, fontWeight: "800" }}>Join the EV crew</Text>
         <Text style={{ color: t.muted, fontSize: 15, lineHeight: 21 }}>
-          Sign in to drop zaps, review chargers, mark facilities and connect with other drivers. The map works without an account.
+          Sign in to drop zings, review chargers, mark facilities and connect with other drivers. The map works without an account.
         </Text>
         <Button title="Sign in or join" kind="primary" onPress={() => router.push("/login")} />
         <View style={{ marginHorizontal: -16, marginTop: 10 }}><Tools /></View>
@@ -47,7 +47,7 @@ export default function You() {
   }
 
   const deleteAccount = () =>
-    Alert.alert("Delete your account?", "This removes your profile, zaps, reviews and connections for good.", [
+    Alert.alert("Delete your account?", "This removes your profile, zings, reviews and connections for good.", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Delete account",
@@ -74,7 +74,7 @@ export default function You() {
       </View>
 
       <View style={{ flexDirection: "row", gap: 8, padding: 16 }}>
-        {[[String(stats.zaps), "Zaps"], [String(stats.reviews), "Reviews"], [String(connections.length), "Connections"], [String(points), `Zap Score · ${badgeFor(points)}`]].map(([v, l]) => (
+        {[[String(stats.zaps), "Zings"], [String(stats.reviews), "Reviews"], [String(connections.length), "Connections"], [String(points), `Zing Score · ${badgeFor(points)}`]].map(([v, l]) => (
           <View key={l} style={[styles.stat, { backgroundColor: t.surface }]}>
             <Text style={{ color: t.text, fontSize: 20, fontWeight: "800" }}>{v}</Text>
             <Text style={{ color: t.muted, fontSize: 11.5 }} numberOfLines={1}>{l}</Text>
@@ -103,7 +103,7 @@ export default function You() {
 
       <View style={[styles.section, { borderTopColor: t.line }]}>
         <Text style={[styles.h, { color: t.muted }]}>Your EV crew</Text>
-        {connections.length === 0 && <Text style={{ color: t.muted }}>Tap a driver's name on any zap or review to connect.</Text>}
+        {connections.length === 0 && <Text style={{ color: t.muted }}>Tap a driver's name on any zing or review to connect.</Text>}
         {connections.map((d) => (
           <Pressable key={d.id} style={styles.person} onPress={() => router.push(`/driver/${d.id}`)}>
             <Avatar name={d.display_name} size={40} />

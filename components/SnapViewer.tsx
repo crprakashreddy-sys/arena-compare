@@ -12,7 +12,7 @@ import { openSafetyMenu } from "./SafetyMenu";
 import { ScoreChip } from "./ZapScore";
 import type { Checkin } from "../lib/types";
 
-/** Full-screen zap story viewer. Tap the right side for next, the left for previous. */
+/** Full-screen zing story viewer. Tap the right side for next, the left for previous. */
 export default function SnapViewer({ snaps, start, onClose, onChanged }: {
   snaps: Checkin[]; start: number; onClose: () => void; onChanged?: () => void;
 }) {
@@ -47,7 +47,7 @@ export default function SnapViewer({ snaps, start, onClose, onChanged }: {
             </Pressable>
             <View style={{ flexDirection: "row", gap: 18 }}>
               {mine ? (
-                <Pressable accessibilityLabel="Delete my zap" hitSlop={10}
+                <Pressable accessibilityLabel="Delete my zing" hitSlop={10}
                   onPress={async () => { await deleteCheckin(s); onChanged?.(); onClose(); }}>
                   <Ionicons name="trash-outline" size={24} color="#fff" />
                 </Pressable>
@@ -71,9 +71,9 @@ export default function SnapViewer({ snaps, start, onClose, onChanged }: {
         ) : null}
 
         <Pressable style={{ position: "absolute", left: 0, top: 140, bottom: 120, width: width * 0.35 }}
-          onPress={() => setI((x) => Math.max(0, x - 1))} accessibilityLabel="Previous zap" />
+          onPress={() => setI((x) => Math.max(0, x - 1))} accessibilityLabel="Previous zing" />
         <Pressable style={{ position: "absolute", right: 0, top: 140, bottom: 120, width: width * 0.65 }}
-          onPress={() => (i < snaps.length - 1 ? setI(i + 1) : onClose())} accessibilityLabel="Next zap" />
+          onPress={() => (i < snaps.length - 1 ? setI(i + 1) : onClose())} accessibilityLabel="Next zing" />
       </View>
     </Modal>
   );

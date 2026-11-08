@@ -24,7 +24,7 @@ export default function RootLayout() {
         >
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="charger/[id]" options={{ title: "Charger" }} />
-          <Stack.Screen name="zap/[id]" options={{ title: "Drop a zap", presentation: "fullScreenModal" }} />
+          <Stack.Screen name="zap/[id]" options={{ title: "Drop a zing", presentation: "fullScreenModal" }} />
           <Stack.Screen name="edit-profile" options={{ title: "Edit profile", presentation: "modal" }} />
           <Stack.Screen name="review/[id]" options={{ title: "Your review", presentation: "modal" }} />
           <Stack.Screen name="facilities/[id]" options={{ title: "Facilities", presentation: "modal" }} />
@@ -42,7 +42,7 @@ export default function RootLayout() {
           <Stack.Screen name="event/[id]" options={{ title: "Event" }} />
           <Stack.Screen name="event-new" options={{ title: "Plan an event", presentation: "modal" }} />
           <Stack.Screen name="add-charger" options={{ title: "Add a charger", presentation: "modal" }} />
-          <Stack.Screen name="login" options={{ title: "Join zappd", presentation: "modal" }} />
+          <Stack.Screen name="login" options={{ title: "Join zingd", presentation: "modal" }} />
         </Stack>
         <Onboarding />
         <Intro />

@@ -132,7 +132,7 @@ export async function postCheckin(
   chargerId: string, status: Status, note: string, photoPath: string | null, look?: string, fix?: ZapFix | null, issue?: IssueKey | null,
 ): Promise<{ zap_score: number; score_breakdown: ScorePart[]; distance_m: number | null }> {
   const { data: u } = await supabase.auth.getUser();
-  if (!u.user) throw new Error("Sign in to drop a zap.");
+  if (!u.user) throw new Error("Sign in to drop a zing.");
   const { data, error } = await supabase.from("checkins").insert({
     charger_id: chargerId,
     user_id: u.user.id,
@@ -146,7 +146,7 @@ export async function postCheckin(
     taken_mocked: fix?.mocked ?? null,
     issue: status === "working" ? null : issue ?? null,
   }).select("zap_score,score_breakdown,distance_m").single();
-  if (error) throw new Error("Your zap didn't post. Try again.");
+  if (error) throw new Error("Your zing didn't post. Try again.");
   return {
     zap_score: (data?.zap_score as number) ?? 0,
     score_breakdown: (data?.score_breakdown as ScorePart[]) ?? [],
@@ -159,7 +159,7 @@ export async function deleteCheckin(c: Checkin) {
   await supabase.from("checkins").delete().eq("id", c.id);
 }
 
-/** For the map: how many live zaps each charger has, and the newest photo to show in its bubble. */
+/** For the map: how many live zings each charger has, and the newest photo to show in its bubble. */
 export async function fetchZapBubbles(chargerIds: string[]): Promise<Record<string, { count: number; photo: string }>> {
   if (!chargerIds.length) return {};
   const out: Record<string, { count: number; photo: string }> = {};
@@ -342,7 +342,7 @@ export async function fetchPoints(userId: string) {
   return (data?.points as number) ?? 0;
 }
 
-/** Badge from lifetime points. One on-site photo zap is about 120 to 145 points. */
+/** Badge from lifetime points. One on-site photo zing is about 120 to 145 points. */
 export function badgeFor(points: number) {
   if (points >= 10000) return "Charging legend";
   if (points >= 3000) return "Top zapper";
@@ -451,7 +451,7 @@ export async function verifyVehicle(reg: string): Promise<{ verified: boolean; c
   return { verified: !!data?.verified, checked: !!data?.checked };
 }
 
-/** The newest live zap photos anywhere, for the opening screen. Empty if offline or none yet. */
+/** The newest live zing photos anywhere, for the opening screen. Empty if offline or none yet. */
 export async function fetchIntroZaps(limit = 5): Promise<{ photo: string; name: string }[]> {
   if (!isConfigured) return [];
   const { data } = await supabase

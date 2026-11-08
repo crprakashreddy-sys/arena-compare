@@ -33,7 +33,7 @@ export default function DropZap() {
   const [fix, setFix] = useState<ZapFix | null>(null);
   const [locOff, setLocOff] = useState(false);
 
-  // Keep a fresh location fix while this screen is open, for the Zap Score preview.
+  // Keep a fresh location fix while this screen is open, for the Zing Score preview.
   useEffect(() => {
     let sub: Location.LocationSubscription | null = null;
     let alive = true;
@@ -54,7 +54,7 @@ export default function DropZap() {
   const enableLocation = async () => {
     const { status: perm } = await Location.requestForegroundPermissionsAsync();
     if (perm === "granted") setLocOff(false);
-    else Alert.alert("Location is off", "Allow location for zappd in Settings to earn full Zap Score.");
+    else Alert.alert("Location is off", "Allow location for zingd in Settings to earn full Zing Score.");
   };
 
   const distance = fix && charger ? metresTo(fix, charger.lat, charger.lng) : null;
@@ -85,7 +85,7 @@ export default function DropZap() {
     const opts: ImagePicker.ImagePickerOptions = { mediaTypes: ["images"], quality: 0.92, allowsEditing: true, aspect: [3, 4] };
     if (fromCamera) {
       const p = await ImagePicker.requestCameraPermissionsAsync();
-      if (!p.granted) return Alert.alert("Camera is off", "Allow camera access for zappd in Settings, or choose a photo instead.");
+      if (!p.granted) return Alert.alert("Camera is off", "Allow camera access for zingd in Settings, or choose a photo instead.");
     }
     const res = fromCamera ? await ImagePicker.launchCameraAsync(opts) : await ImagePicker.launchImageLibraryAsync(opts);
     if (!res.canceled && res.assets[0]) setUri(res.assets[0].uri);
@@ -110,7 +110,7 @@ export default function DropZap() {
         params: { id: charger.id, posted: "1", score: String(result.zap_score), parts: JSON.stringify(result.score_breakdown) },
       });
     } catch (e: any) {
-      Alert.alert("Your zap didn't post", e.message ?? "Try again in a moment.");
+      Alert.alert("Your zing didn't post", e.message ?? "Try again in a moment.");
     } finally {
       setPosting(false);
     }
@@ -119,7 +119,7 @@ export default function DropZap() {
   const header = (
     <Stack.Screen
       options={{
-        title: "Drop a zap",
+        title: "Drop a zing",
         headerStyle: { backgroundColor: DARK },
         headerTitleStyle: { color: "#fff" },
         headerTintColor: "#fff",
@@ -158,7 +158,7 @@ export default function DropZap() {
         {choosing && (
           <View style={{ marginHorizontal: 16, borderRadius: 14, backgroundColor: "#151A1F", overflow: "hidden" }}>
             {nearby.length === 0 && (
-              <Text style={{ color: "#A3ADB6", padding: 14 }}>No chargers found near you. Open a charger from the map and drop your zap from there.</Text>
+              <Text style={{ color: "#A3ADB6", padding: 14 }}>No chargers found near you. Open a charger from the map and drop your zing from there.</Text>
             )}
             {nearby.map(({ c, d }) => (
               <Pressable key={c.id} onPress={() => { setCharger(c); setChoosing(false); }} style={styles.choice}>
@@ -213,7 +213,7 @@ export default function DropZap() {
               <View style={{ marginHorizontal: 16, gap: 10 }}>
                 <Pressable onPress={() => shoot(true)} style={styles.shoot}>
                   <Ionicons name="camera" size={40} color="#1A1A1A" />
-                  <Text style={{ color: "#1A1A1A", fontWeight: "800", fontSize: 17 }}>Take a zap</Text>
+                  <Text style={{ color: "#1A1A1A", fontWeight: "800", fontSize: 17 }}>Take a zing</Text>
                   <Text style={{ color: "#3C3410", fontSize: 13 }}>Show the screen, the queue or the spot</Text>
                 </Pressable>
                 <Pressable onPress={() => shoot(false)} style={styles.secondary}>

@@ -181,7 +181,7 @@ export default function ClubChat() {
         })),
         { text: "Cancel", style: "cancel" as const },
       ]);
-      else Alert.alert(`Block ${name}?`, "You won't see their messages, zaps or reviews.", [
+      else Alert.alert(`Block ${name}?`, "You won't see their messages, zings or reviews.", [
         { text: "Cancel", style: "cancel" },
         { text: "Block", style: "destructive", onPress: async () => { await blockUser(m.user_id); setMsgs((c) => c.filter((x) => x.user_id !== m.user_id)); } },
       ]);

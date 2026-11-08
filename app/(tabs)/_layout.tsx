@@ -23,7 +23,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="feed"
         options={{
-          title: "Zaps",
+          title: "Zings",
           headerShown: false,
           tabBarIcon: ({ color, size }) => <Ionicons name="flash" color={color} size={size} />,
         }}
@@ -31,12 +31,12 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="drop"
         options={{
-          title: "Drop a zap",
+          title: "Drop a zing",
           tabBarButton: () => (
             <Pressable
               onPress={() => router.push("/zap/nearest")}
               accessibilityRole="button"
-              accessibilityLabel="Drop a zap"
+              accessibilityLabel="Drop a zing"
               style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
             >
               <View style={{

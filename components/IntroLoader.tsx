@@ -7,13 +7,13 @@ import { snapUrl } from "../lib/supabase";
 export const LEMON = "#FCE38A";
 const INK = "#1A1A1A";
 
-/** Illustrated stand-ins, replaced by real community zaps once there are some. */
+/** Illustrated stand-ins, replaced by real community zings once there are some. */
 const STARTERS = [
   { src: require("../assets/intro/z1.jpg"), name: "night charge ⚡" },
   { src: require("../assets/intro/z2.jpg"), name: "highway stop" },
   { src: require("../assets/intro/z3.jpg"), name: "chai break · 80%" },
   { src: require("../assets/intro/z4.jpg"), name: "hill route" },
-  { src: require("../assets/intro/z5.jpg"), name: "zappd it" },
+  { src: require("../assets/intro/z5.jpg"), name: "zingd it" },
 ];
 
 // Where each card lands, as a share of the screen from the centre, and its tilt.
@@ -31,7 +31,7 @@ const MIN_MS = 1800;
 const MAX_MS = 4500;
 
 /**
- * Opening screen: picks up exactly where the native lemon splash leaves off, then the zap
+ * Opening screen: picks up exactly where the native lemon splash leaves off, then the zing
  * mark pulses while photo cards burst out around it. Fades away once the app is ready.
  */
 export function IntroLoader({ ready }: { ready: boolean }) {
@@ -130,8 +130,8 @@ export function IntroLoader({ ready }: { ready: boolean }) {
       </Animated.View>
 
       <View style={s.words}>
-        <Text style={s.brand}>zappd</Text>
-        <Text style={s.tag}>been there. zappd it.</Text>
+        <Text style={s.brand}>zingd</Text>
+        <Text style={s.tag}>been there. zingd it.</Text>
       </View>
     </Animated.View>
   );

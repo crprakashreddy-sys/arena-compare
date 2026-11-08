@@ -20,7 +20,7 @@ const STATUS_STYLE = {
   broken: { fg: "#F28B82", bg: "#3D1C1A" },
 } as const;
 
-/** Zaps near you: a dark, full-bleed feed of live charger photos from the last 24 hours. */
+/** Zings near you: a dark, full-bleed feed of live charger photos from the last 24 hours. */
 export default function ZapsFeed() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
@@ -58,13 +58,13 @@ export default function ZapsFeed() {
         refreshControl={<RefreshControl refreshing={loading} onRefresh={() => load()} tintColor="#FCE38A" />}
         ListHeaderComponent={
           <View style={{ paddingHorizontal: 4, paddingBottom: 6 }}>
-            <Text style={{ color: "#fff", fontSize: 40, fontWeight: "900", letterSpacing: -0.5 }}>Zaps near you</Text>
+            <Text style={{ color: "#fff", fontSize: 40, fontWeight: "900", letterSpacing: -0.5 }}>Zings near you</Text>
             <Text style={{ color: "#A9B3BC" }}>Live from chargers within 25 km · gone in 24 hours</Text>
             <Pressable onPress={() => router.push("/leaderboard")} style={styles.board} accessibilityRole="button">
               <Ionicons name="trophy" size={18} color="#FCE38A" />
               <View style={{ flex: 1 }}>
-                <Text style={{ color: "#fff", fontWeight: "800" }}>Zap Score leaderboard</Text>
-                <Text style={{ color: "#A9B3BC", fontSize: 12.5 }}>Zaps taken right at the charger score the most</Text>
+                <Text style={{ color: "#fff", fontWeight: "800" }}>Zing Score leaderboard</Text>
+                <Text style={{ color: "#A9B3BC", fontSize: 12.5 }}>Zings taken right at the charger score the most</Text>
               </View>
               <Ionicons name="chevron-forward" size={18} color="#A9B3BC" />
             </Pressable>
@@ -75,13 +75,13 @@ export default function ZapsFeed() {
             <View style={{ alignItems: "center", gap: 10, paddingVertical: 60 }}>
               <Ionicons name="flash-outline" size={40} color="#FCE38A" />
               <Text style={{ color: "#fff", fontSize: 17, fontWeight: "700" }}>
-                {where ? "No zaps near you today" : "Turn on location to see zaps near you"}
+                {where ? "No zings near you today" : "Turn on location to see zings near you"}
               </Text>
               <Text style={{ color: "#A9B3BC", textAlign: "center", paddingHorizontal: 30 }}>
                 Drop the first one at your next charge. Your photo helps the next driver.
               </Text>
               <Pressable onPress={() => router.push("/zap/nearest")} style={styles.cta}>
-                <Text style={{ color: "#1A1A1A", fontWeight: "800" }}>Drop a zap</Text>
+                <Text style={{ color: "#1A1A1A", fontWeight: "800" }}>Drop a zing</Text>
               </Pressable>
             </View>
           )
@@ -91,7 +91,7 @@ export default function ZapsFeed() {
           const sc = STATUS_STYLE[z.status];
           return (
             <View style={styles.card}>
-              <Pressable onPress={() => setViewer(index)} accessibilityLabel={`Zap by ${name} at ${z.chargers?.name ?? "a charger"}`}>
+              <Pressable onPress={() => setViewer(index)} accessibilityLabel={`Zing by ${name} at ${z.chargers?.name ?? "a charger"}`}>
                 {z.photo_path && (
                   <Image source={{ uri: snapUrl(z.photo_path) }} style={{ width: cardW, height: Math.min(cardW * 4 / 3, 520) }} contentFit="cover" transition={200} />
                 )}

@@ -18,7 +18,7 @@ export default function EditProfile() {
 
   const save = async () => {
     if (!profile) return;
-    if (name.trim().length < 2) return Alert.alert("Add your name", "Other drivers see this on your zaps and reviews.");
+    if (name.trim().length < 2) return Alert.alert("Add your name", "Other drivers see this on your zings and reviews.");
     const reg = normalisePlate(plate);
     if (reg && !PLATE_RE.test(reg)) return Alert.alert("Check the vehicle number", "Use the format TS09EV1234, or leave it empty.");
     setBusy(true);

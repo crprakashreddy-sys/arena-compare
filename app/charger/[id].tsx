@@ -66,7 +66,7 @@ export default function ChargerPage() {
     });
   }, [chargerId]);
 
-  // Refresh whenever the page comes back into view (after a zap, review or facility update).
+  // Refresh whenever the page comes back into view (after a zing, review or facility update).
   useFocusEffect(useCallback(() => { loadCommunity(); }, [loadCommunity]));
 
   if (!c) {
@@ -130,14 +130,14 @@ export default function ChargerPage() {
               {c.id.startsWith("c-") && (
                 <View style={{ flexDirection: "row", alignSelf: "flex-start", alignItems: "center", gap: 5, backgroundColor: "#FCE38A", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, marginTop: 4 }}>
                   <Ionicons name="people" size={13} color="#1A1A1A" />
-                  <Text style={{ color: "#1A1A1A", fontSize: 12, fontWeight: "800" }}>Added by drivers · zap it to confirm</Text>
+                  <Text style={{ color: "#1A1A1A", fontSize: 12, fontWeight: "800" }}>Added by drivers · zing it to confirm</Text>
                 </View>
               )}
               {n.oem && (
                 <View style={{ flexDirection: "row", gap: 6, alignItems: "flex-start", marginTop: 4 }}>
                   <Ionicons name="car-sport-outline" size={14} color={t.muted} />
                   <Text style={{ color: t.muted, fontSize: 12.5, flex: 1 }}>
-                    {n.short} brand charger. Some are open to every EV, some only to {n.short} owners or need its app. Check recent zaps before you go.
+                    {n.short} brand charger. Some are open to every EV, some only to {n.short} owners or need its app. Check recent zings before you go.
                   </Text>
                 </View>
               )}
@@ -173,7 +173,7 @@ export default function ChargerPage() {
           <View style={{ flexDirection: "row", gap: 8 }}>
             <Pressable onPress={() => router.push(`/zap/${encodeURIComponent(c.id)}`)} style={[styles.action, { backgroundColor: "#1A1A1A" }]}>
               <Ionicons name="camera" size={18} color="#FCE38A" />
-              <Text style={{ color: "#FCE38A", fontWeight: "800" }}>Drop a zap</Text>
+              <Text style={{ color: "#FCE38A", fontWeight: "800" }}>Drop a zing</Text>
             </Pressable>
             <Button title="Directions" icon="navigate" kind="primary" onPress={directions} style={{ flex: 1 }} />
           </View>
@@ -188,21 +188,21 @@ export default function ChargerPage() {
           </View>
         </View>
 
-        <Section title="Zaps · gone in 24 hours">
+        <Section title="Zings · gone in 24 hours">
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
             <Pressable onPress={() => router.push(`/zap/${encodeURIComponent(c.id)}`)} style={[styles.zapTile, styles.addTile, { borderColor: t.faint }]}>
               <Ionicons name="camera-outline" size={26} color={t.accent} />
-              <Text style={{ color: t.accent, fontWeight: "700", fontSize: 12 }}>Drop zap</Text>
+              <Text style={{ color: t.accent, fontWeight: "700", fontSize: 12 }}>Drop zing</Text>
             </Pressable>
             {zaps.map((z, i) => (
-              <Pressable key={z.id} onPress={() => setViewer(i)} style={styles.zapTile} accessibilityLabel={`Zap by ${z.profiles?.display_name ?? "a driver"}`}>
+              <Pressable key={z.id} onPress={() => setViewer(i)} style={styles.zapTile} accessibilityLabel={`Zing by ${z.profiles?.display_name ?? "a driver"}`}>
                 {z.photo_path && <Image source={{ uri: snapUrl(z.photo_path) }} style={StyleSheet.absoluteFill} contentFit="cover" />}
                 <Text style={styles.zapAgo}>{timeAgo(z.created_at).replace(" ago", "")}</Text>
                 <Text style={styles.zapWho} numberOfLines={1}>{z.profiles?.display_name ?? "Driver"}</Text>
               </Pressable>
             ))}
           </ScrollView>
-          {zaps.length === 0 && <Text style={{ color: t.muted }}>No zaps yet today. Drop the first one when you're here.</Text>}
+          {zaps.length === 0 && <Text style={{ color: t.muted }}>No zings yet today. Drop the first one when you're here.</Text>}
         </Section>
 
         <Section title="Facilities · marked by drivers" action="Update" onAction={need(() => router.push(`/facilities/${encodeURIComponent(c.id)}`))}>

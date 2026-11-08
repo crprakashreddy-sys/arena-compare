@@ -5,7 +5,7 @@ const IOS_BUNDLE_ID = "com.prakash.zappd";
 const ANDROID_PACKAGE = "com.prakash.zappd";
 
 const config: ExpoConfig = {
-  name: "zappd",
+  name: "zingd",
   slug: "zappd",
   version: "1.0.0",
   scheme: "zappd",
@@ -19,11 +19,11 @@ const config: ExpoConfig = {
     usesAppleSignIn: true,
     infoPlist: {
       NSLocationWhenInUseUsageDescription:
-        "zappd uses your location to show the EV chargers nearest to you and their distance.",
+        "zingd uses your location to show the EV chargers nearest to you and their distance.",
       NSCameraUsageDescription:
-        "zappd uses the camera so you can post a photo of a charger's status for other drivers.",
+        "zingd uses the camera so you can post a photo of a charger's status for other drivers.",
       NSPhotoLibraryUsageDescription:
-        "zappd lets you choose a photo of a charger to share with other drivers.",
+        "zingd lets you choose a photo of a charger to share with other drivers.",
       ITSAppUsesNonExemptEncryption: false,
       LSApplicationQueriesSchemes: ["comgooglemaps"],
     },
@@ -54,13 +54,13 @@ const config: ExpoConfig = {
     ],
     [
       "expo-location",
-      { locationWhenInUsePermission: "zappd uses your location to show the EV chargers nearest to you." },
+      { locationWhenInUsePermission: "zingd uses your location to show the EV chargers nearest to you." },
     ],
     [
       "expo-image-picker",
       {
-        cameraPermission: "zappd uses the camera so you can post a photo of a charger's status.",
-        photosPermission: "zappd lets you choose a photo of a charger to share.",
+        cameraPermission: "zingd uses the camera so you can post a photo of a charger's status.",
+        photosPermission: "zingd lets you choose a photo of a charger to share.",
       },
     ],
   ],

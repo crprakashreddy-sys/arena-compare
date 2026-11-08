@@ -18,7 +18,7 @@ export const NIGHT_STYLE = [
   { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#4b6478" }] },
 ];
 
-/** zappd's own Google map look by day: warm paper land, quiet roads, lemon highways, no business clutter. */
+/** zingd's own Google map look by day: warm paper land, quiet roads, lemon highways, no business clutter. */
 export const DAY_STYLE = [
   { elementType: "geometry", stylers: [{ color: "#F5F3EC" }] },
   { elementType: "labels.text.fill", stylers: [{ color: "#6B6B66" }] },

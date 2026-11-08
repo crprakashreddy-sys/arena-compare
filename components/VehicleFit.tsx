@@ -52,7 +52,7 @@ export default function VehicleFit({ charger }: { charger: Charger }) {
           ))}
         </View>
       )}
-      {fit === "unknown" && <Text style={{ color: t.muted, fontSize: 12.5 }}>Times assume it fits. Check the zaps or ask drivers who charged here.</Text>}
+      {fit === "unknown" && <Text style={{ color: t.muted, fontSize: 12.5 }}>Times assume it fits. Check the zings or ask drivers who charged here.</Text>}
     </View>
   );
 }

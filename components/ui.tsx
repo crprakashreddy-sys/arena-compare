@@ -68,7 +68,7 @@ export function StatusBanner({ live }: { live?: LiveStatus }) {
     return (
       <View style={[styles.banner, { backgroundColor: t.surface }]}>
         <Ionicons name="help-circle-outline" size={18} color={t.muted} />
-        <Text style={{ color: t.muted, flex: 1 }}>No reports in the last 3 hours. Be the first to drop a zap.</Text>
+        <Text style={{ color: t.muted, flex: 1 }}>No reports in the last 3 hours. Be the first to drop a zing.</Text>
       </View>
     );
   }

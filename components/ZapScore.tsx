@@ -6,13 +6,13 @@ import type { ScorePart } from "../lib/types";
 
 const YELLOW = "#FCE38A";
 
-/** Small pill: ⚡ 145. Used on zaps in the viewer, feed and profiles. */
+/** Small pill: ⚡ 145. Used on zings in the viewer, feed and profiles. */
 export function ScoreChip({ points, distanceM, dark = true }: { points?: number; distanceM?: number | null; dark?: boolean }) {
   if (points == null) return null;
   const tone = scoreTone(points);
   return (
     <View style={[styles.chip, { backgroundColor: dark ? "rgba(0,0,0,0.55)" : "rgba(0,0,0,0.06)" }]}
-      accessibilityLabel={`Zap score ${points}${distanceM != null ? `, taken ${formatMetres(distanceM)} from the charger` : ""}`}>
+      accessibilityLabel={`Zing score ${points}${distanceM != null ? `, taken ${formatMetres(distanceM)} from the charger` : ""}`}>
       <Ionicons name="flash" size={12} color={tone} />
       <Text style={{ color: dark ? "#fff" : "#111", fontWeight: "800", fontSize: 12.5, fontVariant: ["tabular-nums"] }}>{points}</Text>
       {distanceM != null && <Text style={{ color: dark ? "rgba(255,255,255,0.75)" : "#555", fontSize: 11.5 }}>· {formatMetres(distanceM)}</Text>}
@@ -21,7 +21,7 @@ export function ScoreChip({ points, distanceM, dark = true }: { points?: number;
 }
 
 /**
- * Live preview before posting: how many points this zap will earn from here,
+ * Live preview before posting: how many points this zing will earn from here,
  * and how much closer to walk for the next tier.
  */
 export function ScoreMeter({ distanceM, accuracy, mocked, hasPhoto, locationOff, onEnableLocation }: {
@@ -44,7 +44,7 @@ export function ScoreMeter({ distanceM, accuracy, mocked, hasPhoto, locationOff,
         <Ionicons name="location-outline" size={20} color={YELLOW} />
         <View style={{ flex: 1 }}>
           <Text style={styles.meterTitle}>Turn on location to earn up to {TIERS[0].points + PHOTO_BONUS + FRESH_BONUS} points</Text>
-          <Text style={styles.meterSub}>Zaps taken at the charger score highest. Your location is never shown to anyone.</Text>
+          <Text style={styles.meterSub}>Zings taken at the charger score highest. Your location is never shown to anyone.</Text>
         </View>
       </Pressable>
     );
@@ -66,10 +66,10 @@ export function ScoreMeter({ distanceM, accuracy, mocked, hasPhoto, locationOff,
           {["Nearby", "At the station", "At the plug"].map((l) => <Text key={l} style={styles.tickLabel}>{l}</Text>)}
         </View>
         <Text style={styles.meterSub}>
-          {mocked ? "Your location looks simulated, so this zap earns the minimum."
+          {mocked ? "Your location looks simulated, so this zing earns the minimum."
             : (accuracy ?? 0) > 150 && distanceM != null && distanceM <= 200 ? `GPS is fuzzy (±${Math.round(accuracy ?? 0)} m). Step outside for a better fix to unlock ${TIERS[0].label}.`
             : tier.next ? `Get ${formatMetres(Math.max(tier.next.metres, 1))} closer for ${tier.next.label}.`
-            : onSite ? `${hasPhoto ? "" : `+${PHOTO_BONUS} with a photo. `}+${FRESH_BONUS} more if you're the first zap here in 3 hours.`
+            : onSite ? `${hasPhoto ? "" : `+${PHOTO_BONUS} with a photo. `}+${FRESH_BONUS} more if you're the first zing here in 3 hours.`
             : ""}
         </Text>
       </View>
@@ -88,12 +88,12 @@ export function ScoreCard({ total, parts, onClose }: { total: number; parts: Sco
   }, [total]);
   const tone = scoreTone(parts[0]?.points ?? total);
   return (
-    <View style={styles.card} accessibilityLabel={`Zap dropped. You earned ${total} points.`}>
+    <View style={styles.card} accessibilityLabel={`Zing dropped. You earned ${total} points.`}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
         <View style={[styles.bolt, { backgroundColor: tone }]}><Ionicons name="flash" size={20} color="#1A1A1A" /></View>
         <View style={{ flex: 1 }}>
           <Text style={{ color: "#fff", fontWeight: "800", fontSize: 26, fontVariant: ["tabular-nums"] }}>+{shown}</Text>
-          <Text style={{ color: "#A3ADB6", fontSize: 12.5 }}>Zap Score · disappears from the map in 24 hours</Text>
+          <Text style={{ color: "#A3ADB6", fontSize: 12.5 }}>Zing Score · disappears from the map in 24 hours</Text>
         </View>
         {onClose && (
           <Pressable onPress={onClose} hitSlop={10} accessibilityLabel="Close"><Ionicons name="close" size={22} color="#A3ADB6" /></Pressable>

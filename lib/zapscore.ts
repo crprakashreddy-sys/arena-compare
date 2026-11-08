@@ -2,7 +2,7 @@ import * as Location from "expo-location";
 import { distanceM } from "./geo";
 
 /**
- * Zap Score. The database decides the real score (supabase/schema.sql, score_zap);
+ * Zing Score. The database decides the real score (supabase/schema.sql, score_zap);
  * this file mirrors its rules so the camera can show a live preview before posting.
  */
 

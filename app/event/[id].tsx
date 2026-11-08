@@ -56,7 +56,7 @@ export default function EventDetail() {
 
   const menu = () => {
     const opts: { text: string; style?: "destructive" | "cancel"; onPress?: () => void }[] = [
-      { text: "Share", onPress: () => Share.share({ message: `${k.emoji} ${e.title}\n${fmtWhen(e.starts_at)}${e.place_name ? `\n📍 ${e.place_name}` : ""}\n\nJoin on zappd ⚡ (${e.club_name})` }) },
+      { text: "Share", onPress: () => Share.share({ message: `${k.emoji} ${e.title}\n${fmtWhen(e.starts_at)}${e.place_name ? `\n📍 ${e.place_name}` : ""}\n\nJoin on zingd ⚡ (${e.club_name})` }) },
     ];
     if (host || admin) opts.push(e.cancelled
       ? { text: "Un-cancel event", onPress: () => cancelEvent(e.id, false).then(load) }

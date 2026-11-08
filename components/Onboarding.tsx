@@ -10,7 +10,7 @@ const LEMON = "#FCE38A";
 const INK = "#1A1A1A";
 const PAGES = 4;
 
-/** First-run welcome: what zappd does, pick your vehicle, then a friendly ask for location. */
+/** First-run welcome: what zingd does, pick your vehicle, then a friendly ask for location. */
 export function Onboarding() {
   const onboarded = useOnboarded();
   if (onboarded !== false) return null;
@@ -31,7 +31,7 @@ function Pages() {
   return (
     <Animated.View style={[StyleSheet.absoluteFill, s.wrap, { opacity: fade, paddingTop: insets.top + 8, paddingBottom: insets.bottom + 16 }]}>
       <View style={s.top}>
-        <Text style={s.logo}>zappd</Text>
+        <Text style={s.logo}>zingd</Text>
         {page < PAGES - 1 && (
           <Pressable onPress={() => go(PAGES - 1)} hitSlop={12}><Text style={s.skip}>Skip</Text></Pressable>
         )}
@@ -52,7 +52,7 @@ function Pages() {
           <Badge style={{ top: 150, left: 4 }} dot="#F2A93B" text="Busy · 2 in queue" />
         </Slide>
 
-        <Slide width={width} title={"Drop a Zap.\nStack points."} body="Snap the charger, tag how it went. The closer you are when you post, the bigger your Zap Score.">
+        <Slide width={width} title={"Drop a Zing.\nStack points."} body="Snap the charger, tag how it went. The closer you are when you post, the bigger your Zing Score.">
           <Polaroid src={require("../assets/intro/z3.jpg")} caption="chai break · 80%" tilt={5} />
           <View style={[s.score, { top: 14, right: 18 }]}>
             <Ionicons name="flash" size={16} color={LEMON} />
@@ -63,7 +63,7 @@ function Pages() {
 
         <PickRide width={width} />
 
-        <Slide width={width} title={"Chargers near you,\nin one tap."} body="zappd uses your location only while the app is open, to show the closest chargers and how far they are.">
+        <Slide width={width} title={"Chargers near you,\nin one tap."} body="zingd uses your location only while the app is open, to show the closest chargers and how far they are.">
           <View style={s.pinCircle}>
             <View style={s.pinInner}><Ionicons name="navigate" size={54} color={LEMON} /></View>
           </View>
