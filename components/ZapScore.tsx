@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { FRESH_BONUS, PHOTO_BONUS, TIERS, formatMetres, scoreTone, tierFor } from "../lib/zapscore";
 import type { ScorePart } from "../lib/types";
 
-const YELLOW = "#FFD60A";
+const YELLOW = "#FCE38A";
 
 /** Small pill: ⚡ 145. Used on zaps in the viewer, feed and profiles. */
 export function ScoreChip({ points, distanceM, dark = true }: { points?: number; distanceM?: number | null; dark?: boolean }) {
@@ -90,7 +90,7 @@ export function ScoreCard({ total, parts, onClose }: { total: number; parts: Sco
   return (
     <View style={styles.card} accessibilityLabel={`Zap dropped. You earned ${total} points.`}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-        <View style={[styles.bolt, { backgroundColor: tone }]}><Ionicons name="flash" size={20} color="#14202B" /></View>
+        <View style={[styles.bolt, { backgroundColor: tone }]}><Ionicons name="flash" size={20} color="#1A1A1A" /></View>
         <View style={{ flex: 1 }}>
           <Text style={{ color: "#fff", fontWeight: "800", fontSize: 26, fontVariant: ["tabular-nums"] }}>+{shown}</Text>
           <Text style={{ color: "#A3ADB6", fontSize: 12.5 }}>Zap Score · disappears from the map in 24 hours</Text>
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   bar: { height: 8, borderRadius: 4 },
   tick: { position: "absolute", top: 0, bottom: 0, width: 2, backgroundColor: "#07090B" },
   tickLabel: { color: "#6E7882", fontSize: 10.5 },
-  card: { gap: 8, padding: 14, borderRadius: 14, backgroundColor: "#14202B" },
+  card: { gap: 8, padding: 14, borderRadius: 14, backgroundColor: "#1A1A1A" },
   bolt: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
   row: { flexDirection: "row", paddingTop: 6, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: "#2A3037" },
 });

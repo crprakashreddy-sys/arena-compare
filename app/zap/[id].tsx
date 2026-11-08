@@ -14,7 +14,7 @@ import { getZapFix, metresTo, type ZapFix } from "../../lib/zapscore";
 import { ScoreMeter } from "../../components/ZapScore";
 
 const DARK = "#07090B";
-const YELLOW = "#FFD60A";
+const YELLOW = "#FCE38A";
 
 /** Drop a zap: pick the charger (or use the nearest), shoot or choose a photo, grade it, post it. */
 export default function DropZap() {
@@ -126,7 +126,7 @@ export default function DropZap() {
         headerRight: () =>
           charger ? (
             <Pressable onPress={post} disabled={posting} style={styles.dropBtn} accessibilityRole="button">
-              {posting ? <ActivityIndicator color="#14202B" /> : <Text style={{ color: "#14202B", fontWeight: "800" }}>Drop it</Text>}
+              {posting ? <ActivityIndicator color="#1A1A1A" /> : <Text style={{ color: "#1A1A1A", fontWeight: "800" }}>Drop it</Text>}
             </Pressable>
           ) : null,
       }}
@@ -192,8 +192,8 @@ export default function DropZap() {
                   {ISSUES.map((i) => (
                     <Pressable key={i.key} onPress={() => setIssue(issue === i.key ? null : i.key)}
                       accessibilityRole="button" accessibilityState={{ selected: issue === i.key }}
-                      style={[styles.issue, issue === i.key && { backgroundColor: "#FFD60A", borderColor: "#FFD60A" }]}>
-                      <Text style={{ color: issue === i.key ? "#14202B" : "#fff", fontWeight: "600", fontSize: 13 }}>{i.label}</Text>
+                      style={[styles.issue, issue === i.key && { backgroundColor: "#FCE38A", borderColor: "#FCE38A" }]}>
+                      <Text style={{ color: issue === i.key ? "#1A1A1A" : "#fff", fontWeight: "600", fontSize: 13 }}>{i.label}</Text>
                     </Pressable>
                   ))}
                 </View>
@@ -212,8 +212,8 @@ export default function DropZap() {
             ) : (
               <View style={{ marginHorizontal: 16, gap: 10 }}>
                 <Pressable onPress={() => shoot(true)} style={styles.shoot}>
-                  <Ionicons name="camera" size={40} color="#14202B" />
-                  <Text style={{ color: "#14202B", fontWeight: "800", fontSize: 17 }}>Take a zap</Text>
+                  <Ionicons name="camera" size={40} color="#1A1A1A" />
+                  <Text style={{ color: "#1A1A1A", fontWeight: "800", fontSize: 17 }}>Take a zap</Text>
                   <Text style={{ color: "#3C3410", fontSize: 13 }}>Show the screen, the queue or the spot</Text>
                 </Pressable>
                 <Pressable onPress={() => shoot(false)} style={styles.secondary}>

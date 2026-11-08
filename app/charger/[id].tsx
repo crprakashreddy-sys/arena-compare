@@ -172,9 +172,9 @@ export default function ChargerPage() {
           )}
 
           <View style={{ flexDirection: "row", gap: 8 }}>
-            <Pressable onPress={() => router.push(`/zap/${encodeURIComponent(c.id)}`)} style={[styles.action, { backgroundColor: "#14202B" }]}>
-              <Ionicons name="camera" size={18} color="#FFD60A" />
-              <Text style={{ color: "#FFD60A", fontWeight: "800" }}>Drop a zap</Text>
+            <Pressable onPress={() => router.push(`/zap/${encodeURIComponent(c.id)}`)} style={[styles.action, { backgroundColor: "#1A1A1A" }]}>
+              <Ionicons name="camera" size={18} color="#FCE38A" />
+              <Text style={{ color: "#FCE38A", fontWeight: "800" }}>Drop a zap</Text>
             </Pressable>
             <Button title="Directions" icon="navigate" kind="primary" onPress={directions} style={{ flex: 1 }} />
           </View>
@@ -318,7 +318,7 @@ export default function ChargerPage() {
 const styles = StyleSheet.create({
   toast: { flexDirection: "row", alignItems: "center", gap: 8, padding: 12, borderRadius: 12 },
   action: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, height: 46, borderRadius: 12 },
-  zapTile: { width: 92, height: 124, borderRadius: 14, overflow: "hidden", backgroundColor: "#14202B" },
+  zapTile: { width: 92, height: 124, borderRadius: 14, overflow: "hidden", backgroundColor: "#1A1A1A" },
   addTile: { borderWidth: 2, borderStyle: "dashed", backgroundColor: "transparent", alignItems: "center", justifyContent: "center", gap: 6 },
   zapAgo: { position: "absolute", top: 6, left: 6, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 9, overflow: "hidden", backgroundColor: "rgba(0,0,0,0.6)", color: "#fff", fontSize: 11, fontWeight: "700" },
   zapWho: { position: "absolute", left: 0, right: 0, bottom: 0, paddingHorizontal: 7, paddingTop: 14, paddingBottom: 6, backgroundColor: "rgba(0,0,0,0.5)", color: "#fff", fontSize: 12, fontWeight: "700" },

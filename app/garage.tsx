@@ -90,7 +90,7 @@ export default function Garage() {
       </Text>
       {vehicles.length > 0 && (
         <Pressable onPress={() => router.back()} style={[styles.done, { backgroundColor: t.accent }]}>
-          <Text style={{ color: t.bg, fontWeight: "800" }}>Done</Text>
+          <Text style={{ color: t.onAccent, fontWeight: "800" }}>Done</Text>
         </Pressable>
       )}
     </ScrollView>
@@ -129,7 +129,7 @@ function VehicleCard({ v, active, editing, onPick, onEdit, onRemove }: {
             <Field label="Real range (km)" value={range} onChange={setRange} />
           </View>
           <View style={{ flexDirection: "row", gap: 8 }}>
-            <Pressable onPress={saveEdits} style={[styles.small, { backgroundColor: t.accent }]}><Text style={{ color: t.bg, fontWeight: "700" }}>Save</Text></Pressable>
+            <Pressable onPress={saveEdits} style={[styles.small, { backgroundColor: t.accent }]}><Text style={{ color: t.onAccent, fontWeight: "700" }}>Save</Text></Pressable>
             <Pressable onPress={onRemove} style={[styles.small, { backgroundColor: t.badSoft }]}><Text style={{ color: t.bad, fontWeight: "700" }}>Remove</Text></Pressable>
           </View>
         </View>

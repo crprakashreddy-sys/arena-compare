@@ -40,11 +40,11 @@ export default function TabsLayout() {
               style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
             >
               <View style={{
-                width: 54, height: 54, borderRadius: 27, backgroundColor: "#FFD60A", marginTop: -20,
+                width: 54, height: 54, borderRadius: 27, backgroundColor: "#FCE38A", marginTop: -20,
                 alignItems: "center", justifyContent: "center",
-                shadowColor: "#FFD60A", shadowOpacity: 0.5, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 6,
+                shadowColor: "#FCE38A", shadowOpacity: 0.5, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 6,
               }}>
-                <Ionicons name="camera" size={26} color="#14202B" />
+                <Ionicons name="camera" size={26} color="#1A1A1A" />
               </View>
             </Pressable>
           ),

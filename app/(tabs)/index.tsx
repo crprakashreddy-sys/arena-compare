@@ -23,7 +23,7 @@ import { chargeMinutes, fitFor, fmtMinutes, reachKm, updateVehicle, usablePowerK
 import { NIGHT_STYLE } from "../../lib/mapStyle";
 
 const INDIA: Region = { latitude: 21.5, longitude: 79, latitudeDelta: 24, longitudeDelta: 24 };
-const MAP_TYPES = ["hybrid", "satellite", "standard"] as const;
+const MAP_TYPES = ["standard", "hybrid", "satellite"] as const;
 
 export default function MapScreen() {
   const t = useTheme();
@@ -34,7 +34,7 @@ export default function MapScreen() {
   const [origin, setOrigin] = useState<{ lat: number; lng: number; label: string } | null>(null);
   const [region, setRegion] = useState<Region | null>(null);
   const [lastLoad, setLastLoad] = useState<{ lat: number; lng: number } | null>(null);
-  const [mapType, setMapType] = useState<(typeof MAP_TYPES)[number]>("hybrid");
+  const [mapType, setMapType] = useState<(typeof MAP_TYPES)[number]>("standard");
 
   const [chargers, setChargers] = useState<Charger[]>([]);
   const [live, setLive] = useState<Record<string, LiveStatus>>({});
@@ -238,7 +238,7 @@ export default function MapScreen() {
         ref={mapRef}
         style={StyleSheet.absoluteFill}
         initialRegion={INDIA}
-        mapType={mapType}
+        mapType={Platform.OS === "ios" && mapType === "standard" ? "mutedStandard" : mapType}
         customMapStyle={Platform.OS === "android" && mapType === "standard" && scheme === "dark" ? NIGHT_STYLE : undefined}
         userInterfaceStyle={scheme === "dark" ? "dark" : "light"}
         showsBuildings
@@ -304,7 +304,7 @@ export default function MapScreen() {
           >
             <View style={styles.bubble}>
               <RNImage source={{ uri: snapUrl(bubbles[c.id].photo) }} style={styles.bubbleImg} />
-              <View style={styles.bubbleCount}><Text style={{ color: "#14202B", fontWeight: "800", fontSize: 11 }}>{bubbles[c.id].count}</Text></View>
+              <View style={styles.bubbleCount}><Text style={{ color: "#1A1A1A", fontWeight: "800", fontSize: 11 }}>{bubbles[c.id].count}</Text></View>
             </View>
           </Marker>
         ))}
@@ -314,7 +314,7 @@ export default function MapScreen() {
       <View style={{ position: "absolute", top: insets.top + 8, left: 12, right: 12, gap: 8 }}>
         {!isConfigured && (
           <View style={{ alignSelf: "center", backgroundColor: "rgba(20,32,43,0.9)", paddingHorizontal: 12, paddingVertical: 5, borderRadius: 12 }}>
-            <Text style={{ color: "#FFD60A", fontSize: 12, fontWeight: "700" }}>Demo mode · Hyderabad chargers, sample status</Text>
+            <Text style={{ color: "#FCE38A", fontSize: 12, fontWeight: "700" }}>Demo mode · Hyderabad chargers, sample status</Text>
           </View>
         )}
         <View style={{ flexDirection: "row", gap: 8 }}>
@@ -344,7 +344,7 @@ export default function MapScreen() {
             <Ionicons name={mapType === "standard" ? "map-outline" : "earth"} size={20} color={t.text} />
           </Pressable>
           <Pressable onPress={() => router.push("/trip")} style={[styles.round, { backgroundColor: t.accent }]} accessibilityLabel="Plan a trip">
-            <Ionicons name="git-branch-outline" size={20} color={t.bg} />
+            <Ionicons name="git-branch-outline" size={20} color={t.onAccent} />
           </Pressable>
         </View>
 
@@ -403,7 +403,7 @@ export default function MapScreen() {
         <View style={[styles.range, { backgroundColor: t.bg, bottom: sheetH + 12 }]}>
           <Pressable onPress={() => setShowRange((v) => !v)} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
             accessibilityLabel={showRange ? "Hide range ring" : "Show range ring"}>
-            <View style={{ width: 12, height: 12, borderRadius: 6, borderWidth: 2, borderColor: "#FFD60A", backgroundColor: showRange ? "rgba(255,214,10,0.3)" : "transparent" }} />
+            <View style={{ width: 12, height: 12, borderRadius: 6, borderWidth: 2, borderColor: "#FCE38A", backgroundColor: showRange ? "rgba(255,214,10,0.3)" : "transparent" }} />
             <Text style={{ color: t.text, fontWeight: "800", fontVariant: ["tabular-nums"] }}>≈{Math.round(reachKm(vehicle))} km</Text>
           </Pressable>
           <Pressable onPress={() => updateVehicle(vehicle.key, { batteryPct: Math.max(10, (vehicle.batteryPct ?? 60) - 10) })} hitSlop={8} accessibilityLabel="Less battery">
@@ -466,12 +466,12 @@ export default function MapScreen() {
             <View style={{ flexDirection: "row", gap: 8 }}>
               <Pressable
                 onPress={() => (peekZaps.length ? setViewer({ list: peekZaps, start: 0 }) : router.push(`/zap/${encodeURIComponent(peek.id)}`))}
-                style={[styles.peekBtn, { backgroundColor: "#14202B" }]}
+                style={[styles.peekBtn, { backgroundColor: "#1A1A1A" }]}
               >
-                <Text style={{ color: "#FFD60A", fontWeight: "800" }}>{peekZaps.length ? `Watch ${peekZaps.length} zap${peekZaps.length > 1 ? "s" : ""}` : "Drop the first zap"}</Text>
+                <Text style={{ color: "#FCE38A", fontWeight: "800" }}>{peekZaps.length ? `Watch ${peekZaps.length} zap${peekZaps.length > 1 ? "s" : ""}` : "Drop the first zap"}</Text>
               </Pressable>
               <Pressable onPress={() => openCharger(peek)} style={[styles.peekBtn, { backgroundColor: t.accent }]}>
-                <Text style={{ color: t.bg, fontWeight: "800" }}>Open charger</Text>
+                <Text style={{ color: t.onAccent, fontWeight: "800" }}>Open charger</Text>
               </Pressable>
             </View>
           </View>
@@ -503,12 +503,12 @@ export default function MapScreen() {
         </View>
         </GestureDetector>
         {best && sheet > 0 && (
-          <Pressable onPress={() => openCharger(best.c)} style={[styles.best, { backgroundColor: "#14202B" }]} accessibilityLabel={`Best charger right now: ${best.c.name}`}>
-            <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: "#FFD60A", alignItems: "center", justifyContent: "center" }}>
-              <Ionicons name="trophy" size={17} color="#14202B" />
+          <Pressable onPress={() => openCharger(best.c)} style={[styles.best, { backgroundColor: "#1A1A1A" }]} accessibilityLabel={`Best charger right now: ${best.c.name}`}>
+            <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: "#FCE38A", alignItems: "center", justifyContent: "center" }}>
+              <Ionicons name="trophy" size={17} color="#1A1A1A" />
             </View>
             <View style={{ flex: 1, minWidth: 0 }}>
-              <Text style={{ color: "#FFD60A", fontSize: 11.5, fontWeight: "800", letterSpacing: 0.4 }}>BEST RIGHT NOW</Text>
+              <Text style={{ color: "#FCE38A", fontSize: 11.5, fontWeight: "800", letterSpacing: 0.4 }}>BEST RIGHT NOW</Text>
               <Text style={{ color: "#fff", fontWeight: "700" }} numberOfLines={1}>{best.c.name}</Text>
               <Text style={{ color: "#A9B3BC", fontSize: 12 }} numberOfLines={1}>
                 {[
@@ -629,15 +629,15 @@ const styles = StyleSheet.create({
   },
   row: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 11, borderTopWidth: StyleSheet.hairlineWidth },
   dot: { width: 32, height: 32, borderRadius: 16, alignItems: "center", justifyContent: "center" },
-  bubble: { width: 50, height: 50, borderRadius: 25, borderWidth: 3, borderColor: "#FFD60A", backgroundColor: "#14202B", padding: 0 },
+  bubble: { width: 50, height: 50, borderRadius: 25, borderWidth: 3, borderColor: "#FCE38A", backgroundColor: "#1A1A1A", padding: 0 },
   bubbleImg: { width: 44, height: 44, borderRadius: 22 },
-  bubbleCount: { position: "absolute", right: -6, top: -6, minWidth: 20, height: 20, paddingHorizontal: 4, borderRadius: 10, backgroundColor: "#FFD60A", borderWidth: 2, borderColor: "#fff", alignItems: "center", justifyContent: "center" },
+  bubbleCount: { position: "absolute", right: -6, top: -6, minWidth: 20, height: 20, paddingHorizontal: 4, borderRadius: 10, backgroundColor: "#FCE38A", borderWidth: 2, borderColor: "#fff", alignItems: "center", justifyContent: "center" },
   peek: {
     position: "absolute", left: 10, right: 10, bottom: 12, borderRadius: 22, padding: 14, gap: 12,
     elevation: 12, shadowColor: "#000", shadowOpacity: 0.3, shadowRadius: 14, shadowOffset: { width: 0, height: 6 },
   },
   close: { width: 34, height: 34, borderRadius: 17, alignItems: "center", justifyContent: "center" },
-  peekTile: { width: 88, height: 118, borderRadius: 14, overflow: "hidden", backgroundColor: "#14202B" },
+  peekTile: { width: 88, height: 118, borderRadius: 14, overflow: "hidden", backgroundColor: "#1A1A1A" },
   peekAgo: { position: "absolute", top: 6, left: 6, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 9, overflow: "hidden", backgroundColor: "rgba(0,0,0,0.6)", color: "#fff", fontSize: 11, fontWeight: "700" },
   peekWho: { position: "absolute", left: 0, right: 0, bottom: 0, paddingHorizontal: 7, paddingTop: 14, paddingBottom: 6, backgroundColor: "rgba(0,0,0,0.5)", color: "#fff", fontSize: 12, fontWeight: "700" },
   peekBtn: { flex: 1, height: 46, borderRadius: 12, alignItems: "center", justifyContent: "center" },

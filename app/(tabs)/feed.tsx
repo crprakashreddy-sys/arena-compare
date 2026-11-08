@@ -55,13 +55,13 @@ export default function ZapsFeed() {
         data={zaps}
         keyExtractor={(z) => z.id}
         contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 24, paddingTop: insets.top + 12, gap: 14 }}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={() => load()} tintColor="#FFD60A" />}
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={() => load()} tintColor="#FCE38A" />}
         ListHeaderComponent={
           <View style={{ paddingHorizontal: 4, paddingBottom: 6 }}>
             <Text style={{ color: "#fff", fontSize: 40, fontWeight: "900", letterSpacing: -0.5 }}>Zaps near you</Text>
             <Text style={{ color: "#A9B3BC" }}>Live from chargers within 25 km · gone in 24 hours</Text>
             <Pressable onPress={() => router.push("/leaderboard")} style={styles.board} accessibilityRole="button">
-              <Ionicons name="trophy" size={18} color="#FFD60A" />
+              <Ionicons name="trophy" size={18} color="#FCE38A" />
               <View style={{ flex: 1 }}>
                 <Text style={{ color: "#fff", fontWeight: "800" }}>Zap Score leaderboard</Text>
                 <Text style={{ color: "#A9B3BC", fontSize: 12.5 }}>Zaps taken right at the charger score the most</Text>
@@ -73,7 +73,7 @@ export default function ZapsFeed() {
         ListEmptyComponent={
           loading ? null : (
             <View style={{ alignItems: "center", gap: 10, paddingVertical: 60 }}>
-              <Ionicons name="flash-outline" size={40} color="#FFD60A" />
+              <Ionicons name="flash-outline" size={40} color="#FCE38A" />
               <Text style={{ color: "#fff", fontSize: 17, fontWeight: "700" }}>
                 {where ? "No zaps near you today" : "Turn on location to see zaps near you"}
               </Text>
@@ -81,7 +81,7 @@ export default function ZapsFeed() {
                 Drop the first one at your next charge. Your photo helps the next driver.
               </Text>
               <Pressable onPress={() => router.push("/zap/nearest")} style={styles.cta}>
-                <Text style={{ color: "#14202B", fontWeight: "800" }}>Drop a zap</Text>
+                <Text style={{ color: "#1A1A1A", fontWeight: "800" }}>Drop a zap</Text>
               </Pressable>
             </View>
           )
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   card: { borderRadius: 20, overflow: "hidden", backgroundColor: "#151C23" },
   note: { position: "absolute", left: 14, right: 14, bottom: 14, color: "#fff", fontSize: 15, lineHeight: 21, textShadowColor: "rgba(0,0,0,0.8)", textShadowRadius: 8 },
   meta: { flexDirection: "row", alignItems: "center", gap: 10, padding: 12 },
-  avatar: { width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: "#FFD60A", backgroundColor: "#1F2A35", alignItems: "center", justifyContent: "center" },
+  avatar: { width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: "#FCE38A", backgroundColor: "#1F2A35", alignItems: "center", justifyContent: "center" },
   status: { fontSize: 12, fontWeight: "800", paddingHorizontal: 9, paddingVertical: 5, borderRadius: 10, overflow: "hidden" },
-  cta: { marginTop: 8, backgroundColor: "#FFD60A", paddingHorizontal: 22, height: 46, borderRadius: 23, alignItems: "center", justifyContent: "center" },
+  cta: { marginTop: 8, backgroundColor: "#FCE38A", paddingHorizontal: 22, height: 46, borderRadius: 23, alignItems: "center", justifyContent: "center" },
 });

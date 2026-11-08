@@ -120,7 +120,7 @@ export default function Trip() {
         </View>
 
         <Pressable onPress={() => go()} disabled={busy} style={[styles.cta, { backgroundColor: t.accent, opacity: busy ? 0.7 : 1 }]}>
-          {busy ? <ActivityIndicator color={t.bg} /> : <Text style={{ color: t.bg, fontWeight: "800", fontSize: 16 }}>Plan my charging stops</Text>}
+          {busy ? <ActivityIndicator color={t.onAccent} /> : <Text style={{ color: t.onAccent, fontWeight: "800", fontSize: 16 }}>Plan my charging stops</Text>}
         </Pressable>
         {error && <Text style={{ color: t.bad }}>{error}</Text>}
       </View>
@@ -129,7 +129,7 @@ export default function Trip() {
         <View style={{ gap: 12 }}>
           <MapView ref={map} style={{ height: 300 }} mapType="hybrid"
             initialRegion={{ latitude: plan.route.coords[0].latitude, longitude: plan.route.coords[0].longitude, latitudeDelta: 2, longitudeDelta: 2 }}>
-            <Polyline coordinates={plan.route.coords} strokeColor="#FFD60A" strokeWidth={5} />
+            <Polyline coordinates={plan.route.coords} strokeColor="#FCE38A" strokeWidth={5} />
             <Marker coordinate={plan.route.coords[0]} title="Start" pinColor="green" />
             <Marker coordinate={plan.route.coords[plan.route.coords.length - 1]} title={to?.label ?? "Destination"} />
             {plan.stops.map((s, i) => (

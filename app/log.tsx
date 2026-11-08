@@ -90,7 +90,7 @@ function ActiveCard({ s }: { s: Session }) {
     kWh: parseFloat(kWh) || null, cost: parseFloat(cost) || null, endPct: parseInt(endPct, 10) || null,
   });
   return (
-    <View style={[styles.active, { backgroundColor: "#14202B" }]}>
+    <View style={[styles.active, { backgroundColor: "#1A1A1A" }]}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
         <View style={styles.pulse} />
         <Text style={{ color: "#A3ADB6", fontSize: 13, fontWeight: "600" }}>CHARGING NOW</Text>
@@ -105,8 +105,8 @@ function ActiveCard({ s }: { s: Session }) {
         <Small value={cost} onChange={setCost} placeholder="₹ paid" />
         <Small value={endPct} onChange={setEndPct} placeholder="Battery %" />
       </View>
-      <Pressable onPress={stop} style={[styles.stop, { backgroundColor: "#FFD60A" }]}>
-        <Text style={{ color: "#14202B", fontWeight: "800" }}>Stop and save</Text>
+      <Pressable onPress={stop} style={[styles.stop, { backgroundColor: "#FCE38A" }]}>
+        <Text style={{ color: "#1A1A1A", fontWeight: "800" }}>Stop and save</Text>
       </Pressable>
     </View>
   );
@@ -138,7 +138,7 @@ function ManualEntry({ onDone }: { onDone: () => void }) {
         <TextInput value={mins} onChangeText={setMins} placeholder="Minutes" keyboardType="number-pad" placeholderTextColor={t.faint} style={[input, { flex: 1 }]} />
       </View>
       <View style={{ flexDirection: "row", gap: 8 }}>
-        <Pressable onPress={save} style={[styles.stop, { flex: 1, backgroundColor: t.accent }]}><Text style={{ color: t.bg, fontWeight: "800" }}>Save</Text></Pressable>
+        <Pressable onPress={save} style={[styles.stop, { flex: 1, backgroundColor: t.accent }]}><Text style={{ color: t.onAccent, fontWeight: "800" }}>Save</Text></Pressable>
         <Pressable onPress={onDone} style={[styles.stop, { flex: 1, backgroundColor: t.surface }]}><Text style={{ color: t.text, fontWeight: "700" }}>Cancel</Text></Pressable>
       </View>
     </View>

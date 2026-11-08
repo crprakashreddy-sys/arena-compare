@@ -8,7 +8,7 @@ import { DAILY_CAP, FRESH_BONUS, PHOTO_BONUS, TIERS } from "../lib/zapscore";
 import { VerifiedBadge } from "../components/ui";
 
 const BG = "#0B1117";
-const MEDAL = ["#FFD60A", "#C7CED6", "#D08A4E"];
+const MEDAL = ["#FCE38A", "#C7CED6", "#D08A4E"];
 
 /** This week's top zappers in the viewer's city, with how scoring works. */
 export default function Leaderboard() {
@@ -32,7 +32,7 @@ export default function Leaderboard() {
       <FlatList
         data={rows}
         keyExtractor={(r) => r.user_id}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={load} tintColor="#FFD60A" />}
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={load} tintColor="#FCE38A" />}
         contentContainerStyle={{ padding: 16, gap: 8, paddingBottom: 40 }}
         ListHeaderComponent={
           <View style={{ gap: 14, marginBottom: 8 }}>
@@ -44,9 +44,9 @@ export default function Leaderboard() {
               <View style={{ flexDirection: "row", gap: 8 }}>
                 {[profile.city, null].map((c) => (
                   <Pressable key={c ?? "all"} onPress={() => setCity(c)}
-                    style={[styles.tab, city === c && { backgroundColor: "#FFD60A", borderColor: "#FFD60A" }]}
+                    style={[styles.tab, city === c && { backgroundColor: "#FCE38A", borderColor: "#FCE38A" }]}
                     accessibilityRole="button" accessibilityState={{ selected: city === c }}>
-                    <Text style={{ color: city === c ? "#14202B" : "#fff", fontWeight: "700" }}>{c ?? "All India"}</Text>
+                    <Text style={{ color: city === c ? "#1A1A1A" : "#fff", fontWeight: "700" }}>{c ?? "All India"}</Text>
                   </Pressable>
                 ))}
               </View>
@@ -55,7 +55,7 @@ export default function Leaderboard() {
         }
         renderItem={({ item: r, index }) => (
           <Pressable onPress={() => router.push(`/driver/${r.user_id}`)}
-            style={[styles.row, r.user_id === me && { borderColor: "#FFD60A" }]}>
+            style={[styles.row, r.user_id === me && { borderColor: "#FCE38A" }]}>
             <Text style={[styles.rank, { color: MEDAL[index] ?? "#6E7882" }]}>{index + 1}</Text>
             <View style={{ flex: 1, minWidth: 0 }}>
               <Text style={{ color: "#fff", fontWeight: "700" }} numberOfLines={1}>{r.display_name}{r.user_id === me ? " (you)" : ""}</Text>
@@ -67,7 +67,7 @@ export default function Leaderboard() {
               </View>
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-              <Ionicons name="flash" size={14} color="#FFD60A" />
+              <Ionicons name="flash" size={14} color="#FCE38A" />
               <Text style={{ color: "#fff", fontWeight: "900", fontSize: 17, fontVariant: ["tabular-nums"] }}>{r.week_score}</Text>
             </View>
           </Pressable>
@@ -99,7 +99,7 @@ function Rule({ left, right }: { left: string; right: string }) {
   return (
     <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
       <Text style={{ color: "#D8DDE2", flex: 1 }}>{left}</Text>
-      <Text style={{ color: "#FFD60A", fontWeight: "800", fontVariant: ["tabular-nums"] }}>{right}</Text>
+      <Text style={{ color: "#FCE38A", fontWeight: "800", fontVariant: ["tabular-nums"] }}>{right}</Text>
     </View>
   );
 }

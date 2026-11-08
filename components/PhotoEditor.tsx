@@ -14,7 +14,7 @@ type StickerKind = "status" | "battery" | "speed" | "charger" | "time" | "waited
 type Sticker = { kind: StickerKind; x: number; y: number };
 
 const STATUS_COLOR: Record<Status, string> = { working: "#137F4E", busy: "#B86E00", broken: "#C5221F" };
-const YELLOW = "#FFD60A";
+const YELLOW = "#FCE38A";
 
 const family = Platform.select({ ios: "Helvetica Neue", default: "sans-serif" });
 const fontBig = matchFont({ fontFamily: family, fontSize: 22, fontWeight: "bold" });
@@ -243,7 +243,7 @@ export default function PhotoEditor({ uri, status, chargerName, speedText, carMo
         {(["looks", "cinema", "stickers", "blur"] as const).map((m) => (
           <Pressable key={m} onPress={() => setMode(m)} style={[styles.tab, mode === m && { backgroundColor: YELLOW }]}
             accessibilityRole="tab" accessibilityState={{ selected: mode === m }}>
-            <Text style={{ color: mode === m ? "#14202B" : "#A3ADB6", fontWeight: "700", fontSize: 13.5 }}>
+            <Text style={{ color: mode === m ? "#1A1A1A" : "#A3ADB6", fontWeight: "700", fontSize: 13.5 }}>
               {m === "looks" ? "Looks" : m === "cinema" ? "Cinema" : m === "stickers" ? "Stickers" : "Blur"}
             </Text>
           </Pressable>

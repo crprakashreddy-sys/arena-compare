@@ -14,7 +14,7 @@ export function Button({ title, icon, onPress, kind = "secondary", busy, style, 
 }) {
   const t = useTheme();
   const bg = kind === "primary" ? t.accent : kind === "danger" ? t.badSoft : t.surface;
-  const fg = kind === "primary" ? t.bg : kind === "danger" ? t.bad : t.text;
+  const fg = kind === "primary" ? t.onAccent : kind === "danger" ? t.bad : t.text;
   return (
     <Pressable
       onPress={onPress}
@@ -121,7 +121,7 @@ export function ClusterPin({ count, working }: { count: number; working: number 
   const size = count > 50 ? 52 : count > 15 ? 44 : 36;
   return (
     <View style={{
-      width: size, height: size, borderRadius: size / 2, backgroundColor: "rgba(20,32,43,0.92)", borderWidth: 2.5, borderColor: "#FFD60A",
+      width: size, height: size, borderRadius: size / 2, backgroundColor: "rgba(20,32,43,0.92)", borderWidth: 2.5, borderColor: "#FCE38A",
       alignItems: "center", justifyContent: "center",
     }}>
       <Text style={{ color: "#fff", fontWeight: "900", fontSize: size > 40 ? 15 : 13 }}>{count}</Text>

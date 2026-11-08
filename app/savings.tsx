@@ -47,7 +47,7 @@ export default function Savings() {
     <ScrollView style={{ flex: 1, backgroundColor: t.bg }} contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
       <Stack.Screen options={{ title: "Savings" }} />
 
-      <View style={[styles.hero, { backgroundColor: "#14202B" }]}>
+      <View style={[styles.hero, { backgroundColor: "#1A1A1A" }]}>
         <Text style={{ color: "#A3ADB6", fontSize: 13, fontWeight: "600" }}>YOU SAVE ABOUT</Text>
         <Text style={{ color: save >= 0 ? "#6DD39A" : "#F28B82", fontSize: 44, fontWeight: "900", fontVariant: ["tabular-nums"] }}>
           {rupees(Math.abs(save))}<Text style={{ fontSize: 18, color: "#A3ADB6" }}> / month</Text>
@@ -57,7 +57,7 @@ export default function Savings() {
         </Text>
         <View style={{ gap: 8, marginTop: 8 }}>
           {[
-            [v ? vehicleName(v) : "Your EV", evCost, "#FFD60A", `₹${(evCost / kmMonth).toFixed(1)}/km`],
+            [v ? vehicleName(v) : "Your EV", evCost, "#FCE38A", `₹${(evCost / kmMonth).toFixed(1)}/km`],
             [fuel === "petrol" ? "Petrol car" : "Diesel car", fuelCost, "#8E99A4", `₹${(fuelCost / kmMonth).toFixed(1)}/km`],
           ].map(([label, val, col, perKm]) => (
             <View key={label as string} style={{ gap: 4 }}>

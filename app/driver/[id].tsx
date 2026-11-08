@@ -101,5 +101,5 @@ export default function DriverProfile() {
 const styles = StyleSheet.create({
   stat: { flex: 1, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 6, alignItems: "center" },
   row: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 8, borderBottomWidth: StyleSheet.hairlineWidth },
-  thumb: { width: 44, height: 58, borderRadius: 8, overflow: "hidden", backgroundColor: "#14202B" },
+  thumb: { width: 44, height: 58, borderRadius: 8, overflow: "hidden", backgroundColor: "#1A1A1A" },
 });
