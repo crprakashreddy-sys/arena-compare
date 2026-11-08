@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../../lib/auth";
 import { useTheme, CTA, ON_CTA } from "../../lib/theme";
 import { useGarage } from "../../lib/vehicles";
-import { autoJoinFor, fetchClubs, fetchMyClubs, joinClub, joinWithCode, type Club, type MyClub } from "../../lib/clubs";
+import { activityLine, autoJoinFor, fetchActivity, fetchClubs, fetchMyClubs, joinClub, joinWithCode, type Activity, type Club, type MyClub } from "../../lib/clubs";
 import { timeAgo } from "../../lib/geo";
 import { ClubBadge } from "../../components/ClubBadge";
 import { clubSuits, useMode } from "../../lib/mode";
@@ -32,6 +32,7 @@ export default function Clubs() {
   const [err, setErr] = useState<string | null>(null);
   const [mode] = useMode();
   const [dmUnread, setDmUnread] = useState(0);
+  const [act, setAct] = useState<Record<string, Activity>>({});
   const tabSpace = useTabSpace();
 
   const load = useCallback(async () => {
@@ -40,6 +41,7 @@ export default function Clubs() {
       if (session) await autoJoinFor(vehicles, session.user.id).catch(() => {});
       const [a, m] = await Promise.all([fetchClubs(), session ? fetchMyClubs(session.user.id) : Promise.resolve([])]);
       setAll(a); setMine(m);
+      fetchActivity().then(setAct).catch(() => {});
       if (session) unreadDms().then(setDmUnread).catch(() => {});
     } catch (e: any) { setErr(e.message); }
     setBusy(false);
@@ -151,7 +153,7 @@ export default function Clubs() {
                     <View style={{ flex: 1, minWidth: 0 }}>
                       <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold", fontSize: 15.5 }} numberOfLines={1}>{c.name}</Text>
                       {!!c.description && <Text style={{ color: t.muted, fontSize: 13 }} numberOfLines={2}>{c.description}</Text>}
-                      <Text style={{ color: t.faint, fontSize: 12, marginTop: 2 }}>{[c.city, `${c.members} members`].filter(Boolean).join(" · ")}</Text>
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 3 }}>{!!act[c.id]?.msgs_today && <LiveDot />}<Text style={{ color: t.faint, fontSize: 12 }}>{[c.city, activityLine(act[c.id], c.members)].filter(Boolean).join(" · ")}</Text></View>
                     </View>
                     <Pressable onPress={() => join(c)} style={[s.join, { backgroundColor: t.bg }]}>
                       <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Join</Text>
@@ -164,21 +166,21 @@ export default function Clubs() {
           )}
           {!!brands.length && (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingHorizontal: 16, paddingVertical: 12 }}>
-              {brands.map((c) => <BrandCard key={c.id} c={c} onJoin={() => join(c)} />)}
+              {brands.map((c) => <BrandCard key={c.id} c={c} a={act[c.id]} onJoin={() => join(c)} />)}
             </ScrollView>
           )}
           <View style={{ paddingHorizontal: 16 }}>
             {models.map((c) => (
-              <View key={c.id} style={[s.row, { borderBottomColor: t.line }]}>
+              <Pressable key={c.id} onPress={() => router.push(`/club/${encodeURIComponent(c.id)}`)} style={[s.row, { borderBottomColor: t.line }]}>
                 <ClubBadge c={c} size={42} />
                 <View style={{ flex: 1, minWidth: 0 }}>
                   <Text style={{ color: t.text, fontWeight: "700", fontSize: 15 }} numberOfLines={1}>{c.name}</Text>
-                  <Text style={{ color: t.muted, fontSize: 12.5 }}>{c.members} {c.members === 1 ? "member" : "members"}</Text>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>{!!act[c.id]?.msgs_today && <LiveDot />}<Text style={{ color: t.muted, fontSize: 12.5 }}>{activityLine(act[c.id], c.members)}</Text></View>
                 </View>
                 <Pressable onPress={() => join(c)} style={[s.join, { backgroundColor: t.surface }]}>
                   <Text style={{ color: t.text, fontWeight: "800", fontFamily: "SpaceGrotesk_700Bold" }}>Join</Text>
                 </Pressable>
-              </View>
+              </Pressable>
             ))}
           </View>
         </>
@@ -190,7 +192,7 @@ export default function Clubs() {
 function MyClubRow({ c }: { c: MyClub }) {
   const t = useTheme();
   const last = c.last;
-  const preview = !last ? "Say hi to the crew" : last.deleted ? "Message deleted"
+  const preview = !last ? "Say hi to the crew 👋" : last.deleted ? "Message deleted"
     : `${last.profiles?.display_name?.split(" ")[0] ?? "Someone"}: ${last.body ?? "Photo"}`;
   return (
     <Pressable onPress={() => router.push(`/club/${encodeURIComponent(c.id)}`)}
@@ -213,14 +215,18 @@ function MyClubRow({ c }: { c: MyClub }) {
   );
 }
 
-function BrandCard({ c, onJoin }: { c: Club; onJoin: () => void }) {
+function LiveDot() {
+  return <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: "#2FBF71" }} />;
+}
+
+function BrandCard({ c, a, onJoin }: { c: Club; a?: Activity; onJoin: () => void }) {
   return (
-    <View style={s.brand}>
+    <Pressable onPress={() => router.push(`/club/${encodeURIComponent(c.id)}`)} style={s.brand}>
       <ClubBadge c={c} size={44} />
       <Text style={s.brandName} numberOfLines={1}>{c.make}</Text>
-      <Text style={s.brandMeta}>{c.members} {c.members === 1 ? "member" : "members"}</Text>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>{!!a?.msgs_today && <LiveDot />}<Text style={s.brandMeta} numberOfLines={1}>{a?.active_week ? `${a.active_week} active` : c.members ? `${c.members} ${c.members === 1 ? "member" : "members"}` : "Be the first"}</Text></View>
       <Pressable onPress={onJoin} style={s.brandJoin}><Text style={s.brandJoinText}>Join</Text></Pressable>
-    </View>
+    </Pressable>
   );
 }
 

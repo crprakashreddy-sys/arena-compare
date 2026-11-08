@@ -7,6 +7,7 @@ export type Club = {
   name: string; vehicle_kind: string | null; members: number;
   description?: string | null; city?: string | null; emoji?: string | null; color?: string | null;
   is_private?: boolean; invite_code?: string | null; created_by?: string | null;
+  rules?: string | null; pinned_message_id?: string | null;
 };
 export type ClubMember = {
   user_id: string; role: "member" | "admin"; joined_at: string;
@@ -173,3 +174,64 @@ export async function joinWithCode(code: string): Promise<string> {
 
 
 export const CLUB_COLORS = ["#FCE38A", "#1A1A1A", "#B8E0D2", "#F6C6C7", "#C9B8FF", "#A9DDF3", "#FFC371", "#9AD28A"];
+
+// ───────── Reactions, pins, rules, activity ─────────
+
+export const REACTIONS = ["⚡", "❤️", "👍", "😂", "😮", "🙏"] as const;
+export type Reaction = (typeof REACTIONS)[number];
+/** message id → emoji → user ids */
+export type ReactionMap = Record<string, Partial<Record<Reaction, string[]>>>;
+
+export async function fetchReactions(messageIds: string[]): Promise<ReactionMap> {
+  if (!messageIds.length) return {};
+  const { data } = await supabase.from("club_reactions").select("message_id,user_id,emoji").in("message_id", messageIds);
+  const out: ReactionMap = {};
+  (data ?? []).forEach((r: any) => {
+    const m = (out[r.message_id] ??= {});
+    (m[r.emoji as Reaction] ??= []).push(r.user_id);
+  });
+  return out;
+}
+
+export async function toggleReaction(messageId: string, userId: string, emoji: Reaction, on: boolean) {
+  if (on) await supabase.from("club_reactions").insert({ message_id: messageId, user_id: userId, emoji });
+  else await supabase.from("club_reactions").delete().eq("message_id", messageId).eq("user_id", userId).eq("emoji", emoji);
+}
+
+export function subscribeReactions(onChange: (messageId: string) => void) {
+  const ch = supabase
+    .channel(`reactions-${Math.random().toString(36).slice(2)}`)
+    .on("postgres_changes", { event: "*", schema: "public", table: "club_reactions" }, (p: any) => onChange((p.new?.message_id ?? p.old?.message_id) as string))
+    .subscribe();
+  return () => { supabase.removeChannel(ch); };
+}
+
+export async function pinMessage(clubId: string, messageId: string | null) {
+  const { error } = await supabase.rpc("pin_club_message", { c: clubId, m: messageId });
+  if (error) throw new Error(error.message);
+}
+
+export async function setRules(clubId: string, rules: string) {
+  const { error } = await supabase.rpc("set_club_rules", { c: clubId, r: rules });
+  if (error) throw new Error(error.message);
+}
+
+export type Activity = { msgs_today: number; active_week: number };
+export async function fetchActivity(): Promise<Record<string, Activity>> {
+  const { data } = await supabase.rpc("club_activity");
+  const out: Record<string, Activity> = {};
+  (data ?? []).forEach((r: any) => (out[r.club_id] = { msgs_today: r.msgs_today, active_week: r.active_week }));
+  return out;
+}
+
+export function activityLine(a?: Activity, members = 0): string {
+  if (a?.msgs_today) return `${a.msgs_today} message${a.msgs_today === 1 ? "" : "s"} today · ${a.active_week} active`;
+  if (a?.active_week) return `${a.active_week} active this week`;
+  return members ? `${members} member${members === 1 ? "" : "s"}` : "Be the first to join";
+}
+
+export type InfoStats = { members: number; msgs_week: number; active_week: number; issues_solved: number; issues_open: number; events_upcoming: number; since: string | null };
+export async function fetchInfoStats(clubId: string): Promise<InfoStats | null> {
+  const { data } = await supabase.rpc("club_info_stats", { c: clubId });
+  return (data as InfoStats) ?? null;
+}

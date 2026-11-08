@@ -31,7 +31,7 @@ const SF: Record<string, string> = {
   "lock-closed": "lock.fill", "paper-plane": "paperplane.fill", moon: "moon.fill", cafe: "cup.and.saucer.fill", restaurant: "fork.knife",
   water: "drop.fill", leaf: "leaf.fill", sparkles: "sparkles", "color-palette": "paintpalette.fill", glasses: "eyeglasses",
   shuffle: "shuffle", "musical-notes": "music.note", flame: "flame.fill", "timer-outline": "timer", timer: "timer",
-  bicycle: "bicycle", "stop-circle": "stop.circle.fill", "card-outline": "creditcard", calendar_clear: "calendar", "information-circle": "info.circle.fill", "information-circle-outline": "info.circle",
+  bicycle: "bicycle", "arrow-undo": "arrowshape.turn.up.left.fill", pin: "pin.fill", "pin-outline": "pin", "copy": "doc.on.doc", "ban": "nosign", "warning-outline": "exclamationmark.triangle", "person-remove-outline": "person.badge.minus", "document-text-outline": "doc.text", "pulse": "waveform.path.ecg", "stop-circle": "stop.circle.fill", "card-outline": "creditcard", calendar_clear: "calendar", "information-circle": "info.circle.fill", "information-circle-outline": "info.circle",
   "time-outline": "clock", time: "clock.fill", "settings-outline": "gearshape", settings: "gearshape.fill",
   "log-out-outline": "rectangle.portrait.and.arrow.right", "mail-outline": "envelope", "shield-checkmark": "checkmark.shield.fill",
   "battery-charging": "battery.100.bolt", "speedometer-outline": "gauge.with.dots.needle.67percent", speedometer: "speedometer",
