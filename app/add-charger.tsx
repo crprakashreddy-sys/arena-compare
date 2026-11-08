@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useColorScheme } from "react-native";
 import MapView, { type Region } from "react-native-maps";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,6 +8,7 @@ import { useAuth } from "../lib/auth";
 import { NETWORKS, OTHER } from "../lib/networks";
 import { addCommunityCharger, chargersNear } from "../lib/chargers";
 import type { Speed } from "../lib/types";
+import { MAP_PROVIDER, zappdStyle } from "../lib/maps";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -27,6 +28,7 @@ const POWERS = [3.3, 7.4, 15, 30, 60, 120];
 /** Add a charger that's missing from the map: drag the map under the pin, then a few taps. */
 export default function AddCharger() {
   const t = useTheme();
+  const scheme = useColorScheme();
   const { session } = useAuth();
   const p = useLocalSearchParams<{ lat?: string; lng?: string }>();
   const start = { latitude: Number(p.lat) || 17.385, longitude: Number(p.lng) || 78.4867 };
@@ -76,7 +78,7 @@ export default function AddCharger() {
       <Stack.Screen options={{ title: "Add a charger" }} />
       <ScrollView ref={scroll} contentContainerStyle={{ paddingBottom: 120 }} keyboardShouldPersistTaps="handled">
         <View style={s.mapBox}>
-          <MapView
+          <MapView provider={MAP_PROVIDER} customMapStyle={zappdStyle(scheme)}
             style={StyleSheet.absoluteFill}
             initialRegion={{ ...start, latitudeDelta: 0.006, longitudeDelta: 0.006 }}
             onRegionChangeComplete={(r: Region) => setSpot({ latitude: r.latitude, longitude: r.longitude })}

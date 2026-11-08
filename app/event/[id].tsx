@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, ScrollView, Share, StyleSheet, Text, View, useColorScheme } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -10,6 +10,7 @@ import { myRole } from "../../lib/clubs";
 import { cancelEvent, fetchEvent, fetchRsvps, fmtWhen, kindOf, openDirections, rsvp, type ClubEvent, type Rsvp } from "../../lib/events";
 import { Avatar } from "../../components/ui";
 import { ClubBadge } from "../../components/ClubBadge";
+import { MAP_PROVIDER, zappdStyle } from "../../lib/maps";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -18,6 +19,7 @@ const LEMON = "#FCE38A";
 export default function EventDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const t = useTheme();
+  const scheme = useColorScheme();
   const { session, profile } = useAuth();
   const me = session?.user.id;
   const [e, setE] = useState<ClubEvent | null>(null);
@@ -87,7 +89,7 @@ export default function EventDetail() {
           {!!e.description && <Text style={{ color: t.text, fontSize: 16, lineHeight: 23 }}>{e.description}</Text>}
 
           <View style={[s.mapCard, { backgroundColor: t.surface }]}>
-            <MapView style={{ height: 160 }} pointerEvents="none" scrollEnabled={false} zoomEnabled={false}
+            <MapView provider={MAP_PROVIDER} customMapStyle={zappdStyle(scheme)} style={{ height: 160 }} pointerEvents="none" scrollEnabled={false} zoomEnabled={false}
               initialRegion={{ latitude: e.lat, longitude: e.lng, latitudeDelta: 0.012, longitudeDelta: 0.012 }}>
               <Marker coordinate={{ latitude: e.lat, longitude: e.lng }} tracksViewChanges={false}>
                 <View style={s.pin}><Text style={{ fontSize: 18 }}>{k.emoji}</Text></View>

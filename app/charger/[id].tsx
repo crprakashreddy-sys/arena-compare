@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useColorScheme } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { Image } from "expo-image";
 import { Stack, router, useFocusEffect, useLocalSearchParams } from "expo-router";
@@ -24,9 +24,11 @@ import VehicleFit from "../../components/VehicleFit";
 import { startSession, useSessions } from "../../lib/sessions";
 import { openNetworkApp } from "../../lib/networks";
 import type { ScorePart } from "../../lib/types";
+import { MAP_PROVIDER, openDirections, zappdStyle } from "../../lib/maps";
 
 export default function ChargerPage() {
   const t = useTheme();
+  const scheme = useColorScheme();
   const auth = useAuth();
   const { id, posted, score, parts } = useLocalSearchParams<{ id: string; posted?: string; score?: string; parts?: string }>();
   const [showScore, setShowScore] = useState(posted === "1");
@@ -76,12 +78,7 @@ export default function ChargerPage() {
   }
 
   const n = networkById(c.network);
-  const directions = () => {
-    const url = Platform.OS === "ios"
-      ? `http://maps.apple.com/?daddr=${c.lat},${c.lng}&dirflg=d`
-      : `https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}&travelmode=driving`;
-    Linking.openURL(url);
-  };
+  const directions = () => openDirections(c.lat, c.lng);
   const need = (go: () => void) => () => (canPost(auth) ? go() : router.push("/login"));
 
   const facRows = FACILITIES.map((f) => {
@@ -106,6 +103,8 @@ export default function ChargerPage() {
       <ScrollView style={{ backgroundColor: t.bg }} contentContainerStyle={{ paddingBottom: 40 }}>
         <View style={{ height: 190 }}>
           <MapView
+            provider={MAP_PROVIDER}
+            customMapStyle={zappdStyle(scheme)}
             style={StyleSheet.absoluteFill}
             mapType="hybrid"
             pointerEvents="none"

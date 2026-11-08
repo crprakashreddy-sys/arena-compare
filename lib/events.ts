@@ -1,4 +1,4 @@
-import { Linking, Platform } from "react-native";
+import { openDirections as googleDirections } from "./maps";
 import { supabase, isConfigured } from "./supabase";
 import { isBlocked } from "./community";
 import { bbox } from "./geo";
@@ -77,12 +77,8 @@ export async function rsvp(eventId: string, userId: string, status: "going" | "i
   if (error) throw new Error(error.message.includes("full") ? "This event is full." : error.message);
 }
 
-export function openDirections(e: Pick<ClubEvent, "lat" | "lng" | "place_name">) {
-  const label = encodeURIComponent(e.place_name ?? "Meetup");
-  const url = Platform.OS === "ios"
-    ? `http://maps.apple.com/?daddr=${e.lat},${e.lng}&q=${label}`
-    : `https://www.google.com/maps/dir/?api=1&destination=${e.lat},${e.lng}`;
-  Linking.openURL(url);
+export function openDirections(e: Pick<ClubEvent, "lat" | "lng">) {
+  return googleDirections(e.lat, e.lng);
 }
 
 export function fmtWhen(iso: string) {

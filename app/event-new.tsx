@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useColorScheme } from "react-native";
 import MapView, { type Region } from "react-native-maps";
 import * as Location from "expo-location";
 import { Stack, router, useLocalSearchParams } from "expo-router";
@@ -7,6 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../lib/theme";
 import { useAuth } from "../lib/auth";
 import { EVENT_KINDS, createEvent, type EventKind } from "../lib/events";
+import { MAP_PROVIDER, zappdStyle } from "../lib/maps";
 
 const INK = "#1A1A1A";
 const LEMON = "#FCE38A";
@@ -16,6 +17,7 @@ const CAPS = [null, 5, 10, 20, 50];
 /** Plan a club event: what, when, where. */
 export default function NewEvent() {
   const t = useTheme();
+  const scheme = useColorScheme();
   const { session } = useAuth();
   const { clubId } = useLocalSearchParams<{ clubId: string }>();
   const days = useMemo(() => Array.from({ length: 30 }, (_, i) => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + i); return d; }), []);
@@ -98,7 +100,7 @@ export default function NewEvent() {
         <View style={{ height: 220 }}>
           {spot ? (
             <>
-              <MapView style={StyleSheet.absoluteFill} initialRegion={{ ...spot, latitudeDelta: 0.02, longitudeDelta: 0.02 }}
+              <MapView provider={MAP_PROVIDER} customMapStyle={zappdStyle(scheme)} style={StyleSheet.absoluteFill} initialRegion={{ ...spot, latitudeDelta: 0.02, longitudeDelta: 0.02 }}
                 onRegionChangeComplete={(r: Region) => setSpot({ latitude: r.latitude, longitude: r.longitude })} showsUserLocation showsPointsOfInterest={false} />
               <View pointerEvents="none" style={s.pinWrap}>
                 <View style={s.pin}><Text style={{ fontSize: 20 }}>{EVENT_KINDS.find((k) => k.key === kind)?.emoji}</Text></View>

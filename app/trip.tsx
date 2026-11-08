@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Keyboard, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Keyboard, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useColorScheme } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { Stack, router } from "expo-router";
 import * as Location from "expo-location";
@@ -9,12 +9,14 @@ import { searchPlaces, type PlaceHit } from "../lib/places";
 import { planTrip, mapsUrl, type Plan } from "../lib/trip";
 import { fmtMinutes, useGarage, vehicleName } from "../lib/vehicles";
 import { networkById } from "../lib/networks";
+import { MAP_PROVIDER, zappdStyle } from "../lib/maps";
 
 type Place = { label: string; lat: number; lng: number };
 
 /** Plan a trip: where to, battery now, and the charging stops on the way. */
 export default function Trip() {
   const t = useTheme();
+  const scheme = useColorScheme();
   const { active: v } = useGarage();
   const [from, setFrom] = useState<Place | null>(null);
   const [to, setTo] = useState<Place | null>(null);
@@ -127,7 +129,7 @@ export default function Trip() {
 
       {plan && (
         <View style={{ gap: 12 }}>
-          <MapView ref={map} style={{ height: 300 }} mapType="hybrid"
+          <MapView provider={MAP_PROVIDER} customMapStyle={zappdStyle(scheme)} ref={map} style={{ height: 300 }} mapType={MAP_PROVIDER ? "standard" : "mutedStandard"}
             initialRegion={{ latitude: plan.route.coords[0].latitude, longitude: plan.route.coords[0].longitude, latitudeDelta: 2, longitudeDelta: 2 }}>
             <Polyline coordinates={plan.route.coords} strokeColor="#FCE38A" strokeWidth={5} />
             <Marker coordinate={plan.route.coords[0]} title="Start" pinColor="green" />
@@ -169,8 +171,8 @@ export default function Trip() {
             ))}
             {plan.ok && <Leg icon="location" color={t.bad} title={to?.label ?? "Destination"} sub={`Arrive with about ${Math.max(0, plan.arrivePct)}%`} />}
 
-            <Pressable onPress={() => from && to && Linking.openURL(mapsUrl(from, to, plan.stops))} style={[styles.cta, { backgroundColor: "#1A73E8" }]}>
-              <Text style={{ color: "#fff", fontWeight: "800", fontSize: 16 }}>Start in Google Maps</Text>
+            <Pressable onPress={() => from && to && Linking.openURL(mapsUrl(from, to, plan.stops))} style={[styles.cta, { backgroundColor: t.accent }]}>
+              <Text style={{ color: t.onAccent, fontWeight: "800", fontSize: 16 }}>Start in Google Maps</Text>
             </Pressable>
             <Text style={{ color: t.muted, fontSize: 12.5, lineHeight: 18 }}>
               Estimates assume highway driving and keep at least 15% in reserve. Check each stop's latest zaps before you go; broken chargers are skipped automatically.

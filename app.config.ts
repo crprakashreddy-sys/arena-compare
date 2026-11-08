@@ -25,6 +25,7 @@ const config: ExpoConfig = {
       NSPhotoLibraryUsageDescription:
         "zappd lets you choose a photo of a charger to share with other drivers.",
       ITSAppUsesNonExemptEncryption: false,
+      LSApplicationQueriesSchemes: ["comgooglemaps"],
     },
   },
   android: {
@@ -37,6 +38,10 @@ const config: ExpoConfig = {
   },
   plugins: [
     "expo-router",
+    // Google Maps inside the iPhone app. Needs EXPO_PUBLIC_GOOGLE_MAPS_IOS_KEY; without it iPhone uses Apple Maps.
+    ...(process.env.EXPO_PUBLIC_GOOGLE_MAPS_IOS_KEY
+      ? [["react-native-maps", { iosGoogleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_IOS_KEY }] as [string, any]]
+      : []),
     [
       "expo-splash-screen",
       { image: "./assets/splash-icon.png", imageWidth: 180, resizeMode: "contain", backgroundColor: "#FCE38A" },

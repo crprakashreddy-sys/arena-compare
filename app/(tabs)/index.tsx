@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { fetchChargers, isFast, onChargersChanged, speedLabel } from "../../lib/chargers";
 import { useOnboarded } from "../../lib/onboarding";
+import { MAP_PROVIDER, USE_GOOGLE, zappdStyle } from "../../lib/maps";
 import { fetchEventsNear, kindOf, type ClubEvent } from "../../lib/events";
 import { fetchLiveStatus, fetchRatings, fetchSnaps, fetchZapBubbles } from "../../lib/community";
 import { isConfigured, snapUrl } from "../../lib/supabase";
@@ -238,8 +239,9 @@ export default function MapScreen() {
         ref={mapRef}
         style={StyleSheet.absoluteFill}
         initialRegion={INDIA}
-        mapType={Platform.OS === "ios" && mapType === "standard" ? "mutedStandard" : mapType}
-        customMapStyle={Platform.OS === "android" && mapType === "standard" && scheme === "dark" ? NIGHT_STYLE : undefined}
+        provider={MAP_PROVIDER}
+        mapType={!USE_GOOGLE && mapType === "standard" ? "mutedStandard" : mapType}
+        customMapStyle={mapType === "standard" ? zappdStyle(scheme) : undefined}
         userInterfaceStyle={scheme === "dark" ? "dark" : "light"}
         showsBuildings
         showsUserLocation
