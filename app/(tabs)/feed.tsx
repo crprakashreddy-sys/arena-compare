@@ -279,6 +279,7 @@ export default function ZingCamera() {
           [() => { tapHaptic(); setFlash((f) => (f === "off" ? "on" : f === "on" ? "auto" : "off")); }, flash === "off" ? "flash-off" : "flash", flash === "auto" ? "Auto" : flash === "on" ? "On" : "Flash"],
           [() => { tapHaptic(); setTimer((t) => (t === 0 ? 3 : t === 3 ? 10 : 0)); }, "timer-outline", timer ? `${timer}s` : "Timer"],
           [() => { tapHaptic(); setGrid((g) => !g); }, "grid-outline", grid ? "Grid on" : "Grid"],
+          [() => { tapHaptic(); router.push("/zing-map"); }, "map-outline", "Map"],
         ] as const).map(([fn, icon, label]) => (
           <Pressable key={label} onPress={fn as any} style={s.railBtn} accessibilityLabel={label}>
             <Glass style={s.railGlass} interactive><Ionicons name={icon as any} size={20} color={(label === "On" || label === "Auto" || /s$/.test(label) || label === "Grid on") ? LEMON : "#fff"} /></Glass>

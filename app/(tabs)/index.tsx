@@ -374,6 +374,11 @@ export default function MapScreen() {
               <Ionicons name={mapType === "standard" ? "map-outline" : "earth"} size={20} color={t.text} />
             </Glass>
           </Pressable>
+          <Pressable onPress={() => { tapHaptic(); router.push("/zing-map"); }} accessibilityLabel="Zing Map">
+            <Glass style={[styles.round, { backgroundColor: "#1A1A1A" }]} interactive>
+              <Ionicons name="flash" size={20} color="#FCE38A" />
+            </Glass>
+          </Pressable>
           <Pressable onPress={() => router.push("/trip")} accessibilityLabel="Plan a trip">
             <Glass style={styles.round} tint={t.accent} interactive>
               <Ionicons name="git-branch-outline" size={20} color={t.onAccent} />
