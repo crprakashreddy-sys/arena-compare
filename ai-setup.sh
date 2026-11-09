@@ -13,10 +13,10 @@ printf "Paste your Gemini API key and press Enter: "
 read GEMINI
 [ -n "$GEMINI" ] || { echo "❌ No key entered"; exit 1; }
 SECRET=$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 32)
-npx -y supabase@latest secrets set GEMINI_API_KEY="$GEMINI" RC_WEBHOOK_SECRET="$SECRET"
-npx -y supabase@latest functions deploy cartoon
-npx -y supabase@latest functions deploy rc-webhook --no-verify-jwt
-npx -y supabase@latest functions deploy cleanup-snaps   # keeps Kept zings safe
+npx -y supabase@latest --yes secrets set GEMINI_API_KEY="$GEMINI" RC_WEBHOOK_SECRET="$SECRET"
+npx -y supabase@latest --yes functions deploy cartoon
+npx -y supabase@latest --yes functions deploy rc-webhook --no-verify-jwt
+npx -y supabase@latest --yes functions deploy cleanup-snaps   # keeps Kept zings safe
 echo ""
 echo "✅ AI cartoons are on. Everyone gets 1 free."
 echo "📝 Later, for paid packs, use this in RevenueCat → Integrations → Webhooks:"
